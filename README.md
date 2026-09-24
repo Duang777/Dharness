@@ -4,6 +4,30 @@ Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它�
 `BaseAgent` 控制隔离任务容器，使用单写者执行循环，并把最后一次修改之后产生的
 新鲜验证回执作为内部完成条件。
 
+## 项目特色
+
+Evidence Harness 的重点不是增加 Agent 角色，而是把完成判断从模型的自然语言声明改成
+控制器可执行的协议。
+
+- **完成必须有可执行证据。** `finish` 必须提交一到三条只读检查，以及任务要求与检查
+  ID 的覆盖表。Harness 自己执行检查，模型不能自行宣布检查通过。
+- **证据绑定工作版本。** 每次 `execute` 都推进 `work_epoch` 并清除旧验证。环境发生
+  后续操作后，先前成功的检查不能继续用于完成判定。
+- **验证预算不会被工作命令耗尽。** 控制器为最终检查预留环境调用次数。模型即使在解题
+  阶段耗费过多调用，也不能占用这部分预算。
+- **环境只有一个写者。** executor 通过 `CommandRunner` 串行执行命令。completion
+  reviewer 只检查覆盖关系，没有环境引用，因此不会与 executor 竞争任务状态。
+- **保留通用 Shell，但约束控制协议。** Harness 不依赖某种语言的 AST 或补丁格式，
+  因此能覆盖运维、服务配置、安全、数据处理和代码修改任务。模型仍必须返回严格的
+  `execute`、`finish`、`replan` 或 `stop` 对象。
+- **上下文和日志可以复查。** 每轮提示都从 `RunState` 重建，不累积完整聊天记录。
+  `RunJournal` 保存脱敏后的完整输出，模型只接收有界摘录、哈希和日志引用。
+- **不把未运行写成失败。** 评测汇总明确区分 `not_run`、`error` 和 `failed`。内部
+  `verified` 也不替代 Harbor verifier 的最终 reward。
+
+这些选择来自对终端 Agent、编码 Agent 和 Harness 优化项目的比较。完整来源、采用内容
+和未采用能力见[参考项目对照](docs/reference-projects.md)。
+
 ## 架构总览
 
 模型负责选择动作，Harness 负责执行、记账和终止。模型不能直接访问任务容器。
@@ -21,15 +45,6 @@ flowchart LR
     L --> V[EvidenceGate]
     L --> X[AgentContext 与 RunReport]
 ```
-
-架构有五个关键约束：
-
-- `EvidenceLoop` 是唯一环境写者。reviewer 只读，不能执行命令。
-- 模型只能返回 `execute`、`finish`、`replan` 或 `stop` 四种结构化动作。
-- 每次 `execute` 都推进 `work_epoch`，因此此前的完成证据立即失效。
-- `RunJournal` 保存脱敏后的完整输出。提示只携带有界摘录、哈希和日志引用。
-- `EvidenceGate` 只判断完成声明是否有新鲜证据。Terminal-Bench 的 Harbor verifier
-  仍决定最终分数。
 
 一次运行按以下顺序推进：
 
@@ -146,6 +161,7 @@ OPENAI_API_KEY=test-key uv run harbor run \
 ## 文档
 
 - [架构决策](docs/architecture-rationale.md)
+- [参考项目对照](docs/reference-projects.md)
 - [评测报告](docs/evaluation-report.md)
 - [失败分析](docs/failure-analysis.md)
 - [后续 10 小时优先级](docs/next-10-hours.md)
