@@ -216,6 +216,7 @@ class LoopOptions:
     max_recoveries: int = 2
     max_completion_reviews: int = 4
     max_wall_time_sec: int = 1_800
+    max_model_call_timeout_sec: int = 360
     max_command_timeout_sec: int = 300
     verification_environment_reserve: int = 3
     recent_observation_count: int = 8

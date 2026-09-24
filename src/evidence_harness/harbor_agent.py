@@ -23,6 +23,7 @@ class EvidenceHarnessOptions(AgentOptions):
     max_recoveries: int = Field(default=2, ge=0, le=10)
     max_completion_reviews: int = Field(default=4, ge=0, le=20)
     max_wall_time_sec: int = Field(default=1_800, ge=60, le=14_400)
+    max_model_call_timeout_sec: int = Field(default=360, ge=30, le=1_800)
     max_command_timeout_sec: int = Field(default=300, ge=5, le=3_600)
     verification_environment_reserve: int = Field(default=3, ge=1, le=10)
     recent_observation_count: int = Field(default=8, ge=2, le=30)
@@ -34,16 +35,14 @@ class EvidenceHarnessOptions(AgentOptions):
     api_base: str | None = None
     temperature: float | None = Field(default=None, ge=0, le=2)
     reasoning_effort: (
-        Literal["none", "minimal", "low", "medium", "high", "xhigh", "max", "default"]
-        | None
+        Literal["none", "minimal", "low", "medium", "high", "xhigh", "max", "default"] | None
     ) = None
 
     @model_validator(mode="after")
     def validate_reserve(self) -> EvidenceHarnessOptions:
         if self.verification_environment_reserve >= self.max_environment_calls:
             raise ValueError(
-                "verification_environment_reserve must be smaller than "
-                "max_environment_calls"
+                "verification_environment_reserve must be smaller than max_environment_calls"
             )
         return self
 
@@ -55,6 +54,7 @@ class EvidenceHarnessOptions(AgentOptions):
             max_recoveries=self.max_recoveries,
             max_completion_reviews=self.max_completion_reviews,
             max_wall_time_sec=self.max_wall_time_sec,
+            max_model_call_timeout_sec=self.max_model_call_timeout_sec,
             max_command_timeout_sec=self.max_command_timeout_sec,
             verification_environment_reserve=self.verification_environment_reserve,
             recent_observation_count=self.recent_observation_count,

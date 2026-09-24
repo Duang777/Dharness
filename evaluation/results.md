@@ -2,27 +2,27 @@
 
 - Dataset: `terminal-bench@2.0`
 - Scoring complete: `no`
-- All tasks attempted: `no`
-- Executed: `6/10`
-- Scored: `6/10`
-- Passed / failed / errored: `5 / 1 / 0`
-- Pass rate over attempted tasks: `83.3%`
-- Pass rate over scored tasks: `83.3%`
-- Execution coverage: `60.0%`
-- Scored coverage: `60.0%`
+- All tasks attempted: `yes`
+- Executed: `10/10`
+- Scored: `9/10`
+- Passed / failed / errored: `9 / 0 / 1`
+- Pass rate over attempted tasks: `90.0%`
+- Pass rate over scored tasks: `100.0%`
+- Execution coverage: `100.0%`
+- Scored coverage: `90.0%`
 
 | Task | Difficulty | Category | Mode | Status | Reward | Stop reason |
 |---|---|---|---|---|---:|---|
-| overfull-hbox | easy | debugging | live | failed | 0 | budget_exhausted |
+| overfull-hbox | easy | debugging | live | passed | 1 | budget_exhausted |
 | fix-git | easy | software-engineering | live | passed | 1 | verified |
 | cobol-modernization | easy | software-engineering | live | passed | 1 | budget_exhausted |
 | log-summary-date-ranges | medium | data-processing | live | passed | 1 | verified |
-| openssl-selfsigned-cert | medium | security | not_run | not_run | N/A |  |
+| openssl-selfsigned-cert | medium | security | live | passed | 1 | verified |
 | modernize-scientific-stack | medium | scientific-computing | replay | passed | 1 |  |
-| qemu-startup | medium | system-administration | not_run | not_run | N/A |  |
-| cancel-async-tasks | hard | software-engineering | not_run | not_run | N/A |  |
+| qemu-startup | medium | system-administration | live | error | 0 |  |
+| cancel-async-tasks | hard | software-engineering | live | passed | 1 | verified |
 | configure-git-webserver | hard | system-administration | live | passed | 1 | budget_exhausted |
-| model-extraction-relu-logits | hard | mathematics | not_run | not_run | N/A |  |
+| model-extraction-relu-logits | hard | mathematics | live | passed | 1 | budget_exhausted |
 
 > `error` tasks count in the attempted pass rate but not the scored pass rate. `not_run` tasks are excluded from both.
 

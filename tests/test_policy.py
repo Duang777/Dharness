@@ -91,6 +91,9 @@ def test_verification_rejects_display_only_checks(script: str) -> None:
     [
         "git merge-base --is-ancestor deadbeef master",
         "if grep -nE '^(<<<<<<<|=======|>>>>>>>)' a.txt; then exit 1; fi",
+        "openssl rsa -in server.key -noout 2>/dev/null",
+        "python3 check.py 2>&1 >/dev/null",
+        "python3 - <<'PY'\nif score > 0.5:\n    print('ok')\nPY",
     ],
 )
 def test_verification_allows_read_only_tokens_that_resemble_mutations(
@@ -115,6 +118,7 @@ def test_verification_allows_read_only_tokens_that_resemble_mutations(
         "git merge recovered-change",
         "grep result source.txt | tee output.txt",
         "bash -c -- 'true; rm -f output.txt'",
+        "python3 - <<'PY' > output.txt\nprint('ok')\nPY",
     ],
 )
 def test_verification_rejects_mutating_shell_commands(script: str) -> None:

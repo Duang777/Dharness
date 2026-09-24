@@ -59,9 +59,7 @@ _OPAQUE_SECRET = re.compile(
         |AKIA[A-Z0-9]{16}
     )\b"""
 )
-_JWT = re.compile(
-    r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b"
-)
+_JWT = re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")
 
 
 class PolicyViolation(ValueError):
@@ -119,26 +117,66 @@ def validate_check(check: VerificationCheck, max_timeout_sec: int) -> None:
         max_timeout_sec,
         cwd=check.cwd,
     )
-    if _CHECK_MUTATING_COMMAND.search(check.script) or _has_output_redirection(
-        check.script
-    ):
+    if _CHECK_MUTATING_COMMAND.search(check.script) or _has_output_redirection(check.script):
         raise PolicyViolation(f"verification check '{check.id}' appears to modify task state")
     if _TRIVIAL_CHECK.fullmatch(check.script):
         raise PolicyViolation(f"verification check '{check.id}' is display-only or a no-op")
 
 
 def _has_output_redirection(script: str) -> bool:
-    lexer = shlex.shlex(script, posix=True, punctuation_chars=_SHELL_PUNCTUATION)
+    lexer = shlex.shlex(
+        _without_heredoc_bodies(script),
+        posix=True,
+        punctuation_chars=_SHELL_PUNCTUATION,
+    )
     lexer.commenters = ""
     lexer.whitespace = " \t\r"
     lexer.whitespace_split = True
     try:
-        return any(
-            ">" in token and _is_shell_operator(token)
-            for token in lexer
-        )
+        tokens = list(lexer)
     except ValueError as exc:
         raise PolicyViolation("verification check shell syntax cannot be inspected") from exc
+    for index, token in enumerate(tokens):
+        if ">" not in token or not _is_shell_operator(token):
+            continue
+        target = tokens[index + 1] if index + 1 < len(tokens) else ""
+        if target == "/dev/null":
+            continue
+        if token.endswith(">&") and target.isdigit():
+            continue
+        return True
+    return False
+
+
+def _without_heredoc_bodies(script: str) -> str:
+    shell_lines: list[str] = []
+    pending_delimiters: list[tuple[str, bool]] = []
+    for line in script.splitlines(keepends=True):
+        if pending_delimiters:
+            delimiter, strip_tabs = pending_delimiters[0]
+            candidate = line.rstrip("\r\n")
+            if strip_tabs:
+                candidate = candidate.lstrip("\t")
+            if candidate == delimiter:
+                pending_delimiters.pop(0)
+            continue
+
+        shell_lines.append(line)
+        lexer = shlex.shlex(line, posix=True, punctuation_chars=_SHELL_PUNCTUATION)
+        lexer.commenters = ""
+        lexer.whitespace = " \t\r"
+        lexer.whitespace_split = True
+        try:
+            tokens = list(lexer)
+        except ValueError:
+            continue
+        for index, token in enumerate(tokens[:-1]):
+            if token != "<<":
+                continue
+            delimiter = tokens[index + 1]
+            strip_tabs = delimiter.startswith("-")
+            pending_delimiters.append((delimiter.removeprefix("-"), strip_tabs))
+    return "".join(shell_lines)
 
 
 def _is_shell_operator(token: str) -> bool:
@@ -158,9 +196,7 @@ def _validate_script(
         raise PolicyViolation(
             f"command timeout {timeout_sec}s exceeds policy maximum {max_timeout_sec}s"
         )
-    if _FORBIDDEN_PATH.search(script) or (
-        cwd is not None and _FORBIDDEN_PATH.search(f" {cwd} ")
-    ):
+    if _FORBIDDEN_PATH.search(script) or (cwd is not None and _FORBIDDEN_PATH.search(f" {cwd} ")):
         raise PolicyViolation("command references benchmark, credential, or host-control paths")
     if _BARE_ENV_DUMP.search(script):
         raise PolicyViolation("bulk environment dumps are not allowed")
@@ -192,8 +228,7 @@ def find_repeated_cycle(
     window: int = 20,
 ) -> tuple[str, ...] | None:
     signatures = [
-        f"{item.command_fingerprint}:{item.observation_fingerprint}"
-        for item in receipts[-window:]
+        f"{item.command_fingerprint}:{item.observation_fingerprint}" for item in receipts[-window:]
     ]
     for period in range(1, max_period + 1):
         required = period * repeats

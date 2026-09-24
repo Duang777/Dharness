@@ -156,14 +156,36 @@ execution coverage 和 scored coverage 均为 60%。
 模型请求停滞，因此并发不是唯一原因。中止的 `qemu-startup`、`cancel-async-tasks`
 和没有形成结果的重跑均未计分。剩余四题只在凭证轮换和端点稳定后以并发 1 运行。
 
+## 9. 模型切换与十题收口
+
+**代表性指令**
+
+> 剩余题目按并发 1 实际运行。失败必须区分模型、Harness 和基础设施，不能只复述状态。
+
+**结果**
+
+切换到 `modelhub/gpt-5.6-terra` 后，三个非 benchmark smoke 请求均返回非空正文。
+`cancel-async-tasks`、`model-extraction-relu-logits` 和 `overfull-hbox` 随后获得 reward
+1.0。GLM 5.3 已完成的 `openssl-selfsigned-cert` 也获得 reward 1.0。
+
+`qemu-startup` 在 Apple Silicon 宿主的 Rosetta amd64 容器中启动 QEMU，立即返回
+`Unimplemented syscall number 282`。容器没有 `/dev/kvm`。后续模型请求停滞，Harbor
+最终记录 `AgentTimeoutError`，因此该题记为基础设施 `error`。
+
+运行过程还暴露了三个 Harness 缺口：空正文没有进入 schema repair、模型调用缺少独立
+超时、heredoc 内的 Python `>` 被误判为 Shell 重定向。三项均已增加回归测试。另有一个
+未在本轮放宽的问题：completion reviewer 需要运行会生成文件的检查，但 policy 只允许
+只读 finish 检查。该问题需要隔离验证工作区，不能直接允许写任务目录。
+
 ## 当前质量证据
 
 - `harbor==0.23.0`，Python 3.12，Docker server 29.4.0
-- 真实 GLM、Harbor 与 Docker smoke reward 1.0
-- 固定十题 Harbor dry-run 通过
-- 当前矩阵快照已评分 6/10 题，5 题通过、1 题失败
-- Live 子集 4/5 通过，replay 子集 1/1 通过
+- 真实 GLM、Terra、Harbor 与 Docker 链路均取得 reward 1.0
+- 固定十题 10/10 已运行，9 题通过，1 题基础设施错误
+- Live 子集 8/9 通过，replay 子集 1/1 通过
+- Attempted pass rate 为 90%，scored pass rate 为 100%
+- Execution coverage 为 100%，scored coverage 为 90%
 - HTTPS apt 挂载恢复了受影响任务的 verifier
-- 45 项测试通过，覆盖率 84%
+- QEMU 需要原生 x86_64 或支持嵌套虚拟化的 runner 重跑
+- 52 项测试通过，覆盖率 85%
 - Ruff、mypy、build 和两个 Agent schema 通过
-- 剩余四题等待凭证轮换和模型端点恢复

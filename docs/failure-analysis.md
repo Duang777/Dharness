@@ -1,8 +1,8 @@
 # 失败分析
 
-当前矩阵快照已评分 6/10 题，包含 5 个 live trial 和 1 个 replay trial。以下问题来自
-评测预检、首轮真实运行和扩展批次。每项问题分别归因到模型通道、Harness 或评测
-基础设施。
+固定矩阵 10/10 题均已运行。9 题获得 reward 1.0，`qemu-startup` 因运行环境异常记为
+`error`。以下问题来自评测预检、真实运行和扩展批次，并分别归因到模型通道、Harness
+或评测基础设施。
 
 ## 1. Codex 登录状态与真实可用性不一致
 
@@ -157,23 +157,99 @@ Agent 最终以 `budget_exhausted` 停止，failure category 是 `model_protocol
 
 **现象**
 
-并发 1 的两题校准全部通过。并发 2 的后续批次出现多次空模型响应和长时间请求停滞。
-`overfull-hbox` 连续收到三次空响应，最终以 `budget_exhausted` 停止，Harbor verifier
-返回 reward 0。使用并发 1 重跑同题时，第三次模型请求仍停滞超过五分钟，重跑被中止，
-没有形成可评分结果。
+GLM 5.3 在并发 2 的批次中多次返回空正文或长时间不返回。`overfull-hbox` 首次运行
+因此耗尽预算并获得 reward 0。并发 1 没有消除单请求停滞。`qemu-startup` 在遇到环境
+错误后，下一次模型请求一直等待，最终由 Harbor 的 1800 秒 Agent 超时终止。
 
 **归因**
 
-这是模型服务通道不稳定。并发 2 会放大空响应和停滞，但并发 1 没有消除问题。当前证据
-不足以把根因归为 Harness 并发控制，也不足以断言并发是唯一原因。
+端点不稳定是外部问题，但 Harness 有两个放大因素。`LiteLLMModelGateway._call` 在调用
+`_request` 后才进入 schema 修复的 `try`，所以空正文直接终止当前决策，不能使用已有的
+一次结构修复机会。`EvidenceLoop` 也没有单次模型调用超时，只能等待整个 trial 的墙钟
+预算结束。
 
-**影响**
+**修正**
 
-`overfull-hbox` 的 live reward 0 仍保留在矩阵快照中。由于该 trial 受到三次空响应影响，
-不能仅根据这条轨迹修改解题策略或 Harness 机制。批次中止前没有形成结果的任务保持
-`not_run`。
+模型请求现在位于 schema 修复的异常边界内。空正文会形成明确的
+`ModelProtocolError`，并触发一次带原始错误的结构修复。`EvidenceLoop` 对 executor 和
+reviewer 调用使用独立的 `max_model_call_timeout_sec`，默认 360 秒，并把模型与命令超时
+上限写入 executor 的预算提示。
 
-**后续防护**
+切换到 `modelhub/gpt-5.6-terra` 前，连续三次非 benchmark 请求均返回 HTTP 200 和非空
+正文。随后使用并发 1 重跑 `cancel-async-tasks`、`model-extraction-relu-logits` 和
+`overfull-hbox`，三题均获得 reward 1.0。原始失败 trial 仍保留，聚合结果选择新的
+可评分 trial。
 
-剩余四题固定使用 `--n-concurrent 1`。运行前轮换已经暴露的凭证并完成最小推理探针。
-端点再次出现空响应或长时间停滞时，停止批次并保留原始结果，不把中止任务计为失败。
+## 7. Heredoc 正文被误判为 Shell 重定向
+
+**现象**
+
+完成检查使用 `python3 - <<'PY'` 运行只读 Python 断言。Python 正文中的
+`if score > 0.5` 被 `validate_check` 判为输出重定向，检查在执行前被拒绝。
+
+**根因**
+
+`policy._has_output_redirection` 把完整 Shell 脚本交给 `shlex`。lexer 不理解 heredoc
+边界，因此继续把 heredoc 中的 Python 比较运算符按 Shell 标点切分。
+
+**修正与验证**
+
+`_without_heredoc_bodies` 在重定向分析前移除 heredoc 正文，只保留 Shell 行。起始行上的
+真实 `> output.txt` 仍会被拒绝。只读的 `/dev/null` 重定向和文件描述符重定向也允许
+通过。回归测试在修复前复现失败，修复后 `tests/test_policy.py` 的 21 项测试全部通过。
+
+## 8. 外部通过但 Harness 内部未完成
+
+**现象**
+
+Terra 运行的 `overfull-hbox` 和 `model-extraction-relu-logits` 都获得 reward 1.0，但
+Harness 内部状态是 `budget_exhausted/model_protocol`。前者用了 5 次 repair，后者也
+用了 5 次。
+
+**根因**
+
+completion reviewer 要求在 finish 阶段重新编译 LaTeX，或在隔离黑盒中重新运行并保存
+恢复矩阵。这些检查会生成 PDF、日志或 `.npy` 文件。`validate_check` 又要求 completion
+check 不得修改任务状态。reviewer 的证据要求与 policy 的只读限制无法同时满足。
+
+这不是任务解法失败。Harbor reward 已证明最终任务状态正确，但 Harness 无法为这类
+“验证过程天然产生文件”的任务给出内部 `verified`。
+
+**处理**
+
+本轮只修复了 heredoc 和无害重定向误报，没有放开任意临时写入。直接放开会允许完成检查
+改变待评分状态。后续需要为 completion check 提供隔离的临时工作区或环境快照，使验证
+产生的文件无法回写任务目录。
+
+## 9. QEMU 在 Rosetta 中无法启动
+
+**现象**
+
+`qemu-startup` 的容器可以找到 `qemu-system-x86_64`，但没有 `/dev/kvm`。Agent 提取并
+检查 Alpine 内核和 initramfs 后启动 QEMU，进程立即退出：
+
+```text
+rosetta error: Unimplemented syscall number 282
+```
+
+随后一次模型请求停滞，Harbor 最终记录 `AgentTimeoutError`。verifier 返回 reward 0，
+但汇总器因 trial 同时带异常而将其记为 `error`，不记为普通评分失败。
+
+**根因**
+
+宿主是 Apple Silicon。amd64 任务容器通过 Rosetta 运行，容器内又启动 x86 QEMU，形成
+嵌套模拟。Rosetta 不支持 QEMU 启动所需的 syscall 282，且容器没有 KVM 可回退。模型
+选择或 Harness prompt 无法补齐这个运行时能力。
+
+**处理**
+
+该题需要在原生 x86_64 Linux runner，或支持所需系统调用和嵌套虚拟化的环境中重跑。
+新的单次模型超时能避免环境错误后的模型停滞耗尽整个 trial，但不能修复 QEMU 启动条件。
+
+## 10. 最终状态
+
+- 10/10 题已尝试，execution coverage 为 100%。
+- 9 题获得 reward 1.0，0 题为普通 verifier 失败。
+- `qemu-startup` 是唯一 `error`，因此 attempted pass rate 为 90%。
+- 9 个可评分 trial 全部通过，scored pass rate 为 100%，scored coverage 为 90%。
+- 9 个通过结果中有 8 个 live trial 和 1 个 replay trial。

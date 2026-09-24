@@ -102,8 +102,10 @@ uv run harbor run \
 [`evaluation/matrix.json`](evaluation/matrix.json) 固定了 3 easy、4 medium、3 hard
 共 10 题。它只依据公开 `task.toml` 元数据分层选样，不读取 verifier 或 solution。
 
-当前快照已评分 6/10 题，5 题通过、1 题失败。5 题使用 live 模型调用，1 题使用
-已记录决策 replay；[`evaluation/results.md`](evaluation/results.md) 明确标注每题模式。
+当前快照 10/10 题均已运行：9 题通过，`qemu-startup` 因运行环境异常记为 `error`。
+9 个通过结果中有 8 个 live trial 和 1 个 replay trial；
+[`evaluation/results.md`](evaluation/results.md) 明确标注每题模式。attempted pass
+rate 为 90%，scored pass rate 为 100%。
 
 先验证任务选择和 Harbor 配置，不调用模型：
 
@@ -124,8 +126,9 @@ uv run python scripts/run_evaluation.py \
 ```
 
 GLM 5.3 端点在并发 2 时出现过成批空响应和长时间停滞，并发 1 的重跑也发生过单请求
-停滞。当前评测固定使用 `--n-concurrent 1`，在模型服务稳定后再提高并发。单题校准可以
-重复传入 `--include-task-name`：
+停滞。Harness 现在为每次模型调用设置独立超时，并把空正文送入一次 schema repair。
+评测仍固定使用 `--n-concurrent 1`。单题校准可以重复传入
+`--include-task-name`：
 
 ```bash
 uv run python scripts/run_evaluation.py \

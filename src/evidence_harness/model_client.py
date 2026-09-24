@@ -64,10 +64,11 @@ class LiteLLMModelGateway:
     ) -> ResponseT:
         repair_prompt: str | None = None
         for schema_attempt in range(2):
-            raw = await self._request(repair_prompt or prompt)
+            raw = ""
             try:
+                raw = await self._request(repair_prompt or prompt)
                 parsed = response_type.model_validate_json(_strict_json(raw))
-            except (ValueError, ValidationError) as exc:
+            except (ModelProtocolError, ValueError, ValidationError) as exc:
                 if schema_attempt:
                     raise ModelProtocolError(
                         f"{role} returned invalid structured output after repair: {exc}"
@@ -77,7 +78,7 @@ class LiteLLMModelGateway:
                     "Your previous response did not validate. Return only one corrected JSON "
                     "object. Do not add Markdown or explanation outside the object.\n"
                     f"VALIDATION ERROR\n{str(exc)[:2_000]}\n"
-                    f"INVALID RESPONSE\n{raw[:6_000]}"
+                    f"INVALID RESPONSE\n{raw[:6_000] or '<empty>'}"
                 )
                 continue
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+
 from conftest import FakeEnvironment, FakeExecResult, ScriptedModel
 
 from evidence_harness.journal import RunJournal
@@ -9,10 +11,12 @@ from evidence_harness.protocol import (
     CheckKind,
     CommandMode,
     LoopOptions,
+    ModelGateway,
     RequirementCoverage,
     ReviewDecision,
     ShellCommand,
     StopReason,
+    UsageTotals,
     VerificationCheck,
 )
 from evidence_harness.run_loop import EvidenceLoop
@@ -58,7 +62,7 @@ def _finish(script: str = "test -s answer.txt") -> AgentDecision:
     )
 
 
-def _loop(tmp_path, model: ScriptedModel, **option_overrides) -> EvidenceLoop:
+def _loop(tmp_path, model: ModelGateway, **option_overrides) -> EvidenceLoop:
     options = LoopOptions(
         max_turns=option_overrides.pop("max_turns", 12),
         max_environment_calls=option_overrides.pop("max_environment_calls", 20),
@@ -72,6 +76,59 @@ def _loop(tmp_path, model: ScriptedModel, **option_overrides) -> EvidenceLoop:
         journal=RunJournal(tmp_path, inline_bytes=512),
         options=options,
     )
+
+
+class BlockingModel:
+    @property
+    def usage(self) -> UsageTotals:
+        return UsageTotals()
+
+    async def decide(self, prompt: str) -> AgentDecision:
+        del prompt
+        await asyncio.Event().wait()
+        raise AssertionError("unreachable")
+
+    async def review(self, prompt: str) -> ReviewDecision:
+        del prompt
+        raise AssertionError("unreachable")
+
+
+class BlockingReviewModel:
+    @property
+    def usage(self) -> UsageTotals:
+        return UsageTotals()
+
+    async def decide(self, prompt: str) -> AgentDecision:
+        del prompt
+        return _finish()
+
+    async def review(self, prompt: str) -> ReviewDecision:
+        del prompt
+        await asyncio.Event().wait()
+        raise AssertionError("unreachable")
+
+
+async def test_model_call_cannot_exceed_its_timeout(tmp_path) -> None:
+    report = await _loop(
+        tmp_path,
+        BlockingModel(),
+        max_model_call_timeout_sec=0.01,
+    ).run("Create answer.txt", FakeEnvironment())
+
+    assert report.stop_reason is StopReason.MODEL_FAILURE
+    assert report.failure_category == "model_service"
+    assert report.environment_calls_used == 1
+
+
+async def test_reviewer_timeout_falls_back_to_verification_checks(tmp_path) -> None:
+    report = await _loop(
+        tmp_path,
+        BlockingReviewModel(),
+        max_model_call_timeout_sec=0.01,
+    ).run("Create answer.txt", FakeEnvironment())
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert report.environment_calls_used == 2
 
 
 async def test_success_requires_fresh_check_after_change(tmp_path) -> None:

@@ -2,48 +2,38 @@
 
 ## 当前起点
 
-固定矩阵已评分 6/10 题。当前快照为 5 题通过、1 题失败，execution coverage 和
-scored coverage 均为 60%。5 个结果来自 live 模型调用，1 个结果来自 replay。剩余任务
-是 `openssl-selfsigned-cert`、`qemu-startup`、`cancel-async-tasks` 和
-`model-extraction-relu-logits`。
+固定矩阵 10/10 题均已运行。9 题获得 reward 1.0，`qemu-startup` 因 Rosetta 不支持
+syscall 282 且 trial 最终触发 `AgentTimeoutError`，记为 `error`。execution coverage
+为 100%，scored coverage 为 90%。9 个通过结果中有 8 个 live trial 和 1 个 replay。
 
-## 0 至 1 小时：恢复模型通道
+## 0 至 2 小时：在 x86_64 runner 重跑 QEMU
 
-轮换此前暴露的模型凭证。运行一个不接触 benchmark 的最小结构化推理探针，确认端点能
-连续返回三次非空响应。任何一次请求停滞或返回空内容时，停止评测并保留诊断记录。
+使用原生 x86_64 Linux runner，先确认容器内 QEMU 能启动，且不经过 Rosetta。保持任务、
+Agent、预算和 `--n-concurrent 1` 不变。若仍失败，记录 QEMU stderr、`/dev/kvm` 状态和
+Harbor exception，不将基础设施异常改写为 verifier 失败。
 
-## 1 至 5 小时：补齐四题
+## 2 至 5 小时：设计隔离 completion check
 
-使用 `scripts/run_evaluation.py` 逐题运行剩余四题。每题使用独立 job name，并固定
-`--debian-https-sources --n-concurrent 1`。模型、prompt 和预算保持不变。每题结束后
-检查 Harbor reward、Harness stop reason、模型协议错误和日志脱敏，再开始下一题。
+`overfull-hbox` 和 `model-extraction-relu-logits` 的 Harbor reward 为 1.0，但 Harness
+内部因 completion check 需要生成 PDF、日志或矩阵文件而耗尽 repair。设计一个隔离
+工作区接口，要求验证写入不能回流任务目录，并保留命令、退出码和输出哈希。
 
-中止或没有 reward 的 trial 记为 `error`。没有形成 trial 的任务保持 `not_run`，不能
-记为 verifier 失败。
+先写威胁模型和失败用例，再改 policy。不要直接允许任意重定向、`cp`、`mkdir` 或工具
+输出，因为这会让 finish 检查改变待评分状态。
 
-## 5 至 6 小时：更新矩阵快照
+## 5 至 7 小时：实现与回归
 
-把新增 trial 与当前六题结果放入一个无重复任务的聚合目录。运行
-`summarize_results.py` 重写 `evaluation/results.json` 和 `evaluation/results.md`。
-逐题核对模式、reward、状态和原始 Harbor 结果。
+实现隔离检查后，先运行 policy、evidence gate 和 run loop 的单元测试。再用本地 fixture
+证明验证产生的文件不会改变任务目录。检查 read-only 默认路径不增加额外容器复制成本。
 
-## 6 至 8 小时：分析失败
+## 7 至 9 小时：复测两类任务
 
-先分析 `overfull-hbox`。该 trial 同时存在三次空模型响应和 reward 0，不能直接归因于
-模型解题能力。按模型输出、环境回执、evidence gate 和 verifier 顺序还原因果链。只有
-稳定端点上的同配置证据支持某个 Harness 根因时，才修改代码。
+在稳定模型端点上，以并发 1 重跑一个编译型任务和一个会保存产物的黑盒任务。目标是
+Harbor reward 保持 1.0，Harness stop reason 从 `budget_exhausted/model_protocol`
+变为 `verified`，且 repair 次数下降。
 
-若新增任务失败，分别归类为模型能力、Harness 设计或评测基础设施。每次只验证一个假设，
-并至少重跑一题已通过任务作为回归。
-
-## 8 至 9.5 小时：回归与质量门禁
+## 9 至 10 小时：质量门禁与发布
 
 运行 Ruff、全量 pytest、覆盖率、类型检查、build、Agent schema 和本地 Docker smoke。
-审查 journal 是否含凭证，确认评测汇总与 Harbor 原始 reward 一致，检查 README 命令
-可以从干净环境复现。
-
-## 9.5 至 10 小时：发布
-
-冻结结果和失败分析，提交并推送。最终报告分别给出 live、replay 和组合快照。仍有缺失
-trial 时继续报告 execution coverage 和 scored coverage，不把 `error` 或 `not_run`
-算作 verifier 失败。
+审查 journal 是否含凭证，确认聚合结果与原始 Harbor reward 一致。若 QEMU 尚未在合适
+runner 重跑，继续保留 `error` 和 90% scored coverage，不将其改写为模型失败。

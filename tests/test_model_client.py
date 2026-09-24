@@ -74,3 +74,35 @@ async def test_gateway_uses_one_schema_repair_call(tmp_path, monkeypatch) -> Non
     assert decision.action == "stop"
     assert completion.await_count == 2
     assert "VALIDATION ERROR" in completion.await_args_list[1].kwargs["messages"][0]["content"]
+
+
+async def test_gateway_repairs_empty_content_once(tmp_path, monkeypatch) -> None:
+    completion = AsyncMock(
+        side_effect=[
+            _response(""),
+            _response(
+                """
+                {
+                  "action": "stop",
+                  "rationale": "required input is unavailable",
+                  "summary": "blocked",
+                  "stop_category": "blocked"
+                }
+                """
+            ),
+        ]
+    )
+    monkeypatch.setattr("litellm.acompletion", completion)
+    monkeypatch.setattr("litellm.get_supported_openai_params", lambda **_: [])
+    monkeypatch.setattr("litellm.completion_cost", lambda **_: 0)
+    gateway = LiteLLMModelGateway(
+        model_name="test/model",
+        journal=RunJournal(tmp_path, inline_bytes=256),
+    )
+
+    decision = await gateway.decide("prompt")
+
+    assert decision.action == "stop"
+    assert completion.await_count == 2
+    repair_prompt = completion.await_args_list[1].kwargs["messages"][0]["content"]
+    assert "model returned empty content" in repair_prompt

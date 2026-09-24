@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import time
 from collections.abc import Callable
 from dataclasses import asdict
@@ -117,8 +118,10 @@ class EvidenceLoop:
             state.phase = RunPhase.THINKING
             self._notify(state)
             prompt = build_executor_prompt(state, self._options, self._clock())
+            model_timeout_sec = self._model_call_timeout_sec(state)
             try:
-                decision = await self._model.decide(prompt)
+                async with asyncio.timeout(model_timeout_sec):
+                    decision = await self._model.decide(prompt)
             except ModelProtocolError as exc:
                 state.turn_count += 1
                 state.unresolved_errors.append(str(exc))
@@ -133,6 +136,15 @@ class EvidenceLoop:
             except ModelServiceError as exc:
                 state.unresolved_errors.append(str(exc))
                 self._journal.append("model_service_error", {"error": str(exc)})
+                return self._finish(
+                    state,
+                    StopReason.MODEL_FAILURE,
+                    failure_category="model_service",
+                )
+            except TimeoutError:
+                error = f"model decision exceeded {model_timeout_sec:g}s timeout"
+                state.unresolved_errors.append(error)
+                self._journal.append("model_service_error", {"error": error})
                 return self._finish(
                     state,
                     StopReason.MODEL_FAILURE,
@@ -204,9 +216,7 @@ class EvidenceLoop:
         state.current_goal = decision.commands[0].purpose
         state.work_epoch += 1
         state.latest_evidence = None
-        receipts_before = {
-            item.observation_fingerprint for item in state.observations
-        }
+        receipts_before = {item.observation_fingerprint for item in state.observations}
         batch_progressed = False
 
         for command in decision.commands:
@@ -270,15 +280,17 @@ class EvidenceLoop:
                 observations=state.observations,
             )
             state.completion_review_count += 1
+            model_timeout_sec = self._model_call_timeout_sec(state)
             try:
-                review = await self._model.review(review_prompt)
+                async with asyncio.timeout(model_timeout_sec):
+                    review = await self._model.review(review_prompt)
                 self._journal.append("completion_review", review)
                 if review.verdict == "repair":
                     reasons = [review.rationale, *review.missing_requirements]
                     reasons.extend(review.suggested_checks)
                     self._reject_completion(state, tuple(reasons))
                     return
-            except (ModelProtocolError, ModelServiceError) as exc:
+            except (ModelProtocolError, ModelServiceError, TimeoutError) as exc:
                 self._journal.append(
                     "completion_review_error",
                     {"error_type": type(exc).__name__, "error": str(exc)},
@@ -376,6 +388,13 @@ class EvidenceLoop:
                 "cycle": repeated_cycle,
                 "stagnant_batches": state.stagnant_batches,
             },
+        )
+
+    def _model_call_timeout_sec(self, state: RunState) -> float:
+        remaining = state.deadline_monotonic - self._clock()
+        return max(
+            0.001,
+            min(float(self._options.max_model_call_timeout_sec), remaining - 5),
         )
 
     def _reject_completion(self, state: RunState, reasons: tuple[str, ...]) -> None:
@@ -477,10 +496,7 @@ class EvidenceLoop:
 
 def _failure_summary(receipt: CommandReceipt) -> str:
     detail = (
-        receipt.stderr.tail
-        or receipt.stderr.head
-        or receipt.stdout.tail
-        or receipt.stdout.head
+        receipt.stderr.tail or receipt.stderr.head or receipt.stdout.tail or receipt.stdout.head
     )
     return (
         f"command '{receipt.command_id}' failed with {receipt.failure or receipt.return_code}: "

@@ -109,6 +109,8 @@ def _executor_payload(
             "repairs_remaining": max(0, options.max_repairs - state.repair_count),
             "recoveries_remaining": max(0, options.max_recoveries - state.recovery_count),
             "wall_time_remaining_sec": max(0, int(state.deadline_monotonic - now)),
+            "max_model_call_timeout_sec": options.max_model_call_timeout_sec,
+            "max_command_timeout_sec": options.max_command_timeout_sec,
             "verification_environment_reserve": options.verification_environment_reserve,
         },
         "work_epoch": state.work_epoch,
@@ -125,9 +127,7 @@ def _executor_payload(
             if item.mode.value == "change"
         ][-20:],
         "compacted_history": [_receipt_summary(item) for item in old_receipts[-30:]],
-        "recent_observations": [
-            _receipt_view(item, detail_chars) for item in recent_receipts
-        ],
+        "recent_observations": [_receipt_view(item, detail_chars) for item in recent_receipts],
         "latest_verification": (
             state.latest_evidence.model_dump(mode="json") if state.latest_evidence else None
         ),
