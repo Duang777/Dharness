@@ -1,0 +1,56 @@
+[project]
+name = "evidence-harness"
+version = "0.1.0"
+description = "An evidence-gated Harbor agent for Terminal-Bench 2.0"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "harbor==0.23.0",
+    "litellm>=1.92.0,<2",
+    "pydantic>=2.12.0,<3",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.4,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3.1",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.15.17",
+]
+
+[tool.uv.build-backend]
+module-name = "evidence_harness"
+module-root = "src"
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers --strict-config"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["evidence_harness"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["harbor.*"]
+ignore_missing_imports = true
