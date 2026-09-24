@@ -1,7 +1,7 @@
 # 失败分析
 
-当前已经运行一个真实 Terminal-Bench trial，但该 trial 没有获得 verifier reward。
-以下问题来自评测预检和首轮真实运行。每项问题分别归因到模型通道、Harness 或评测
+当前矩阵快照已评分 6/10 题，包含 5 个 live trial 和 1 个 replay trial。以下问题来自
+评测预检、首轮真实运行和扩展批次。每项问题分别归因到模型通道、Harness 或评测
 基础设施。
 
 ## 1. Codex 登录状态与真实可用性不一致
@@ -146,9 +146,34 @@ Agent 最终以 `budget_exhausted` 停止，failure category 是 `model_protocol
 **后续防护**
 
 评测报告分别显示 `passed`、`failed`、`error` 和 `not_run`。只有 verifier 返回 reward
-的 trial 才能证明任务是否通过。原始超时 trial 保持不变；下一步使用轮换后的模型凭证
-重跑 `fix-git`，不能把 `nop` 诊断结果计为模型成绩。
+的 trial 才能证明任务是否通过。原始超时 trial 保持不变，`nop` 诊断结果不计入模型
+成绩。启用 HTTPS 挂载后的 live `fix-git` 已获得 reward 1.0。
 
 恢复 verifier 后，`JournalReplayAgent` 将策略修复后的原始模型命令重放到全新容器。
 源 journal SHA-256 与记录值一致，官方 verifier 返回 reward 1.0。该结果确认原始解法
 正确，但报告仍将 replay 与新的模型运行分开。
+
+## 6. 模型端点空响应和停滞
+
+**现象**
+
+并发 1 的两题校准全部通过。并发 2 的后续批次出现多次空模型响应和长时间请求停滞。
+`overfull-hbox` 连续收到三次空响应，最终以 `budget_exhausted` 停止，Harbor verifier
+返回 reward 0。使用并发 1 重跑同题时，第三次模型请求仍停滞超过五分钟，重跑被中止，
+没有形成可评分结果。
+
+**归因**
+
+这是模型服务通道不稳定。并发 2 会放大空响应和停滞，但并发 1 没有消除问题。当前证据
+不足以把根因归为 Harness 并发控制，也不足以断言并发是唯一原因。
+
+**影响**
+
+`overfull-hbox` 的 live reward 0 仍保留在矩阵快照中。由于该 trial 受到三次空响应影响，
+不能仅根据这条轨迹修改解题策略或 Harness 机制。批次中止前没有形成结果的任务保持
+`not_run`。
+
+**后续防护**
+
+剩余四题固定使用 `--n-concurrent 1`。运行前轮换已经暴露的凭证并完成最小推理探针。
+端点再次出现空响应或长时间停滞时，停止批次并保留原始结果，不把中止任务计为失败。

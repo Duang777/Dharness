@@ -72,7 +72,7 @@ adapter。单元测试使用 scripted model 与 fake environment 覆盖完成、
 
 第一次把本地路径传给 `--task`，Harbor 按 registry task 解析并失败。根据当前
 `harbor run --help` 改为 `--path` 后通过：reward 1.0、2 个 executor turns、1 次
-reviewer、3 次环境调用，验证证据位于最后一次修改之后。
+reviewer、5 次环境调用，验证证据位于最后一次修改之后。
 
 **工具表现**
 
@@ -132,13 +132,38 @@ Harbor registry 与 dataset download 可稳定提供公开元数据。用 TOML p
 官方 verifier 在 `apt-get update` 中停留，并在 900 秒后超时。该结果记为 `error`，
 不记为任务失败。复测关闭 verifier，只用于比较 Agent 内部状态。
 
+## 8. Verifier 恢复与矩阵扩展
+
+**代表性指令**
+
+> 先恢复官方 verifier，再扩大固定矩阵。每个结果必须保留 live 或 replay 来源，批次
+> 中止时不得把未完成任务计分。
+
+**结果**
+
+将 Debian apt 源从 HTTP 改为 HTTPS 后，`fix-git` 的 `nop` verifier 诊断在 51 秒内
+结束。新的 live `fix-git` 和 `log-summary-date-ranges` 均获得 reward 1.0。后续批次
+又得到 `cobol-modernization` 和 `configure-git-webserver` 两个 live 通过结果，以及
+`overfull-hbox` 的 live reward 0。`modernize-scientific-stack` 的已记录决策在独立
+HTTPS verifier 中 replay 通过。
+
+当前快照评分 6/10 题，5 题通过、1 题失败。live 子集为 4/5，replay 子集为 1/1。
+execution coverage 和 scored coverage 均为 60%。
+
+**人工判断**
+
+并发 2 的批次出现多次空响应和长时间停滞。并发 1 的 `overfull-hbox` 重跑仍在第三次
+模型请求停滞，因此并发不是唯一原因。中止的 `qemu-startup`、`cancel-async-tasks`
+和没有形成结果的重跑均未计分。剩余四题只在凭证轮换和端点稳定后以并发 1 运行。
+
 ## 当前质量证据
 
 - `harbor==0.23.0`，Python 3.12，Docker server 29.4.0
 - 真实 GLM、Harbor 与 Docker smoke reward 1.0
 - 固定十题 Harbor dry-run 通过
+- 当前矩阵快照已评分 6/10 题，5 题通过、1 题失败
+- Live 子集 4/5 通过，replay 子集 1/1 通过
+- HTTPS apt 挂载恢复了受影响任务的 verifier
 - 45 项测试通过，覆盖率 84%
-- Ruff、mypy、build 和 Agent schema 通过
-- `fix-git` Agent 复测为 `verified`
-- `fix-git` 原始模型轨迹 replay 获得官方 reward 1.0
-- Live Terminal-Bench 可评分通过率仍为 N/A，等待使用轮换后的凭证重跑
+- Ruff、mypy、build 和两个 Agent schema 通过
+- 剩余四题等待凭证轮换和模型端点恢复

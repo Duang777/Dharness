@@ -102,6 +102,9 @@ uv run harbor run \
 [`evaluation/matrix.json`](evaluation/matrix.json) 固定了 3 easy、4 medium、3 hard
 共 10 题。它只依据公开 `task.toml` 元数据分层选样，不读取 verifier 或 solution。
 
+当前快照已评分 6/10 题，5 题通过、1 题失败。5 题使用 live 模型调用，1 题使用
+已记录决策 replay；[`evaluation/results.md`](evaluation/results.md) 明确标注每题模式。
+
 先验证任务选择和 Harbor 配置，不调用模型：
 
 ```bash
@@ -115,11 +118,14 @@ uv run python scripts/run_evaluation.py \
 ```bash
 uv run python scripts/run_evaluation.py \
   --model provider/model \
-  --env-file /absolute/path/to/provider.env
+  --env-file /absolute/path/to/provider.env \
+  --debian-https-sources \
+  --n-concurrent 1
 ```
 
-单题校准可以重复传入 `--include-task-name`。如果 OrbStack 中的 Debian HTTP apt 源
-持续降速，使用已验证的 HTTPS 源挂载：
+GLM 5.3 端点在并发 2 时出现过成批空响应和长时间停滞，并发 1 的重跑也发生过单请求
+停滞。当前评测固定使用 `--n-concurrent 1`，在模型服务稳定后再提高并发。单题校准可以
+重复传入 `--include-task-name`：
 
 ```bash
 uv run python scripts/run_evaluation.py \
@@ -140,7 +146,8 @@ uv run python scripts/summarize_results.py runs/terminal-bench-2/<job-name> \
 
 汇总器将未执行任务标为 `not_run`，将缺少 reward 或出现异常的任务标为 `error`。
 报告同时给出 attempted pass rate 和 scored pass rate。`error` 进入前者但不进入后者，
-`not_run` 不进入两者。execution coverage 仍记录已启动的任务。
+`not_run` 不进入两者。execution coverage 仍记录已启动的任务。`execution_mode` 区分
+`live`、`replay` 和 `not_run`，replay 不表示一次新的模型调用。
 
 ## 验证
 
@@ -150,6 +157,7 @@ uv run mypy src scripts tests
 uv run pytest --cov=evidence_harness
 uv build
 uv run harbor agent schema evidence_harness.harbor_agent:EvidenceHarnessAgent
+uv run harbor agent schema evidence_harness.replay_agent:JournalReplayAgent
 ```
 
 本地 smoke test 使用 OpenAI 兼容 mock server 和真实 Docker/Harbor 链路，验证 Agent
@@ -172,8 +180,8 @@ OPENAI_API_KEY=test-key uv run harbor run \
 
 - [架构决策](docs/architecture-rationale.md)
 - [评测报告](docs/evaluation-report.md)
-- [当前 live 评测结果](evaluation/results.md)
-- [当前 replay 验证结果](evaluation/replay-results.md)
+- [当前矩阵快照](evaluation/results.md)
+- [独立 fix-git replay 结果](evaluation/replay-results.md)
 - [失败分析](docs/failure-analysis.md)
 - [后续 10 小时优先级](docs/next-10-hours.md)
 - [Vibe Coding 日志](docs/vibe-coding-log.md)

@@ -2,52 +2,52 @@
 
 ## 结论
 
-截至 2026-09-24，GLM 5.3 已通过结构化推理探针和真实 Harbor smoke。固定矩阵中的
-`fix-git` 已运行一次完整 Agent 阶段。官方 verifier 在 `apt-get update` 中停滞，并在
-900 秒后返回 `VerifierTimeoutError`，因此该 trial 状态是 `error`，没有 reward。
-2026-09-25 的独立诊断已用 HTTPS apt 源恢复 verifier，但尚未用新凭证重跑模型。
+截至 2026-09-25，固定矩阵已有 6/10 题获得 Harbor verifier reward。当前快照包含
+5 个 live trial 和 1 个 replay trial，5 题通过、1 题失败。四题尚未运行，矩阵未完成。
 
 - 数据集：`terminal-bench@2.0`，官方 registry 显示 89 题
 - 固定样本：10 题，3 easy + 4 medium + 3 hard
 - Harbor dry-run：通过，解析为 10 trials
-- 已启动真实 benchmark trials：1/10
-- 获得 verifier reward 的 trials：0/10
-- Attempted pass rate：0%
-- 可评分通过率：N/A
-- Execution coverage：10%
-- Scored coverage：0%
-- 任务失败数：0
-- 基础设施错误数：1
-- 已完成 replay 验证：`fix-git` reward 1.0
-- 当前阻塞：需要轮换已经暴露的模型凭证，再重跑 `fix-git`
+- Live trials：5，4 题通过、1 题失败，通过率 80%
+- Replay trials：1，1 题通过
+- 当前矩阵快照：5/6 通过，attempted pass rate 和 scored pass rate 均为 83.3%
+- Execution coverage：60%
+- Scored coverage：60%
+- 基础设施错误数：0
+- 未运行：`openssl-selfsigned-cert`、`qemu-startup`、`cancel-async-tasks`、
+  `model-extraction-relu-logits`
+- 当前阻塞：模型端点仍有空响应和长时间停滞，且此前暴露的凭证需要轮换
 
-Attempted pass rate 把 `error` 计入分母，所以当前是 0%。Scored pass rate 只统计获得
-reward 的 trial，所以当前是 N/A。两个值必须同时报告。
+当前六题都获得了 reward，因此 attempted pass rate 与 scored pass rate 相同。四个
+`not_run` trial 不进入任一通过率。矩阵快照包含 replay，所以必须同时查看逐题
+`execution_mode` 和 live 子集通过率。
 
 当前汇总文件：
 
-- Live：[results.json](../evaluation/results.json)、
+- 矩阵快照：[results.json](../evaluation/results.json)、
   [results.md](../evaluation/results.md)
-- Replay：[replay-results.json](../evaluation/replay-results.json)、
+- 独立 `fix-git` replay：[replay-results.json](../evaluation/replay-results.json)、
   [replay-results.md](../evaluation/replay-results.md)
 
 ## 逐题状态
 
-| Task | Difficulty | Category | Status | Reward |
-|---|---|---|---|---:|
-| `overfull-hbox` | easy | debugging | not_run | N/A |
-| `fix-git` | easy | software-engineering | error | N/A |
-| `cobol-modernization` | easy | software-engineering | not_run | N/A |
-| `log-summary-date-ranges` | medium | data-processing | not_run | N/A |
-| `openssl-selfsigned-cert` | medium | security | not_run | N/A |
-| `modernize-scientific-stack` | medium | scientific-computing | not_run | N/A |
-| `qemu-startup` | medium | system-administration | not_run | N/A |
-| `cancel-async-tasks` | hard | software-engineering | not_run | N/A |
-| `configure-git-webserver` | hard | system-administration | not_run | N/A |
-| `model-extraction-relu-logits` | hard | mathematics | not_run | N/A |
+| Task | Difficulty | Mode | Status | Reward | Harness stop reason |
+|---|---|---|---|---:|---|
+| `overfull-hbox` | easy | live | failed | 0 | `budget_exhausted` |
+| `fix-git` | easy | live | passed | 1 | `verified` |
+| `cobol-modernization` | easy | live | passed | 1 | `budget_exhausted` |
+| `log-summary-date-ranges` | medium | live | passed | 1 | `verified` |
+| `openssl-selfsigned-cert` | medium | not_run | not_run | N/A | N/A |
+| `modernize-scientific-stack` | medium | replay | passed | 1 | N/A |
+| `qemu-startup` | medium | not_run | not_run | N/A | N/A |
+| `cancel-async-tasks` | hard | not_run | not_run | N/A | N/A |
+| `configure-git-webserver` | hard | live | passed | 1 | `budget_exhausted` |
+| `model-extraction-relu-logits` | hard | not_run | not_run | N/A | N/A |
 
 矩阵位于 [`evaluation/matrix.json`](../evaluation/matrix.json)。选样只使用公开
 `task.toml` 中的难度、类别和标签，没有读取 verifier 或 solution。
+Harbor reward 决定最终状态，因此 `cobol-modernization` 和
+`configure-git-webserver` 在 Harness 内部耗尽预算后仍记为通过。
 
 ## 已完成的真实链路验证
 
@@ -119,7 +119,25 @@ solution 或 verifier。
 `agent_decision/execute` 命令原样重放到全新任务容器。源 journal SHA-256 为
 `feee916c234682d08fad78f909a9865965d742ae1d354d96aa5800436befece7`。Harbor 官方
 verifier 在 52.8 秒内返回 reward 1.0。该结果证明已记录的 GLM 轨迹能够通过任务，
-但不代表一次新的模型调用，也不并入 live 结果。
+但不代表一次新的模型调用，也不并入当前 live 子集。
+
+## 六题快照
+
+HTTPS apt 挂载启用后，`fix-git` 和 `log-summary-date-ranges` 的 live trial 均获得
+reward 1.0。并发 2 的后续批次产生三个可评分结果：
+
+- `cobol-modernization` 和 `configure-git-webserver` 获得 reward 1.0。
+- `overfull-hbox` 在三次空模型响应后耗尽预算，获得 reward 0。
+- 同批次中止前，`qemu-startup` 和 `cancel-async-tasks` 没有形成可评分 trial，因此
+  没有进入汇总。
+
+`modernize-scientific-stack` 的 live Agent journal 已形成完整解法，但原 verifier
+受 HTTP apt 和竞争容器影响。将该 journal 重放到独立 HTTPS verifier 后获得
+reward 1.0。当前快照把它标为 `replay`，没有把它写成新的模型调用。
+
+并发 2 的批次出现多次空响应和长时间停滞。随后使用并发 1 重跑 `overfull-hbox` 时，
+第三次模型请求仍停滞超过五分钟。现有证据说明并发 2 会放大问题，但模型端点本身也不
+稳定。剩余四题只使用并发 1，并在凭证轮换和端点恢复后运行。
 
 ## 可复现命令
 

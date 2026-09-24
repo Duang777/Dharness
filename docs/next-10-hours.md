@@ -1,49 +1,49 @@
 # 后续 10 小时优先级
 
-## 0-1 小时：重跑单题
+## 当前起点
 
-优先级 P0。HTTPS apt 源已经让 `fix-git` 官方 verifier 在 51 秒内完成。轮换此前暴露
-的模型凭证，然后使用 `--include-task-name fix-git --debian-https-sources` 重跑。
-成功标准是 Harbor 返回 reward，而不是 Agent 内部状态为 `verified`。
+固定矩阵已评分 6/10 题。当前快照为 5 题通过、1 题失败，execution coverage 和
+scored coverage 均为 60%。5 个结果来自 live 模型调用，1 个结果来自 replay。剩余任务
+是 `openssl-selfsigned-cert`、`qemu-startup`、`cancel-async-tasks` 和
+`model-extraction-relu-logits`。
 
-## 1-2 小时：两题校准
+## 0 至 1 小时：恢复模型通道
 
-先跑 `fix-git`（easy）和 `log-summary-date-ranges`（medium），并发设为 1。逐条检查
-Harbor reward、Harness stop reason、fresh evidence、模型协议错误和日志脱敏。如果
-任一题出现 infrastructure 或 model-service error，先修运行环境。如果 verifier 为
-0，再分析解题轨迹。
+轮换此前暴露的模型凭证。运行一个不接触 benchmark 的最小结构化推理探针，确认端点能
+连续返回三次非空响应。任何一次请求停滞或返回空内容时，停止评测并保留诊断记录。
 
-## 2-5 小时：执行固定 10 题
+## 1 至 5 小时：补齐四题
 
-通过 `scripts/run_evaluation.py` 跑完整矩阵，并发最多 2，禁止中途更换模型、prompt、
-预算或任务。保存原始 Harbor job 目录，随后用 `summarize_results.py` 生成 JSON 和
-Markdown。这个阶段只收集基线，不边跑边调参。
+使用 `scripts/run_evaluation.py` 逐题运行剩余四题。每题使用独立 job name，并固定
+`--debian-https-sources --n-concurrent 1`。模型、prompt 和预算保持不变。每题结束后
+检查 Harbor reward、Harness stop reason、模型协议错误和日志脱敏，再开始下一题。
 
-## 5-7 小时：任务级失败分析
+中止或没有 reward 的 trial 记为 `error`。没有形成 trial 的任务保持 `not_run`，不能
+记为 verifier 失败。
 
-选择最有代表性的 2-3 个失败，按环境事实、模型计划、命令回执、evidence gate 和
-verifier 还原因果链。每项明确归类：
+## 5 至 6 小时：更新矩阵快照
 
-- 模型能力：知识、推理、命令构造或错误理解不足。
-- Harness 设计：上下文投影、预算、恢复、策略或完成门禁造成。
-- 评测基础设施：认证、镜像、网络、超时或 verifier 异常。
+把新增 trial 与当前六题结果放入一个无重复任务的聚合目录。运行
+`summarize_results.py` 重写 `evaluation/results.json` 和 `evaluation/results.md`。
+逐题核对模式、reward、状态和原始 Harbor 结果。
 
-只修可由证据支持的根因，不根据最终 reward 反推故事。
+## 6 至 8 小时：分析失败
 
-## 7-8.5 小时：单变量改进与消融
+先分析 `overfull-hbox`。该 trial 同时存在三次空模型响应和 reward 0，不能直接归因于
+模型解题能力。按模型输出、环境回执、evidence gate 和 verifier 顺序还原因果链。只有
+稳定端点上的同配置证据支持某个 Harness 根因时，才修改代码。
 
-优先比较 completion reviewer 开/关，其次评估 `recent_observation_count` 或命令批大小。
-保持模型、任务、随机条件和预算一致。每次只改一个变量，至少重跑失败题和一题已通过
-回归，避免把模型方差误认为架构收益。
+若新增任务失败，分别归类为模型能力、Harness 设计或评测基础设施。每次只验证一个假设，
+并至少重跑一题已通过任务作为回归。
 
-## 8.5-9.5 小时：回归与质量门禁
+## 8 至 9.5 小时：回归与质量门禁
 
 运行 Ruff、全量 pytest、覆盖率、类型检查、build、Agent schema 和本地 Docker smoke。
 审查 journal 是否含凭证，确认评测汇总与 Harbor 原始 reward 一致，检查 README 命令
 可以从干净环境复现。
 
-## 9.5-10 小时：发布
+## 9.5 至 10 小时：发布
 
-冻结结果和失败分析，创建本地 commit。确认 GitHub 仓库名称和可见性后再创建远端并
-push。最终报告只引用真实结果。完整运行给出总通过率。仍有缺失 trial 时，报告同时
-给出 execution coverage。报告不把 `error` 或 `not_run` 算作 verifier 失败。
+冻结结果和失败分析，提交并推送。最终报告分别给出 live、replay 和组合快照。仍有缺失
+trial 时继续报告 execution coverage 和 scored coverage，不把 `error` 或 `not_run`
+算作 verifier 失败。
