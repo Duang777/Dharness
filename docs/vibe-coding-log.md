@@ -137,7 +137,8 @@ Harbor registry 与 dataset download 可稳定提供公开元数据。用 TOML p
 - `harbor==0.23.0`，Python 3.12，Docker server 29.4.0
 - 真实 GLM、Harbor 与 Docker smoke reward 1.0
 - 固定十题 Harbor dry-run 通过
-- 38 项测试通过，覆盖率 84%
+- 45 项测试通过，覆盖率 84%
 - Ruff、mypy、build 和 Agent schema 通过
 - `fix-git` Agent 复测为 `verified`
-- 真实 Terminal-Bench 可评分通过率：N/A，原因是 verifier 超时
+- `fix-git` 原始模型轨迹 replay 获得官方 reward 1.0
+- Live Terminal-Bench 可评分通过率仍为 N/A，等待使用轮换后的凭证重跑

@@ -1,10 +1,10 @@
 # 后续 10 小时优先级
 
-## 0-1 小时：恢复 verifier 环境
+## 0-1 小时：重跑单题
 
-优先级 P0。GLM 5.3 模型通道已经通过结构化探针和真实 Harbor smoke。当前需要在
-`alexgshaw/fix-git:20251031` 能完成 `apt-get update` 的 Docker 环境中重跑官方
-verifier。成功标准是 Harbor 返回 reward，而不是 Agent 内部状态为 `verified`。
+优先级 P0。HTTPS apt 源已经让 `fix-git` 官方 verifier 在 51 秒内完成。轮换此前暴露
+的模型凭证，然后使用 `--include-task-name fix-git --debian-https-sources` 重跑。
+成功标准是 Harbor 返回 reward，而不是 Agent 内部状态为 `verified`。
 
 ## 1-2 小时：两题校准
 

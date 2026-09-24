@@ -118,6 +118,18 @@ uv run python scripts/run_evaluation.py \
   --env-file /absolute/path/to/provider.env
 ```
 
+单题校准可以重复传入 `--include-task-name`。如果 OrbStack 中的 Debian HTTP apt 源
+持续降速，使用已验证的 HTTPS 源挂载：
+
+```bash
+uv run python scripts/run_evaluation.py \
+  --model provider/model \
+  --env-file /absolute/path/to/provider.env \
+  --include-task-name fix-git \
+  --debian-https-sources \
+  --n-concurrent 1
+```
+
 汇总结果：
 
 ```bash
@@ -160,7 +172,8 @@ OPENAI_API_KEY=test-key uv run harbor run \
 
 - [架构决策](docs/architecture-rationale.md)
 - [评测报告](docs/evaluation-report.md)
-- [当前评测结果](evaluation/results.md)
+- [当前 live 评测结果](evaluation/results.md)
+- [当前 replay 验证结果](evaluation/replay-results.md)
 - [失败分析](docs/failure-analysis.md)
 - [后续 10 小时优先级](docs/next-10-hours.md)
 - [Vibe Coding 日志](docs/vibe-coding-log.md)

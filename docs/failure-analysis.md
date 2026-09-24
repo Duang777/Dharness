@@ -115,7 +115,7 @@ Agent 最终以 `budget_exhausted` 停止，failure category 是 `model_protocol
 **验证**
 
 同题复测从 11 turns、5 repairs 和 `budget_exhausted` 改善到 4 turns、0 repairs 和
-`verified`。输入 token 从 91,405 降到 33,938。38 项测试和所有项目门禁通过。
+`verified`。输入 token 从 91,405 降到 33,938。45 项测试和所有项目门禁通过。
 
 ## 5. Terminal-Bench verifier 超时
 
@@ -131,21 +131,24 @@ Agent 最终以 `budget_exhausted` 停止，failure category 是 `model_protocol
 
 **根因**
 
-`alexgshaw/fix-git:20251031` 是 amd64 镜像，当前 OrbStack 虚拟机是 arm64。该镜像的
-独立临时容器也能复现 `apt-get update` 停滞。相同主机上的官方
-`debian:bookworm-slim` amd64 镜像能在 51 秒内完成更新，因此问题集中在 `fix-git`
-镜像，而不是 Harbor 调度或全部跨架构容器。
-
-没有修改或读取隐藏 verifier 内容。现有证据还不能区分镜像内的软件状态和模拟层对该
-镜像的特定兼容问题。
+`alexgshaw/fix-git:20251031` 中 apt 使用 HTTP Debian 源。相同镜像和资源限制下，
+一次更新在 12 秒完成，随后三次都在 90 秒超时。下载停在 0.36 到 0.97 MB，容器 CPU
+接近空闲。相同 8.79 MB 文件通过宿主 curl 和镜像内 Python 都在约 9 秒完成，因此
+问题位于 apt 的 HTTP 传输路径，不是 Harbor 调度、容器网络整体故障或索引解压。
 
 **修正**
 
-保留超时 trial 和完整 Harbor 异常。后续需要在 verifier 能正常完成的 Docker 环境中
-重跑同一任务。策略修复的同题对照暂时使用 `--disable-verification`，只比较 Agent 内部
-状态，不把该结果计入通过率。
+将同一 Debian 官方源改为 HTTPS 后，四次 apt 更新均在 7 到 19 秒完成。评测脚本的
+`--debian-https-sources` 参数通过 Harbor 只读挂载替换源配置，不修改 benchmark 任务
+或 verifier。使用该挂载运行 `nop` Agent 时，官方 verifier 在 51 秒内正常结束并返回
+预期的 reward 0。
 
 **后续防护**
 
 评测报告分别显示 `passed`、`failed`、`error` 和 `not_run`。只有 verifier 返回 reward
-的 trial 才能证明任务是否通过。
+的 trial 才能证明任务是否通过。原始超时 trial 保持不变；下一步使用轮换后的模型凭证
+重跑 `fix-git`，不能把 `nop` 诊断结果计为模型成绩。
+
+恢复 verifier 后，`JournalReplayAgent` 将策略修复后的原始模型命令重放到全新容器。
+源 journal SHA-256 与记录值一致，官方 verifier 返回 reward 1.0。该结果确认原始解法
+正确，但报告仍将 replay 与新的模型运行分开。

@@ -22,6 +22,7 @@ def _write_trial(
     reward: float | None,
     exception_type: str | None = None,
     trial_id: str = "trial",
+    replay_source_sha256: str | None = None,
 ) -> None:
     trial_dir = root / f"{task}__{trial_id}"
     trial_dir.mkdir(parents=True)
@@ -39,7 +40,17 @@ def _write_trial(
                     "turns_used": 3,
                     "environment_calls_used": 5,
                     "failure_category": None,
-                }
+                },
+                **(
+                    {
+                        "evidence_harness_replay": {
+                            "source_sha256": replay_source_sha256,
+                            "completed": True,
+                        }
+                    }
+                    if replay_source_sha256 is not None
+                    else {}
+                ),
             },
         },
         "verifier_result": (
@@ -102,7 +113,9 @@ def test_summary_keeps_missing_tasks_out_of_failure_count(tmp_path) -> None:
     assert summary.execution_coverage == pytest.approx(3 / 4)
     assert summary.scored_coverage == pytest.approx(1 / 2)
     assert summary.tasks[0].duration_sec == 90
+    assert summary.tasks[0].execution_mode == "live"
     assert summary.tasks[-1].status == "not_run"
+    assert summary.tasks[-1].execution_mode == "not_run"
 
     markdown = render_markdown(summary)
     assert "Pass rate over attempted tasks: `33.3%`" in markdown
@@ -186,3 +199,34 @@ def test_duplicate_task_results_are_rejected(tmp_path) -> None:
 
     with pytest.raises(ValueError, match="multiple trial results"):
         summarize_results(matrix, tmp_path)
+
+
+def test_replay_result_is_labeled_with_source_hash(tmp_path) -> None:
+    matrix = EvaluationMatrix(
+        schema_version=1,
+        dataset="terminal-bench@2.0",
+        selection_method="test",
+        tasks=(
+            MatrixTask(
+                name="replayed",
+                difficulty="easy",
+                category="debugging",
+            ),
+        ),
+    )
+    source_sha256 = "a" * 64
+    _write_trial(
+        tmp_path,
+        task="replayed",
+        reward=1.0,
+        replay_source_sha256=source_sha256,
+    )
+
+    summary = summarize_results(matrix, tmp_path)
+
+    assert summary.schema_version == 3
+    assert summary.tasks[0].execution_mode == "replay"
+    assert summary.tasks[0].source_journal_sha256 == source_sha256
+    markdown = render_markdown(summary)
+    assert "| replayed | easy | debugging | replay | passed | 1 | verified |" in markdown
+    assert "`replay` runs execute previously recorded agent decisions" in markdown

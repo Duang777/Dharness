@@ -5,6 +5,7 @@
 截至 2026-09-24，GLM 5.3 已通过结构化推理探针和真实 Harbor smoke。固定矩阵中的
 `fix-git` 已运行一次完整 Agent 阶段。官方 verifier 在 `apt-get update` 中停滞，并在
 900 秒后返回 `VerifierTimeoutError`，因此该 trial 状态是 `error`，没有 reward。
+2026-09-25 的独立诊断已用 HTTPS apt 源恢复 verifier，但尚未用新凭证重跑模型。
 
 - 数据集：`terminal-bench@2.0`，官方 registry 显示 89 题
 - 固定样本：10 题，3 easy + 4 medium + 3 hard
@@ -17,15 +18,18 @@
 - Scored coverage：0%
 - 任务失败数：0
 - 基础设施错误数：1
-- 当前阻塞：`fix-git` 官方镜像中的 `apt-get update` 在本机 OrbStack 环境中超时
+- 已完成 replay 验证：`fix-git` reward 1.0
+- 当前阻塞：需要轮换已经暴露的模型凭证，再重跑 `fix-git`
 
 Attempted pass rate 把 `error` 计入分母，所以当前是 0%。Scored pass rate 只统计获得
 reward 的 trial，所以当前是 N/A。两个值必须同时报告。
 
 当前汇总文件：
 
-- [`results.json`](../evaluation/results.json)
-- [`results.md`](../evaluation/results.md)
+- Live：[results.json](../evaluation/results.json)、
+  [results.md](../evaluation/results.md)
+- Replay：[replay-results.json](../evaluation/replay-results.json)、
+  [replay-results.md](../evaluation/replay-results.md)
 
 ## 逐题状态
 
@@ -96,6 +100,27 @@ verifier 会在当前环境中超时。复测只比较 Agent 内部控制结果�
 实验决策和证据路径记录在
 [`benchmark-optimization.tsv`](../.audit/benchmark-optimization.tsv)。
 
+## Verifier 恢复
+
+`fix-git` 镜像使用 HTTP Debian apt 源。在相同的 1 CPU、2 GB 限制下，一次更新在
+12 秒完成，随后三次都在 90 秒超时，未完成的 Packages 索引只有 0.36 到 0.97 MB。
+当时容器 CPU 接近空闲，说明瓶颈不在索引解压。
+
+同一 8.79 MB URL 通过宿主 curl 和镜像内 Python 分别在 8.4 秒和 9.0 秒完成。将 apt
+源从 HTTP 改为 HTTPS 后，四次更新均在 7 到 19 秒完成。随后用 `nop` Agent 运行原始
+任务和官方 verifier，51 秒内得到预期的 reward 0，没有异常。这证明 verifier 链路
+已恢复，reward 0 只因为 `nop` 没有修改任务。
+
+评测脚本提供 `--debian-https-sources`，通过 Harbor 的只读 bind mount 注入
+[`debian-https.sources`](../evaluation/debian-https.sources)。该参数不修改任务、
+solution 或 verifier。
+
+为避免再次调用已经暴露凭证，`JournalReplayAgent` 把策略修复后保存的 8 条
+`agent_decision/execute` 命令原样重放到全新任务容器。源 journal SHA-256 为
+`feee916c234682d08fad78f909a9865965d742ae1d354d96aa5800436befece7`。Harbor 官方
+verifier 在 52.8 秒内返回 reward 1.0。该结果证明已记录的 GLM 轨迹能够通过任务，
+但不代表一次新的模型调用，也不并入 live 结果。
+
 ## 可复现命令
 
 仅预检：
@@ -118,7 +143,10 @@ Dry run OK - 10 trial(s); nothing was run.
 ```bash
 uv run python scripts/run_evaluation.py \
   --model provider/model \
-  --env-file /absolute/path/to/provider.env
+  --env-file /absolute/path/to/provider.env \
+  --include-task-name fix-git \
+  --debian-https-sources \
+  --n-concurrent 1
 ```
 
 生成逐题和总分报告：

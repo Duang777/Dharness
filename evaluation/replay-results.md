@@ -4,17 +4,17 @@
 - Scoring complete: `no`
 - All tasks attempted: `no`
 - Executed: `1/10`
-- Scored: `0/10`
-- Passed / failed / errored: `0 / 0 / 1`
-- Pass rate over attempted tasks: `0.0%`
-- Pass rate over scored tasks: `N/A`
+- Scored: `1/10`
+- Passed / failed / errored: `1 / 0 / 0`
+- Pass rate over attempted tasks: `100.0%`
+- Pass rate over scored tasks: `100.0%`
 - Execution coverage: `10.0%`
-- Scored coverage: `0.0%`
+- Scored coverage: `10.0%`
 
 | Task | Difficulty | Category | Mode | Status | Reward | Stop reason |
 |---|---|---|---|---|---:|---|
 | overfull-hbox | easy | debugging | not_run | not_run | N/A |  |
-| fix-git | easy | software-engineering | live | error | N/A | budget_exhausted |
+| fix-git | easy | software-engineering | replay | passed | 1 |  |
 | cobol-modernization | easy | software-engineering | not_run | not_run | N/A |  |
 | log-summary-date-ranges | medium | data-processing | not_run | not_run | N/A |  |
 | openssl-selfsigned-cert | medium | security | not_run | not_run | N/A |  |
@@ -25,3 +25,5 @@
 | model-extraction-relu-logits | hard | mathematics | not_run | not_run | N/A |  |
 
 > `error` tasks count in the attempted pass rate but not the scored pass rate. `not_run` tasks are excluded from both.
+
+> `replay` runs execute previously recorded agent decisions without a new model call.

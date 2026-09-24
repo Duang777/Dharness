@@ -295,11 +295,11 @@ Planner、Executor 和 Critic 更省模型调用，也避免多个 Agent 同时�
 - 不同模型对结构化响应的遵守程度不同。Gateway 只允许一次格式修复，之后终止该轮并记录协议错误。
 - Shell 策略防止明显误操作和循环，但不是容器安全边界。隔离责任仍属于 Harbor
   environment。
-- 当前 `fix-git` 官方镜像的 verifier 在本机 OrbStack 环境中超时。该错误没有 reward，
-  不能计入 scored pass rate。
+- OrbStack 中 apt 的 HTTP 传输可能持续降速。评测 runner 提供显式的 HTTPS Debian
+  源挂载，且只在调用方要求时启用。
 
 ## 下一步
 
-先在 verifier 能正常运行的 Docker 环境中重跑 `fix-git`，再执行固定 10 题。随后按
-失败分类比较 executor、evidence gate 和预算策略。只有同模型、同任务、同预算的消融
-结果才能用于判断 reviewer 或恢复策略的实际收益。
+使用轮换后的模型凭证重跑 `fix-git`，再执行固定 10 题。随后按失败分类比较 executor、
+evidence gate 和预算策略。只有同模型、同任务、同预算的消融结果才能用于判断
+reviewer 或恢复策略的实际收益。

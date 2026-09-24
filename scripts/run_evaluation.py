@@ -12,6 +12,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix.json"
+DEBIAN_HTTPS_SOURCES = PROJECT_ROOT / "evaluation" / "debian-https.sources"
 AGENT_IMPORT = "evidence_harness.harbor_agent:EvidenceHarnessAgent"
 
 
@@ -36,6 +37,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--n-concurrent", type=int, default=2)
     parser.add_argument("--env-file", type=Path)
+    parser.add_argument(
+        "--include-task-name",
+        action="append",
+        default=[],
+        help="Run only this task from the fixed matrix; repeat as needed.",
+    )
+    parser.add_argument(
+        "--debian-https-sources",
+        action="store_true",
+        help="Mount the repository's HTTPS Debian apt sources into task containers.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument(
         "--agent-kwarg",
@@ -82,7 +94,16 @@ def build_command(args: argparse.Namespace) -> list[str]:
     if args.env_file is not None and not args.env_file.is_file():
         raise ValueError(f"env file does not exist: {args.env_file}")
 
-    dataset, task_names = load_matrix(args.matrix)
+    dataset, matrix_task_names = load_matrix(args.matrix)
+    task_names = args.include_task_name or matrix_task_names
+    unknown_tasks = sorted(set(task_names) - set(matrix_task_names))
+    if unknown_tasks:
+        raise ValueError(
+            "tasks are not in the fixed evaluation matrix: "
+            + ", ".join(unknown_tasks)
+        )
+    if len(task_names) != len(set(task_names)):
+        raise ValueError("--include-task-name values must be unique")
     harbor = shutil.which("harbor")
     if harbor is None:
         raise ValueError(
@@ -122,6 +143,17 @@ def build_command(args: argparse.Namespace) -> list[str]:
 
     if args.env_file is not None:
         command.extend(("--env-file", str(args.env_file)))
+    if args.debian_https_sources:
+        mounts = [
+            {
+                "type": "bind",
+                "source": str(DEBIAN_HTTPS_SOURCES.resolve()),
+                "target": "/etc/apt/sources.list.d/debian.sources",
+                "read_only": True,
+            }
+        ]
+        command.extend(("--mounts", json.dumps(mounts, separators=(",", ":"))))
+        command.append("--yes")
     if args.dry_run:
         command.append("--dry-run")
     return command

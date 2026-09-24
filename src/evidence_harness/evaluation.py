@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -31,6 +31,7 @@ class TaskResult(BaseModel):
     difficulty: str
     category: str
     status: str
+    execution_mode: Literal["live", "replay", "not_run"]
     reward: float | None = None
     stop_reason: str | None = None
     failure_category: str | None = None
@@ -42,10 +43,11 @@ class TaskResult(BaseModel):
     duration_sec: float | None = None
     trial_path: str | None = None
     exception_type: str | None = None
+    source_journal_sha256: str | None = None
 
 
 class EvaluationSummary(BaseModel):
-    schema_version: int = 2
+    schema_version: int = 3
     dataset: str
     source_dir: str
     complete: bool
@@ -130,8 +132,8 @@ def render_markdown(summary: EvaluationSummary) -> str:
         f"- Execution coverage: `{summary.execution_coverage:.1%}`",
         f"- Scored coverage: `{summary.scored_coverage:.1%}`",
         "",
-        "| Task | Difficulty | Category | Status | Reward | Stop reason |",
-        "|---|---|---|---|---:|---|",
+        "| Task | Difficulty | Category | Mode | Status | Reward | Stop reason |",
+        "|---|---|---|---|---|---:|---|",
     ]
     for task in summary.tasks:
         reward = "N/A" if task.reward is None else f"{task.reward:g}"
@@ -142,6 +144,7 @@ def render_markdown(summary: EvaluationSummary) -> str:
                     _escape_cell(task.name),
                     _escape_cell(task.difficulty),
                     _escape_cell(task.category),
+                    _escape_cell(task.execution_mode),
                     _escape_cell(task.status),
                     reward,
                     _escape_cell(task.stop_reason or ""),
@@ -156,6 +159,14 @@ def render_markdown(summary: EvaluationSummary) -> str:
                 "",
                 "> `error` tasks count in the attempted pass rate but not the scored pass "
                 "rate. `not_run` tasks are excluded from both.",
+            )
+        )
+    if any(task.execution_mode == "replay" for task in summary.tasks):
+        lines.extend(
+            (
+                "",
+                "> `replay` runs execute previously recorded agent decisions without a new "
+                "model call.",
             )
         )
     return "\n".join(lines) + "\n"
@@ -214,6 +225,7 @@ def _summarize_task(
             difficulty=task.difficulty,
             category=task.category,
             status="not_run",
+            execution_mode="not_run",
         )
 
     data, result_path = trial
@@ -223,6 +235,7 @@ def _summarize_task(
     exception = _mapping(data.get("exception_info"))
     metadata = _mapping(_mapping(data.get("agent_result")).get("metadata"))
     harness = _mapping(metadata.get("evidence_harness"))
+    replay = _mapping(metadata.get("evidence_harness_replay"))
 
     if exception or reward is None:
         status = "error"
@@ -236,6 +249,7 @@ def _summarize_task(
         difficulty=task.difficulty,
         category=task.category,
         status=status,
+        execution_mode="replay" if replay else "live",
         reward=reward,
         stop_reason=_string_or_none(harness.get("stop_reason")),
         failure_category=_string_or_none(harness.get("failure_category")),
@@ -247,6 +261,7 @@ def _summarize_task(
         duration_sec=_duration_sec(data),
         trial_path=str(result_path.relative_to(results_dir)),
         exception_type=_string_or_none(exception.get("exception_type") or exception.get("type")),
+        source_journal_sha256=_string_or_none(replay.get("source_sha256")),
     )
 
 
