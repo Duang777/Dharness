@@ -242,10 +242,10 @@ epoch 和停止原因。评测矩阵单独固定在 `evaluation/matrix.json`，r
 的任务状态是 `not_run`，认证或基础设施错误是 `error`，只有 verifier 给出非满分结果
 才是 `failed`。这条区分保证报告不会把未执行写成模型解题失败。
 
-## 项目特色与参考取舍
+## 设计特色
 
-单个机制都能在相关 Agent 项目中找到先例。本项目的差异在于把这些机制组合成一个
-Terminal-Bench 专用控制器，并让关键约束由代码执行，而不是只写在 prompt 中。
+Evidence Harness 把完成条件、证据时效、执行权限和评测状态编码在控制器中。模型负责
+选择动作，但不能跳过这些约束。
 
 第一，完成证据有完整的生命周期。模型提交检查计划，reviewer 判断需求覆盖，
 `CommandRunner` 重新执行检查，`EvidenceGate` 再核对退出码和 `work_epoch`。任何新的
@@ -263,28 +263,6 @@ Planner、Executor 和 Critic 更省模型调用，也避免多个 Agent 同时�
 第四，内部完成与 benchmark 评分分离。Harness 不读取隐藏 verifier，不把 mock smoke
 当成 benchmark 成绩，也不把没有运行的任务计为失败。这个边界既减少评测泄漏，也让
 失败分析能区分模型、控制器和基础设施问题。
-
-参考项目对本设计的影响如下。项目身份、原始资料和完整比较见
-[参考项目对照](reference-projects.md)。
-
-| 参考项目 | 借鉴的机制 | 本项目的取舍 |
-| --- | --- | --- |
-| 用户摘要：Terminal Agent | Verify-First 和完成前验证 | 增加 requirement coverage、`work_epoch` 和控制器重跑检查 |
-| 用户摘要：OpenLoop | 长循环预算、停滞检测和有界停止 | 使用命令与观察指纹识别重复，并单独预留验证调用 |
-| AutoCodeRover | 结构化定位优于无目的遍历 | 首版不绑定 AST，因为评测还包含运维、安全和数据任务 |
-| Agentless | 受限流程更容易复现 | 固定动作协议和完成流程，但保留动态 `execute` 处理未知任务 |
-| Goose | 薄 Agent 核心和明确的工具边界 | 直接使用 Harbor 环境接口，首版不增加 MCP 生命周期 |
-| Crush | 前端、会话与执行进程分离 | 评测按 trial 无头运行，因此不引入 TUI 或常驻 daemon |
-| Plandex | 先审查变更，再应用或回滚 | Git diff 无法表示服务和系统状态，首版改用命令 journal |
-| OpenDev | 分阶段思考、压缩和审查 | 只保留 executor 与完成时 reviewer，不使用持续多模型流水线 |
-| ForgeCode | 会话导出、压缩、恢复和分支 | 保留可审计日志和确定性压缩，不支持跨 trial 恢复或克隆 |
-| Meta-Harness | 环境 bootstrap 和基于运行记录改进 Harness | 已实现固定 bootstrap 与评测记录，尚未实现自动 Harness 搜索 |
-| 用户摘要：WolfBench | 从多个维度评估运行结果 | 已记录通过率、执行覆盖率、token、成本、turn 和停止原因 |
-| Anthropic Agent 指南 | 先组合简单 workflow，再按证据增加复杂度 | 首版不引入持续 Critic 或多 Agent 写环境 |
-
-这张表不是功能优劣排名。AutoCodeRover 的 AST 检索、Plandex 的 diff sandbox、Goose 的
-MCP 扩展和 ForgeCode 的会话管理都比本项目更适合各自目标。Evidence Harness 只选择
-当前评测能直接验证收益、且不会扩大运行变量的部分。
 
 ## 综合选择
 

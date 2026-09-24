@@ -25,9 +25,6 @@ Evidence Harness 的重点不是增加 Agent 角色，而是把完成判断从�
 - **不把未运行写成失败。** 评测汇总明确区分 `not_run`、`error` 和 `failed`。内部
   `verified` 也不替代 Harbor verifier 的最终 reward。
 
-这些选择来自对终端 Agent、编码 Agent 和 Harness 优化项目的比较。完整来源、采用内容
-和未采用能力见[参考项目对照](docs/reference-projects.md)。
-
 ## 架构总览
 
 模型负责选择动作，Harness 负责执行、记账和终止。模型不能直接访问任务容器。
@@ -161,7 +158,6 @@ OPENAI_API_KEY=test-key uv run harbor run \
 ## 文档
 
 - [架构决策](docs/architecture-rationale.md)
-- [参考项目对照](docs/reference-projects.md)
 - [评测报告](docs/evaluation-report.md)
 - [失败分析](docs/failure-analysis.md)
 - [后续 10 小时优先级](docs/next-10-hours.md)
