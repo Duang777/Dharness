@@ -4,6 +4,46 @@ Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它�
 `BaseAgent` 控制隔离任务容器，使用单写者执行循环，并把最后一次修改之后产生的
 新鲜验证回执作为内部完成条件。
 
+## 架构总览
+
+模型负责选择动作，Harness 负责执行、记账和终止。模型不能直接访问任务容器。
+
+```mermaid
+flowchart LR
+    H[Harbor runner] --> A[EvidenceHarnessAgent]
+    A --> L[EvidenceLoop]
+    L <-->|结构化决策与完成审查| G[LiteLLMModelGateway]
+    G <--> M[provider/model]
+    L --> P[Policy]
+    P --> C[CommandRunner]
+    C --> E[Harbor BaseEnvironment]
+    C --> J[RunJournal]
+    L --> V[EvidenceGate]
+    L --> X[AgentContext 与 RunReport]
+```
+
+架构有五个关键约束：
+
+- `EvidenceLoop` 是唯一环境写者。reviewer 只读，不能执行命令。
+- 模型只能返回 `execute`、`finish`、`replan` 或 `stop` 四种结构化动作。
+- 每次 `execute` 都推进 `work_epoch`，因此此前的完成证据立即失效。
+- `RunJournal` 保存脱敏后的完整输出。提示只携带有界摘录、哈希和日志引用。
+- `EvidenceGate` 只判断完成声明是否有新鲜证据。Terminal-Bench 的 Harbor verifier
+  仍决定最终分数。
+
+一次运行按以下顺序推进：
+
+1. Harness 执行固定的只读 bootstrap，收集目录、平台、Git 状态和工具信息。
+2. 模型根据原始任务、预算、当前计划和最近观察选择一个结构化动作。
+3. 对于 `execute`，Policy 先检查命令，`CommandRunner` 再串行操作任务容器。
+4. 对于 `finish`，启用 completion review 时，只读 reviewer 检查任务要求与检查命令的
+   覆盖关系。
+5. Harness 重新执行一到三条只读检查。检查全部成功且属于当前 `work_epoch` 时，
+   `EvidenceGate` 才接受完成声明。
+
+完整的组件职责、状态机、证据模型和设计取舍见
+[架构决策](docs/architecture-rationale.md)。
+
 ## 环境
 
 需要 Python 3.12、`uv` 和 Docker。

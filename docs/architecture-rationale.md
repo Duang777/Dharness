@@ -35,9 +35,54 @@ report = await loop.run(instruction, fake_environment)
 assert report.stop_reason == StopReason.VERIFIED
 ```
 
-## 结构
+## 系统边界
+
+Harness 运行在 Harbor 宿主进程中。任务命令只通过 Harbor 提供的
+`BaseEnvironment.exec` 进入隔离容器。模型从不持有环境对象，也不能绕过控制器执行
+命令。
+
+```mermaid
+flowchart TB
+    subgraph Host[Harbor 宿主进程]
+        H[Harbor runner] --> A[EvidenceHarnessAgent]
+        A --> L[EvidenceLoop]
+        L <-->|AgentDecision 与 ReviewDecision| G[LiteLLMModelGateway]
+        L --> P[Policy]
+        P --> C[CommandRunner]
+        L --> V[EvidenceGate]
+        C --> J[RunJournal]
+        L --> J
+        L --> X[AgentContext 与 RunReport]
+    end
+
+    G <--> M[模型供应商]
+    C --> E[Harbor BaseEnvironment]
+
+    subgraph Task[隔离任务容器]
+        E --> S[Shell 与任务文件]
+    end
+```
+
+控制路径和评分路径彼此独立。`EvidenceGate` 决定 Harness 能否声明完成，Harbor
+verifier 在 Agent 退出后判断任务是否真正通过。Harness 不读取 verifier 文件，也不把
+内部门禁结果当作 benchmark 分数。
+
+## 组件职责
 
 `EvidenceHarnessAgent` 是唯一公开入口。它把 Harbor 注入的模型名、日志目录和环境适配成 `EvidenceLoop` 所需的两个端口：`ModelGateway` 和 `ShellEnvironment`。`EvidenceLoop.run` 隐藏预算、重复检测、命令策略、验证票据和停止条件。
+
+| 模块 | 职责 | 不负责 |
+| --- | --- | --- |
+| `harbor_agent.py` | 连接 Harbor，解析选项，同步 token、成本和运行状态 | 解题策略和命令执行 |
+| `run_loop.py` | 推进状态机，维护预算、恢复次数和 `work_epoch` | 供应商协议和最终评分 |
+| `protocol.py` | 定义动作、命令、回执、状态和报告的严格类型 | 执行副作用 |
+| `prompting.py` | 从权威状态重建有界 executor 和 reviewer 提示 | 保存对话历史 |
+| `model_client.py` | 通过 LiteLLM 调用指定模型，解析 JSON，累计用量 | 直接访问任务容器 |
+| `policy.py` | 拒绝危险、无效或重复的命令和完成检查 | 充当容器隔离边界 |
+| `shell.py` | 串行调用 `BaseEnvironment.exec` 并生成命令回执 | 判断任务是否完成 |
+| `evidence.py` | 检查覆盖关系、检查结果和证据时效 | 替代 Harbor verifier |
+| `journal.py` | 脱敏并归档事件和完整命令输出 | 把无限输出送入模型上下文 |
+| `evaluation.py` | 汇总固定评测矩阵和 Harbor `result.json` | 参与单题运行控制 |
 
 核心数据结构如下：
 
@@ -82,12 +127,30 @@ class EvidenceLoop:
 
 ## 运行时状态机
 
+```mermaid
+stateDiagram-v2
+    [*] --> BOOTSTRAPPING
+    BOOTSTRAPPING --> THINKING: bootstrap 成功
+    BOOTSTRAPPING --> TERMINATED: 环境故障
+    THINKING --> EXECUTING: execute
+    EXECUTING --> THINKING: 命令批次结束
+    THINKING --> THINKING: replan
+    THINKING --> REVIEWING: finish
+    REVIEWING --> REPAIRING: 提案或 reviewer 拒绝
+    REVIEWING --> VERIFYING: 完成提案通过
+    VERIFYING --> TERMINATED: 新鲜检查全部通过
+    VERIFYING --> REPAIRING: 检查失败
+    REPAIRING --> THINKING: 修复预算仍充足
+    THINKING --> TERMINATED: stop、预算耗尽或模型故障
+    EXECUTING --> TERMINATED: 恢复预算耗尽
+```
+
 状态机从 `BOOTSTRAPPING` 开始。固定 bootstrap 命令读取工作目录、平台、浅层文件、
 Git 状态和常见工具位置，避免模型第一轮重复做相同探测。之后每轮进入
 `THINKING`，模型只能返回四种结构化动作：
 
 1. `execute`：执行最多四条有目的、有超时、有读写模式的命令。
-2. `finish`：提交只读检查和“需求 -> 检查 ID”覆盖表。
+2. `finish`：提交只读检查和需求与检查 ID 的覆盖表。
 3. `replan`：在重复循环或假设失效后显式改变计划。
 4. `stop`：把外部阻塞、不安全条件或不可实现状态显式分类。
 
@@ -96,6 +159,33 @@ epoch 重新执行检查。控制器预留三次环境调用给最终验证，�
 耗尽全部预算。命令失败会进入恢复策略：首次要求读取错误并改变方法；重复观察指纹会
 触发强制 replan；超过恢复次数、时间、turn 或环境调用预算后由控制器终止。停止原因是
 领域枚举，而不是依赖最后一句自然语言猜测。
+
+### `work_epoch` 如何防止使用旧证据
+
+`work_epoch` 是只增不减的工作批次版本号。固定 bootstrap 在 epoch 0 运行。每个
+`execute` 批次开始时，控制器先增加 epoch，再清除 `latest_evidence`。完成检查产生的
+每条 `CommandReceipt` 都记录当前 epoch。
+
+```mermaid
+sequenceDiagram
+    participant L as EvidenceLoop
+    participant M as 模型
+    participant E as 任务容器
+    participant G as EvidenceGate
+
+    L->>E: bootstrap，epoch 0
+    M->>L: execute
+    L->>L: work_epoch = 1，清除旧证据
+    L->>E: 执行修改命令
+    M->>L: finish，提交检查和覆盖表
+    L->>E: 重新执行只读检查，epoch 1
+    E-->>L: 返回退出码和输出哈希
+    L->>G: 检查回执与 epoch 1
+    G-->>L: accepted
+```
+
+如果模型在验证后再次选择 `execute`，`work_epoch` 变为 2。epoch 1 的回执即使退出码
+为 0，也不能证明 epoch 2 的环境状态。模型必须重新提交并执行检查。
 
 ## 命令与证据边界
 
@@ -108,16 +198,32 @@ Shell 是 Terminal-Bench 的必要通用能力，完全改成固定工具集合�
 - 大输出保留完整归档，提示中只投影固定字节数的 head/tail、SHA-256 和路径引用。
 - 相同命令加相同观察结果形成重复周期时，禁止继续机械重试。
 
-证据门禁不判断任务的业务真相，它只证明 Harness 的“完成声明”满足最低可审计条件：
+证据门禁不判断任务的业务真相，它只证明 Harness 的 `完成声明` 满足最低可审计条件：
 检查非空、检查 ID 唯一、覆盖表引用有效、脚本不是单纯 `echo/true`、检查均为只读且
 发生在最新修改之后。最终正确性仍由 Terminal-Bench verifier 决定。这样可以避免把
 Harness 自己的启发式规则误当作 benchmark oracle。
+
+## 完成验证的四层职责
+
+完成流程把结构、语义、执行结果和官方评分分开：
+
+1. `EvidenceGate.validate_proposal` 检查命令是否只读且非平凡，并检查覆盖表引用是否
+   有效。
+2. 启用 completion review 时，reviewer 只判断拟执行的检查能否覆盖原始任务要求。
+   reviewer 不执行命令，也不能接受最终完成状态。
+3. `CommandRunner` 在当前 `work_epoch` 重新执行检查。`EvidenceGate.decide` 要求所有
+   检查成功且证据未过期。
+4. Harbor verifier 在 Harness 退出后独立评分。只有该结果进入 Terminal-Bench
+   pass rate。
+
+前两层减少无证据的提前结束。第三层证明完成声明对应当前环境。第四层保留 benchmark
+的唯一评分权。
 
 ## Prompt 与上下文
 
 Executor prompt 由固定协议、原始任务、当前预算、当前计划、恢复指令、未解决错误和
 最近观察组成。旧观察不会无限追加；超出窗口后只保留确定性的压缩投影。输出中的
-“忽略规则”“任务已完成”等文本仅作为不可信数据出现，固定协议始终在其前后保持清晰
+`忽略规则` 和 `任务已完成` 等文本仅作为不可信数据出现，固定协议始终在其前后保持清晰
 边界。模型输出由 Pydantic 以 `extra="forbid"` 解析，字段缺失、未知字段和动作负载
 冲突都会成为协议错误。Gateway 只允许一次格式修复，防止无界 JSON 修复循环。
 
@@ -132,7 +238,7 @@ Planner/Executor/Critic 更节省 token，也不会产生第二个环境写者�
 epoch 和停止原因。评测矩阵单独固定在 `evaluation/matrix.json`，runner 用十个精确
 任务名调用 `terminal-bench@2.0`，汇总器直接读取 Harbor `result.json`。未产生 trial
 的任务状态是 `not_run`，认证或基础设施错误是 `error`，只有 verifier 给出非满分结果
-才是 `failed`。这条区分保证报告不会把“没测成”写成“模型解错”。
+才是 `failed`。这条区分保证报告不会把未执行写成模型解题失败。
 
 ## 综合选择
 
