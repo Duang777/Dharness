@@ -95,6 +95,7 @@ class AgentDecision(BaseModel):
     checks: tuple[VerificationCheck, ...]
     coverage: tuple[RequirementCoverage, ...]
 
+
 class CommandReceipt(BaseModel):
     sequence: int
     command_id: str
@@ -105,11 +106,13 @@ class CommandReceipt(BaseModel):
     stderr: OutputExcerpt
     observation_fingerprint: str
 
+
 class VerificationReceipt(BaseModel):
     work_epoch: int
     checks: tuple[CommandReceipt, ...]
     coverage: tuple[RequirementCoverage, ...]
     accepted: bool
+
 
 class EvidenceLoop:
     async def run(
@@ -238,9 +241,12 @@ Planner/Executor/Critic 更节省 token，也不会产生第二个环境写者�
 `RunJournal` 以 JSONL 记录 run、模型决策、策略拒绝、命令回执、reviewer 判断、恢复和
 最终报告。Harbor `AgentContext` 同步 token、成本、turn、环境调用、repair、recovery、
 epoch 和停止原因。评测矩阵单独固定在 `evaluation/matrix.json`，runner 用十个精确
-任务名调用 `terminal-bench@2.0`，汇总器直接读取 Harbor `result.json`。未产生 trial
-的任务状态是 `not_run`，认证或基础设施错误是 `error`，只有 verifier 给出非满分结果
-才是 `failed`。这条区分保证报告不会把未执行写成模型解题失败。
+任务名调用 `terminal-bench@2.0`。原始 Harbor 目录默认不进 Git；冻结器从
+`result.json` 只提取任务、模型、用量、Harness 状态、reward、异常类型和来源 SHA-256，
+写入 `evaluation/trials/`。汇总器从这些脱敏快照重建报告，因此 fresh clone 不依赖开发
+机的 `runs/` 目录。未产生 trial 的任务状态是 `not_run`，认证或基础设施错误是
+`error`，只有 verifier 给出非满分结果才是 `failed`。这条区分保证报告不会把未执行
+写成模型解题失败。
 
 ## 设计特色
 
@@ -300,6 +306,11 @@ Planner、Executor 和 Critic 更省模型调用，也避免多个 Agent 同时�
 
 ## 下一步
 
-使用轮换后的模型凭证重跑 `fix-git`，再执行固定 10 题。随后按失败分类比较 executor、
-evidence gate 和预算策略。只有同模型、同任务、同预算的消融结果才能用于判断
-reviewer 或恢复策略的实际收益。
+当前固定 10 题已全部尝试。下一阶段首先在原生 x86_64 Linux runner 上重跑
+`qemu-startup`，把基础设施错误与任务解法分开。其次为会生成 PDF、日志或数组文件的
+completion check 设计隔离工作区，证明检查产物不能回写待评分目录，再复测
+`overfull-hbox` 与 `model-extraction-relu-logits` 的内部停止状态。
+
+20 题扩展应使用新的分层矩阵、未泄露且通过最小推理探针的凭证，并继续保持并发 1。
+它可以扩大类别覆盖，但不能替代同模型、同任务、同预算的消融实验；只有后者能够判断
+reviewer、恢复策略或预算变化是否真正提高通过率。

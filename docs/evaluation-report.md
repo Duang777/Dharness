@@ -26,23 +26,24 @@
 
 - 矩阵快照：[results.json](../evaluation/results.json)、
   [results.md](../evaluation/results.md)
+- 10 个脱敏 Harbor trial：[evaluation/trials](../evaluation/trials)
 - 独立 `fix-git` replay：[replay-results.json](../evaluation/replay-results.json)、
   [replay-results.md](../evaluation/replay-results.md)
 
 ## 逐题状态
 
-| Task | Difficulty | Mode | Status | Reward | Harness stop reason |
-|---|---|---|---|---:|---|
-| `overfull-hbox` | easy | live | passed | 1 | `budget_exhausted` |
-| `fix-git` | easy | live | passed | 1 | `verified` |
-| `cobol-modernization` | easy | live | passed | 1 | `budget_exhausted` |
-| `log-summary-date-ranges` | medium | live | passed | 1 | `verified` |
-| `openssl-selfsigned-cert` | medium | live | passed | 1 | `verified` |
-| `modernize-scientific-stack` | medium | replay | passed | 1 | N/A |
-| `qemu-startup` | medium | live | error | 0 | `AgentTimeoutError` |
-| `cancel-async-tasks` | hard | live | passed | 1 | `verified` |
-| `configure-git-webserver` | hard | live | passed | 1 | `budget_exhausted` |
-| `model-extraction-relu-logits` | hard | live | passed | 1 | `budget_exhausted` |
+| Task | Difficulty | Model | Mode | Status | Reward | Harness stop reason |
+|---|---|---|---|---|---:|---|
+| `overfull-hbox` | easy | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
+| `fix-git` | easy | GLM 5.3 | live | passed | 1 | `verified` |
+| `cobol-modernization` | easy | GLM 5.3 | live | passed | 1 | `budget_exhausted` |
+| `log-summary-date-ranges` | medium | GLM 5.3 | live | passed | 1 | `verified` |
+| `openssl-selfsigned-cert` | medium | GLM 5.3 | live | passed | 1 | `verified` |
+| `modernize-scientific-stack` | medium | no new call | replay | passed | 1 | N/A |
+| `qemu-startup` | medium | GLM 5.3 | live | error | 0 | `AgentTimeoutError` |
+| `cancel-async-tasks` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `configure-git-webserver` | hard | GLM 5.3 | live | passed | 1 | `budget_exhausted` |
+| `model-extraction-relu-logits` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
 
 矩阵位于 [`evaluation/matrix.json`](../evaluation/matrix.json)。选样只使用公开
 `task.toml` 中的难度、类别和标签，没有读取 verifier 或 solution。
@@ -206,15 +207,20 @@ uv run python scripts/run_evaluation.py \
   --n-concurrent 1
 ```
 
-生成逐题和总分报告：
+原始 Harbor job 默认位于被 Git 忽略的 `runs/`。先冻结允许公开的字段，再从提交到
+仓库的快照生成逐题和总分报告：
 
 ```bash
-uv run python scripts/summarize_results.py runs/terminal-bench-2/<job-name> \
+uv run python scripts/freeze_evaluation.py runs/terminal-bench-2/<job-name>
+uv run python scripts/summarize_results.py evaluation/trials \
   --json-out evaluation/results.json \
   --markdown-out evaluation/results.md
+uv run python scripts/verify_delivery.py
 ```
 
 汇总规则为：reward 等于 1.0 记 `passed`。已运行但 reward 非 1.0 记 `failed`。异常或
 缺少 reward 记 `error`。找不到 trial 记 `not_run`。一个 job 里同一任务存在多个
 trial 时，汇总器拒绝生成结果。报告必须同时给出两种通过率、任务状态、execution
-coverage 和 scored coverage。
+coverage 和 scored coverage。冻结快照还记录模型名称、原始 `result.json` SHA-256
+和 replay journal SHA-256；API base、凭证、绝对路径、任务输出及 traceback 不进入
+快照。

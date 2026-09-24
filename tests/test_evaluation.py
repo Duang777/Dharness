@@ -23,13 +23,18 @@ def _write_trial(
     exception_type: str | None = None,
     trial_id: str = "trial",
     replay_source_sha256: str | None = None,
+    model_name: str | None = "openai/test-model",
 ) -> None:
     trial_dir = root / f"{task}__{trial_id}"
     trial_dir.mkdir(parents=True)
     payload = {
+        "snapshot": {"source_result_sha256": "b" * 64},
         "trial_name": f"{task}__{trial_id}",
         "task_name": f"terminal-bench/{task}",
-        "config": {"task": {"name": task}},
+        "config": {
+            "task": {"name": task},
+            "agent": {"model_name": model_name},
+        },
         "agent_result": {
             "n_input_tokens": 100,
             "n_output_tokens": 20,
@@ -53,9 +58,7 @@ def _write_trial(
                 ),
             },
         },
-        "verifier_result": (
-            {"rewards": {"reward": reward}} if reward is not None else None
-        ),
+        "verifier_result": ({"rewards": {"reward": reward}} if reward is not None else None),
         "exception_info": (
             {"exception_type": exception_type} if exception_type is not None else None
         ),
@@ -114,6 +117,8 @@ def test_summary_keeps_missing_tasks_out_of_failure_count(tmp_path) -> None:
     assert summary.scored_coverage == pytest.approx(1 / 2)
     assert summary.tasks[0].duration_sec == 90
     assert summary.tasks[0].execution_mode == "live"
+    assert summary.tasks[0].model_name == "openai/test-model"
+    assert summary.tasks[0].source_result_sha256 == "b" * 64
     assert summary.tasks[-1].status == "not_run"
     assert summary.tasks[-1].execution_mode == "not_run"
 
@@ -220,13 +225,16 @@ def test_replay_result_is_labeled_with_source_hash(tmp_path) -> None:
         task="replayed",
         reward=1.0,
         replay_source_sha256=source_sha256,
+        model_name=None,
     )
 
     summary = summarize_results(matrix, tmp_path)
 
-    assert summary.schema_version == 3
+    assert summary.schema_version == 4
     assert summary.tasks[0].execution_mode == "replay"
     assert summary.tasks[0].source_journal_sha256 == source_sha256
     markdown = render_markdown(summary)
-    assert "| replayed | easy | debugging | replay | passed | 1 | verified |" in markdown
+    assert (
+        "| replayed | easy | debugging | N/A (journal replay) | replay | passed | 1 | verified |"
+    ) in markdown
     assert "`replay` runs execute previously recorded agent decisions" in markdown

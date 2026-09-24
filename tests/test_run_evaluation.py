@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -28,6 +29,8 @@ def test_build_command_can_select_one_task_and_mount_https_apt_sources(
 
     command = run_evaluation.build_command(args)
 
+    concurrency_index = command.index("--n-concurrent")
+    assert command[concurrency_index + 1] == "1"
     assert command.count("--include-task-name") == 1
     task_index = command.index("--include-task-name")
     assert command[task_index + 1] == "fix-git"
@@ -43,9 +46,12 @@ def test_build_command_can_select_one_task_and_mount_https_apt_sources(
         }
     ]
     assert "--yes" in command
-    assert run_evaluation.DEBIAN_HTTPS_SOURCES.read_text(encoding="utf-8").count(
-        "URIs: https://deb.debian.org"
-    ) == 2
+    assert (
+        run_evaluation.DEBIAN_HTTPS_SOURCES.read_text(encoding="utf-8").count(
+            "URIs: https://deb.debian.org"
+        )
+        == 2
+    )
 
 
 def test_build_command_rejects_task_outside_fixed_matrix(
@@ -78,3 +84,39 @@ def test_build_command_rejects_duplicate_task_selection(
 
     with pytest.raises(ValueError, match="must be unique"):
         run_evaluation.build_command(args)
+
+
+def test_load_matrix_accepts_nonempty_custom_task_count(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "matrix.json"
+    matrix_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "dataset": "terminal-bench@2.0",
+                "tasks": [{"name": f"task-{index}"} for index in range(20)],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    dataset, tasks = run_evaluation.load_matrix(matrix_path)
+
+    assert dataset == "terminal-bench@2.0"
+    assert len(tasks) == 20
+
+
+def test_load_matrix_rejects_empty_task_list(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "matrix.json"
+    matrix_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "dataset": "terminal-bench@2.0",
+                "tasks": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="at least one task"):
+        run_evaluation.load_matrix(matrix_path)

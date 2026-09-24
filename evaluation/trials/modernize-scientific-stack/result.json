@@ -1,0 +1,38 @@
+{
+  "agent_result": {
+    "cost_usd": null,
+    "metadata": {
+      "evidence_harness": {},
+      "evidence_harness_replay": {
+        "completed": true,
+        "source_sha256": "4ab9176378eef0f88512fceaeae5584dbc4d17afc17eb74ffe3a80eba5d0b6fe"
+      }
+    },
+    "n_cache_tokens": null,
+    "n_input_tokens": null,
+    "n_output_tokens": null
+  },
+  "config": {
+    "agent": {
+      "model_name": null,
+      "name": "evidence_harness.replay_agent:JournalReplayAgent"
+    },
+    "task": {
+      "name": "modernize-scientific-stack"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-24T18:04:40.706787Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "488e2d2c76d765de8e8970711f118b1c7874ed29e3d1302c1fb873e6e19878db"
+  },
+  "started_at": "2026-09-24T18:03:23.362340Z",
+  "task_name": "modernize-scientific-stack",
+  "trial_name": "modernize-scientific-stack__xmW4uEx",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -30,6 +30,7 @@ class TaskResult(BaseModel):
     name: str
     difficulty: str
     category: str
+    model_name: str | None = None
     status: str
     execution_mode: Literal["live", "replay", "not_run"]
     reward: float | None = None
@@ -43,11 +44,12 @@ class TaskResult(BaseModel):
     duration_sec: float | None = None
     trial_path: str | None = None
     exception_type: str | None = None
+    source_result_sha256: str | None = None
     source_journal_sha256: str | None = None
 
 
 class EvaluationSummary(BaseModel):
-    schema_version: int = 3
+    schema_version: int = 4
     dataset: str
     source_dir: str
     complete: bool
@@ -90,7 +92,7 @@ def summarize_results(matrix: EvaluationMatrix, results_dir: Path) -> Evaluation
 
     return EvaluationSummary(
         dataset=matrix.dataset,
-        source_dir=str(results_dir),
+        source_dir=_display_path(results_dir),
         complete=scored == len(task_results),
         all_tasks_attempted=not_run == 0,
         selected_tasks=len(task_results),
@@ -109,13 +111,9 @@ def summarize_results(matrix: EvaluationMatrix, results_dir: Path) -> Evaluation
 
 
 def render_markdown(summary: EvaluationSummary) -> str:
-    pass_rate = (
-        f"{summary.pass_rate:.1%}" if summary.pass_rate is not None else "N/A"
-    )
+    pass_rate = f"{summary.pass_rate:.1%}" if summary.pass_rate is not None else "N/A"
     scored_pass_rate = (
-        f"{summary.scored_pass_rate:.1%}"
-        if summary.scored_pass_rate is not None
-        else "N/A"
+        f"{summary.scored_pass_rate:.1%}" if summary.scored_pass_rate is not None else "N/A"
     )
     lines = [
         "# Terminal-Bench 2.0 Evaluation",
@@ -132,11 +130,14 @@ def render_markdown(summary: EvaluationSummary) -> str:
         f"- Execution coverage: `{summary.execution_coverage:.1%}`",
         f"- Scored coverage: `{summary.scored_coverage:.1%}`",
         "",
-        "| Task | Difficulty | Category | Mode | Status | Reward | Stop reason |",
-        "|---|---|---|---|---|---:|---|",
+        "| Task | Difficulty | Category | Model | Mode | Status | Reward | Stop reason |",
+        "|---|---|---|---|---|---|---:|---|",
     ]
     for task in summary.tasks:
         reward = "N/A" if task.reward is None else f"{task.reward:g}"
+        model_name = task.model_name or (
+            "N/A (journal replay)" if task.execution_mode == "replay" else ""
+        )
         lines.append(
             "| "
             + " | ".join(
@@ -144,6 +145,7 @@ def render_markdown(summary: EvaluationSummary) -> str:
                     _escape_cell(task.name),
                     _escape_cell(task.difficulty),
                     _escape_cell(task.category),
+                    _escape_cell(model_name),
                     _escape_cell(task.execution_mode),
                     _escape_cell(task.status),
                     reward,
@@ -191,8 +193,7 @@ def _load_trial_results(results_dir: Path) -> dict[str, tuple[dict[str, Any], Pa
         previous = trials.get(task_name)
         if previous is not None:
             raise ValueError(
-                f"multiple trial results for task '{task_name}': "
-                f"{previous[1]} and {result_path}"
+                f"multiple trial results for task '{task_name}': {previous[1]} and {result_path}"
             )
         trials[task_name] = (data, result_path)
     return trials
@@ -236,6 +237,8 @@ def _summarize_task(
     metadata = _mapping(_mapping(data.get("agent_result")).get("metadata"))
     harness = _mapping(metadata.get("evidence_harness"))
     replay = _mapping(metadata.get("evidence_harness_replay"))
+    agent_config = _mapping(_mapping(data.get("config")).get("agent"))
+    snapshot = _mapping(data.get("snapshot"))
 
     if exception or reward is None:
         status = "error"
@@ -248,6 +251,7 @@ def _summarize_task(
         name=task.name,
         difficulty=task.difficulty,
         category=task.category,
+        model_name=_string_or_none(agent_config.get("model_name")),
         status=status,
         execution_mode="replay" if replay else "live",
         reward=reward,
@@ -261,6 +265,7 @@ def _summarize_task(
         duration_sec=_duration_sec(data),
         trial_path=str(result_path.relative_to(results_dir)),
         exception_type=_string_or_none(exception.get("exception_type") or exception.get("type")),
+        source_result_sha256=_string_or_none(snapshot.get("source_result_sha256")),
         source_journal_sha256=_string_or_none(replay.get("source_sha256")),
     )
 
@@ -300,3 +305,10 @@ def _string_or_none(value: object) -> str | None:
 
 def _escape_cell(value: str) -> str:
     return value.replace("|", "\\|").replace("\n", " ")
+
+
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(Path.cwd().resolve()))
+    except ValueError:
+        return str(path)

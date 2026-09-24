@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
         "--job-name",
         default=datetime.now(UTC).strftime("%Y-%m-%d__%H-%M-%S"),
     )
-    parser.add_argument("--n-concurrent", type=int, default=2)
+    parser.add_argument("--n-concurrent", type=int, default=1)
     parser.add_argument("--env-file", type=Path)
     parser.add_argument(
         "--include-task-name",
@@ -68,8 +68,8 @@ def load_matrix(path: Path) -> tuple[str, list[str]]:
     tasks = data.get("tasks")
     if not isinstance(dataset, str) or not dataset:
         raise ValueError(f"matrix dataset must be a non-empty string: {path}")
-    if not isinstance(tasks, list) or len(tasks) != 10:
-        raise ValueError(f"matrix must contain exactly 10 tasks: {path}")
+    if not isinstance(tasks, list) or not tasks:
+        raise ValueError(f"matrix must contain at least one task: {path}")
 
     names: list[str] = []
     for item in tasks:
@@ -86,9 +86,7 @@ def load_matrix(path: Path) -> tuple[str, list[str]]:
 
 def build_command(args: argparse.Namespace) -> list[str]:
     if not args.model:
-        raise ValueError(
-            "no model configured; pass --model or set EVIDENCE_HARNESS_MODEL"
-        )
+        raise ValueError("no model configured; pass --model or set EVIDENCE_HARNESS_MODEL")
     if args.n_concurrent < 1:
         raise ValueError("--n-concurrent must be at least 1")
     if args.env_file is not None and not args.env_file.is_file():
@@ -99,8 +97,7 @@ def build_command(args: argparse.Namespace) -> list[str]:
     unknown_tasks = sorted(set(task_names) - set(matrix_task_names))
     if unknown_tasks:
         raise ValueError(
-            "tasks are not in the fixed evaluation matrix: "
-            + ", ".join(unknown_tasks)
+            "tasks are not in the fixed evaluation matrix: " + ", ".join(unknown_tasks)
         )
     if len(task_names) != len(set(task_names)):
         raise ValueError("--include-task-name values must be unique")

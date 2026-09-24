@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 9,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": "verified",
+        "turns_used": 6,
+        "work_epoch": 5
+      }
+    },
+    "n_cache_tokens": 19456,
+    "n_input_tokens": 73908,
+    "n_output_tokens": 30118
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/glm-5.3",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "fix-git"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-24T17:30:31.792806Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "c77dde25ea48bf27817bb50df0c8b2bf5919383228d0a0921c5ed6221d416f96"
+  },
+  "started_at": "2026-09-24T17:23:14.967148Z",
+  "task_name": "fix-git",
+  "trial_name": "fix-git__CuBXojv",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

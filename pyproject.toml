@@ -30,6 +30,7 @@ module-root = "src"
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers --strict-config"
 asyncio_mode = "auto"
+pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.coverage.run]

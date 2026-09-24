@@ -6,6 +6,51 @@
 Harness，同时保留可复查的工程证据。日志记录代表性工作指令、工具表现和人工判断，
 不包含凭证、隐藏推理或 benchmark verifier/solution 内容。
 
+## 使用工具
+
+- **TRAE：** 主 Vibe Coding 环境，用于阅读仓库、比较架构、实现、测试、运行 Harbor
+  和维护决策日志。
+- **并行评审 Agent：** 用于独立审查架构候选、Shell policy 和提交前风险；结论必须由
+  主线程用代码、测试或真实 trial 复核。
+- **终端工具：** `rg`、Git、`uv`、Ruff、mypy、pytest/coverage、Docker 和 Harbor。
+- **模型通道：** GLM 5.3 与 `modelhub/gpt-5.6-terra` 用于真实 benchmark；
+  确定性 OpenAI-compatible mock server 用于无费用的集成回归。
+
+## 5 个关键 Prompt
+
+> 1. 调研终端 Agent 的控制循环、验证、长上下文、回滚、工具协议与停止条件，给出多套
+> 有实质差异的架构，并按正确性、通用性、成本和 Harbor 适配交叉评审。
+
+> 2. 先建立严格领域协议，再实现命令执行、输出归档、模型边界、prompt 投影、证据门禁
+> 和主循环；测试必须断言用户可观察行为，不依赖真实模型。
+
+> 3. 不以单测通过代替真实集成。用本地 fixture、mock OpenAI 服务、Docker、Harbor
+> Agent 和官方 verifier 跑完整链路。
+
+> 4. 用固定矩阵中的同一题建立真实基线，只根据运行证据修改一个 Harness 机制，再用
+> 同一模型、任务和预算复测，量化 turn、repair、token 和停止原因。
+
+> 5. 剩余题目按并发 1 实际运行；失败必须区分模型、Harness 和基础设施，报告必须区分
+> live、replay、failed、error 与 not_run，不能只复述最终状态。
+
+## AI 帮了什么
+
+AI 最有价值的工作不是批量生成代码，而是扩大假设空间并快速构造反例。它并行比较了
+外部单 Agent、分层控制器和容器内 CLI，帮助选择单写者架构；为 `work_epoch`、验证
+预算、schema repair、模型超时和 heredoc 解析补齐了行为测试；还把真实 trial 的异常
+按模型通道、Harness policy、Harbor 编排和宿主虚拟化分层。每项保留的结论都落到了
+测试、原始 reward、来源哈希或可重跑命令，而不是只保留对话文本。
+
+## AI 坑了什么
+
+AI 首先把 Harbor 本地 fixture 错写成 `--task`，而当前 0.23.0 实际要求 `--path`。
+其次，第一版 Shell 写操作 denylist 修完一个误报后又暴露嵌套 shell 绕过；这说明生成
+更多正则不能把通用 Shell 变成安全边界。它还一度把已存在的 CLI 登录状态当作模型可用，
+真实最小请求却分别超时和返回 401。最后，completion reviewer 给出的“重新编译并保存
+产物”建议与只读 finish policy 冲突，导致外部 reward 1.0 而内部预算耗尽。人工决策是
+保留严格边界、记录限制，并把隔离验证工作区列为后续设计，而不是为追求漂亮 stop reason
+放开写权限。
+
 ## 1. 设计调研
 
 **代表性指令**
@@ -187,5 +232,5 @@ execution coverage 和 scored coverage 均为 60%。
 - Execution coverage 为 100%，scored coverage 为 90%
 - HTTPS apt 挂载恢复了受影响任务的 verifier
 - QEMU 需要原生 x86_64 或支持嵌套虚拟化的 runner 重跑
-- 52 项测试通过，覆盖率 85%
+- 59 项测试通过，覆盖率 86%
 - Ruff、mypy、build 和两个 Agent schema 通过

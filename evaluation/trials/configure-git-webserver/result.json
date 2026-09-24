@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 16,
+        "failure_category": "model_protocol",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 5,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 11,
+        "work_epoch": 6
+      }
+    },
+    "n_cache_tokens": 15552,
+    "n_input_tokens": 107037,
+    "n_output_tokens": 100442
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/glm-5.3",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "configure-git-webserver"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-24T18:33:38.056238Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "802f87cafbc12579b5adc8e9dc30718a5f2a605170745a1fa5ab5406d3fdc795"
+  },
+  "started_at": "2026-09-24T18:05:05.624716Z",
+  "task_name": "configure-git-webserver",
+  "trial_name": "configure-git-webserver__j5shWU2",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

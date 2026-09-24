@@ -24,8 +24,7 @@ def test_journal_writes_one_json_event_per_line(tmp_path) -> None:
     journal.append("state", {"phase": "verifying"})
 
     events = [
-        json.loads(line)
-        for line in journal.events_path.read_text(encoding="utf-8").splitlines()
+        json.loads(line) for line in journal.events_path.read_text(encoding="utf-8").splitlines()
     ]
     assert [event["payload"]["phase"] for event in events] == [
         "thinking",
@@ -37,11 +36,7 @@ def test_journal_redacts_secrets_in_structured_events(tmp_path) -> None:
     journal = RunJournal(tmp_path, inline_bytes=256)
     bearer = "Bearer abcdefghijklmnopqrstuvwxyz"
     provider_key = "sk-proj-abcdefghijklmnopqrstuvwxyz123456"
-    jwt = (
-        "eyJhbGciOiJIUzI1NiJ9."
-        "eyJzdWIiOiIxMjM0NTY3ODkwIn0."
-        "abcdefghijklmnopqrstuvwxyz"
-    )
+    jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.abcdefghijklmnopqrstuvwxyz"
 
     journal.append(
         "decision",
