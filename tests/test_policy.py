@@ -49,6 +49,19 @@ def test_verification_blocks_benchmark_verifier_path() -> None:
         validate_check(check, 300)
 
 
+def test_verification_blocks_benchmark_verifier_cwd() -> None:
+    check = VerificationCheck(
+        id="hidden-cwd",
+        kind=CheckKind.BEHAVIOR,
+        script="pytest -q test_task.py",
+        cwd="/tests",
+        proves="hidden verifier passes",
+    )
+
+    with pytest.raises(PolicyViolation, match="benchmark"):
+        validate_check(check, 300)
+
+
 def test_verification_allows_project_owned_tests() -> None:
     check = VerificationCheck(
         id="project-tests",
@@ -70,6 +83,49 @@ def test_verification_rejects_display_only_checks(script: str) -> None:
     )
 
     with pytest.raises(PolicyViolation, match=r"display-only|no-op"):
+        validate_check(check, 300)
+
+
+@pytest.mark.parametrize(
+    "script",
+    [
+        "git merge-base --is-ancestor deadbeef master",
+        "if grep -nE '^(<<<<<<<|=======|>>>>>>>)' a.txt; then exit 1; fi",
+    ],
+)
+def test_verification_allows_read_only_tokens_that_resemble_mutations(
+    script: str,
+) -> None:
+    check = VerificationCheck(
+        id="read-only",
+        kind=CheckKind.BEHAVIOR,
+        script=script,
+        proves="repository state is correct",
+    )
+
+    validate_check(check, 300)
+
+
+@pytest.mark.parametrize(
+    "script",
+    [
+        "rm -f output.txt",
+        "printf result > output.txt",
+        "sed -i 's/old/new/' file.txt",
+        "git merge recovered-change",
+        "grep result source.txt | tee output.txt",
+        "bash -c -- 'true; rm -f output.txt'",
+    ],
+)
+def test_verification_rejects_mutating_shell_commands(script: str) -> None:
+    check = VerificationCheck(
+        id="mutating",
+        kind=CheckKind.BEHAVIOR,
+        script=script,
+        proves="repository state is correct",
+    )
+
+    with pytest.raises(PolicyViolation, match="modify task state"):
         validate_check(check, 300)
 
 

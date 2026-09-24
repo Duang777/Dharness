@@ -215,7 +215,7 @@ Harness 自己的启发式规则误当作 benchmark oracle。
    reviewer 不执行命令，也不能接受最终完成状态。
 3. `CommandRunner` 在当前 `work_epoch` 重新执行检查。`EvidenceGate.decide` 要求所有
    检查成功且证据未过期。
-4. Harbor verifier 在 Harness 退出后独立评分。只有该结果进入 Terminal-Bench
+4. Harbor verifier 在 Harness 退出后独立评分。只有获得 reward 的结果进入 scored
    pass rate。
 
 前两层减少无证据的提前结束。第三层证明完成声明对应当前环境。第四层保留 benchmark
@@ -295,11 +295,11 @@ Planner、Executor 和 Critic 更省模型调用，也避免多个 Agent 同时�
 - 不同模型对结构化响应的遵守程度不同。Gateway 只允许一次格式修复，之后终止该轮并记录协议错误。
 - Shell 策略防止明显误操作和循环，但不是容器安全边界。隔离责任仍属于 Harbor
   environment。
-- 当前真实 10 题评测需要可用的 LiteLLM 供应商凭证。没有凭证时只允许 dry-run 和
-  mock smoke，不生成虚假分数。
+- 当前 `fix-git` 官方镜像的 verifier 在本机 OrbStack 环境中超时。该错误没有 reward，
+  不能计入 scored pass rate。
 
 ## 下一步
 
-先补齐真实模型认证并执行固定 10 题。随后按失败分类比较 executor、evidence gate 和
-预算策略。只有同模型、同任务、同预算的消融结果才能用于判断 reviewer 或恢复策略的
-实际收益。
+先在 verifier 能正常运行的 Docker 环境中重跑 `fix-git`，再执行固定 10 题。随后按
+失败分类比较 executor、evidence gate 和预算策略。只有同模型、同任务、同预算的消融
+结果才能用于判断 reviewer 或恢复策略的实际收益。

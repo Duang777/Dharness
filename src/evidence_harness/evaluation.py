@@ -45,18 +45,22 @@ class TaskResult(BaseModel):
 
 
 class EvaluationSummary(BaseModel):
-    schema_version: int = 1
+    schema_version: int = 2
     dataset: str
     source_dir: str
     complete: bool
+    all_tasks_attempted: bool
     selected_tasks: int
     executed_tasks: int
+    scored_tasks: int
     passed_tasks: int
     failed_tasks: int
     errored_tasks: int
     not_run_tasks: int
     pass_rate: float | None
+    scored_pass_rate: float | None
     execution_coverage: float
+    scored_coverage: float
     tasks: tuple[TaskResult, ...]
 
 
@@ -79,20 +83,25 @@ def summarize_results(matrix: EvaluationMatrix, results_dir: Path) -> Evaluation
     failed = sum(item.status == "failed" for item in task_results)
     errored = sum(item.status == "error" for item in task_results)
     not_run = sum(item.status == "not_run" for item in task_results)
-    executed = passed + failed + errored
+    scored = passed + failed
+    executed = scored + errored
 
     return EvaluationSummary(
         dataset=matrix.dataset,
-        source_dir=str(results_dir.resolve()),
-        complete=not_run == 0,
+        source_dir=str(results_dir),
+        complete=scored == len(task_results),
+        all_tasks_attempted=not_run == 0,
         selected_tasks=len(task_results),
         executed_tasks=executed,
+        scored_tasks=scored,
         passed_tasks=passed,
         failed_tasks=failed,
         errored_tasks=errored,
         not_run_tasks=not_run,
         pass_rate=passed / executed if executed else None,
+        scored_pass_rate=passed / scored if scored else None,
         execution_coverage=executed / len(task_results),
+        scored_coverage=scored / len(task_results),
         tasks=task_results,
     )
 
@@ -101,16 +110,25 @@ def render_markdown(summary: EvaluationSummary) -> str:
     pass_rate = (
         f"{summary.pass_rate:.1%}" if summary.pass_rate is not None else "N/A"
     )
+    scored_pass_rate = (
+        f"{summary.scored_pass_rate:.1%}"
+        if summary.scored_pass_rate is not None
+        else "N/A"
+    )
     lines = [
         "# Terminal-Bench 2.0 Evaluation",
         "",
         f"- Dataset: `{summary.dataset}`",
-        f"- Complete: `{'yes' if summary.complete else 'no'}`",
+        f"- Scoring complete: `{'yes' if summary.complete else 'no'}`",
+        f"- All tasks attempted: `{'yes' if summary.all_tasks_attempted else 'no'}`",
         f"- Executed: `{summary.executed_tasks}/{summary.selected_tasks}`",
+        f"- Scored: `{summary.scored_tasks}/{summary.selected_tasks}`",
         f"- Passed / failed / errored: "
         f"`{summary.passed_tasks} / {summary.failed_tasks} / {summary.errored_tasks}`",
-        f"- Pass rate over executed tasks: `{pass_rate}`",
+        f"- Pass rate over attempted tasks: `{pass_rate}`",
+        f"- Pass rate over scored tasks: `{scored_pass_rate}`",
         f"- Execution coverage: `{summary.execution_coverage:.1%}`",
+        f"- Scored coverage: `{summary.scored_coverage:.1%}`",
         "",
         "| Task | Difficulty | Category | Status | Reward | Stop reason |",
         "|---|---|---|---|---:|---|",
@@ -132,12 +150,12 @@ def render_markdown(summary: EvaluationSummary) -> str:
             + " |"
         )
 
-    if not summary.complete:
+    if summary.errored_tasks or summary.not_run_tasks:
         lines.extend(
             (
                 "",
-                "> This run is incomplete. `not_run` tasks are excluded from the pass-rate "
-                "denominator and must not be reported as benchmark failures.",
+                "> `error` tasks count in the attempted pass rate but not the scored pass "
+                "rate. `not_run` tasks are excluded from both.",
             )
         )
     return "\n".join(lines) + "\n"
@@ -160,8 +178,12 @@ def _load_trial_results(results_dir: Path) -> dict[str, tuple[dict[str, Any], Pa
         if task_name is None:
             continue
         previous = trials.get(task_name)
-        if previous is None or _finished_at(data) >= _finished_at(previous[0]):
-            trials[task_name] = (data, result_path)
+        if previous is not None:
+            raise ValueError(
+                f"multiple trial results for task '{task_name}': "
+                f"{previous[1]} and {result_path}"
+            )
+        trials[task_name] = (data, result_path)
     return trials
 
 
@@ -226,11 +248,6 @@ def _summarize_task(
         trial_path=str(result_path.relative_to(results_dir)),
         exception_type=_string_or_none(exception.get("exception_type") or exception.get("type")),
     )
-
-
-def _finished_at(data: dict[str, Any]) -> str:
-    value = data.get("finished_at")
-    return value if isinstance(value, str) else ""
 
 
 def _duration_sec(data: dict[str, Any]) -> float | None:

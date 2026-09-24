@@ -108,18 +108,36 @@ Harbor registry 与 dataset download 可稳定提供公开元数据。用 TOML p
 **结果**
 
 环境中没有 LiteLLM 供应商 key。Claude Code 显示 OAuth 登录，但最小推理超过两分钟
-无响应。Codex CLI 显示 API key 登录，但真实请求返回 401。没有启动十题真实评测，
-pass rate 保持 N/A。
+无响应。Codex CLI 显示 API key 登录，但真实请求返回 401。随后获得一个 OpenAI 兼容
+的 GLM 5.3 端点。结构化推理探针和真实 Harbor smoke 均通过。
 
 **人工判断**
 
 没有临时增加 CLI Gateway，也没有用 mock 结果冒充 benchmark 分数。CLI 登录态不属于
-项目可复现依赖。应先恢复有效模型通道，再收集基线。
+项目可复现依赖。GLM 端点通过现有 LiteLLM 边界接入，不需要改变 Agent 接口。
+
+## 7. 首轮真实评测与优化
+
+**代表性指令**
+
+> 用固定矩阵中的一题建立真实基线。只根据运行证据修改一个 Harness 机制，并用同一
+> 模型、任务和预算复测。
+
+**结果**
+
+`fix-git` 基线暴露了验证策略误报。模型完成任务后，五次只读检查被判为写操作。策略从
+整段正则扫描改为命令边界匹配和引号感知的重定向分析。同题复测从
+`budget_exhausted` 变为 `verified`。turns 从 11 降到 4，repairs 从 5 降到 0。
+
+官方 verifier 在 `apt-get update` 中停留，并在 900 秒后超时。该结果记为 `error`，
+不记为任务失败。复测关闭 verifier，只用于比较 Agent 内部状态。
 
 ## 当前质量证据
 
 - `harbor==0.23.0`，Python 3.12，Docker server 29.4.0
-- 真实 Harbor 与 Docker smoke reward 1.0
+- 真实 GLM、Harbor 与 Docker smoke reward 1.0
 - 固定十题 Harbor dry-run 通过
-- Ruff、pytest、coverage、build 和 Agent schema 由交付前门禁统一复查
-- 真实 Terminal-Bench 通过率：N/A，原因是模型认证阻塞，不是任务失败
+- 38 项测试通过，覆盖率 84%
+- Ruff、mypy、build 和 Agent schema 通过
+- `fix-git` Agent 复测为 `verified`
+- 真实 Terminal-Bench 可评分通过率：N/A，原因是 verifier 超时

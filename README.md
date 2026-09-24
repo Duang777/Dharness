@@ -121,13 +121,14 @@ uv run python scripts/run_evaluation.py \
 汇总结果：
 
 ```bash
-uv run python scripts/summarize_results.py runs/terminal-bench-2 \
+uv run python scripts/summarize_results.py runs/terminal-bench-2/<job-name> \
   --json-out evaluation/results.json \
   --markdown-out evaluation/results.md
 ```
 
-汇总器将未执行任务标为 `not_run`。它们不会被伪装成 benchmark failure，也不会进入
-pass-rate 分母。
+汇总器将未执行任务标为 `not_run`，将缺少 reward 或出现异常的任务标为 `error`。
+报告同时给出 attempted pass rate 和 scored pass rate。`error` 进入前者但不进入后者，
+`not_run` 不进入两者。execution coverage 仍记录已启动的任务。
 
 ## 验证
 
@@ -159,6 +160,7 @@ OPENAI_API_KEY=test-key uv run harbor run \
 
 - [架构决策](docs/architecture-rationale.md)
 - [评测报告](docs/evaluation-report.md)
+- [当前评测结果](evaluation/results.md)
 - [失败分析](docs/failure-analysis.md)
 - [后续 10 小时优先级](docs/next-10-hours.md)
 - [Vibe Coding 日志](docs/vibe-coding-log.md)

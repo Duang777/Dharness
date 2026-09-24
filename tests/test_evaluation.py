@@ -21,11 +21,12 @@ def _write_trial(
     task: str,
     reward: float | None,
     exception_type: str | None = None,
+    trial_id: str = "trial",
 ) -> None:
-    trial_dir = root / f"{task}__trial"
+    trial_dir = root / f"{task}__{trial_id}"
     trial_dir.mkdir(parents=True)
     payload = {
-        "trial_name": f"{task}__trial",
+        "trial_name": f"{task}__{trial_id}",
         "task_name": f"terminal-bench/{task}",
         "config": {"task": {"name": task}},
         "agent_result": {
@@ -89,19 +90,24 @@ def test_summary_keeps_missing_tasks_out_of_failure_count(tmp_path) -> None:
     summary = summarize_results(matrix, tmp_path)
 
     assert summary.complete is False
+    assert summary.all_tasks_attempted is False
     assert summary.executed_tasks == 3
     assert summary.passed_tasks == 1
     assert summary.failed_tasks == 1
     assert summary.errored_tasks == 1
     assert summary.not_run_tasks == 1
+    assert summary.scored_tasks == 2
     assert summary.pass_rate == pytest.approx(1 / 3)
+    assert summary.scored_pass_rate == pytest.approx(1 / 2)
     assert summary.execution_coverage == pytest.approx(3 / 4)
+    assert summary.scored_coverage == pytest.approx(1 / 2)
     assert summary.tasks[0].duration_sec == 90
     assert summary.tasks[-1].status == "not_run"
 
     markdown = render_markdown(summary)
-    assert "Pass rate over executed tasks: `33.3%`" in markdown
-    assert "`not_run` tasks are excluded" in markdown
+    assert "Pass rate over attempted tasks: `33.3%`" in markdown
+    assert "Pass rate over scored tasks: `50.0%`" in markdown
+    assert "`error` tasks count in the attempted pass rate" in markdown
 
 
 def test_empty_results_report_has_no_pass_rate(tmp_path) -> None:
@@ -121,6 +127,62 @@ def test_empty_results_report_has_no_pass_rate(tmp_path) -> None:
     summary = summarize_results(matrix, tmp_path / "does-not-exist")
 
     assert summary.executed_tasks == 0
+    assert summary.scored_tasks == 0
     assert summary.pass_rate is None
+    assert summary.scored_pass_rate is None
     assert summary.execution_coverage == 0
-    assert "Pass rate over executed tasks: `N/A`" in render_markdown(summary)
+    assert summary.scored_coverage == 0
+    assert "Pass rate over attempted tasks: `N/A`" in render_markdown(summary)
+    assert "Pass rate over scored tasks: `N/A`" in render_markdown(summary)
+
+
+def test_error_only_results_have_no_pass_rate(tmp_path) -> None:
+    matrix = EvaluationMatrix(
+        schema_version=1,
+        dataset="terminal-bench@2.0",
+        selection_method="test",
+        tasks=(
+            MatrixTask(
+                name="errored",
+                difficulty="easy",
+                category="debugging",
+            ),
+        ),
+    )
+    _write_trial(
+        tmp_path,
+        task="errored",
+        reward=None,
+        exception_type="VerifierTimeoutError",
+    )
+
+    summary = summarize_results(matrix, tmp_path)
+
+    assert summary.complete is False
+    assert summary.all_tasks_attempted is True
+    assert summary.executed_tasks == 1
+    assert summary.scored_tasks == 0
+    assert summary.pass_rate == 0
+    assert summary.scored_pass_rate is None
+    assert summary.execution_coverage == 1
+    assert summary.scored_coverage == 0
+
+
+def test_duplicate_task_results_are_rejected(tmp_path) -> None:
+    matrix = EvaluationMatrix(
+        schema_version=1,
+        dataset="terminal-bench@2.0",
+        selection_method="test",
+        tasks=(
+            MatrixTask(
+                name="duplicate",
+                difficulty="easy",
+                category="debugging",
+            ),
+        ),
+    )
+    _write_trial(tmp_path, task="duplicate", reward=0.0, trial_id="first")
+    _write_trial(tmp_path, task="duplicate", reward=1.0, trial_id="second")
+
+    with pytest.raises(ValueError, match="multiple trial results"):
+        summarize_results(matrix, tmp_path)

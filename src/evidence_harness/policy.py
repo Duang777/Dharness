@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import shlex
 from collections.abc import Sequence
 
 from evidence_harness.protocol import CommandMode, CommandReceipt, ShellCommand, VerificationCheck
@@ -27,16 +28,17 @@ _TRIVIAL_CHECK = re.compile(
         ls(?:\s+.*)?|find(?:\s+.*)?|cat\s+\S+|head(?:\s+.*)?|tail(?:\s+.*)?
     )\s*;?\s*$"""
 )
-_CHECK_MUTATION = re.compile(
+_SHELL_PUNCTUATION = ";&|<>()\n"
+_CHECK_MUTATING_COMMAND = re.compile(
     r"""(?ix)
     (?:
         (^|[;&|]\s*)(?:rm|mv|cp|install|mkdir|touch|truncate|chmod|chown)\s
-        |\bsed\s+[^\n;]*\s-i(?:\s|$)
-        |(?:^|[^<>])>{1,2}(?!=)
-        |\btee\s+
+        |\bsed\b[^\n;]*(?:\s-i(?:[A-Za-z]*|\s)|\s--in-place(?:=\S*)?(?:\s|$))
+        |(^|[;&|]\s*)tee\s
         |\b(?:apt|apt-get|dnf|yum|apk|brew)\s+(?:install|remove|upgrade)\b
         |\b(?:pip|pip3|npm|pnpm|yarn)\s+(?:install|uninstall|add|remove)\b
-        |\bgit\s+(?:commit|reset|checkout|switch|clean|rebase|merge)\b
+        |\bgit\s+(?:commit|reset|checkout|switch|clean|rebase|merge)
+        (?=\s|[;&|]|$)
     )
     """
 )
@@ -102,25 +104,63 @@ def redact_sensitive(text: str) -> str:
 
 
 def validate_command(command: ShellCommand, max_timeout_sec: int) -> None:
-    _validate_script(command.script, command.timeout_sec, max_timeout_sec)
+    _validate_script(
+        command.script,
+        command.timeout_sec,
+        max_timeout_sec,
+        cwd=command.cwd,
+    )
 
 
 def validate_check(check: VerificationCheck, max_timeout_sec: int) -> None:
-    _validate_script(check.script, check.timeout_sec, max_timeout_sec)
+    _validate_script(
+        check.script,
+        check.timeout_sec,
+        max_timeout_sec,
+        cwd=check.cwd,
+    )
+    if _CHECK_MUTATING_COMMAND.search(check.script) or _has_output_redirection(
+        check.script
+    ):
+        raise PolicyViolation(f"verification check '{check.id}' appears to modify task state")
     if _TRIVIAL_CHECK.fullmatch(check.script):
         raise PolicyViolation(f"verification check '{check.id}' is display-only or a no-op")
-    if _CHECK_MUTATION.search(check.script):
-        raise PolicyViolation(f"verification check '{check.id}' appears to modify task state")
 
 
-def _validate_script(script: str, timeout_sec: int, max_timeout_sec: int) -> None:
+def _has_output_redirection(script: str) -> bool:
+    lexer = shlex.shlex(script, posix=True, punctuation_chars=_SHELL_PUNCTUATION)
+    lexer.commenters = ""
+    lexer.whitespace = " \t\r"
+    lexer.whitespace_split = True
+    try:
+        return any(
+            ">" in token and _is_shell_operator(token)
+            for token in lexer
+        )
+    except ValueError as exc:
+        raise PolicyViolation("verification check shell syntax cannot be inspected") from exc
+
+
+def _is_shell_operator(token: str) -> bool:
+    return bool(token) and all(character in _SHELL_PUNCTUATION for character in token)
+
+
+def _validate_script(
+    script: str,
+    timeout_sec: int,
+    max_timeout_sec: int,
+    *,
+    cwd: str | None,
+) -> None:
     if not script.strip():
         raise PolicyViolation("empty command")
     if timeout_sec > max_timeout_sec:
         raise PolicyViolation(
             f"command timeout {timeout_sec}s exceeds policy maximum {max_timeout_sec}s"
         )
-    if _FORBIDDEN_PATH.search(script):
+    if _FORBIDDEN_PATH.search(script) or (
+        cwd is not None and _FORBIDDEN_PATH.search(f" {cwd} ")
+    ):
         raise PolicyViolation("command references benchmark, credential, or host-control paths")
     if _BARE_ENV_DUMP.search(script):
         raise PolicyViolation("bulk environment dumps are not allowed")

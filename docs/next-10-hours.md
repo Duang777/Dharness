@@ -1,17 +1,17 @@
 # 后续 10 小时优先级
 
-## 0-1 小时：恢复真实模型通道
+## 0-1 小时：恢复 verifier 环境
 
-优先级 P0。配置一个明确支持 LiteLLM 的有效供应商 API key，用最小 JSON 请求验证模型
-名、认证、结构化输出和限流。成功标准不是“环境变量存在”，而是模型返回可被
-`AgentDecision` 解析的对象。失败则停在这里，不消耗 Docker 和 benchmark 时间。
+优先级 P0。GLM 5.3 模型通道已经通过结构化探针和真实 Harbor smoke。当前需要在
+`alexgshaw/fix-git:20251031` 能完成 `apt-get update` 的 Docker 环境中重跑官方
+verifier。成功标准是 Harbor 返回 reward，而不是 Agent 内部状态为 `verified`。
 
 ## 1-2 小时：两题校准
 
 先跑 `fix-git`（easy）和 `log-summary-date-ranges`（medium），并发设为 1。逐条检查
-Harbor reward、Harness stop reason、fresh evidence、模型协议错误和日志脱敏。若任一题
-是 infrastructure/model-service error，先修运行环境；若 verifier 为 0，再分析解题
-轨迹。
+Harbor reward、Harness stop reason、fresh evidence、模型协议错误和日志脱敏。如果
+任一题出现 infrastructure 或 model-service error，先修运行环境。如果 verifier 为
+0，再分析解题轨迹。
 
 ## 2-5 小时：执行固定 10 题
 
@@ -21,8 +21,8 @@ Markdown。这个阶段只收集基线，不边跑边调参。
 
 ## 5-7 小时：任务级失败分析
 
-选择最有代表性的 2-3 个失败，按“环境事实 -> 模型计划 -> 命令回执 -> evidence gate
--> verifier”还原因果链。每项明确归类：
+选择最有代表性的 2-3 个失败，按环境事实、模型计划、命令回执、evidence gate 和
+verifier 还原因果链。每项明确归类：
 
 - 模型能力：知识、推理、命令构造或错误理解不足。
 - Harness 设计：上下文投影、预算、恢复、策略或完成门禁造成。
@@ -45,5 +45,5 @@ Markdown。这个阶段只收集基线，不边跑边调参。
 ## 9.5-10 小时：发布
 
 冻结结果和失败分析，创建本地 commit。确认 GitHub 仓库名称和可见性后再创建远端并
-push。最终报告只引用真实结果：完整运行给出总通过率；仍有缺失 trial 则同时报告
-execution coverage，不把缺失项算作 0 分。
+push。最终报告只引用真实结果。完整运行给出总通过率。仍有缺失 trial 时，报告同时
+给出 execution coverage。报告不把 `error` 或 `not_run` 算作 verifier 失败。

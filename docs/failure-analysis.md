@@ -1,8 +1,8 @@
 # 失败分析
 
-当前没有真实 Terminal-Bench trial，因此不能编造“模型解题失败”。以下三项是开发和
-评测预检阶段实际发生的失败，分别归因到认证、模型通道和 Harbor 调用层。真实十题运行
-后，应使用同样结构补充任务级失败。
+当前已经运行一个真实 Terminal-Bench trial，但该 trial 没有获得 verifier reward。
+以下问题来自评测预检和首轮真实运行。每项问题分别归因到模型通道、Harness 或评测
+基础设施。
 
 ## 1. Codex 登录状态与真实可用性不一致
 
@@ -18,7 +18,7 @@
 
 **根因**
 
-评测预检最初把“凭证存在”误当成“模型可调用”。两者之间缺少一次不会操作 benchmark
+评测预检最初把凭证存在误当成模型可调用。两者之间缺少一次不会操作 benchmark
 环境的最小推理探针。
 
 **修正**
@@ -41,12 +41,12 @@ reward 的 trial 记为 `error`，把根本没有产生的 trial 记为 `not_run
 **归因**
 
 这是模型通道可用性问题。由于当前 Agent 使用 LiteLLM 结构化调用，Claude CLI 本来也
-不是已支持的生产后端；临时把 CLI 包装为 Gateway 会额外引入进程生命周期、CLI 版本、
+不是已支持的生产后端。临时把 CLI 包装为 Gateway 会额外引入进程生命周期、CLI 版本、
 登录态和输出协议风险。
 
 **根因**
 
-“本机有可执行文件且显示已登录”不足以构成稳定模型依赖。CLI 可能受网络、账户策略、
+本机有可执行文件且显示已登录，不足以构成稳定模型依赖。CLI 可能受网络、账户策略、
 服务端排队或本地配置影响，且这些状态不在项目锁文件内。
 
 **修正**
@@ -79,7 +79,7 @@ Harbor 0.23.0 中，`--task` 明确表示 registry `org/name`，本地任务使�
 
 **修正**
 
-README 和 smoke 命令统一使用 `--path`；正式 benchmark 使用
+README 和 smoke 命令统一使用 `--path`。正式 benchmark 使用
 `--dataset terminal-bench@2.0` 加十个 `--include-task-name`。runner 生成命令，避免
 每次手工重写参数。
 
@@ -87,3 +87,65 @@ README 和 smoke 命令统一使用 `--path`；正式 benchmark 使用
 
 项目固定 Harbor 0.23.0，并在交付前执行 Agent schema 检查、固定矩阵 dry-run 和真实
 本地 smoke。Harbor 升级时先过这三道兼容性检查，再运行付费 benchmark。
+
+## 4. 只读验证被误判为写操作
+
+**现象**
+
+`fix-git` 的任务修改已经完成，但五次 `finish` 都被 `EvidenceGate` 拒绝。被拒绝的
+检查包含 `git merge-base --is-ancestor`，以及用 `grep` 搜索 Git 冲突标记的命令。
+Agent 最终以 `budget_exhausted` 停止，failure category 是 `model_protocol`。
+
+**归因**
+
+这是 Harness 策略缺陷，不是模型解题失败。模型已恢复丢失提交、解决冲突并生成合并
+提交。错误发生在完成检查执行之前。
+
+**根因**
+
+`_CHECK_MUTATION` 用正则扫描整段 Shell。正则把 `merge-base` 的 `merge` 前缀当成
+`git merge`，也把引号内的 `>>>>>>>` 当成输出重定向。相同正则还漏掉了 `sed -i`。
+
+**修正**
+
+`validate_check` 现在分别判断写命令和输出重定向。Git 子命令使用完整 token 边界。
+输出重定向使用 Python `shlex` 区分操作符和引号内容。该策略是完成门禁，不是容器
+安全边界。
+
+**验证**
+
+同题复测从 11 turns、5 repairs 和 `budget_exhausted` 改善到 4 turns、0 repairs 和
+`verified`。输入 token 从 91,405 降到 33,938。38 项测试和所有项目门禁通过。
+
+## 5. Terminal-Bench verifier 超时
+
+**现象**
+
+`fix-git` 的 Agent 阶段结束后，verifier 在 `apt-get update` 中停留。Harbor 在 900 秒
+后返回 `VerifierTimeoutError`。trial 没有 reward。
+
+**归因**
+
+这是 verifier 基础设施错误。它既不是模型失败，也不是 Harness 完成门禁失败。结果状态
+是 `error`，不是 `failed`。
+
+**根因**
+
+`alexgshaw/fix-git:20251031` 是 amd64 镜像，当前 OrbStack 虚拟机是 arm64。该镜像的
+独立临时容器也能复现 `apt-get update` 停滞。相同主机上的官方
+`debian:bookworm-slim` amd64 镜像能在 51 秒内完成更新，因此问题集中在 `fix-git`
+镜像，而不是 Harbor 调度或全部跨架构容器。
+
+没有修改或读取隐藏 verifier 内容。现有证据还不能区分镜像内的软件状态和模拟层对该
+镜像的特定兼容问题。
+
+**修正**
+
+保留超时 trial 和完整 Harbor 异常。后续需要在 verifier 能正常完成的 Docker 环境中
+重跑同一任务。策略修复的同题对照暂时使用 `--disable-verification`，只比较 Agent 内部
+状态，不把该结果计入通过率。
+
+**后续防护**
+
+评测报告分别显示 `passed`、`failed`、`error` 和 `not_run`。只有 verifier 返回 reward
+的 trial 才能证明任务是否通过。
