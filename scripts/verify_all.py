@@ -81,6 +81,20 @@ STATIC_GATES = (
         ),
     ),
     (
+        "full-run orchestrator dry-run",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/run_full_evaluation.py",
+            "--model",
+            "openai/mock-model",
+            "--env-file",
+            "/dev/null",
+            "--dry-run",
+        ),
+    ),
+    (
         "delivery artifacts",
         ("uv", "run", "python", "scripts/verify_delivery.py"),
     ),

@@ -4,8 +4,9 @@ Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它�
 改造成控制器执行的证据协议：模型提出操作和验收条件，Harness 串行执行命令、保存观察、
 重新运行最终检查，只有新鲜证据覆盖全部任务要求时才结束。
 
-> **全量评测进行中：** Terminal-Bench 2.0 共 89 道任务，目前正在以并发 1 串行运行
-> 全部 benchmark。下方 20 题是已经完成并冻结的阶段性结果，不代表 89 题全量最终成绩。
+> **全量评测等待启动：** Terminal-Bench 2.0 共 89 道任务，仓库已固定完整矩阵和
+> 并发 1 的可恢复运行入口；真实 89 题作业尚未启动。下方 20 题是已经完成并冻结的
+> 阶段性结果，不代表 89 题全量最终成绩。
 
 ## 成绩
 
@@ -230,7 +231,9 @@ uv run python scripts/run_full_evaluation.py \
 
 进度写入
 `runs/terminal-bench-2/<run-name>/progress.jsonl`。编排器始终传递
-`--n-concurrent 1`，并且只为 `fix-git` 挂载 HTTPS Debian 源。
+`--n-concurrent 1`，并且只为 `fix-git` 挂载 HTTPS Debian 源。相同 `--run-name`
+只能使用相同模型、矩阵、凭证文件、Agent 参数和 Harness 源码；配置变化时请使用新的
+名称。
 
 评测预算可用 `--agent-kwarg max_turns=...`、
 `--agent-kwarg max_environment_calls=...` 和
