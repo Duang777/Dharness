@@ -62,21 +62,19 @@ Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifi
 
 ## 核心亮点
 
-- **完成声明必须带证据。** `finish` 给出一到三条检查命令和 requirement-to-check
-  覆盖表。Harness 自己执行检查，模型不能用自然语言宣布成功。
-- **证据绑定当前工作版本。** 每次变更推进 `work_epoch` 并使旧检查失效，避免
-  “先测试、后改坏、仍然结束”。
-- **最终验证有独立预算。** executor 不能把全部环境调用消耗在探索阶段。
-- **单写者消除状态竞争。** 只有 `CommandRunner` 能操作 Harbor 环境；completion
-  reviewer 只审查覆盖关系，不持有环境对象。
-- **上下文按状态重建。** 每轮 prompt 从 `RunState`、计划、预算和有界观察生成。完整
-  输出脱敏后进入 journal，prompt 只携带首尾摘录、摘要哈希和引用。
-- **模型异常可恢复。** 空正文进入一次 schema repair；executor 和 reviewer 都有独立
-  模型调用超时；重复失败会触发 replan 或分类停止。
-- **报告不美化失败。** `passed`、`failed`、`error`、`not_run` 以及
-  `live`、`replay` 分开统计。内部 `verified` 不能替代 Harbor reward。
-- **结果可以从仓库复算。** `evaluation/trials-20/` 保存 20 个脱敏 trial 快照和原始
-  结果 SHA-256，不保存 API 地址、凭证、绝对路径或 traceback。
+这里的亮点只描述 Harness 的运行时设计。评测统计、文档和 Skills 放在后续独立章节。
+
+| 设计亮点 | Harness 的实现 |
+|---|---|
+| 结构化动作协议 | 模型只能返回 `execute`、`finish`、`replan` 或 `stop`。Pydantic 在模型边界解析动作，格式错误只允许一次 schema repair |
+| 证据驱动的完成协议 | `finish` 必须提交检查命令和 requirement-to-check 覆盖表。Harness 重跑检查，模型不能用自然语言自行宣布成功 |
+| 基于 epoch 的证据新鲜度 | 每次修改环境都会推进 `work_epoch`。旧检查立即失效，避免修改后继续复用过期的通过结果 |
+| 单写者执行边界 | 只有 `CommandRunner` 可以调用 Harbor 环境。executor 和 reviewer 不会并发修改同一个容器 |
+| 独立的完成审查 | completion reviewer 只判断检查是否覆盖原始要求，不持有环境对象，也不执行命令 |
+| 状态投影式上下文 | 每轮 prompt 从 `RunState` 重建，只包含当前计划、剩余预算和有界观察。完整输出写入脱敏 journal |
+| 分层恢复机制 | 命令失败触发分类处理，协议错误进入 repair，重复周期触发 replan，模型停滞由独立超时截断 |
+| 有界预算与明确停止 | turn、环境调用、repair、recovery 和墙钟时间分别计数。预算耗尽后返回明确的停止原因，不无限循环 |
+| 内外两层验收 | `EvidenceGate` 判断 Harness 是否具备完成证据，Harbor verifier 决定 benchmark reward。内部 `verified` 不覆盖外部评分 |
 
 ## 工程方法与知识覆盖
 
