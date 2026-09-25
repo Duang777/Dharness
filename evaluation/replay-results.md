@@ -1,29 +1,29 @@
-# Terminal-Bench 2.0 Evaluation
+# Terminal-Bench 2.0 评测结果
 
-- Dataset: `terminal-bench@2.0`
-- Scoring complete: `no`
-- All tasks attempted: `no`
-- Executed: `1/10`
-- Scored: `1/10`
-- Passed / failed / errored: `1 / 0 / 0`
-- Pass rate over attempted tasks: `100.0%`
-- Pass rate over scored tasks: `100.0%`
-- Execution coverage: `10.0%`
-- Scored coverage: `10.0%`
+- 数据集: `terminal-bench@2.0`
+- 评分完整: `否`
+- 所有任务均已尝试: `否`
+- 已执行: `1/10`
+- 已评分: `1/10`
+- 通过 / 失败 / 错误: `1 / 0 / 0`
+- 已尝试任务通过率: `100.0%`
+- 已评分任务通过率: `100.0%`
+- 执行覆盖率: `10.0%`
+- 评分覆盖率: `10.0%`
 
-| Task | Difficulty | Category | Mode | Status | Reward | Stop reason |
-|---|---|---|---|---|---:|---|
-| overfull-hbox | easy | debugging | not_run | not_run | N/A |  |
-| fix-git | easy | software-engineering | replay | passed | 1 |  |
-| cobol-modernization | easy | software-engineering | not_run | not_run | N/A |  |
-| log-summary-date-ranges | medium | data-processing | not_run | not_run | N/A |  |
-| openssl-selfsigned-cert | medium | security | not_run | not_run | N/A |  |
-| modernize-scientific-stack | medium | scientific-computing | not_run | not_run | N/A |  |
-| qemu-startup | medium | system-administration | not_run | not_run | N/A |  |
-| cancel-async-tasks | hard | software-engineering | not_run | not_run | N/A |  |
-| configure-git-webserver | hard | system-administration | not_run | not_run | N/A |  |
-| model-extraction-relu-logits | hard | mathematics | not_run | not_run | N/A |  |
+| 任务 | 难度 | 类别 | 模型 | 模式 | 状态 | 奖励 | 停止原因 |
+|---|---|---|---|---|---|---:|---|
+| overfull-hbox | 简单 | 调试 |  | 未运行 | 未运行 | 不适用 |  |
+| fix-git | 简单 | 软件工程 | 不适用 (日志回放) | 回放 | 通过 | 1 |  |
+| cobol-modernization | 简单 | 软件工程 |  | 未运行 | 未运行 | 不适用 |  |
+| log-summary-date-ranges | 中等 | 数据处理 |  | 未运行 | 未运行 | 不适用 |  |
+| openssl-selfsigned-cert | 中等 | 安全 |  | 未运行 | 未运行 | 不适用 |  |
+| modernize-scientific-stack | 中等 | 科学计算 |  | 未运行 | 未运行 | 不适用 |  |
+| qemu-startup | 中等 | 系统管理 |  | 未运行 | 未运行 | 不适用 |  |
+| cancel-async-tasks | 困难 | 软件工程 |  | 未运行 | 未运行 | 不适用 |  |
+| configure-git-webserver | 困难 | 系统管理 |  | 未运行 | 未运行 | 不适用 |  |
+| model-extraction-relu-logits | 困难 | 数学 |  | 未运行 | 未运行 | 不适用 |  |
 
-> `error` tasks count in the attempted pass rate but not the scored pass rate. `not_run` tasks are excluded from both.
+> `error` 任务计入已尝试任务通过率。不计入已评分任务通过率。`not_run` 任务不计入这两个通过率。
 
-> `replay` runs execute previously recorded agent decisions without a new model call.
+> `replay` 运行会执行先前记录的 Agent 决策。不会发起新的模型调用。

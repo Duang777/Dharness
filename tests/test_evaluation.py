@@ -123,9 +123,10 @@ def test_summary_keeps_missing_tasks_out_of_failure_count(tmp_path) -> None:
     assert summary.tasks[-1].execution_mode == "not_run"
 
     markdown = render_markdown(summary)
-    assert "Pass rate over attempted tasks: `33.3%`" in markdown
-    assert "Pass rate over scored tasks: `50.0%`" in markdown
-    assert "`error` tasks count in the attempted pass rate" in markdown
+    assert "已尝试任务通过率: `33.3%`" in markdown
+    assert "已评分任务通过率: `50.0%`" in markdown
+    assert "`error` 任务计入已尝试任务通过率" in markdown
+    assert "| passed | 中等 | 测试 | openai/test-model | 实时 | 通过 | 1 | 已验证 |" in markdown
 
 
 def test_empty_results_report_has_no_pass_rate(tmp_path) -> None:
@@ -150,8 +151,8 @@ def test_empty_results_report_has_no_pass_rate(tmp_path) -> None:
     assert summary.scored_pass_rate is None
     assert summary.execution_coverage == 0
     assert summary.scored_coverage == 0
-    assert "Pass rate over attempted tasks: `N/A`" in render_markdown(summary)
-    assert "Pass rate over scored tasks: `N/A`" in render_markdown(summary)
+    assert "已尝试任务通过率: `不适用`" in render_markdown(summary)
+    assert "已评分任务通过率: `不适用`" in render_markdown(summary)
 
 
 def test_error_only_results_have_no_pass_rate(tmp_path) -> None:
@@ -234,7 +235,5 @@ def test_replay_result_is_labeled_with_source_hash(tmp_path) -> None:
     assert summary.tasks[0].execution_mode == "replay"
     assert summary.tasks[0].source_journal_sha256 == source_sha256
     markdown = render_markdown(summary)
-    assert (
-        "| replayed | easy | debugging | N/A (journal replay) | replay | passed | 1 | verified |"
-    ) in markdown
-    assert "`replay` runs execute previously recorded agent decisions" in markdown
+    assert ("| replayed | 简单 | 调试 | 不适用 (日志回放) | 回放 | 通过 | 1 | 已验证 |") in markdown
+    assert "`replay` 运行会执行先前记录的 Agent 决策" in markdown

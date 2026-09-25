@@ -7,6 +7,44 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+DIFFICULTY_LABELS = {
+    "easy": "简单",
+    "medium": "中等",
+    "hard": "困难",
+}
+CATEGORY_LABELS = {
+    "debugging": "调试",
+    "software-engineering": "软件工程",
+    "data-processing": "数据处理",
+    "security": "安全",
+    "scientific-computing": "科学计算",
+    "system-administration": "系统管理",
+    "mathematics": "数学",
+    "file-operations": "文件操作",
+    "data-science": "数据科学",
+    "test": "测试",
+}
+MODE_LABELS = {
+    "live": "实时",
+    "replay": "回放",
+    "not_run": "未运行",
+}
+STATUS_LABELS = {
+    "passed": "通过",
+    "failed": "失败",
+    "error": "错误",
+    "not_run": "未运行",
+}
+STOP_REASON_LABELS = {
+    "verified": "已验证",
+    "budget_exhausted": "预算耗尽",
+    "doom_loop": "重复循环",
+    "model_stopped": "模型主动停止",
+    "policy_blocked": "策略阻止",
+    "infrastructure_failure": "基础设施失败",
+    "model_failure": "模型失败",
+}
+
 
 class MatrixTask(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -111,45 +149,45 @@ def summarize_results(matrix: EvaluationMatrix, results_dir: Path) -> Evaluation
 
 
 def render_markdown(summary: EvaluationSummary) -> str:
-    pass_rate = f"{summary.pass_rate:.1%}" if summary.pass_rate is not None else "N/A"
+    pass_rate = f"{summary.pass_rate:.1%}" if summary.pass_rate is not None else "不适用"
     scored_pass_rate = (
-        f"{summary.scored_pass_rate:.1%}" if summary.scored_pass_rate is not None else "N/A"
+        f"{summary.scored_pass_rate:.1%}" if summary.scored_pass_rate is not None else "不适用"
     )
     lines = [
-        "# Terminal-Bench 2.0 Evaluation",
+        "# Terminal-Bench 2.0 评测结果",
         "",
-        f"- Dataset: `{summary.dataset}`",
-        f"- Scoring complete: `{'yes' if summary.complete else 'no'}`",
-        f"- All tasks attempted: `{'yes' if summary.all_tasks_attempted else 'no'}`",
-        f"- Executed: `{summary.executed_tasks}/{summary.selected_tasks}`",
-        f"- Scored: `{summary.scored_tasks}/{summary.selected_tasks}`",
-        f"- Passed / failed / errored: "
+        f"- 数据集: `{summary.dataset}`",
+        f"- 评分完整: `{'是' if summary.complete else '否'}`",
+        f"- 所有任务均已尝试: `{'是' if summary.all_tasks_attempted else '否'}`",
+        f"- 已执行: `{summary.executed_tasks}/{summary.selected_tasks}`",
+        f"- 已评分: `{summary.scored_tasks}/{summary.selected_tasks}`",
+        f"- 通过 / 失败 / 错误: "
         f"`{summary.passed_tasks} / {summary.failed_tasks} / {summary.errored_tasks}`",
-        f"- Pass rate over attempted tasks: `{pass_rate}`",
-        f"- Pass rate over scored tasks: `{scored_pass_rate}`",
-        f"- Execution coverage: `{summary.execution_coverage:.1%}`",
-        f"- Scored coverage: `{summary.scored_coverage:.1%}`",
+        f"- 已尝试任务通过率: `{pass_rate}`",
+        f"- 已评分任务通过率: `{scored_pass_rate}`",
+        f"- 执行覆盖率: `{summary.execution_coverage:.1%}`",
+        f"- 评分覆盖率: `{summary.scored_coverage:.1%}`",
         "",
-        "| Task | Difficulty | Category | Model | Mode | Status | Reward | Stop reason |",
+        "| 任务 | 难度 | 类别 | 模型 | 模式 | 状态 | 奖励 | 停止原因 |",
         "|---|---|---|---|---|---|---:|---|",
     ]
     for task in summary.tasks:
-        reward = "N/A" if task.reward is None else f"{task.reward:g}"
+        reward = "不适用" if task.reward is None else f"{task.reward:g}"
         model_name = task.model_name or (
-            "N/A (journal replay)" if task.execution_mode == "replay" else ""
+            "不适用 (日志回放)" if task.execution_mode == "replay" else ""
         )
         lines.append(
             "| "
             + " | ".join(
                 (
                     _escape_cell(task.name),
-                    _escape_cell(task.difficulty),
-                    _escape_cell(task.category),
+                    _display_label(DIFFICULTY_LABELS, task.difficulty),
+                    _display_label(CATEGORY_LABELS, task.category),
                     _escape_cell(model_name),
-                    _escape_cell(task.execution_mode),
-                    _escape_cell(task.status),
+                    _display_label(MODE_LABELS, task.execution_mode),
+                    _display_label(STATUS_LABELS, task.status),
                     reward,
-                    _escape_cell(task.stop_reason or ""),
+                    _display_label(STOP_REASON_LABELS, task.stop_reason or ""),
                 )
             )
             + " |"
@@ -159,16 +197,15 @@ def render_markdown(summary: EvaluationSummary) -> str:
         lines.extend(
             (
                 "",
-                "> `error` tasks count in the attempted pass rate but not the scored pass "
-                "rate. `not_run` tasks are excluded from both.",
+                "> `error` 任务计入已尝试任务通过率。不计入已评分任务通过率。"
+                "`not_run` 任务不计入这两个通过率。",
             )
         )
     if any(task.execution_mode == "replay" for task in summary.tasks):
         lines.extend(
             (
                 "",
-                "> `replay` runs execute previously recorded agent decisions without a new "
-                "model call.",
+                "> `replay` 运行会执行先前记录的 Agent 决策。不会发起新的模型调用。",
             )
         )
     return "\n".join(lines) + "\n"
@@ -305,6 +342,10 @@ def _string_or_none(value: object) -> str | None:
 
 def _escape_cell(value: str) -> str:
     return value.replace("|", "\\|").replace("\n", " ")
+
+
+def _display_label(labels: dict[str, str], value: str) -> str:
+    return _escape_cell(labels.get(value, value))
 
 
 def _display_path(path: Path) -> str:

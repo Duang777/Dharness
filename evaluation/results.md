@@ -1,29 +1,29 @@
-# Terminal-Bench 2.0 Evaluation
+# Terminal-Bench 2.0 评测结果
 
-- Dataset: `terminal-bench@2.0`
-- Scoring complete: `no`
-- All tasks attempted: `yes`
-- Executed: `10/10`
-- Scored: `9/10`
-- Passed / failed / errored: `9 / 0 / 1`
-- Pass rate over attempted tasks: `90.0%`
-- Pass rate over scored tasks: `100.0%`
-- Execution coverage: `100.0%`
-- Scored coverage: `90.0%`
+- 数据集: `terminal-bench@2.0`
+- 评分完整: `否`
+- 所有任务均已尝试: `是`
+- 已执行: `10/10`
+- 已评分: `9/10`
+- 通过 / 失败 / 错误: `9 / 0 / 1`
+- 已尝试任务通过率: `90.0%`
+- 已评分任务通过率: `100.0%`
+- 执行覆盖率: `100.0%`
+- 评分覆盖率: `90.0%`
 
-| Task | Difficulty | Category | Model | Mode | Status | Reward | Stop reason |
+| 任务 | 难度 | 类别 | 模型 | 模式 | 状态 | 奖励 | 停止原因 |
 |---|---|---|---|---|---|---:|---|
-| overfull-hbox | easy | debugging | openai/modelhub/gpt-5.6-terra | live | passed | 1 | budget_exhausted |
-| fix-git | easy | software-engineering | openai/glm-5.3 | live | passed | 1 | verified |
-| cobol-modernization | easy | software-engineering | openai/glm-5.3 | live | passed | 1 | budget_exhausted |
-| log-summary-date-ranges | medium | data-processing | openai/glm-5.3 | live | passed | 1 | verified |
-| openssl-selfsigned-cert | medium | security | openai/glm-5.3 | live | passed | 1 | verified |
-| modernize-scientific-stack | medium | scientific-computing | N/A (journal replay) | replay | passed | 1 |  |
-| qemu-startup | medium | system-administration | openai/glm-5.3 | live | error | 0 |  |
-| cancel-async-tasks | hard | software-engineering | openai/modelhub/gpt-5.6-terra | live | passed | 1 | verified |
-| configure-git-webserver | hard | system-administration | openai/glm-5.3 | live | passed | 1 | budget_exhausted |
-| model-extraction-relu-logits | hard | mathematics | openai/modelhub/gpt-5.6-terra | live | passed | 1 | budget_exhausted |
+| overfull-hbox | 简单 | 调试 | openai/modelhub/gpt-5.6-terra | 实时 | 通过 | 1 | 预算耗尽 |
+| fix-git | 简单 | 软件工程 | openai/glm-5.3 | 实时 | 通过 | 1 | 已验证 |
+| cobol-modernization | 简单 | 软件工程 | openai/glm-5.3 | 实时 | 通过 | 1 | 预算耗尽 |
+| log-summary-date-ranges | 中等 | 数据处理 | openai/glm-5.3 | 实时 | 通过 | 1 | 已验证 |
+| openssl-selfsigned-cert | 中等 | 安全 | openai/glm-5.3 | 实时 | 通过 | 1 | 已验证 |
+| modernize-scientific-stack | 中等 | 科学计算 | 不适用 (日志回放) | 回放 | 通过 | 1 |  |
+| qemu-startup | 中等 | 系统管理 | openai/glm-5.3 | 实时 | 错误 | 0 |  |
+| cancel-async-tasks | 困难 | 软件工程 | openai/modelhub/gpt-5.6-terra | 实时 | 通过 | 1 | 已验证 |
+| configure-git-webserver | 困难 | 系统管理 | openai/glm-5.3 | 实时 | 通过 | 1 | 预算耗尽 |
+| model-extraction-relu-logits | 困难 | 数学 | openai/modelhub/gpt-5.6-terra | 实时 | 通过 | 1 | 预算耗尽 |
 
-> `error` tasks count in the attempted pass rate but not the scored pass rate. `not_run` tasks are excluded from both.
+> `error` 任务计入已尝试任务通过率。不计入已评分任务通过率。`not_run` 任务不计入这两个通过率。
 
-> `replay` runs execute previously recorded agent decisions without a new model call.
+> `replay` 运行会执行先前记录的 Agent 决策。不会发起新的模型调用。
