@@ -25,6 +25,41 @@ replay 组成；live trial 使用 GLM 5.3 与 `modelhub/gpt-5.6-terra`。评分�
 `qemu-startup` 发生在 Apple Silicon 宿主的 Rosetta amd64 容器中。逐题模型、模式、
 reward 和停止原因见[20 题冻结评测结果](evaluation/results-20.md)。
 
+### 如何解读成绩
+
+本项目同时报告两种通过率。Attempted pass rate 以全部已运行任务为分母，能暴露模型、
+Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifier 正常给出评分的
+任务，用于区分解题失败与运行环境错误。
+
+| 分组 | 通过 | 失败 | 错误 | 结论 |
+|---|---:|---:|---:|---|
+| easy | 4 / 4 | 0 | 0 | 基础代码与调试任务全部通过 |
+| medium | 8 / 10 | 1 | 1 | 唯一策略拒绝和唯一基础设施错误都在此组 |
+| hard | 6 / 6 | 0 | 0 | 并发、服务配置、安全修复和科学计算任务全部通过 |
+| GLM 5.3 live | 5 / 6 | 0 | 1 | `qemu-startup` 因运行环境失败 |
+| Terra live | 12 / 13 | 1 | 0 | `vulnerable-secret` 被供应商策略拒绝 |
+| journal replay | 1 / 1 | 0 | 0 | 只证明记录轨迹可复现，不代表新的模型推理 |
+
+这 20 题不是随机抽样，也不是单模型对照实验。矩阵只根据公开 `task.toml` 的难度、类别
+和标签确定；选样阶段不读取 solution 或 verifier。所有 live trial 使用并发 1。恢复
+批次只重跑首次没有通过的四题，最终快照为每个任务保留一个明确来源。
+
+### 实验结论
+
+1. **证据门禁能减少无依据的提前结束，但门禁本身也会失败。** `fix-git` 的首轮解法
+   已完成，旧策略却连续五次拒绝合法检查。修复命令解析后，同模型、同任务、同预算的
+   turns 从 11 降到 4，repairs 从 5 降到 0，输入 token 减少 62.9%。
+2. **外部 reward 与内部 `verified` 必须分开。** 17 个 live 通过任务中，10 个以
+   `verified` 结束，7 个以 `budget_exhausted` 结束但仍获得 reward 1.0。这说明当前
+   主要缺口已从“不会做题”转向“完成审查和只读策略不能稳定达成一致”。
+3. **验证器必须按消费者语义读取产物。** `dna-assembly` 首轮内部状态为 `verified`，
+   官方 verifier 却发现引物 Tm 差值超限。改为解析完整扩增产物、BsaI 位点和环形拼接
+   后，恢复 trial 获得 reward 1.0。
+4. **错误分类决定优化方向。** `query-optimize` 是算法和证据不足，修正后查询中位耗时
+   比参考快 1.22 倍；Docker manifest EOF 是可重试的环境错误；QEMU 缺少 syscall 和
+   KVM 是 runner 能力问题；`cyber_policy` 是模型通道边界。这四类问题不能用同一个
+   “重试”策略处理。
+
 ## 核心亮点
 
 - **完成声明必须带证据。** `finish` 给出一到三条检查命令和 requirement-to-check
@@ -70,6 +105,27 @@ flowchart LR
 | 终止判断 | reviewer 审覆盖，Harness 重跑 checks，EvidenceGate 校验 epoch 与结果 |
 
 完整状态机、组件职责、方案比较和取舍见[架构决策](docs/architecture-rationale.md)。
+
+## 架构判断
+
+Evidence Harness 的设计不是“让模型多思考几轮”，而是把不稳定的模型放进一个确定性的
+控制器。模型负责提出下一步，控制器负责维护事实、执行副作用和裁决是否允许结束。
+
+**选择单写者。** 只有 `CommandRunner` 可以修改任务环境。reviewer 不持有环境引用，
+因此不会和 executor 并发写同一容器，也不能用自然语言伪造执行结果。这个选择牺牲并行
+探索速度，换来可归因的命令序列和稳定的状态。
+
+**选择状态投影，不保留无限对话。** 每轮 prompt 从 `RunState` 重建，只携带当前计划、
+预算、最近观察和日志引用。完整输出进入脱敏 journal。模型需要旧细节时重新执行窄范围
+查询，而不是让历史输出永久占用上下文。
+
+**选择双重完成判定。** Harness 的 `EvidenceGate` 只判断完成声明是否有新鲜、可执行、
+覆盖要求的证据。Harbor verifier 才决定 benchmark reward。两者分离后，报告可以识别
+“任务已通过但 Harness 未收敛”和“内部已验证但外部产物错误”这两种相反问题。
+
+**选择有限恢复。** schema repair、模型调用超时、命令失败分类和重复周期检测都有明确
+预算。系统宁可返回可解释的 `model_failure` 或 `budget_exhausted`，也不无限重试并把
+成本隐藏在长对话中。
 
 ## 安装
 
@@ -209,7 +265,8 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [20 题逐题结果与统计口径](evaluation/results-20.md)
 - [首批 10 题冻结结果](evaluation/results.md)
 - [首批 10 题逐题分析](docs/ten-task-analysis.md)
+- [新增 10 题逐题分析](docs/expanded-ten-analysis.md)
 - [失败分析](docs/failure-analysis.md)
 - [如果再给 10 小时](docs/next-10-hours.md)
-- [Vibe Coding 日志](docs/vibe-coding-log.md)
+- [AI Coding 工程日志](docs/vibe-coding-log.md)
 - [独立 fix-git replay 结果](evaluation/replay-results.md)

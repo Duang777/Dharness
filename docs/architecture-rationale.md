@@ -4,6 +4,41 @@
 
 Terminal-Bench 2.0 的任务横跨系统运维、数据处理、服务配置和代码修改。Harness 必须保留通用 shell 能力，同时限制重复操作、上下文膨胀和没有证据的提前结束。Harbor 0.23.0 在宿主进程中加载自定义 `BaseAgent`，Agent 再通过 `BaseEnvironment.exec` 操作隔离环境。这个边界允许控制器直接获得命令退出码，无需在每个任务容器中安装 CLI。
 
+## 核心架构判断
+
+终端 Agent 的主要风险不是模型不会生成命令，而是模型同时承担计划、执行、记忆和完成
+判定后，系统没有独立事实来源。一次错误观察、过期测试或模型空响应都可能污染后续判断。
+Evidence Harness 因此把模型视为不稳定的决策组件，而不是系统状态的权威。
+
+设计围绕五个不变量展开：
+
+| 不变量 | 约束 | 目的 |
+|---|---|---|
+| 单一环境写者 | 只有 `CommandRunner` 调用 `BaseEnvironment.exec` | 让每次副作用都能归因和排序 |
+| 状态由控制器持有 | 预算、epoch、回执和停止原因存入 `RunState` | 模型失忆或重试不会改写事实 |
+| 证据必须新鲜 | 修改后递增 `work_epoch`，旧检查立即失效 | 防止“先测试通过，再修改出错” |
+| 完成需要双重判定 | Harness 审核证据，Harbor verifier 评分 | 避免内部启发式冒充任务真相 |
+| 恢复必须有上限 | repair、recovery、turn、调用和墙钟都有预算 | 失败能够终止、分类和复现 |
+
+这五个不变量决定了模块边界。`protocol.py` 定义模型能说什么，`run_loop.py` 决定状态
+如何变化，`shell.py` 是唯一副作用入口，`evidence.py` 决定完成声明是否成立，
+`evaluation.py` 只处理运行结束后的评分事实。
+
+## 三条权威边界
+
+系统把一次评测拆成三个彼此独立的权威来源：
+
+1. **控制权威。** `EvidenceLoop` 决定预算、状态迁移和停止原因。模型不能直接修改这些
+   字段。
+2. **环境权威。** `CommandRunner` 返回真实退出码、输出摘要和观察哈希。模型文本不能
+   替代命令回执。
+3. **评分权威。** Harbor verifier 决定 reward。内部 `verified` 只表示完成证据通过
+   Harness 门禁，不表示 benchmark 已通过。
+
+这个分离解释了两类看似矛盾的结果。`dna-assembly` 首轮内部 `verified`，但外部
+verifier 发现产物错误；另有 7 个任务外部 reward 为 1.0，但内部因完成检查契约冲突而
+以 `budget_exhausted` 结束。两种信号都要保留，不能互相覆盖。
+
 ## 使用方式
 
 Harbor 只需要一个导入路径：
@@ -66,6 +101,11 @@ flowchart TB
 控制路径和评分路径彼此独立。`EvidenceGate` 决定 Harness 能否声明完成，Harbor
 verifier 在 Agent 退出后判断任务是否真正通过。Harness 不读取 verifier 文件，也不把
 内部门禁结果当作 benchmark 分数。
+
+从职责上看，`EvidenceLoop`、`Policy` 和 `EvidenceGate` 构成控制平面；
+`CommandRunner` 与 `BaseEnvironment` 构成执行平面；Harbor verifier 构成评分平面。
+控制平面可以拒绝不安全或证据不足的动作，但不能声明评分成功。评分平面可以判断最终
+结果，却不参与 Agent 的中间决策。
 
 ## 组件职责
 
@@ -240,13 +280,16 @@ Planner/Executor/Critic 更节省 token，也不会产生第二个环境写者�
 
 `RunJournal` 以 JSONL 记录 run、模型决策、策略拒绝、命令回执、reviewer 判断、恢复和
 最终报告。Harbor `AgentContext` 同步 token、成本、turn、环境调用、repair、recovery、
-epoch 和停止原因。评测矩阵单独固定在 `evaluation/matrix.json`，runner 用十个精确
-任务名调用 `terminal-bench@2.0`。原始 Harbor 目录默认不进 Git；冻结器从
-`result.json` 只提取任务、模型、用量、Harness 状态、reward、异常类型和来源 SHA-256，
-写入 `evaluation/trials/`。汇总器从这些脱敏快照重建报告，因此 fresh clone 不依赖开发
-机的 `runs/` 目录。未产生 trial 的任务状态是 `not_run`，认证或基础设施错误是
-`error`，只有 verifier 给出非满分结果才是 `failed`。这条区分保证报告不会把未执行
-写成模型解题失败。
+epoch 和停止原因。首批矩阵固定在 `evaluation/matrix.json`，扩展矩阵固定在
+`evaluation/matrix-20.json`。原始 Harbor 目录默认不进 Git；冻结器从 `result.json`
+只提取任务、模型、用量、Harness 状态、reward、异常类型和来源 SHA-256，写入
+`evaluation/trials/` 或 `evaluation/trials-20/`。
+
+冻结器先在临时目录生成完整结果，再整体替换目标目录。它拒绝重复、缺失和矩阵外任务。
+交付检查会递归检查快照路径和内嵌任务名，防止历史文件被静默计入。汇总器从脱敏快照
+重建 JSON 与 Markdown，因此 fresh clone 不依赖开发机的 `runs/` 目录。未产生 trial
+的任务状态是 `not_run`，认证或基础设施错误是 `error`，只有 verifier 给出非满分结果
+才是 `failed`。
 
 ## 设计特色
 
@@ -269,6 +312,36 @@ Planner、Executor 和 Critic 更省模型调用，也避免多个 Agent 同时�
 第四，内部完成与 benchmark 评分分离。Harness 不读取隐藏 verifier，不把 mock smoke
 当成 benchmark 成绩，也不把没有运行的任务计为失败。这个边界既减少评测泄漏，也让
 失败分析能区分模型、控制器和基础设施问题。
+
+## 实验如何反向验证架构
+
+架构不是在评测前一次确定。每次改动都来自可复现的失败，并用同题或同类任务验证。
+
+| 运行证据 | 暴露的问题 | 架构修正 | 结果 |
+|---|---|---|---|
+| `fix-git` 五次拒绝合法检查 | 正则把参数文本误判为写操作 | 命令与重定向分开解析 | turns 11 降到 4，输入 token 减少 62.9% |
+| GLM 空正文和长时间停滞 | 模型错误逃出 repair 边界，单次调用无截止时间 | 空正文进入 schema repair，模型调用增加独立超时 | 后续任务能分类停止或恢复 |
+| `query-optimize` 正确但慢 | 第一份可用方案被误当成优化完成 | 允许选择方案时至少比较两个候选 | 恢复 trial 比参考查询快 1.22 倍 |
+| `dna-assembly` 内部通过、外部失败 | 自写检查和产物共享错误解释 | 按目标工具或消费者语义解析完整产物 | 恢复 trial 获得 reward 1.0 |
+| Docker manifest EOF | 环境准备错误与解题失败混在同一批次 | 保留原 trial，只重跑受影响任务 | 恢复运行 5 turns 后通过 |
+| QEMU syscall 282 | 任务需要宿主未提供的虚拟化能力 | 将异常保留为 `error`，不调整 prompt | 明确需要 x86_64 runner |
+
+这些结果也暴露了当前架构的主要缺口。17 个 live 通过任务中只有 10 个以
+`verified` 结束。剩余 7 个任务的外部结果正确，但完成审查没有在预算内收敛。下一步
+应改进验证隔离和 reviewer 的增量反馈，而不是继续增加 executor 自由度。
+
+## 与常见架构的对照
+
+| 体系 | 可借鉴的思想 | Evidence Harness 的选择 |
+|---|---|---|
+| Kubernetes controller | 比较期望状态与观察状态，循环收敛 | 用原始任务、`RunState` 和命令回执驱动有限次 reconcile |
+| Temporal | 状态持久化、可重放历史和明确重试 | journal 支持审计与命令 replay，但不声称具备完整 durable execution |
+| LangGraph | 显式状态节点和条件边 | 使用普通 Python 状态机，减少 benchmark 运行时依赖 |
+| CrewAI、AutoGen | 多角色分工 | 只保留低频只读 reviewer，拒绝多个 Agent 并发写同一环境 |
+
+这里没有直接引入这些框架。Terminal-Bench 的核心约束是 Harbor 环境执行、严格预算和
+逐题隔离。额外编排运行时会增加安装、序列化和故障变量。当前实现只采用可验证的设计
+思想，并把状态机和协议保留在项目代码中。
 
 ## 综合选择
 
@@ -306,11 +379,15 @@ Planner、Executor 和 Critic 更省模型调用，也避免多个 Agent 同时�
 
 ## 下一步
 
-当前固定 10 题已全部尝试。下一阶段首先在原生 x86_64 Linux runner 上重跑
-`qemu-startup`，把基础设施错误与任务解法分开。其次为会生成 PDF、日志或数组文件的
-completion check 设计隔离工作区，证明检查产物不能回写待评分目录，再复测
-`overfull-hbox` 与 `model-extraction-relu-logits` 的内部停止状态。
+当前 20 题已全部尝试。下一阶段首先在原生 x86_64 Linux runner 上重跑
+`qemu-startup`，再使用明确允许授权安全评测的模型通道复测 `vulnerable-secret`。
+这两步只处理外部能力边界，不改变 Harness。
 
-20 题扩展应使用新的分层矩阵、未泄露且通过最小推理探针的凭证，并继续保持并发 1。
-它可以扩大类别覆盖，但不能替代同模型、同任务、同预算的消融实验；只有后者能够判断
-reviewer、恢复策略或预算变化是否真正提高通过率。
+随后为会生成 PDF、日志或数组文件的 completion check 设计隔离工作区。验证进程可以
+写临时目录，但产物不能回写待评分目录。完成该能力后，使用同模型、同任务和同预算复测
+`overfull-hbox` 与 `model-extraction-relu-logits`，比较内部 stop reason、turns 和
+repairs。
+
+最后对 completion reviewer 做消融实验。对照组关闭 reviewer，实验组启用 reviewer，
+两组使用相同任务、模型、预算和 runner。只有这样的对照才能判断 reviewer 带来的通过率
+收益是否抵消额外 token 和延迟。

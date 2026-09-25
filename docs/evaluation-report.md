@@ -9,12 +9,12 @@
 - 数据集：`terminal-bench@2.0`，官方 registry 显示 89 题
 - 扩展样本：20 题，4 easy + 10 medium + 6 hard
 - Harbor dry-run：通过，解析为 20 trials
-- Live trials：19，17 题通过、1 题失败、1 题错误
-- Replay trials：1，1 题通过
-- Attempted pass rate：90%
-- Scored pass rate：94.7%
-- Execution coverage：100%
-- Scored coverage：95%
+- 实时运行：19 题，17 题通过、1 题失败、1 题错误
+- 日志回放：1 题，1 题通过
+- 已尝试任务通过率：90%
+- 已评分任务通过率：94.7%
+- 执行覆盖率：100%
+- 评分覆盖率：95%
 - 普通 verifier 失败数：1
 - 基础设施错误数：1
 - 未运行：0
@@ -34,38 +34,134 @@
 - 20 个脱敏 Harbor trial：[evaluation/trials-20](../evaluation/trials-20)
 - 首批 10 题快照：[results.json](../evaluation/results.json)、
   [results.md](../evaluation/results.md)
+- 逐题分析：[首批 10 题](ten-task-analysis.md)、
+  [新增 10 题](expanded-ten-analysis.md)
 - 独立 `fix-git` replay：[replay-results.json](../evaluation/replay-results.json)、
   [replay-results.md](../evaluation/replay-results.md)
 
+## 评测问题
+
+本次实验回答四个问题：
+
+1. Harness 能否在不同难度和不同领域的终端任务中稳定产出可评分结果？
+2. 证据门禁、完成审查和恢复机制是否帮助模型收敛，还是只增加调用成本？
+3. 失败来自任务解法、模型通道、Harness 约束还是运行基础设施？
+4. 原始运行离开当前开发机后，结果能否从脱敏快照重新计算？
+
+这不是模型排行榜实验。任务分配给两个模型通道的方式不同，其中一题使用 journal replay。
+因此模型分组只能说明本次运行的来源和结果，不能证明模型之间的能力差异。
+
+## 实验方法
+
+### 任务选择
+
+首批矩阵选择 3 道 easy、4 道 medium 和 3 道 hard。扩展矩阵再增加 1 道 easy、
+6 道 medium 和 3 道 hard，最终形成 20 题。选样只读取公开 `task.toml` 的难度、类别
+和标签，不读取 solution 或 verifier。
+
+### 运行控制
+
+所有 live trial 都通过 Harbor 0.23.0 启动独立 Docker 环境。runner 默认并发为 1，
+避免供应商端点在并发 2 时出现的成批空响应和停滞。Harness 使用相同的动作协议、
+证据门禁和默认预算；任务只在明确的恢复批次中重跑。
+
+### 结果选择
+
+首次扩展批次得到 6 个通过、3 个评分失败和 1 个环境错误。恢复批次只运行这四个未通过
+任务。最终冻结过程从首批运行、扩展运行和恢复运行中为每个任务选择一个
+`result.json`。冻结器拒绝缺失、矩阵外任务和重复任务，并整体替换输出目录，避免旧
+快照残留。
+
+### 统计口径
+
+- reward 等于 1.0 的已评分任务记为 `passed`。
+- verifier 返回非满分且 trial 没有异常时记为 `failed`。
+- trial 有异常或没有 reward 时记为 `error`。
+- 没有 trial 的任务记为 `not_run`。
+- Attempted pass rate 的分母是全部已执行任务。
+- Scored pass rate 的分母只包含 `passed` 和 `failed`。
+- Execution coverage 表示产生 trial 的任务比例。
+- Scored coverage 表示获得正常 verifier 评分的任务比例。
+
+## 分层结果
+
+### 按难度
+
+| 难度 | 任务数 | 通过 | 失败 | 错误 | 已尝试通过率 |
+|---|---:|---:|---:|---:|---:|
+| 简单 | 4 | 4 | 0 | 0 | 100% |
+| 中等 | 10 | 8 | 1 | 1 | 80% |
+| 困难 | 6 | 6 | 0 | 0 | 100% |
+
+两个未通过结果都在 medium 组，但原因不同。`vulnerable-secret` 是模型供应商策略拒绝，
+`qemu-startup` 是宿主虚拟化能力不足。当前样本不能据此推断 medium 任务本身更难。
+
+### 按类别
+
+| 类别 | 任务数 | 通过 | 失败 | 错误 |
+|---|---:|---:|---:|---:|
+| 软件工程 | 4 | 4 | 0 | 0 |
+| 安全 | 4 | 3 | 1 | 0 |
+| 数据处理 | 3 | 3 | 0 | 0 |
+| 系统管理 | 3 | 2 | 0 | 1 |
+| 科学计算 | 2 | 2 | 0 | 0 |
+| 调试、文件操作、数学、数据科学 | 4 | 4 | 0 | 0 |
+
+类别结果与失败归因一致。安全类别的损失来自模型通道策略，系统管理类别的损失来自
+QEMU 运行条件。其余类别在本次样本中全部通过。
+
+### 按执行来源
+
+| 来源 | 任务数 | 通过 | 失败 | 错误 |
+|---|---:|---:|---:|---:|
+| GLM 5.3 live | 6 | 5 | 0 | 1 |
+| `modelhub/gpt-5.6-terra` live | 13 | 12 | 1 | 0 |
+| journal replay | 1 | 1 | 0 | 0 |
+
+19 个 live trial 共使用 254 turns、343 次环境调用、2,704,800 个输入 token 和
+768,352 个输出 token，总运行时间约 3 小时 45 分。成本字段由当前端点返回为 0，因此
+报告不据此估算真实费用。
+
+### 内部收敛与外部评分
+
+17 个 live 通过任务中，10 个以 Harness `verified` 结束，7 个以
+`budget_exhausted` 结束。两组平均环境调用分别为 19.4 和 19.3，几乎相同；平均 turns
+分别为 12.9 和 16.6。差异主要来自完成提案、reviewer 反馈和协议修复，而不是执行更多
+命令。
+
+这个结果说明 `verified` 不能替代 Harbor reward，Harbor reward 也不能诊断 Harness
+是否高效收敛。项目同时保留两个信号：外部 reward 衡量任务结果，内部 stop reason
+衡量控制循环质量。
+
 ## 前 10 题状态
 
-| Task | Difficulty | Model | Mode | Status | Reward | Harness stop reason |
+| 任务 | 难度 | 模型 | 模式 | 状态 | 奖励 | Harness 停止原因 |
 |---|---|---|---|---|---:|---|
-| `overfull-hbox` | easy | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
-| `fix-git` | easy | GLM 5.3 | live | passed | 1 | `verified` |
-| `cobol-modernization` | easy | GLM 5.3 | live | passed | 1 | `budget_exhausted` |
-| `log-summary-date-ranges` | medium | GLM 5.3 | live | passed | 1 | `verified` |
-| `openssl-selfsigned-cert` | medium | GLM 5.3 | live | passed | 1 | `verified` |
-| `modernize-scientific-stack` | medium | no new call | replay | passed | 1 | N/A |
-| `qemu-startup` | medium | GLM 5.3 | live | error | 0 | `AgentTimeoutError` |
-| `cancel-async-tasks` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
-| `configure-git-webserver` | hard | GLM 5.3 | live | passed | 1 | `budget_exhausted` |
-| `model-extraction-relu-logits` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
+| `overfull-hbox` | 简单 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `budget_exhausted` |
+| `fix-git` | 简单 | GLM 5.3 | 实时 | 通过 | 1 | `verified` |
+| `cobol-modernization` | 简单 | GLM 5.3 | 实时 | 通过 | 1 | `budget_exhausted` |
+| `log-summary-date-ranges` | 中等 | GLM 5.3 | 实时 | 通过 | 1 | `verified` |
+| `openssl-selfsigned-cert` | 中等 | GLM 5.3 | 实时 | 通过 | 1 | `verified` |
+| `modernize-scientific-stack` | 中等 | 未调用新模型 | 回放 | 通过 | 1 | 不适用 |
+| `qemu-startup` | 中等 | GLM 5.3 | 实时 | 错误 | 0 | `AgentTimeoutError` |
+| `cancel-async-tasks` | 困难 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
+| `configure-git-webserver` | 困难 | GLM 5.3 | 实时 | 通过 | 1 | `budget_exhausted` |
+| `model-extraction-relu-logits` | 困难 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `budget_exhausted` |
 
 ## 新增 10 题状态
 
-| Task | Difficulty | Model | Mode | Status | Reward | Harness stop reason |
+| 任务 | 难度 | 模型 | 模式 | 状态 | 奖励 | Harness 停止原因 |
 |---|---|---|---|---|---:|---|
-| `prove-plus-comm` | easy | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
-| `regex-log` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
-| `nginx-request-logging` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
-| `extract-elf` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
-| `query-optimize` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
-| `vulnerable-secret` | medium | `modelhub/gpt-5.6-terra` | live | failed | 0 | `model_failure` |
-| `multi-source-data-merger` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
-| `fix-code-vulnerability` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
-| `password-recovery` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
-| `dna-assembly` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `prove-plus-comm` | 简单 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `budget_exhausted` |
+| `regex-log` | 中等 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
+| `nginx-request-logging` | 中等 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `budget_exhausted` |
+| `extract-elf` | 中等 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `budget_exhausted` |
+| `query-optimize` | 中等 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
+| `vulnerable-secret` | 中等 | `modelhub/gpt-5.6-terra` | 实时 | 失败 | 0 | `model_failure` |
+| `multi-source-data-merger` | 中等 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
+| `fix-code-vulnerability` | 困难 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
+| `password-recovery` | 困难 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
+| `dna-assembly` | 困难 | `modelhub/gpt-5.6-terra` | 实时 | 通过 | 1 | `verified` |
 
 新增批次首次得到 6 个通过、3 个评分失败和 1 个环境错误。随后只重跑四个未通过任务：
 
@@ -208,6 +304,37 @@ rosetta error: Unimplemented syscall number 282
 
 `tests/test_policy.py` 的 heredoc 回归用例在修复前失败，修复后通过。模型空正文和单次
 调用超时也有独立回归测试。
+
+## 架构结论
+
+实验结果支持四个架构判断。
+
+第一，模型不适合成为完成状态的唯一权威。`dna-assembly` 证明模型、reviewer 和自写
+检查可能共享同一个错误解释。控制器必须重新执行检查，外部 verifier 仍必须保留最终
+裁决权。
+
+第二，恢复策略必须按故障域选择。协议空响应可以进入 schema repair，单次请求停滞可以
+由模型调用超时截断，Docker 拉取 EOF 可以重试，QEMU 能力缺失则必须更换 runner。
+不区分故障域的统一重试只会增加 token 和墙钟时间。
+
+第三，单写者结构值得保留。19 个 live trial 的 343 次环境调用都由
+`CommandRunner` 串行执行。reviewer 只读取证据覆盖关系，没有与 executor 竞争环境
+状态。当前问题集中在完成标准，而不是并发写入导致的不可重现状态。
+
+第四，下一轮优化应针对完成协议，而不是继续扩展 prompt。7 个外部通过任务没有达到
+内部 `verified`。这些任务已经完成，但 reviewer 与只读检查策略无法就证据形式达成
+一致。更有效的改进是隔离验证工作区和增量缺口反馈，不是增加更多通用提示。
+
+## 有效性边界
+
+- 样本量只有 20，且选样强调类别和难度覆盖，不代表 Terminal-Bench 2.0 全部 89 题。
+- 结果混合两个模型通道和一次 replay，不能用于模型排名。
+- 恢复批次使用了首次失败后的诊断信息。最终 18/20 反映工程闭环结果，不是严格的一次性
+  pass@1。
+- 当前运行位于 Apple Silicon 和 OrbStack。QEMU 结论只适用于该运行环境。
+- 部分 provider 成本字段为 0。token 可以复算，真实费用不能从当前快照推导。
+- 冻结快照只保留 allowlist 字段和源结果 SHA-256。它支持结果复算和来源核对，但不包含
+  完整任务输出或模型推理内容。
 
 ## 可复现命令
 

@@ -1,22 +1,63 @@
-# Vibe Coding 日志
+# AI Coding 工程日志
 
-## 目标
+## 目标与记录原则
 
 使用 AI 辅助调研、架构比较、实现和验证一个 Terminal-Bench 2.0 Harbor Agent
-Harness，同时保留可复查的工程证据。日志记录代表性工作指令、工具表现和人工判断，
-不包含凭证、隐藏推理或 benchmark verifier/solution 内容。
+Harness，同时保留可复查的工程证据。记录范围为 2026-09-24 至 2026-09-25，覆盖架构
+选择、实现、真实评测、故障恢复和交付审查。
 
-## 使用工具
+本日志不把 AI 对话当作证据。每项结论至少绑定一种可检查产物：代码 diff、自动化测试、
+Harbor reward、命令回执、来源哈希或复现命令。日志不包含凭证、隐藏推理或 benchmark
+solution 内容。只有在一次 trial 结束后，才使用 verifier 输出定位失败原因。
 
-- **TRAE：** 主 Vibe Coding 环境，用于阅读仓库、比较架构、实现、测试、运行 Harbor
+## 工具与职责
+
+- **TRAE。** 主 AI Coding 环境，用于阅读仓库、比较架构、实现、测试、运行 Harbor
   和维护决策日志。
-- **并行评审 Agent：** 用于独立审查架构候选、Shell policy 和提交前风险；结论必须由
-  主线程用代码、测试或真实 trial 复核。
-- **终端工具：** `rg`、Git、`uv`、Ruff、mypy、pytest/coverage、Docker 和 Harbor。
-- **模型通道：** GLM 5.3 与 `modelhub/gpt-5.6-terra` 用于真实 benchmark；
+- **并行评审 Agent。** 用于独立审查架构候选、Shell policy 和提交前风险。主线程必须
+  用代码、测试或真实 trial 复核评审结论。
+- **终端工具。** `rg`、Git、`uv`、Ruff、mypy、pytest、coverage、Docker 和 Harbor
+  提供可重复的本地证据。
+- **模型通道。** GLM 5.3 与 `modelhub/gpt-5.6-terra` 用于真实 benchmark。
   确定性 OpenAI-compatible mock server 用于无费用的集成回归。
 
-## 5 个关键 Prompt
+角色边界如下：
+
+| 角色 | 可以做什么 | 不能决定什么 |
+|---|---|---|
+| AI executor | 阅读任务、提出命令、分析观察、提交完成检查 | 不能直接执行命令或决定 reward |
+| AI reviewer | 判断检查是否覆盖原始要求 | 不能修改环境或接受最终评分 |
+| Harness | 执行命令、维护预算、校验证据、记录停止原因 | 不能把内部 `verified` 当作 benchmark 通过 |
+| Harbor verifier | 根据最终环境返回 reward | 不参与 Agent 中间决策 |
+| 人工工程师 | 选择架构、判断归因、接受或拒绝 AI 建议 | 不能用主观判断替代运行证据 |
+
+## 证据等级
+
+| 等级 | 证据 | 用途 |
+|---|---|---|
+| E1 | 静态阅读、类型检查、lint | 发现接口和代码质量问题 |
+| E2 | 单元测试与 fake environment | 验证状态迁移和边界条件 |
+| E3 | mock model + Docker + Harbor smoke | 验证完整集成链路 |
+| E4 | 真实模型 live trial 或 journal replay | 验证 Agent 在真实任务中的行为 |
+| E5 | Terminal-Bench verifier reward | 判定任务最终是否通过 |
+
+低等级证据不能覆盖高等级结论。单元测试通过不能证明 benchmark 通过，Harness
+`verified` 也不能覆盖 verifier reward 0。
+
+## 关键决策摘要
+
+| 阶段 | 观察 | 人工决策 | 可检查结果 |
+|---|---|---|---|
+| 架构选择 | 多 Agent 共享环境会引入写竞争 | 使用外部单写者循环，只保留只读 reviewer | 所有环境调用由 `CommandRunner` 串行执行 |
+| 首次集成 | Harbor 0.23.0 把 `--task` 解释为 registry task | 本地 fixture 改用 `--path` | Docker smoke reward 1.0 |
+| `fix-git` 基线 | 合法只读检查被策略拒绝 5 次 | 修复命令边界和引号解析 | turns 11 降到 4，输入 token 减少 62.9% |
+| verifier 超时 | HTTP apt 下载停滞，CPU 空闲 | 只读挂载 HTTPS Debian 源 | 官方 verifier 恢复并返回 reward |
+| 模型不稳定 | 空正文和单次请求停滞 | 空正文进入 repair，模型调用增加 360 秒上限 | 错误可分类并在 trial 预算内终止 |
+| 20 题扩展 | 6 题通过，3 题失败，1 题环境错误 | 只重跑四个未通过任务 | 3 题恢复，1 题保留策略失败 |
+| 产物验证 | `dna-assembly` 内部通过但外部失败 | 按消费者语义解析完整产物 | 恢复 trial reward 1.0 |
+| 交付审查 | 冻结目录可能残留旧快照 | 暂存后整体替换，并递归验证目录结构 | 独立复审无剩余 finding |
+
+## 五个关键 Prompt
 
 > 1. 调研终端 Agent 的控制循环、验证、长上下文、回滚、工具协议与停止条件，给出多套
 > 有实质差异的架构，并按正确性、通用性、成本和 Harbor 适配交叉评审。
@@ -33,7 +74,7 @@ Harness，同时保留可复查的工程证据。日志记录代表性工作指�
 > 5. 剩余题目按并发 1 实际运行；失败必须区分模型、Harness 和基础设施，报告必须区分
 > live、replay、failed、error 与 not_run，不能只复述最终状态。
 
-## AI 帮了什么
+## AI 的有效贡献
 
 AI 最有价值的工作不是批量生成代码，而是扩大假设空间并快速构造反例。它并行比较了
 外部单 Agent、分层控制器和容器内 CLI，帮助选择单写者架构；为 `work_epoch`、验证
@@ -41,15 +82,19 @@ AI 最有价值的工作不是批量生成代码，而是扩大假设空间并�
 按模型通道、Harness policy、Harbor 编排和宿主虚拟化分层。每项保留的结论都落到了
 测试、原始 reward、来源哈希或可重跑命令，而不是只保留对话文本。
 
-## AI 坑了什么
+## AI 引入的问题与人工纠偏
 
 AI 首先把 Harbor 本地 fixture 错写成 `--task`，而当前 0.23.0 实际要求 `--path`。
 其次，第一版 Shell 写操作 denylist 修完一个误报后又暴露嵌套 shell 绕过；这说明生成
 更多正则不能把通用 Shell 变成安全边界。它还一度把已存在的 CLI 登录状态当作模型可用，
 真实最小请求却分别超时和返回 401。最后，completion reviewer 给出的“重新编译并保存
 产物”建议与只读 finish policy 冲突，导致外部 reward 1.0 而内部预算耗尽。人工决策是
-保留严格边界、记录限制，并把隔离验证工作区列为后续设计，而不是为追求漂亮 stop reason
+保留严格边界、记录限制，并把隔离验证工作区列为后续设计，而不是为追求理想化 stop reason
 放开写权限。
+
+这些错误有一个共同点：AI 擅长提出可行候选，但不天然知道当前版本的接口事实、系统的
+信任边界或最终产物的消费者语义。工程流程因此要求 AI 的每个关键结论经过外部证据确认。
+无法确认的建议不会进入代码或成绩报告。
 
 ## 1. 设计调研
 
@@ -68,7 +113,7 @@ AI 首先把 Harbor 本地 fixture 错写成 `--task`，而当前 0.23.0 实际�
 并行检索适合扩大设计空间，但不同项目术语不一致。人工归一为五个问题：谁写环境、
 上下文如何投影、何时恢复、怎样证明完成、谁决定停止。
 
-## 2. 架构 Arena
+## 2. 架构方案评审
 
 **代表性指令**
 
@@ -85,7 +130,7 @@ Candidate A（53/60），Candidate C 为 32/60。最终采用外部 `BaseAgent` 
 
 没有保留持续 Critic 和多 Agent 并行写环境。它们会增加 token 与状态竞争，但在没有
 基线数据时无法证明收益。Harbor 已提供 `BaseEnvironment.exec`，容器内再装 Agent CLI
-只会扩大故障面。
+会扩大故障面。
 
 ## 3. 实现
 
@@ -106,7 +151,7 @@ adapter。单元测试使用 scripted model 与 fake environment 覆盖完成、
 `rg` 和小范围文件读取用于确认 Harbor 0.23.0 的真实接口。`uv` 保证 Python 3.12
 依赖一致。Ruff 发现 import 和表达式风格问题。pytest fake 精确复现状态迁移。
 
-## 4. 端到端 Smoke
+## 4. 端到端集成验证
 
 **代表性指令**
 
@@ -123,7 +168,7 @@ reviewer、5 次环境调用，验证证据位于最后一次修改之后。
 
 mock server 用于隔离 Harness 与模型方差。Docker smoke 发现了单测无法发现的 CLI
 参数语义和日志路径问题。仓库没有首个 commit 时 bootstrap 的 `git status` 曾产生
-`fatal: bad revision 'HEAD'` 噪声，但 trial 不受影响，首次 commit 后会自然消失。
+`fatal: bad revision 'HEAD'` 噪声，但 trial 不受影响。首次 commit 后不再出现该错误。
 
 ## 5. Terminal-Bench 矩阵
 
@@ -192,7 +237,7 @@ Harbor registry 与 dataset download 可稳定提供公开元数据。用 TOML p
 `overfull-hbox` 的 live reward 0。`modernize-scientific-stack` 的已记录决策在独立
 HTTPS verifier 中 replay 通过。
 
-当前快照评分 6/10 题，5 题通过、1 题失败。live 子集为 4/5，replay 子集为 1/1。
+该阶段快照评分 6/10 题，5 题通过、1 题失败。live 子集为 4/5，replay 子集为 1/1。
 execution coverage 和 scored coverage 均为 60%。
 
 **人工判断**
@@ -241,8 +286,8 @@ execution coverage 和 scored coverage 均为 60%。
 
 **人工判断**
 
-`dna-assembly` 的首轮 Harness `verified` 不能覆盖外部 reward 0。根因不是 verifier
-“挑剔”，而是自写检查和产物共享同一套错误边界解释。prompt 因此要求从保存后的完整
+`dna-assembly` 的首轮 Harness `verified` 不能覆盖外部 reward 0。根因是自写检查和
+产物共享同一套错误边界解释。prompt 因此要求从保存后的完整
 产物按下游消费者语义解析。`query-optimize` 则要求比较至少两个实质不同的候选，但
 reviewer 不再索取不可证明的全局最优。
 
@@ -258,3 +303,21 @@ reviewer 不再索取不可证明的全局最优。
 - QEMU 需要原生 x86_64 或支持嵌套虚拟化的 runner 重跑
 - 63 项测试通过，覆盖率 86%
 - Ruff、mypy、build 和两个 Agent schema 通过
+
+## 复盘结论
+
+本项目把 AI 用在四类工作：扩大方案空间、生成实现候选、分析失败证据和检查交付内容。
+AI 没有获得架构决策或评分解释的最终决定权。主线程根据当前代码、当前 CLI 帮助、真实
+命令回执和 Harbor reward 作出裁决。
+
+有效的协作模式是“提出假设、构造反例、执行验证、记录决定”。`fix-git` 的同题对照证明
+了策略修正的收益；`dna-assembly` 则证明 AI 自写检查可能与错误实现共享假设。两者共同
+说明，AI 生成更多内容不是目标。目标是缩短从错误假设到可证伪实验的路径。
+
+最终提交保留三类可追溯材料：
+
+- `.audit/benchmark-optimization.tsv` 记录每次工程决定、原因、证据和结果。
+- `evaluation/trials-20/` 保存每题的脱敏结果和原始结果 SHA-256。
+- `scripts/verify_all.py` 重跑静态检查、测试、构建、schema、报告复算和 Docker smoke。
+
+这些材料让后续维护者可以质疑结论、重算指标和替换某次 trial，而不需要相信本次对话。

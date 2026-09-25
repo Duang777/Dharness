@@ -32,6 +32,7 @@ REQUIRED_FILES = (
     Path("docs/failure-analysis.md"),
     Path("docs/next-10-hours.md"),
     Path("docs/ten-task-analysis.md"),
+    Path("docs/expanded-ten-analysis.md"),
     Path("docs/vibe-coding-log.md"),
 )
 
@@ -47,10 +48,10 @@ README_HEADINGS = (
 )
 
 VIBE_HEADINGS = (
-    "## 使用工具",
-    "## 5 个关键 Prompt",
-    "## AI 帮了什么",
-    "## AI 坑了什么",
+    "## 工具与职责",
+    "## 五个关键 Prompt",
+    "## AI 的有效贡献",
+    "## AI 引入的问题与人工纠偏",
 )
 
 SECRET_PATTERNS = (
