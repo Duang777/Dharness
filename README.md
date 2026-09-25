@@ -214,6 +214,24 @@ uv run python scripts/run_evaluation.py \
 传给 `api_base`。`openai/` 是 LiteLLM provider 前缀，实际发送的模型名仍是
 `modelhub/gpt-5.6-terra`。
 
+全量 89 题使用可恢复的串行编排器。每题保存为独立 Harbor job；进程中断后，用相同
+`--run-name` 重启命令，编排器会根据 trial 的 `result.json` 跳过已完成任务：
+
+```bash
+uv run python scripts/run_full_evaluation.py \
+  --matrix evaluation/matrix-89.json \
+  --run-name full89-terra-20260925 \
+  --model openai/modelhub/gpt-5.6-terra \
+  --env-file /tmp/evidence-harness.env \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
+  --agent-kwarg max_output_tokens=8192 \
+  --agent-kwarg max_model_call_timeout_sec=360
+```
+
+进度写入
+`runs/terminal-bench-2/<run-name>/progress.jsonl`。编排器始终传递
+`--n-concurrent 1`，并且只为 `fix-git` 挂载 HTTPS Debian 源。
+
 评测预算可用 `--agent-kwarg max_turns=...`、
 `--agent-kwarg max_environment_calls=...` 和
 `--agent-kwarg max_wall_time_sec=...` 调整。
