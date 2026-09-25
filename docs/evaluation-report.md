@@ -2,35 +2,42 @@
 
 ## 结论
 
-截至 2026-09-25，固定矩阵 10/10 题均已运行。9 题获得 Harbor reward 1.0，
-`qemu-startup` 因 `AgentTimeoutError` 记为 `error`。没有普通 verifier 评分失败。
+截至 2026-09-25，扩展矩阵 20/20 题均已运行。18 题获得 Harbor reward 1.0，
+`vulnerable-secret` 因模型供应商策略拒绝获得 reward 0，`qemu-startup` 因
+`AgentTimeoutError` 记为 `error`。
 
 - 数据集：`terminal-bench@2.0`，官方 registry 显示 89 题
-- 固定样本：10 题，3 easy + 4 medium + 3 hard
-- Harbor dry-run：通过，解析为 10 trials
-- Live trials：9，8 题通过、1 题错误
+- 扩展样本：20 题，4 easy + 10 medium + 6 hard
+- Harbor dry-run：通过，解析为 20 trials
+- Live trials：19，17 题通过、1 题失败、1 题错误
 - Replay trials：1，1 题通过
 - Attempted pass rate：90%
-- Scored pass rate：100%
+- Scored pass rate：94.7%
 - Execution coverage：100%
-- Scored coverage：90%
+- Scored coverage：95%
+- 普通 verifier 失败数：1
 - 基础设施错误数：1
 - 未运行：0
-- 当前阻塞：`qemu-startup` 需要原生 x86_64 或支持嵌套虚拟化的 runner
+- 当前阻塞：`qemu-startup` 需要兼容的 x86_64 runner；`vulnerable-secret` 需要允许该
+  授权安全评测的模型通道
 
 `qemu-startup` 已执行并返回 reward 0，但同一 trial 带有 `AgentTimeoutError`。汇总器
 按 `error` 处理，因此它进入 attempted pass rate，不进入 scored pass rate。矩阵包含
 一个 replay，逐题结果保留 `execution_mode`，不会把 replay 写成新的模型调用。
+`vulnerable-secret` 没有 Harbor 异常，reward 0，因此记为普通 `failed`。
 
 当前汇总文件：
 
-- 矩阵快照：[results.json](../evaluation/results.json)、
+- 20 题矩阵与汇总：[matrix-20.json](../evaluation/matrix-20.json)、
+  [results-20.json](../evaluation/results-20.json)、
+  [results-20.md](../evaluation/results-20.md)
+- 20 个脱敏 Harbor trial：[evaluation/trials-20](../evaluation/trials-20)
+- 首批 10 题快照：[results.json](../evaluation/results.json)、
   [results.md](../evaluation/results.md)
-- 10 个脱敏 Harbor trial：[evaluation/trials](../evaluation/trials)
 - 独立 `fix-git` replay：[replay-results.json](../evaluation/replay-results.json)、
   [replay-results.md](../evaluation/replay-results.md)
 
-## 逐题状态
+## 前 10 题状态
 
 | Task | Difficulty | Model | Mode | Status | Reward | Harness stop reason |
 |---|---|---|---|---|---:|---|
@@ -45,9 +52,32 @@
 | `configure-git-webserver` | hard | GLM 5.3 | live | passed | 1 | `budget_exhausted` |
 | `model-extraction-relu-logits` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
 
-矩阵位于 [`evaluation/matrix.json`](../evaluation/matrix.json)。选样只使用公开
-`task.toml` 中的难度、类别和标签，没有读取 verifier 或 solution。
-Harbor reward 决定可评分 trial 的最终状态，因此 `overfull-hbox`、
+## 新增 10 题状态
+
+| Task | Difficulty | Model | Mode | Status | Reward | Harness stop reason |
+|---|---|---|---|---|---:|---|
+| `prove-plus-comm` | easy | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
+| `regex-log` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `nginx-request-logging` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
+| `extract-elf` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `budget_exhausted` |
+| `query-optimize` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `vulnerable-secret` | medium | `modelhub/gpt-5.6-terra` | live | failed | 0 | `model_failure` |
+| `multi-source-data-merger` | medium | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `fix-code-vulnerability` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `password-recovery` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+| `dna-assembly` | hard | `modelhub/gpt-5.6-terra` | live | passed | 1 | `verified` |
+
+新增批次首次得到 6 个通过、3 个评分失败和 1 个环境错误。随后只重跑四个未通过任务：
+
+- `query-optimize` 从比参考查询慢约 33% 改进到中位数快 1.22 倍，6 项 verifier 测试通过。
+- `multi-source-data-merger` 首次在拉取 Docker manifest 时遇到 EOF，重跑后 3 项测试通过。
+- `dna-assembly` 首次引物 Tm 差值为 7.60°C，超过 5°C 上限；重跑使用完整扩增产物、
+  终端 BsaI 位点、线性模板顺序和环形拼接语义验证，最终通过。
+- `vulnerable-secret` 两次都在模型调用阶段收到 `cyber_policy`，因此保留 reward 0。
+
+扩展矩阵位于 [`evaluation/matrix-20.json`](../evaluation/matrix-20.json)。选样只使用公开
+`task.toml` 中的难度、类别和标签，没有读取 verifier 或 solution。Harbor reward 决定
+可评分 trial 的最终状态，因此 `overfull-hbox`、
 `cobol-modernization`、`configure-git-webserver` 和
 `model-extraction-relu-logits` 在 Harness 内部耗尽预算后仍记为通过。
 
@@ -123,7 +153,7 @@ solution 或 verifier。
 verifier 在 52.8 秒内返回 reward 1.0。该结果证明已记录的 GLM 轨迹能够通过任务，
 但不代表一次新的模型调用，也不并入当前 live 子集。
 
-## 十题聚合
+## 首批十题聚合
 
 HTTPS apt 挂载启用后，GLM 5.3 产生 5 个通过的 live trial：
 
@@ -190,10 +220,19 @@ uv run python scripts/run_evaluation.py \
   --job-name preflight-2026-09-24
 ```
 
-本次输出：
+首批矩阵输出：
 
 ```text
 Dry run OK - 10 trial(s); nothing was run.
+```
+
+扩展矩阵预检：
+
+```bash
+uv run python scripts/run_evaluation.py \
+  --matrix evaluation/matrix-20.json \
+  --model openai/mock-model \
+  --dry-run
 ```
 
 使用可用的 OpenAI 兼容模型端点运行：
@@ -215,6 +254,12 @@ uv run python scripts/freeze_evaluation.py runs/terminal-bench-2/<job-name>
 uv run python scripts/summarize_results.py evaluation/trials \
   --json-out evaluation/results.json \
   --markdown-out evaluation/results.md
+
+uv run python scripts/summarize_results.py evaluation/trials-20 \
+  --matrix evaluation/matrix-20.json \
+  --json-out evaluation/results-20.json \
+  --markdown-out evaluation/results-20.md
+
 uv run python scripts/verify_delivery.py
 ```
 

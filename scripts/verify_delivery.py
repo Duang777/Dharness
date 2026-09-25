@@ -13,6 +13,10 @@ MATRIX_PATH = Path("evaluation/matrix.json")
 TRIALS_DIR = Path("evaluation/trials")
 RESULTS_JSON = Path("evaluation/results.json")
 RESULTS_MARKDOWN = Path("evaluation/results.md")
+MATRIX_20_PATH = Path("evaluation/matrix-20.json")
+TRIALS_20_DIR = Path("evaluation/trials-20")
+RESULTS_20_JSON = Path("evaluation/results-20.json")
+RESULTS_20_MARKDOWN = Path("evaluation/results-20.md")
 
 REQUIRED_FILES = (
     Path("README.md"),
@@ -20,10 +24,14 @@ REQUIRED_FILES = (
     MATRIX_PATH,
     RESULTS_JSON,
     RESULTS_MARKDOWN,
+    MATRIX_20_PATH,
+    RESULTS_20_JSON,
+    RESULTS_20_MARKDOWN,
     Path("docs/architecture-rationale.md"),
     Path("docs/evaluation-report.md"),
     Path("docs/failure-analysis.md"),
     Path("docs/next-10-hours.md"),
+    Path("docs/ten-task-analysis.md"),
     Path("docs/vibe-coding-log.md"),
 )
 
@@ -92,27 +100,54 @@ def validate_delivery(root: Path = PROJECT_ROOT) -> list[str]:
 
 
 def _validate_results(root: Path) -> list[str]:
+    return [
+        *_validate_result_set(
+            root,
+            matrix_path=MATRIX_PATH,
+            trials_dir=TRIALS_DIR,
+            results_json=RESULTS_JSON,
+            results_markdown=RESULTS_MARKDOWN,
+            expected_task_count=10,
+        ),
+        *_validate_result_set(
+            root,
+            matrix_path=MATRIX_20_PATH,
+            trials_dir=TRIALS_20_DIR,
+            results_json=RESULTS_20_JSON,
+            results_markdown=RESULTS_20_MARKDOWN,
+            expected_task_count=20,
+        ),
+    ]
+
+
+def _validate_result_set(
+    root: Path,
+    *,
+    matrix_path: Path,
+    trials_dir: Path,
+    results_json: Path,
+    results_markdown: Path,
+    expected_task_count: int,
+) -> list[str]:
     errors: list[str] = []
-    matrix = load_matrix(root / MATRIX_PATH)
-    summary = summarize_results(matrix, root / TRIALS_DIR)
-    expected_json = json.loads((root / RESULTS_JSON).read_text(encoding="utf-8"))
+    matrix = load_matrix(root / matrix_path)
+    summary = summarize_results(matrix, root / trials_dir)
+    expected_json = json.loads((root / results_json).read_text(encoding="utf-8"))
     actual_json = summary.model_dump(mode="json")
     if actual_json != expected_json:
-        errors.append("evaluation/results.json is stale; regenerate it from evaluation/trials")
-    expected_markdown = (root / RESULTS_MARKDOWN).read_text(encoding="utf-8")
+        errors.append(f"{results_json} is stale; regenerate it from {trials_dir}")
+    expected_markdown = (root / results_markdown).read_text(encoding="utf-8")
     if render_markdown(summary) != expected_markdown:
-        errors.append("evaluation/results.md is stale; regenerate it from evaluation/trials")
+        errors.append(f"{results_markdown} is stale; regenerate it from {trials_dir}")
 
-    if summary.selected_tasks < 10:
-        errors.append("evaluation must select at least 10 tasks")
+    if summary.selected_tasks != expected_task_count:
+        errors.append(f"{matrix_path} must select exactly {expected_task_count} tasks")
     if not summary.all_tasks_attempted or summary.not_run_tasks:
-        errors.append("every selected evaluation task must be attempted")
+        errors.append(f"every task in {matrix_path} must be attempted")
     if summary.executed_tasks != summary.selected_tasks:
-        errors.append("every selected evaluation task must have a trial result")
+        errors.append(f"every task in {matrix_path} must have a trial result")
     expected_tasks = {task.name for task in matrix.tasks}
-    snapshot_tasks = {path.parent.name for path in (root / TRIALS_DIR).glob("*/result.json")}
-    if snapshot_tasks != expected_tasks:
-        errors.append("evaluation/trials must match the evaluation matrix exactly")
+    errors.extend(_validate_snapshot_layout(root, trials_dir, expected_tasks))
     for task in summary.tasks:
         if task.execution_mode == "live" and not task.model_name:
             errors.append(f"trial has no model provenance: {task.name}")
@@ -122,6 +157,32 @@ def _validate_results(root: Path) -> list[str]:
             task.source_result_sha256 and re.fullmatch(r"[0-9a-f]{64}", task.source_result_sha256)
         ):
             errors.append(f"trial has no source result hash: {task.name}")
+    return errors
+
+
+def _validate_snapshot_layout(
+    root: Path,
+    trials_dir: Path,
+    expected_tasks: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    snapshot_tasks: set[str] = set()
+    for snapshot_path in sorted((root / trials_dir).rglob("result.json")):
+        relative_path = snapshot_path.relative_to(root / trials_dir)
+        if len(relative_path.parts) != 2:
+            errors.append(f"{trials_dir} contains invalid trial path: {relative_path}")
+            continue
+        directory_task = relative_path.parts[0]
+        snapshot_tasks.add(directory_task)
+        try:
+            snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            errors.append(f"{trials_dir} contains unreadable snapshot: {relative_path}")
+            continue
+        if not isinstance(snapshot, dict) or snapshot.get("task_name") != directory_task:
+            errors.append(f"{trials_dir} snapshot task does not match path: {relative_path}")
+    if snapshot_tasks != expected_tasks:
+        errors.append(f"{trials_dir} must match the expected task set exactly")
     return errors
 
 

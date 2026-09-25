@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 25,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 1,
+        "stop_reason": "verified",
+        "turns_used": 22,
+        "work_epoch": 20
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 294680,
+    "n_output_tokens": 60595
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "dna-assembly"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T05:57:07.458661Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "5208983d3cb5e574183f087fad8f67ac878ef8748b99a6a24bd0627d644c51b6"
+  },
+  "started_at": "2026-09-25T05:43:57.551726Z",
+  "task_name": "dna-assembly",
+  "trial_name": "dna-assembly__C8Sajg3",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

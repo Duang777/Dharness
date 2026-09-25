@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 31,
+        "failure_category": "model_protocol",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 5,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 30,
+        "work_epoch": 25
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 373003,
+    "n_output_tokens": 31399
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "overfull-hbox"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-24T21:47:33.183573Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "f8b8b170e55c207b5470972315eef8f79f732941a20482b80d250b9d6a2b3bc3"
+  },
+  "started_at": "2026-09-24T21:38:56.598759Z",
+  "task_name": "overfull-hbox",
+  "trial_name": "overfull-hbox__jAF8bbK",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

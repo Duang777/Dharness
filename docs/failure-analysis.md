@@ -1,8 +1,11 @@
 # 失败分析
 
-固定矩阵 10/10 题均已运行。9 题获得 reward 1.0，`qemu-startup` 因运行环境异常记为
-`error`。以下问题来自评测预检、真实运行和扩展批次，并分别归因到模型通道、Harness
-或评测基础设施。
+扩展矩阵 20/20 题均已运行。18 题获得 reward 1.0，`vulnerable-secret` 因模型供应商
+策略拒绝记为 `failed`，`qemu-startup` 因运行环境异常记为 `error`。以下问题来自评测
+预检、真实运行和恢复批次，并分别归因到模型通道、Harness 或评测基础设施。
+
+每道题的任务目标、执行方法、内部停止状态和设计启示见
+[前 10 题逐题分析](ten-task-analysis.md)。
 
 ## 1. Codex 登录状态与真实可用性不一致
 
@@ -246,10 +249,84 @@ rosetta error: Unimplemented syscall number 282
 该题需要在原生 x86_64 Linux runner，或支持所需系统调用和嵌套虚拟化的环境中重跑。
 新的单次模型超时能避免环境错误后的模型停滞耗尽整个 trial，但不能修复 QEMU 启动条件。
 
-## 10. 最终状态
+## 10. 查询正确但性能不达标
 
-- 10/10 题已尝试，execution coverage 为 100%。
-- 9 题获得 reward 1.0，0 题为普通 verifier 失败。
-- `qemu-startup` 是唯一 `error`，因此 attempted pass rate 为 90%。
-- 9 个可评分 trial 全部通过，scored pass rate 为 100%，scored coverage 为 90%。
-- 9 个通过结果中有 8 个 live trial 和 1 个 replay trial。
+**现象**
+
+`query-optimize` 首次运行通过了结果一致性、数据库只读和 SQL 格式检查，但 solution
+中位耗时为 0.996 秒，参考查询为 0.750 秒。它超过 verifier 允许的 5% 波动范围，最终
+reward 为 0。Harness 内部也因 reviewer 反复要求证明“尽可能快”而耗尽预算。
+
+**根因**
+
+首次解法停在“结果正确且结构看起来合理”，没有把至少两个实质不同的查询方案放在等价
+条件下比较。另一方面，reviewer 把主观最高级误解为需要证明全局最优，提出了无法在有限
+预算内完成的要求。
+
+**修正与验证**
+
+executor 现在要求优化任务比较至少两个不同候选；reviewer 接受可信的实测改进和结构
+证据，不要求证明全局最优。恢复 trial 的 solution 中位耗时为 0.669 秒，参考查询为
+0.817 秒，快 1.22 倍。6 项 verifier 测试全部通过，Harness 以 `verified` 结束。
+
+## 11. Docker 镜像拉取 EOF
+
+**现象**
+
+`multi-source-data-merger` 首次运行尚未启动 Agent。Docker 在读取 Docker Hub manifest
+时返回 EOF，Harbor 记录 `RuntimeError`，没有 reward。
+
+**归因与处理**
+
+这是任务容器准备阶段的瞬时网络错误，不是模型、任务解法或 Harness 控制循环失败。保留
+原 trial 后，对该题执行一次独立恢复运行。镜像正常启动，Agent 在 5 turns、8 次环境
+调用后进入 `verified`，官方 verifier 的 3 项测试全部通过。20 题冻结快照选择恢复
+trial，并通过原始 `result.json` SHA-256 保留来源。
+
+## 12. 模型供应商安全策略拒绝
+
+**现象**
+
+`vulnerable-secret` 的初次和恢复运行都在模型调用阶段返回
+`BadRequestError/cyber_policy`。第二次运行只完成 4 turns 和 6 次环境调用，Harness
+随后以 `model_failure/model_service` 结束，Harbor reward 为 0。
+
+**归因**
+
+任务在隔离 benchmark 沙箱内执行，但供应商仍按请求内容触发网络安全策略。Harness 已在
+prompt 中明确“授权评测、仅操作当前一次性沙箱、不得访问外部系统”，重跑仍被拒绝。这是
+当前模型通道的策略边界，不能通过重复请求或弱化任务描述绕过。
+
+**处理**
+
+最终报告把该题记为普通 `failed`，不伪装成基础设施 `error`，也不尝试规避供应商策略。
+若要复测，应使用明确获准执行此类安全评测的模型通道。
+
+## 13. 生成产物的自证与消费者语义不一致
+
+**现象**
+
+`dna-assembly` 首次运行在 31 turns 后得到 Harness `verified`，但官方 verifier 返回
+reward 0。失败点是 EGFP 引物对的 Tm 差值为 7.60°C，超过任务要求的 5°C。Agent 自己的
+检查曾报告 BsaI 位点和环形拼接都通过。
+
+**根因**
+
+完成检查用一套手写逻辑解释引物边界，并验证模型期望的片段；它没有完全复现下游消费者
+对完整引物、退火区和线性模板顺序的解析方式。检查与产物共享了同一个错误假设，因此
+Harness 得到假阳性的内部 `verified`。
+
+**修正与验证**
+
+executor 和 reviewer 现在要求从已保存字节读取生成产物，并使用目标工具或格式消费者的
+约定解析完整结构，不能硬编码“预期片段”自证。恢复 trial 检查了完整扩增产物、每个产物
+仅有两个终端 BsaI 位点、三个线性模板不环绕，以及最终环形拼接序列。Harness 在
+22 turns、25 次环境调用后进入 `verified`，官方 verifier 通过。
+
+## 14. 最终状态
+
+- 20/20 题已尝试，execution coverage 为 100%。
+- 18 题获得 reward 1.0，`vulnerable-secret` 是唯一普通 `failed`。
+- `qemu-startup` 是唯一 `error`，attempted pass rate 为 90%。
+- 19 个可评分 trial 中 18 个通过，scored pass rate 为 94.7%，scored coverage 为 95%。
+- 18 个通过结果中有 17 个 live trial 和 1 个 replay trial。

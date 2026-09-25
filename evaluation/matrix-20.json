@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "dataset": "terminal-bench@2.0",
+  "selection_method": "Deterministic expansion of the original 10-task matrix using only public task.toml metadata. Adds 1 easy, 6 medium, and 3 hard tasks while avoiding known nested-virtualization requirements.",
+  "tasks": [
+    {
+      "name": "overfull-hbox",
+      "difficulty": "easy",
+      "category": "debugging",
+      "tags": [
+        "latex",
+        "document-processing",
+        "combinatorial-optimization"
+      ]
+    },
+    {
+      "name": "fix-git",
+      "difficulty": "easy",
+      "category": "software-engineering",
+      "tags": [
+        "coding",
+        "version-control"
+      ]
+    },
+    {
+      "name": "cobol-modernization",
+      "difficulty": "easy",
+      "category": "software-engineering",
+      "tags": [
+        "coding"
+      ]
+    },
+    {
+      "name": "log-summary-date-ranges",
+      "difficulty": "medium",
+      "category": "data-processing",
+      "tags": [
+        "log-analysis",
+        "report-generation",
+        "data-processing"
+      ]
+    },
+    {
+      "name": "openssl-selfsigned-cert",
+      "difficulty": "medium",
+      "category": "security",
+      "tags": [
+        "coding",
+        "file-operations",
+        "security",
+        "system"
+      ]
+    },
+    {
+      "name": "modernize-scientific-stack",
+      "difficulty": "medium",
+      "category": "scientific-computing",
+      "tags": [
+        "python-migration",
+        "scientific-computing",
+        "legacy-modernization",
+        "climate-science",
+        "data-processing"
+      ]
+    },
+    {
+      "name": "qemu-startup",
+      "difficulty": "medium",
+      "category": "system-administration",
+      "tags": [
+        "sys-admin"
+      ]
+    },
+    {
+      "name": "cancel-async-tasks",
+      "difficulty": "hard",
+      "category": "software-engineering",
+      "tags": [
+        "async",
+        "concurrency",
+        "python"
+      ]
+    },
+    {
+      "name": "configure-git-webserver",
+      "difficulty": "hard",
+      "category": "system-administration",
+      "tags": [
+        "system",
+        "version-control",
+        "web"
+      ]
+    },
+    {
+      "name": "model-extraction-relu-logits",
+      "difficulty": "hard",
+      "category": "mathematics",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "prove-plus-comm",
+      "difficulty": "easy",
+      "category": "software-engineering",
+      "tags": [
+        "coding"
+      ]
+    },
+    {
+      "name": "regex-log",
+      "difficulty": "medium",
+      "category": "data-processing",
+      "tags": [
+        "regex",
+        "string-parsing",
+        "log-analysis"
+      ]
+    },
+    {
+      "name": "nginx-request-logging",
+      "difficulty": "medium",
+      "category": "system-administration",
+      "tags": [
+        "web-server"
+      ]
+    },
+    {
+      "name": "extract-elf",
+      "difficulty": "medium",
+      "category": "file-operations",
+      "tags": []
+    },
+    {
+      "name": "query-optimize",
+      "difficulty": "medium",
+      "category": "data-science",
+      "tags": [
+        "query-optimization",
+        "sql-query"
+      ]
+    },
+    {
+      "name": "vulnerable-secret",
+      "difficulty": "medium",
+      "category": "security",
+      "tags": [
+        "security",
+        "file-operations"
+      ]
+    },
+    {
+      "name": "multi-source-data-merger",
+      "difficulty": "medium",
+      "category": "data-processing",
+      "tags": [
+        "data-processing",
+        "etl",
+        "schema-mapping",
+        "conflict-resolution",
+        "pandas",
+        "parquet"
+      ]
+    },
+    {
+      "name": "fix-code-vulnerability",
+      "difficulty": "hard",
+      "category": "security",
+      "tags": [
+        "security",
+        "code-vulnerability",
+        "common-weakness-enumeration"
+      ]
+    },
+    {
+      "name": "password-recovery",
+      "difficulty": "hard",
+      "category": "security",
+      "tags": [
+        "system",
+        "file-operations",
+        "troubleshooting"
+      ]
+    },
+    {
+      "name": "dna-assembly",
+      "difficulty": "hard",
+      "category": "scientific-computing",
+      "tags": [
+        "biology",
+        "cloning"
+      ]
+    }
+  ]
+}

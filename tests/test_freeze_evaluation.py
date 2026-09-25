@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.freeze_evaluation import freeze_results
+from scripts.freeze_evaluation import freeze_result_sets, freeze_results
 
 
 def _write_matrix(path: Path, *task_names: str) -> None:
@@ -117,3 +117,38 @@ def test_freeze_results_requires_exact_matrix_coverage(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="missing: missing"):
         freeze_results(results_dir, matrix_path, tmp_path / "frozen")
+
+
+def test_freeze_result_sets_combines_distinct_jobs(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "matrix.json"
+    first_results = tmp_path / "first"
+    second_results = tmp_path / "second"
+    output_dir = tmp_path / "frozen"
+    stale_snapshot = output_dir / "stale-task" / "result.json"
+    _write_matrix(matrix_path, "first-task", "second-task")
+    _write_result(first_results / "first-task__trial" / "result.json", "first-task")
+    _write_result(second_results / "second-task__trial" / "result.json", "second-task")
+    _write_result(stale_snapshot, "stale-task")
+
+    count = freeze_result_sets((first_results, second_results), matrix_path, output_dir)
+
+    assert count == 2
+    assert (output_dir / "first-task" / "result.json").is_file()
+    assert (output_dir / "second-task" / "result.json").is_file()
+    assert not stale_snapshot.exists()
+
+
+def test_freeze_result_sets_rejects_duplicates_across_jobs(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "matrix.json"
+    first_results = tmp_path / "first"
+    second_results = tmp_path / "second"
+    _write_matrix(matrix_path, "duplicate")
+    _write_result(first_results / "duplicate__first" / "result.json", "duplicate")
+    _write_result(second_results / "duplicate__second" / "result.json", "duplicate")
+
+    with pytest.raises(ValueError, match="multiple trial results for task 'duplicate'"):
+        freeze_result_sets(
+            (first_results, second_results),
+            matrix_path,
+            tmp_path / "frozen",
+        )

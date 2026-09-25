@@ -1,6 +1,6 @@
 import json
 
-from evidence_harness.prompting import build_executor_prompt
+from evidence_harness.prompting import build_executor_prompt, build_review_prompt
 from evidence_harness.protocol import (
     CommandMode,
     CommandReceipt,
@@ -69,3 +69,26 @@ def test_compaction_preserves_task_and_complete_schema() -> None:
     assert all("command" not in item for item in payload["known_changes"])
     assert all("command_sha256" in item for item in payload["known_changes"])
     assert "z" * 3_000 not in prompt
+    assert "authorized evaluation inside the current disposable sandbox" in prompt
+    assert "allows choosing among approaches" in prompt
+    assert "compare at least two materially different candidates" in prompt
+    assert "Do not violate a task-mandated algorithm" in prompt
+    assert "from their saved bytes" in prompt
+    assert "consumer's conventions" in prompt
+
+
+def test_completion_reviewer_uses_feasible_evidence_standard() -> None:
+    prompt = build_review_prompt(
+        instruction="Make the query as efficient as possible.",
+        checks=(),
+        coverage=(),
+        observations=[],
+    )
+
+    assert "Do not demand proof of a global" in prompt
+    assert "allows choosing among approaches" in prompt
+    assert "task-mandated algorithm" in prompt
+    assert "One full benchmark is enough" in prompt
+    assert "Do not require the finish checks to repeat" in prompt
+    assert "complete saved artifact" in prompt
+    assert "downstream consumer will extract" in prompt

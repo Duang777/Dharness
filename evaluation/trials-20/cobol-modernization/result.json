@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 13,
+        "failure_category": "harness_control",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 7,
+        "work_epoch": 4
+      }
+    },
+    "n_cache_tokens": 16576,
+    "n_input_tokens": 84508,
+    "n_output_tokens": 92265
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/glm-5.3",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "cobol-modernization"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-24T18:26:20.385162Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "e8178c7680291a71d2d53f78536f57b2a2c0b89a5a6b9770b7eea57af904d364"
+  },
+  "started_at": "2026-09-24T18:05:05.769468Z",
+  "task_name": "cobol-modernization",
+  "trial_name": "cobol-modernization__Graxm4F",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 6,
+        "failure_category": "model_service",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": "model_failure",
+        "turns_used": 4,
+        "work_epoch": 4
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 21889,
+    "n_output_tokens": 1645
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "vulnerable-secret"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T05:43:57.538767Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "565799bac7c98fa596869cdd303d5b20adfe279c70c0a6f90774d300dc39f2c3"
+  },
+  "started_at": "2026-09-25T05:42:36.332868Z",
+  "task_name": "vulnerable-secret",
+  "trial_name": "vulnerable-secret__AjmSoAq",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

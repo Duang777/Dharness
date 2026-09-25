@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 17,
+        "failure_category": "model_protocol",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 5,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 17,
+        "work_epoch": 12
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 169966,
+    "n_output_tokens": 36200
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "model-extraction-relu-logits"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-24T21:36:47.220390Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "b50f9ac425fc4a20930c7699e8a709e77701c0ae0359d32221d720ef18986ea3"
+  },
+  "started_at": "2026-09-24T21:29:21.803353Z",
+  "task_name": "model-extraction-relu-logits",
+  "trial_name": "model-extraction-relu-logits__aRYALe3",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

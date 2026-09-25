@@ -6,24 +6,24 @@ Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它�
 
 ## 成绩
 
-固定矩阵覆盖 3 easy、4 medium、3 hard，共 10 个系统运维、软件工程、安全、数据处理、
+扩展矩阵覆盖 4 easy、10 medium、6 hard，共 20 个系统运维、软件工程、安全、数据处理、
 科学计算和数学任务。
 
 | 指标 | 当前结果 |
 |---|---:|
-| 已尝试 | 10 / 10 |
-| Harbor reward 1.0 | 9 |
-| 普通 verifier 失败 | 0 |
+| 已尝试 | 20 / 20 |
+| Harbor reward 1.0 | 18 |
+| 普通 verifier 失败 | 1 |
 | 基础设施错误 | 1 |
 | Attempted pass rate | 90% |
-| Scored pass rate | 100% |
-| Execution / scored coverage | 100% / 90% |
+| Scored pass rate | 94.7% |
+| Execution / scored coverage | 100% / 95% |
 
-这不是同一模型的一次完整 10 题成绩。9 个通过结果由 8 个 live trial 和 1 个 journal
-replay 组成；live trial 使用 GLM 5.3 与 `modelhub/gpt-5.6-terra`。唯一错误
-`qemu-startup` 发生在 Apple Silicon 宿主的 Rosetta amd64 容器中：QEMU 触发
-`Unimplemented syscall number 282`，且容器没有 `/dev/kvm`。逐题模型、模式、reward
-和停止原因见[冻结评测结果](evaluation/results.md)。
+这不是同一模型的一次完整 20 题成绩。18 个通过结果由 17 个 live trial 和 1 个 journal
+replay 组成；live trial 使用 GLM 5.3 与 `modelhub/gpt-5.6-terra`。评分失败
+`vulnerable-secret` 被模型供应商的 `cyber_policy` 拒绝；唯一基础设施错误
+`qemu-startup` 发生在 Apple Silicon 宿主的 Rosetta amd64 容器中。逐题模型、模式、
+reward 和停止原因见[20 题冻结评测结果](evaluation/results-20.md)。
 
 ## 核心亮点
 
@@ -40,8 +40,8 @@ replay 组成；live trial 使用 GLM 5.3 与 `modelhub/gpt-5.6-terra`。唯一�
   模型调用超时；重复失败会触发 replan 或分类停止。
 - **报告不美化失败。** `passed`、`failed`、`error`、`not_run` 以及
   `live`、`replay` 分开统计。内部 `verified` 不能替代 Harbor reward。
-- **结果可以从仓库复算。** `evaluation/trials/` 保存 10 个脱敏 trial 快照和原始结果
-  SHA-256，不保存 API 地址、凭证、绝对路径或 traceback。
+- **结果可以从仓库复算。** `evaluation/trials-20/` 保存 20 个脱敏 trial 快照和原始
+  结果 SHA-256，不保存 API 地址、凭证、绝对路径或 traceback。
 
 ## 架构
 
@@ -83,6 +83,15 @@ docker info
 项目固定 `harbor==0.23.0`。模型凭证放在供应商环境变量或仓库外的 env 文件中；不要把
 key 写入命令、README 或 Git。
 
+创建权限为 `0600` 的临时 env 文件：
+
+```bash
+umask 077
+read -rs EVIDENCE_HARNESS_KEY
+printf 'OPENAI_API_KEY=%s\n' "$EVIDENCE_HARNESS_KEY" > /tmp/evidence-harness.env
+unset EVIDENCE_HARNESS_KEY
+```
+
 ## 运行评测
 
 运行单题：
@@ -119,10 +128,17 @@ uv run python scripts/run_evaluation.py \
 ```bash
 uv run python scripts/run_evaluation.py \
   --matrix evaluation/matrix-20.json \
-  --model provider/model \
-  --env-file /absolute/path/to/provider.env \
-  --debian-https-sources
+  --model openai/modelhub/gpt-5.6-terra \
+  --env-file /tmp/evidence-harness.env \
+  --debian-https-sources \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
+  --agent-kwarg max_output_tokens=8192 \
+  --agent-kwarg max_model_call_timeout_sec=360
 ```
+
+`api_base` 必须停在 `/v1`。LiteLLM 会追加 `/chat/completions`，因此不要把完整请求路径
+传给 `api_base`。`openai/` 是 LiteLLM provider 前缀，实际发送的模型名仍是
+`modelhub/gpt-5.6-terra`。
 
 评测预算可用 `--agent-kwarg max_turns=...`、
 `--agent-kwarg max_environment_calls=...` 和
@@ -131,7 +147,7 @@ uv run python scripts/run_evaluation.py \
 ## 完整验收
 
 一条命令运行 Ruff lint/format、mypy、pytest coverage、构建、两个 Harbor Agent
-schema、10 题 dry-run、交付物检查、结果复算、凭证扫描，以及真实 mock-model +
+schema、10/20 题 dry-run、交付物检查、结果复算、凭证扫描，以及真实 mock-model +
 Docker + Harbor verifier smoke：
 
 ```bash
@@ -144,7 +160,7 @@ uv run python scripts/verify_all.py
 uv run python scripts/verify_all.py --skip-smoke
 ```
 
-从原始 Harbor 目录生成可提交的脱敏快照，再重建报告：
+从原始 Harbor 目录生成可提交的脱敏快照，再重建 10 题报告：
 
 ```bash
 uv run python scripts/freeze_evaluation.py /path/to/harbor/job
@@ -154,6 +170,23 @@ uv run python scripts/summarize_results.py evaluation/trials \
 uv run python scripts/verify_delivery.py
 ```
 
+20 题结果可以由多个互不重叠的 Harbor job 或单题 trial 目录合并。每个任务必须恰好
+出现一次；冻结器会拒绝重复、缺失或矩阵外任务：
+
+```bash
+uv run python scripts/freeze_evaluation.py \
+  runs/terminal-bench-2/<original-10-job> \
+  runs/terminal-bench-2/<expanded-job>/<selected-trial> \
+  runs/terminal-bench-2/<recovery-job>/<selected-trial> \
+  --matrix evaluation/matrix-20.json \
+  --output-dir evaluation/trials-20
+
+uv run python scripts/summarize_results.py evaluation/trials-20 \
+  --matrix evaluation/matrix-20.json \
+  --json-out evaluation/results-20.json \
+  --markdown-out evaluation/results-20.md
+```
+
 本地 smoke 使用固定 fixture 和确定性 mock server，只证明 Harness、Docker、Harbor 与
 verifier 的集成链路，不计入 Terminal-Bench 成绩。
 
@@ -161,17 +194,21 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 
 - 当前结果来自混合模型和一次 replay，不能解读为单模型排行榜成绩。
 - `qemu-startup` 需要原生 x86_64 Linux 或支持相应系统调用与嵌套虚拟化的 runner。
+- `vulnerable-secret` 连续两次被供应商 `cyber_policy` 拒绝。该结果反映当前模型通道的
+  策略边界，不是 verifier 基础设施错误。
 - `overfull-hbox` 与 `model-extraction-relu-logits` 已获 reward 1.0，但 reviewer 曾要求
   运行会生成 PDF、日志或 `.npy` 的检查。只读 policy 不允许它们写任务目录，因此内部
   状态为 `budget_exhausted`。正确改进是隔离验证工作区，不是放开任意写入。
-- 本仓库没有使用已在对话中暴露的凭证扩跑 20 题。20 题 runner 路径已经就绪，但正式
-  扩跑仍应使用未泄露、经过最小推理探针验证的凭证。
+- 扩展批次发现的 `query-optimize` 性能不足、Docker 拉取 EOF 和 `dna-assembly` 产物
+  语义验证缺口均已通过独立 recovery trial 复测。
 
 ## 交付文档
 
 - [架构决策](docs/architecture-rationale.md)
 - [评测报告](docs/evaluation-report.md)
-- [逐题结果与统计口径](evaluation/results.md)
+- [20 题逐题结果与统计口径](evaluation/results-20.md)
+- [首批 10 题冻结结果](evaluation/results.md)
+- [首批 10 题逐题分析](docs/ten-task-analysis.md)
 - [失败分析](docs/failure-analysis.md)
 - [如果再给 10 小时](docs/next-10-hours.md)
 - [Vibe Coding 日志](docs/vibe-coding-log.md)

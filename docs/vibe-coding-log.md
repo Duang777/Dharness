@@ -222,15 +222,39 @@ execution coverage 和 scored coverage 均为 60%。
 未在本轮放宽的问题：completion reviewer 需要运行会生成文件的检查，但 policy 只允许
 只读 finish 检查。该问题需要隔离验证工作区，不能直接允许写任务目录。
 
+## 10. 二十题扩展与恢复
+
+**代表性指令**
+
+> 完成新增十题，失败项要先归因再选择性重跑。最终证据只能为每个任务选择一个来源，
+> 不能把失败和恢复 trial 重复计数。
+
+**结果**
+
+新增十题首次运行得到 6 个通过、3 个评分失败和 1 个 Docker 环境错误。恢复批次只重跑
+`query-optimize`、`multi-source-data-merger`、`vulnerable-secret` 和
+`dna-assembly`。前三个可恢复问题中，查询优化、镜像拉取和引物设计均得到 reward 1.0；
+`vulnerable-secret` 再次被供应商 `cyber_policy` 拒绝，保留 reward 0。
+
+冻结器从首批十题、扩展主运行和恢复运行中为每题选取一个唯一 `result.json`，生成
+`evaluation/trials-20`。最终结果是 20/20 已尝试、18 passed、1 failed、1 error。
+
+**人工判断**
+
+`dna-assembly` 的首轮 Harness `verified` 不能覆盖外部 reward 0。根因不是 verifier
+“挑剔”，而是自写检查和产物共享同一套错误边界解释。prompt 因此要求从保存后的完整
+产物按下游消费者语义解析。`query-optimize` 则要求比较至少两个实质不同的候选，但
+reviewer 不再索取不可证明的全局最优。
+
 ## 当前质量证据
 
 - `harbor==0.23.0`，Python 3.12，Docker server 29.4.0
 - 真实 GLM、Terra、Harbor 与 Docker 链路均取得 reward 1.0
-- 固定十题 10/10 已运行，9 题通过，1 题基础设施错误
-- Live 子集 8/9 通过，replay 子集 1/1 通过
-- Attempted pass rate 为 90%，scored pass rate 为 100%
-- Execution coverage 为 100%，scored coverage 为 90%
+- 扩展矩阵 20/20 已运行，18 题通过、1 题评分失败、1 题基础设施错误
+- Live 子集 17/19 通过，replay 子集 1/1 通过
+- Attempted pass rate 为 90%，scored pass rate 为 94.7%
+- Execution coverage 为 100%，scored coverage 为 95%
 - HTTPS apt 挂载恢复了受影响任务的 verifier
 - QEMU 需要原生 x86_64 或支持嵌套虚拟化的 runner 重跑
-- 59 项测试通过，覆盖率 86%
+- 63 项测试通过，覆盖率 86%
 - Ruff、mypy、build 和两个 Agent schema 通过

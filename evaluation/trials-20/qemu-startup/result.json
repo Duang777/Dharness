@@ -1,0 +1,44 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 8,
+        "phase": "thinking",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": null,
+        "turns_used": 5,
+        "work_epoch": 4
+      }
+    },
+    "n_cache_tokens": 31296,
+    "n_input_tokens": 76007,
+    "n_output_tokens": 99260
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/glm-5.3",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent"
+    },
+    "task": {
+      "name": "qemu-startup"
+    }
+  },
+  "exception_info": {
+    "exception_type": "AgentTimeoutError"
+  },
+  "finished_at": "2026-09-24T20:43:46.547842Z",
+  "snapshot": {
+    "schema_version": 1,
+    "source_result_sha256": "7ccae38fd718e938d1a75bac26f8c687bf4f31dc1b21edd64fdf7a1f2052e3f2"
+  },
+  "started_at": "2026-09-24T20:11:41.612741Z",
+  "task_name": "qemu-startup",
+  "trial_name": "qemu-startup__y3YBjPn",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

@@ -4,6 +4,8 @@ import argparse
 import hashlib
 import json
 import sys
+import tempfile
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -30,16 +32,20 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Freeze sanitized, reproducible Harbor trial evidence."
     )
-    parser.add_argument("results_dir", type=Path)
+    parser.add_argument("results_dir", type=Path, nargs="+")
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()
 
 
 def freeze_results(results_dir: Path, matrix_path: Path, output_dir: Path) -> int:
+    return freeze_result_sets((results_dir,), matrix_path, output_dir)
+
+
+def freeze_result_sets(results_dirs: Iterable[Path], matrix_path: Path, output_dir: Path) -> int:
     matrix = load_matrix(matrix_path)
     expected = {task.name for task in matrix.tasks}
-    sources = _load_sources(results_dir)
+    sources = _load_sources(results_dirs)
     missing = sorted(expected - sources.keys())
     unexpected = sorted(sources.keys() - expected)
     if missing or unexpected:
@@ -50,15 +56,22 @@ def freeze_results(results_dir: Path, matrix_path: Path, output_dir: Path) -> in
             details.append("unexpected: " + ", ".join(unexpected))
         raise ValueError("trial set does not match matrix (" + "; ".join(details) + ")")
 
-    for task in matrix.tasks:
-        source_path, source = sources[task.name]
-        destination = output_dir / task.name / "result.json"
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        snapshot = sanitize_result(source, source_path.read_bytes())
-        destination.write_text(
-            json.dumps(snapshot, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
+    output_dir.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(
+        prefix=f".{output_dir.name}-",
+        dir=output_dir.parent,
+    ) as temporary:
+        staged_dir = Path(temporary) / "next"
+        for task in matrix.tasks:
+            source_path, source = sources[task.name]
+            destination = staged_dir / task.name / "result.json"
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            snapshot = sanitize_result(source, source_path.read_bytes())
+            destination.write_text(
+                json.dumps(snapshot, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        _replace_directory(staged_dir, output_dir)
     return len(matrix.tasks)
 
 
@@ -120,28 +133,46 @@ def sanitize_result(source: dict[str, Any], source_bytes: bytes) -> dict[str, An
     }
 
 
-def _load_sources(results_dir: Path) -> dict[str, tuple[Path, dict[str, Any]]]:
-    if not results_dir.is_dir():
-        raise ValueError(f"results directory does not exist: {results_dir}")
-
+def _load_sources(
+    results_dirs: Iterable[Path],
+) -> dict[str, tuple[Path, dict[str, Any]]]:
     sources: dict[str, tuple[Path, dict[str, Any]]] = {}
-    for result_path in sorted(results_dir.rglob("result.json")):
-        try:
-            source = json.loads(result_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            raise ValueError(f"cannot read trial result: {result_path}") from exc
-        if not isinstance(source, dict) or "trial_name" not in source:
-            continue
-        task_name = _task_name(source)
-        if task_name is None:
-            raise ValueError(f"trial result has no task name: {result_path}")
-        previous = sources.get(task_name)
-        if previous is not None:
-            raise ValueError(
-                f"multiple trial results for task '{task_name}': {previous[0]} and {result_path}"
-            )
-        sources[task_name] = (result_path, source)
+    for results_dir in results_dirs:
+        if not results_dir.is_dir():
+            raise ValueError(f"results directory does not exist: {results_dir}")
+        for result_path in sorted(results_dir.rglob("result.json")):
+            try:
+                source = json.loads(result_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise ValueError(f"cannot read trial result: {result_path}") from exc
+            if not isinstance(source, dict) or "trial_name" not in source:
+                continue
+            task_name = _task_name(source)
+            if task_name is None:
+                raise ValueError(f"trial result has no task name: {result_path}")
+            previous = sources.get(task_name)
+            if previous is not None:
+                raise ValueError(
+                    f"multiple trial results for task '{task_name}': "
+                    f"{previous[0]} and {result_path}"
+                )
+            sources[task_name] = (result_path, source)
     return sources
+
+
+def _replace_directory(staged_dir: Path, output_dir: Path) -> None:
+    if output_dir.exists() and not output_dir.is_dir():
+        raise ValueError(f"output path is not a directory: {output_dir}")
+
+    backup_dir = staged_dir.parent / "previous"
+    if output_dir.exists():
+        output_dir.replace(backup_dir)
+    try:
+        staged_dir.replace(output_dir)
+    except OSError:
+        if backup_dir.exists():
+            backup_dir.replace(output_dir)
+        raise
 
 
 def _task_name(source: dict[str, Any]) -> str | None:
@@ -164,7 +195,7 @@ def _mapping(value: object) -> dict[str, Any]:
 def main() -> int:
     args = parse_args()
     try:
-        count = freeze_results(args.results_dir, args.matrix, args.output_dir)
+        count = freeze_result_sets(args.results_dir, args.matrix, args.output_dir)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"freeze failed: {exc}", file=sys.stderr)
         return 2
