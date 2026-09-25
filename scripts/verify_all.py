@@ -67,6 +67,20 @@ STATIC_GATES = (
         ),
     ),
     (
+        "89-task dry-run",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/run_evaluation.py",
+            "--matrix",
+            "evaluation/matrix-89.json",
+            "--model",
+            "openai/mock-model",
+            "--dry-run",
+        ),
+    ),
+    (
         "delivery artifacts",
         ("uv", "run", "python", "scripts/verify_delivery.py"),
     ),
