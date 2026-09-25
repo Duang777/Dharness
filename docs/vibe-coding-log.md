@@ -31,6 +31,35 @@ solution 内容。只有在一次 trial 结束后，才使用 verifier 输出定
 | Harbor verifier | 根据最终环境返回 reward | 不参与 Agent 中间决策 |
 | 人工工程师 | 选择架构、判断归因、接受或拒绝 AI 建议 | 不能用主观判断替代运行证据 |
 
+## 使用的 Skills
+
+| Skill | 用途 | 产物或验证 |
+|---|---|---|
+| `show-me-your-work` | 记录工程决定、原因、证据和结果 | `.audit/benchmark-optimization.tsv` |
+| `principle-prove-it-works` | 用真实产物验证结论，不以编译或自述代替运行 | `scripts/verify_all.py`、Docker smoke、Harbor reward |
+| `technical-writing` | 组织 README、架构说明、评测方法和复现步骤 | `README.md`、`docs/architecture-rationale.md`、`docs/evaluation-report.md` |
+| `write` | 中文化并统一报告语气 | 中文评测结果、AI Coding 日志 |
+| `unslop` | 删除模板句、空泛结论和重复表述 | 文档 diff 与中文标点检查 |
+
+这些 Skills 解决不同问题。决策日志负责追溯，真实运行负责证明，技术写作负责解释，
+中文润色负责可读性。Skill 的结论只有绑定代码、测试、命令回执或 reward 后才进入
+交付文档。
+
+## 本轮接触的新知识
+
+| 领域 | 实际接触并验证的内容 |
+|---|---|
+| Agent 工程 | Harbor `BaseAgent`、`BaseEnvironment.exec`、结构化动作协议、状态机、证据新鲜度、journal replay |
+| 模型可靠性 | schema repair、空响应处理、单次调用超时、上下文投影、token 与环境调用预算 |
+| 容器与系统 | Docker、OrbStack、Rosetta amd64、QEMU/KVM、Debian HTTPS 软件源挂载 |
+| 编程语言与格式 | Python、Shell、Coq、JavaScript、ELF32/ELF64、SQLite、JSON、CSV、Parquet |
+| 服务与安全 | Nginx、OpenSSL 自签名证书、CWE-93 响应头注入、供应商安全策略边界 |
+| 数据与取证 | 多源 ETL、SQL 查询优化、删除文件恢复、ZIP 结构、CRC 约束 |
+| 科学计算 | Python 科学计算栈迁移、Golden Gate DNA assembly、引物 Tm 与 BsaI 位点验证 |
+
+这里的“接触”指完成了任务阅读、实现、检查或失败分析，并留下可复查证据。它不等于对
+每个领域都具备长期生产经验。
+
 ## 证据等级
 
 | 等级 | 证据 | 用途 |

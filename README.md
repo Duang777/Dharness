@@ -78,6 +78,23 @@ Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifi
 - **结果可以从仓库复算。** `evaluation/trials-20/` 保存 20 个脱敏 trial 快照和原始
   结果 SHA-256，不保存 API 地址、凭证、绝对路径或 traceback。
 
+## 工程方法与知识覆盖
+
+开发过程使用了五项可追踪的 Skills：
+
+| Skill | 在项目中的作用 |
+|---|---|
+| `show-me-your-work` | 把工程决定写入 TSV，并绑定证据和结果 |
+| `principle-prove-it-works` | 要求真实 Harbor、Docker 和 verifier 结果 |
+| `technical-writing` | 组织架构说明、评测方法和复现文档 |
+| `write` | 中文化并统一报告语气 |
+| `unslop` | 删除模板化表述和重复结论 |
+
+20 道任务也扩大了技术覆盖。项目实际处理了 Coq 证明、Nginx、OpenSSL、ELF32/ELF64、
+SQLite 查询优化、JSON/CSV/Parquet 合并、CWE-93、文件系统取证、Python 科学计算栈和
+Golden Gate DNA assembly。每项只按本次任务的实现和验证结果陈述，不把一次评测写成
+长期生产经验。完整记录见 [AI Coding 工程日志](docs/vibe-coding-log.md)。
+
 ## 架构
 
 模型负责选择动作，Harness 负责执行、记账和决定是否终止。模型不能直接访问任务容器。
