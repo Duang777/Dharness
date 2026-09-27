@@ -90,6 +90,13 @@ hard 组占全部任务的 33.7%，却占失败的 56.7%。主要损失来自需
 冲突。另有 12 个 reward 1.0 的 live trial 没有以 `verified` 结束。内部状态与外部评分
 共出现 22 次错位，因此报告只以 Harbor reward 计算成绩。
 
+冻结评测后的轨迹分析进一步确认，旧控制器在两次 completion review 后允许后续 finish
+跳过语义复核。当前源码已改为 receipt-first review、review 失败关闭和末三回合
+finalization，并用 136 项测试及 Docker smoke 验证控制器行为。该改动没有重跑 89 题，
+所以不得据此调整 59/89。数据、设计和外部系统调研分别见
+[失败分析](failure-analysis.md)、[completion control 设计](completion-control-design.md)
+和 [Terminal-Agent Harness Research](terminal-agent-research.md)。
+
 ### 资源
 
 85 个 live canonical trial 共使用 1,933 turns、2,359 次环境调用、28,565,991 个输入

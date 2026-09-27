@@ -272,15 +272,18 @@ async def test_completion_check_timeout_is_clamped_to_wall_budget(tmp_path) -> N
     assert environment.calls[-1][2] <= 6
 
 
-async def test_reviewer_timeout_falls_back_to_verification_checks(tmp_path) -> None:
+async def test_reviewer_timeout_cannot_fall_back_to_verified(tmp_path) -> None:
     report = await _loop(
         tmp_path,
         BlockingReviewModel(),
         max_model_call_timeout_sec=0.01,
     ).run("Create answer.txt", FakeEnvironment())
 
-    assert report.stop_reason is StopReason.VERIFIED
+    assert report.stop_reason is StopReason.MODEL_FAILURE
+    assert report.failure_category == "completion_review_service"
     assert report.environment_calls_used == 2
+    assert report.latest_evidence is not None
+    assert report.latest_evidence.accepted is False
 
 
 async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
@@ -338,7 +341,7 @@ async def test_failed_verification_returns_to_repair(tmp_path) -> None:
     assert any("verification commands failed" in error for error in model.prompts[-1].splitlines())
 
 
-async def test_reviewer_can_reject_weak_requirement_coverage(tmp_path) -> None:
+async def test_reviewer_can_reject_weak_executed_requirement_coverage(tmp_path) -> None:
     model = ScriptedModel(
         [_finish("test -e answer.txt"), _finish('test "$(cat answer.txt)" = good')],
         [
@@ -356,11 +359,46 @@ async def test_reviewer_can_reject_weak_requirement_coverage(tmp_path) -> None:
 
     assert report.stop_reason is StopReason.VERIFIED
     assert report.repairs_used == 1
-    assert "test -e answer.txt" not in [call[0] for call in environment.calls]
+    assert "test -e answer.txt" in [call[0] for call in environment.calls]
+    assert "test -e answer.txt" in model.review_prompts[0]
     assert 'test "$(cat answer.txt)" = good' in [call[0] for call in environment.calls]
 
 
-async def test_default_review_budget_verifies_after_two_rejections(tmp_path) -> None:
+async def test_reviewer_judges_executed_receipt_before_acceptance(tmp_path) -> None:
+    check = "python3 inspect_answer.py"
+    model = ScriptedModel(
+        [_finish(check), _finish(check)],
+        [
+            ReviewDecision(
+                verdict="repair",
+                rationale="the receipt reports the wrong value",
+                missing_requirements=("answer.txt must contain good",),
+            ),
+            ReviewDecision(verdict="accept", rationale="the receipt proves the value"),
+        ],
+    )
+    environment = FakeEnvironment(
+        {
+            check: [
+                FakeExecResult(stdout="expected=good actual=bad\n"),
+                FakeExecResult(stdout="expected=good actual=good\n"),
+            ]
+        }
+    )
+
+    report = await _loop(tmp_path, model).run("Write good to answer.txt", environment)
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert report.repairs_used == 1
+    assert "expected=good actual=bad" in model.review_prompts[0]
+    assert "expected=good actual=good" in model.review_prompts[1]
+    assert report.latest_evidence is not None
+    assert report.latest_evidence.accepted is True
+    assert report.latest_evidence.semantic_assessment is not None
+    assert report.latest_evidence.semantic_assessment.accepted is True
+
+
+async def test_review_budget_exhaustion_never_bypasses_semantic_review(tmp_path) -> None:
     check = 'test "$(cat answer.txt)" = good'
     model = ScriptedModel(
         [_finish(check), _finish(check), _finish(check)],
@@ -373,10 +411,14 @@ async def test_default_review_budget_verifies_after_two_rejections(tmp_path) -> 
 
     report = await _loop(tmp_path, model).run("Write good to answer.txt", environment)
 
-    assert report.stop_reason is StopReason.VERIFIED
-    assert report.repairs_used == 2
+    assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+    assert report.failure_category == "completion_review_budget"
+    assert report.repairs_used == 1
+    assert len(model.prompts) == 2
     assert len(model.review_prompts) == 2
-    assert check in [call[0] for call in environment.calls]
+    assert [call[0] for call in environment.calls].count(check) == 2
+    assert report.latest_evidence is not None
+    assert report.latest_evidence.accepted is False
 
 
 async def test_forbidden_command_never_reaches_environment(tmp_path) -> None:
@@ -441,3 +483,148 @@ async def test_work_cannot_consume_verification_reserve(tmp_path) -> None:
 
     assert report.stop_reason is StopReason.VERIFIED
     assert "touch should-not-run" not in [call[0] for call in environment.calls]
+
+
+async def test_finalization_blocks_late_exploration_but_allows_finish(tmp_path) -> None:
+    model = ScriptedModel(
+        [
+            _execute("printf good > answer.txt", command_id="write-answer"),
+            _execute("touch too-late", command_id="late-exploration"),
+            _finish('test "$(cat answer.txt)" = good'),
+        ],
+        [ReviewDecision(verdict="accept", rationale="the receipt proves the value")],
+    )
+    environment = FakeEnvironment()
+
+    report = await _loop(tmp_path, model, max_turns=4).run(
+        "Write good to answer.txt",
+        environment,
+    )
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert "touch too-late" not in [call[0] for call in environment.calls]
+    assert '"phase": "finalizing"' in model.prompts[1]
+    assert '"allowed_actions": [' in model.prompts[1]
+    assert '"finish"' in model.prompts[1]
+    assert '"execute"' not in model.prompts[1].split('"allowed_actions": [', 1)[1].split("]", 1)[0]
+
+
+async def test_finalization_allows_one_repair_batch_then_requires_finish(tmp_path) -> None:
+    check = 'test "$(cat answer.txt)" = good'
+    model = ScriptedModel(
+        [
+            _execute("printf bad > answer.txt", command_id="write-bad"),
+            _finish(check),
+            _execute("printf good > answer.txt", command_id="repair-answer"),
+            _finish(check),
+        ],
+        [
+            ReviewDecision(verdict="repair", rationale="the value is still bad"),
+            ReviewDecision(verdict="accept", rationale="the value is now good"),
+        ],
+    )
+    environment = FakeEnvironment()
+
+    report = await _loop(tmp_path, model, max_turns=4).run(
+        "Write good to answer.txt",
+        environment,
+    )
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert report.repairs_used == 1
+    assert "printf good > answer.txt" in [call[0] for call in environment.calls]
+    assert '"execute"' in model.prompts[2].split('"allowed_actions": [', 1)[1].split("]", 1)[0]
+    assert '"execute"' not in model.prompts[3].split('"allowed_actions": [', 1)[1].split("]", 1)[0]
+
+
+async def test_finalization_supersedes_a_pending_replan(tmp_path) -> None:
+    failed_changes = [
+        _execute(f"change-{index}", command_id=f"change-{index}") for index in range(3)
+    ]
+    model = ScriptedModel(
+        [*failed_changes, _finish()],
+        [ReviewDecision(verdict="accept", rationale="the receipt proves completion")],
+    )
+    environment = FakeEnvironment(
+        {f"change-{index}": [FakeExecResult(return_code=1)] for index in range(3)}
+    )
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_turns=6,
+        max_recoveries=1,
+    ).run("Create answer.txt", environment)
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert '"phase": "finalizing"' in model.prompts[-1]
+    assert '"recovery_directive": null' in model.prompts[-1]
+
+
+async def test_failed_change_batches_accumulate_stagnation(tmp_path) -> None:
+    commands = [_execute(f"change-{index}", command_id=f"change-{index}") for index in range(3)]
+    environment = FakeEnvironment(
+        {f"change-{index}": [FakeExecResult(return_code=1, stderr="failed")] for index in range(3)}
+    )
+
+    report = await _loop(
+        tmp_path,
+        ScriptedModel(commands),
+        max_recoveries=0,
+        max_turns=8,
+    ).run("Make the requested change", environment)
+
+    assert report.stop_reason is StopReason.DOOM_LOOP
+    assert report.recoveries_used == 0
+    assert len(environment.calls) == 4
+
+
+@pytest.mark.parametrize("max_repairs", [0, 1, 2, 4])
+async def test_max_repairs_grants_exactly_n_cycles(tmp_path, max_repairs: int) -> None:
+    check = "test -s answer.txt"
+    attempt_count = max_repairs + 1
+    model = ScriptedModel([_finish(check) for _ in range(attempt_count)])
+    environment = FakeEnvironment(
+        {check: [FakeExecResult(return_code=1, stderr="missing") for _ in range(attempt_count)]}
+    )
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_repairs=max_repairs,
+        max_completion_reviews=10,
+        max_turns=12,
+    ).run("Create answer.txt", environment)
+
+    assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+    assert report.failure_category == "completion_repair_budget"
+    assert report.repairs_used == max_repairs
+    assert len(model.prompts) == attempt_count
+    assert model.review_prompts == []
+
+
+async def test_review_findings_fit_the_full_review_schema(tmp_path) -> None:
+    missing = tuple(f"missing requirement {index}" for index in range(20))
+    suggestions = tuple(f"suggested check {index}" for index in range(5))
+    model = ScriptedModel(
+        [_finish()],
+        [
+            ReviewDecision(
+                verdict="repair",
+                rationale="the evidence is incomplete",
+                missing_requirements=missing,
+                suggested_checks=suggestions,
+            )
+        ],
+    )
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_repairs=0,
+    ).run("Create answer.txt", FakeEnvironment())
+
+    assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+    assert report.latest_evidence is not None
+    assert report.latest_evidence.semantic_assessment is not None
+    assert len(report.latest_evidence.semantic_assessment.findings) == 25

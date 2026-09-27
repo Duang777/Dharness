@@ -54,6 +54,47 @@ completion reviewer 接受了局部或自写检查，而官方 verifier 仍找�
 或端到端行为错误。预算耗尽的 10 题则需要更早选择决定性验证和更少的重复探索。模型服务
 与依赖缺失应继续单独报告，不能通过增加 prompt 文字解决。
 
+## 控制循环轨迹
+
+`scripts/analyze_failure_traces.py` 从 `evaluation/canonical-89.json` 追到原始 Harness
+journal，并跳过没有 Harness metadata 的 replay trial。它只分析上述 10 个内部
+`verified` 假阳性和 10 个 `budget_exhausted`：
+
+| 指标 | `verified` 假阳性 | `budget_exhausted` |
+|---|---:|---:|
+| 任务数 | 10 | 10 |
+| finish 尝试 | 31 | 12 |
+| completion review | 20 | 6 |
+| reviewer 要求 repair | 18 | 6 |
+| completion rejection | 21 | 12 |
+| 到达过 finish 的任务 | 10 | 5 |
+| 首次 finish 中位回合 | 8 | 35 |
+| 首次 finish 时剩余回合中位数 | 32 | 5 |
+| 最终仍剩余的环境调用中位数 | 48.5 | 36.5 |
+| 最后五次决策仍有 change 的任务 | 5 | 10 |
+| 出现重复 plan item 的任务 | 2 | 9 |
+
+这组数据排除了“环境调用额度普遍不足”作为主因。假阳性组有 31 次 finish，却只有 20 次
+review，说明两次 review 上限在旧控制器中变成了语义检查旁路。预算组的环境调用仍充足，
+但一半任务从未进入 finish，另一半首次 finish 已到第 35 回合。
+
+基于该证据，后续控制器改为先执行 completion checks，再让 reviewer 读取实际 receipt；
+启用 review 时，配额耗尽或 reviewer 故障都失败关闭。最后三个 executor 决策进入
+controller 强制的 finalization，保留一次 finish、一次定向 repair 和一次 revised
+finish 的路径。失败的 change receipt 不再重置停滞计数，`max_repairs=N` 只允许 N 次
+repair。设计与取舍见
+[receipt-aware completion control](completion-control-design.md)。
+
+这些是 canonical 评测完成后的控制器修正，尚未产生新的 89 题分数。当前 59/89 仍只代表
+已冻结 trial。
+
+可复算命令：
+
+```bash
+uv run python scripts/analyze_failure_traces.py \
+  --json-out /tmp/harness-failure-traces.json
+```
+
 ## 20 题阶段性问题记录
 
 以下案例记录评测过程中的 Harness 和基础设施修正。它们解释最终全量运行的配置来源，

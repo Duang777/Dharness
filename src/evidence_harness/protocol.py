@@ -52,6 +52,7 @@ class RunPhase(StrEnum):
     BOOTSTRAPPING = "bootstrapping"
     THINKING = "thinking"
     EXECUTING = "executing"
+    FINALIZING = "finalizing"
     REVIEWING = "reviewing"
     VERIFYING = "verifying"
     REPAIRING = "repairing"
@@ -150,6 +151,20 @@ class ReviewDecision(StrictModel):
         return self
 
 
+class SemanticAssessment(StrictModel):
+    accepted: bool
+    rationale: str = Field(min_length=1, max_length=2_000)
+    findings: tuple[str, ...] = Field(default_factory=tuple, max_length=25)
+
+    @model_validator(mode="after")
+    def validate_assessment(self) -> SemanticAssessment:
+        if self.accepted and self.findings:
+            raise ValueError("accepted assessment cannot contain findings")
+        if not self.accepted and not self.findings:
+            raise ValueError("rejected assessment requires findings")
+        return self
+
+
 class OutputExcerpt(StrictModel):
     head: str
     tail: str
@@ -184,6 +199,7 @@ class VerificationReceipt(StrictModel):
     work_epoch: int = Field(ge=0)
     checks: tuple[CommandReceipt, ...]
     coverage: tuple[RequirementCoverage, ...]
+    semantic_assessment: SemanticAssessment | None = None
     accepted: bool
     rejection_reasons: tuple[str, ...] = ()
 
@@ -244,6 +260,9 @@ class RunState:
     unresolved_errors: list[str] = field(default_factory=list)
     recovery_directive: str | None = None
     must_replan: bool = False
+    completion_findings: tuple[str, ...] = ()
+    finalization_started: bool = False
+    finalization_repair_used: bool = False
     latest_evidence: VerificationReceipt | None = None
     final_summary: str | None = None
     stop_reason: StopReason | None = None

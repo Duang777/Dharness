@@ -23,9 +23,11 @@ from evidence_harness.protocol import (
     FailureKind,
     LoopOptions,
     ModelGateway,
+    ReviewDecision,
     RunPhase,
     RunReport,
     RunState,
+    SemanticAssessment,
     ShellCommand,
     ShellEnvironment,
     StopReason,
@@ -34,6 +36,7 @@ from evidence_harness.shell import CommandRunner
 
 ProgressCallback = Callable[[RunState], None]
 MODEL_CALL_SHUTDOWN_RESERVE_SEC = 5.0
+FINALIZATION_TURN_RESERVE = 3
 
 _BOOTSTRAP = ShellCommand(
     id="bootstrap-environment",
@@ -116,9 +119,16 @@ class EvidenceLoop:
                     failure_category="harness_control",
                 )
 
-            state.phase = RunPhase.THINKING
+            self._enter_finalization_if_needed(state)
+            state.phase = RunPhase.FINALIZING if state.finalization_started else RunPhase.THINKING
             self._notify(state)
-            prompt = build_executor_prompt(state, self._options, self._clock())
+            allowed_actions = self._allowed_actions(state)
+            prompt = build_executor_prompt(
+                state,
+                self._options,
+                self._clock(),
+                allowed_actions=allowed_actions,
+            )
             model_timeout_sec = self._model_call_timeout_sec(state)
             try:
                 async with asyncio.timeout(model_timeout_sec):
@@ -165,7 +175,32 @@ class EvidenceLoop:
 
             state.turn_count += 1
             self._journal.append("agent_decision", decision)
-            if state.must_replan and decision.action not in {ActionKind.REPLAN, ActionKind.STOP}:
+            if decision.action not in allowed_actions:
+                feedback = (
+                    f"Action '{decision.action}' is not allowed during finalization. "
+                    "Submit completion checks or stop."
+                )
+                state.unresolved_errors.append(feedback)
+                self._journal.append(
+                    "finalization_action_rejected",
+                    {
+                        "action": decision.action,
+                        "allowed_actions": allowed_actions,
+                        "turns_remaining": (self._options.max_turns - state.turn_count),
+                    },
+                )
+                if state.turn_count >= self._options.max_turns:
+                    return self._finish(
+                        state,
+                        StopReason.BUDGET_EXHAUSTED,
+                        failure_category="harness_control",
+                    )
+                continue
+            if (
+                not state.finalization_started
+                and state.must_replan
+                and decision.action not in {ActionKind.REPLAN, ActionKind.STOP}
+            ):
                 self._record_control_feedback(
                     state,
                     "A repeated cycle requires a replan or stop before more shell commands.",
@@ -173,6 +208,8 @@ class EvidenceLoop:
                 continue
 
             if decision.action is ActionKind.EXECUTE:
+                if state.finalization_started:
+                    state.finalization_repair_used = True
                 await self._handle_execute(state, runner, decision)
             elif decision.action is ActionKind.FINISH:
                 await self._handle_finish(state, runner, decision)
@@ -233,7 +270,7 @@ class EvidenceLoop:
                 break
 
             receipt = await self._run_command(state, runner, command)
-            if (
+            if receipt.succeeded and (
                 receipt.mode is CommandMode.CHANGE
                 or receipt.observation_fingerprint not in receipts_before
             ):
@@ -244,9 +281,10 @@ class EvidenceLoop:
 
         state.last_batch_progressed = batch_progressed
         state.stagnant_batches = 0 if batch_progressed else state.stagnant_batches + 1
-        self._apply_recovery_policy(state)
+        if not state.finalization_started:
+            self._apply_recovery_policy(state)
         if state.phase is not RunPhase.TERMINATED:
-            state.phase = RunPhase.THINKING
+            state.phase = RunPhase.FINALIZING if state.finalization_started else RunPhase.THINKING
 
     async def _handle_finish(
         self,
@@ -254,10 +292,21 @@ class EvidenceLoop:
         runner: CommandRunner,
         decision: AgentDecision,
     ) -> None:
-        state.phase = RunPhase.REVIEWING
         rejection_reasons = self._gate.validate_proposal(decision.checks, decision.coverage)
         if rejection_reasons:
             self._reject_completion(state, rejection_reasons)
+            return
+
+        if (
+            self._options.enable_completion_review
+            and state.completion_review_count >= self._options.max_completion_reviews
+        ):
+            state.unresolved_errors.append("completion review budget exhausted")
+            self._finish(
+                state,
+                StopReason.BUDGET_EXHAUSTED,
+                failure_category="completion_review_budget",
+            )
             return
 
         remaining_calls = self._options.max_environment_calls - state.environment_call_count
@@ -270,33 +319,7 @@ class EvidenceLoop:
             )
             return
 
-        if (
-            self._options.enable_completion_review
-            and state.completion_review_count < self._options.max_completion_reviews
-        ):
-            review_prompt = build_review_prompt(
-                instruction=state.instruction,
-                checks=decision.checks,
-                coverage=decision.coverage,
-                observations=state.observations,
-            )
-            state.completion_review_count += 1
-            model_timeout_sec = self._model_call_timeout_sec(state)
-            try:
-                async with asyncio.timeout(model_timeout_sec):
-                    review = await self._model.review(review_prompt)
-                self._journal.append("completion_review", review)
-                if review.verdict == "repair":
-                    reasons = [review.rationale, *review.missing_requirements]
-                    reasons.extend(review.suggested_checks)
-                    self._reject_completion(state, tuple(reasons))
-                    return
-            except (ModelProtocolError, ModelServiceError, TimeoutError) as exc:
-                self._journal.append(
-                    "completion_review_error",
-                    {"error_type": type(exc).__name__, "error": str(exc)},
-                )
-
+        supporting_observations = list(state.observations)
         state.phase = RunPhase.VERIFYING
         receipts: list[CommandReceipt] = []
         for check in decision.checks:
@@ -314,14 +337,71 @@ class EvidenceLoop:
             if not receipt.succeeded:
                 break
 
-        evidence = self._gate.decide(
+        semantic_assessment: SemanticAssessment | None = None
+        mechanical_evidence = self._gate.decide(
             work_epoch=state.work_epoch,
             checks=tuple(receipts),
             coverage=decision.coverage,
         )
+        if not mechanical_evidence.accepted:
+            state.latest_evidence = mechanical_evidence
+            self._journal.append("verification_receipt", mechanical_evidence)
+            self._reject_completion(state, mechanical_evidence.rejection_reasons)
+            return
+
+        if self._options.enable_completion_review:
+            state.phase = RunPhase.REVIEWING
+            review_prompt = build_review_prompt(
+                instruction=state.instruction,
+                checks=decision.checks,
+                coverage=decision.coverage,
+                verification_receipts=tuple(receipts),
+                supporting_observations=supporting_observations,
+                prior_findings=state.completion_findings,
+            )
+            state.completion_review_count += 1
+            model_timeout_sec = self._model_call_timeout_sec(state)
+            try:
+                async with asyncio.timeout(model_timeout_sec):
+                    review = await self._model.review(review_prompt)
+                self._journal.append("completion_review", review)
+                semantic_assessment = _semantic_assessment(review)
+            except (ModelProtocolError, ModelServiceError, TimeoutError) as exc:
+                self._journal.append(
+                    "completion_review_error",
+                    {"error_type": type(exc).__name__, "error": str(exc)},
+                )
+                evidence = self._gate.decide(
+                    work_epoch=state.work_epoch,
+                    checks=tuple(receipts),
+                    coverage=decision.coverage,
+                    require_semantic_review=True,
+                )
+                state.latest_evidence = evidence
+                self._journal.append("verification_receipt", evidence)
+                failure_category = (
+                    "completion_review_protocol"
+                    if isinstance(exc, ModelProtocolError)
+                    else "completion_review_service"
+                )
+                self._finish(
+                    state,
+                    StopReason.MODEL_FAILURE,
+                    failure_category=failure_category,
+                )
+                return
+
+        evidence = self._gate.decide(
+            work_epoch=state.work_epoch,
+            checks=tuple(receipts),
+            coverage=decision.coverage,
+            semantic_assessment=semantic_assessment,
+            require_semantic_review=self._options.enable_completion_review,
+        )
         state.latest_evidence = evidence
         self._journal.append("verification_receipt", evidence)
         if evidence.accepted:
+            state.completion_findings = ()
             state.final_summary = decision.summary or decision.rationale
             self._finish(state, StopReason.VERIFIED)
             return
@@ -404,19 +484,70 @@ class EvidenceLoop:
         )
 
     def _reject_completion(self, state: RunState, reasons: tuple[str, ...]) -> None:
-        state.repair_count += 1
-        state.phase = RunPhase.REPAIRING
-        state.unresolved_errors.extend(f"completion rejected: {reason}" for reason in reasons)
+        state.completion_findings = _stable_unique(reasons)
+        review_exhausted = (
+            self._options.enable_completion_review
+            and state.completion_review_count >= self._options.max_completion_reviews
+        )
+        repair_granted = not review_exhausted and state.repair_count < self._options.max_repairs
+        if repair_granted:
+            state.repair_count += 1
+            state.phase = RunPhase.REPAIRING
         self._journal.append(
             "completion_rejected",
-            {"repair_count": state.repair_count, "reasons": reasons},
+            {
+                "repair_count": state.repair_count,
+                "repair_granted": repair_granted,
+                "reasons": state.completion_findings,
+            },
         )
-        if state.repair_count > self._options.max_repairs:
+        if review_exhausted:
             self._finish(
                 state,
                 StopReason.BUDGET_EXHAUSTED,
-                failure_category="model_protocol",
+                failure_category="completion_review_budget",
             )
+        elif not repair_granted:
+            self._finish(
+                state,
+                StopReason.BUDGET_EXHAUSTED,
+                failure_category="completion_repair_budget",
+            )
+
+    def _enter_finalization_if_needed(self, state: RunState) -> None:
+        if state.finalization_started:
+            return
+        reserve = min(
+            FINALIZATION_TURN_RESERVE,
+            max(1, self._options.max_turns - 1),
+        )
+        turns_remaining = self._options.max_turns - state.turn_count
+        if turns_remaining > reserve:
+            return
+        state.finalization_started = True
+        state.must_replan = False
+        state.recovery_directive = None
+        self._journal.append(
+            "finalization_started",
+            {
+                "turns_remaining": turns_remaining,
+                "turn_reserve": reserve,
+                "completion_findings": state.completion_findings,
+            },
+        )
+
+    def _allowed_actions(self, state: RunState) -> tuple[ActionKind, ...]:
+        if not state.finalization_started:
+            return tuple(ActionKind)
+        turns_remaining = self._options.max_turns - state.turn_count
+        may_repair = (
+            bool(state.completion_findings)
+            and not state.finalization_repair_used
+            and turns_remaining >= 2
+        )
+        if may_repair:
+            return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+        return (ActionKind.FINISH, ActionKind.STOP)
 
     def _record_policy_rejection(
         self,
@@ -434,7 +565,8 @@ class EvidenceLoop:
         state.unresolved_errors.append(feedback)
         state.last_batch_progressed = False
         state.stagnant_batches += 1
-        self._apply_recovery_policy(state)
+        if not state.finalization_started:
+            self._apply_recovery_policy(state)
 
     def _budget_exhaustion(self, state: RunState) -> str | None:
         if self._clock() >= state.deadline_monotonic - MODEL_CALL_SHUTDOWN_RESERVE_SEC:
@@ -508,3 +640,20 @@ def _failure_summary(receipt: CommandReceipt) -> str:
         f"command '{receipt.command_id}' failed with {receipt.failure or receipt.return_code}: "
         f"{detail[-1_000:]}"
     )
+
+
+def _semantic_assessment(review: ReviewDecision) -> SemanticAssessment:
+    if review.verdict == "accept":
+        return SemanticAssessment(accepted=True, rationale=review.rationale)
+    findings = _stable_unique((*review.missing_requirements, *review.suggested_checks))
+    if not findings:
+        findings = (review.rationale,)
+    return SemanticAssessment(
+        accepted=False,
+        rationale=review.rationale,
+        findings=findings,
+    )
+
+
+def _stable_unique(values: tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(dict.fromkeys(value for value in values if value))

@@ -82,7 +82,8 @@ def test_completion_reviewer_uses_feasible_evidence_standard() -> None:
         instruction="Make the query as efficient as possible.",
         checks=(),
         coverage=(),
-        observations=[],
+        verification_receipts=(),
+        supporting_observations=[],
     )
 
     assert "Do not demand proof of a global" in prompt
@@ -92,3 +93,4 @@ def test_completion_reviewer_uses_feasible_evidence_standard() -> None:
     assert "Do not require the finish checks to repeat" in prompt
     assert "complete saved artifact" in prompt
     assert "downstream consumer will extract" in prompt
+    assert "executed completion receipts" in prompt

@@ -7,6 +7,7 @@ from evidence_harness.protocol import (
     CommandReceipt,
     LoopOptions,
     RequirementCoverage,
+    SemanticAssessment,
     VerificationCheck,
     VerificationReceipt,
 )
@@ -54,6 +55,8 @@ class EvidenceGate:
         checks: tuple[CommandReceipt, ...],
         coverage: tuple[RequirementCoverage, ...],
         prior_rejections: tuple[str, ...] = (),
+        semantic_assessment: SemanticAssessment | None = None,
+        require_semantic_review: bool = False,
     ) -> VerificationReceipt:
         reasons = list(prior_rejections)
         if not checks:
@@ -63,11 +66,18 @@ class EvidenceGate:
         failed_ids = [item.command_id for item in checks if not item.succeeded]
         if failed_ids:
             reasons.append(f"verification commands failed: {failed_ids}")
+        if not reasons and require_semantic_review and semantic_assessment is None:
+            reasons.append("completion semantic review was not accepted")
+        if semantic_assessment is not None and not semantic_assessment.accepted:
+            reasons.extend(
+                dict.fromkeys((semantic_assessment.rationale, *semantic_assessment.findings))
+            )
 
         return VerificationReceipt(
             work_epoch=work_epoch,
             checks=checks,
             coverage=coverage,
+            semantic_assessment=semantic_assessment,
             accepted=not reasons,
             rejection_reasons=tuple(reasons),
         )
