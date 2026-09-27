@@ -8,6 +8,7 @@ from evidence_harness.protocol import (
     ActionKind,
     AgentDecision,
     CommandReceipt,
+    CompletionIsolationEvidence,
     LoopOptions,
     RequirementCoverage,
     ReviewDecision,
@@ -42,8 +43,12 @@ Rules:
 - Validate generated artifacts from their saved bytes with the target tool or a format-aware
   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
-- Use finish only after the task appears complete. Supply one to three fresh, read-only checks.
-  A check must exit nonzero when its stated condition is false.
+- Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+  Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+  stated condition is false.
+- A completion check may create temporary output, but it must not modify or delete a pre-existing
+  candidate file. Files created by a check are discarded and do not prove that the candidate
+  already contained those files.
 - A finish response must map every explicit task requirement to one or more check IDs.
 - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
   for completion. Submit focused checks or stop; do not propose more exploration.
@@ -64,10 +69,10 @@ When the task allows choosing among approaches and uses subjective superlatives 
 structural evidence. Do not demand proof of a global optimum or require alternatives that violate a
 task-mandated algorithm, query shape, or tool. One full benchmark is enough when it is expensive and
 the observations show stable, task-relevant evidence.
-Completion checks must remain read-only. When a compiler or program must write output to verify a
-requirement, accept a successful current-epoch execution receipt plus fresh read-only checks that
-bind the unchanged source to the generated artifact. Do not require the finish checks to repeat the
-write-producing command.
+Each completion check runs in a fresh disposable snapshot. The isolation record lists files that
+the check added, modified, or deleted. Reject a check that modifies or deletes a pre-existing
+candidate file. Treat every added file as verification-only output; it cannot prove that the frozen
+candidate already contained the same artifact. Checks do not share files with one another.
 For generated structured artifacts, require checks to parse the complete saved artifact with the
 target tool or the documented consumer conventions. Reject checks that validate hard-coded intended
 segments instead of the values a downstream consumer will extract.
@@ -120,6 +125,7 @@ def build_review_prompt(
     coverage: tuple[RequirementCoverage, ...],
     verification_receipts: tuple[CommandReceipt, ...],
     supporting_observations: list[CommandReceipt],
+    isolation: CompletionIsolationEvidence | None = None,
     prior_findings: tuple[str, ...] = (),
 ) -> str:
     payload = {
@@ -130,6 +136,9 @@ def build_review_prompt(
         "executed_verification_receipts": [
             _receipt_view(item, 2_000) for item in verification_receipts
         ],
+        "completion_isolation": (
+            isolation.model_dump(mode="json") if isolation is not None else None
+        ),
         "supporting_observations": [
             _receipt_view(item, 1_000) for item in supporting_observations[-6:]
         ],

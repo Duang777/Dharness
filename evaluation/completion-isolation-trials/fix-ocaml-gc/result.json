@@ -1,0 +1,291 @@
+{
+    "id": "e9a774f4-e04d-47a8-a6e9-aa2c0be23368",
+    "task_name": "fix-ocaml-gc",
+    "trial_name": "fix-ocaml-gc__RMkgTk8",
+    "trial_uri": "file:///Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-ocaml-final4-20260927/fix-ocaml-gc__RMkgTk8",
+    "task_id": {
+        "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+        "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "path": "fix-ocaml-gc"
+    },
+    "source": "terminal-bench",
+    "task_checksum": "faa983dd79f63daa168b41c753bddb0621822820ba6f16661a9767b815e436e8",
+    "config": {
+        "task": {
+            "path": "fix-ocaml-gc",
+            "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+            "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": "terminal-bench"
+        },
+        "trial_name": "fix-ocaml-gc__RMkgTk8",
+        "trials_dir": "/Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-ocaml-final4-20260927",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": 2.0,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "evidence_harness.isolation_experiment_agent:CompletionIsolationExperimentAgent",
+            "import_path": null,
+            "model_name": "openai/modelhub/gpt-5.6-terra",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "corpus_path": "/Users/bytedance/develop/harness-4/evaluation/completion-disagreements.json",
+                "journal_path": "/Users/bytedance/develop/harness-4/evaluation/completion-isolation-trials/fix-ocaml-gc/source-events.jsonl",
+                "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
+                "api_base": "https://xpa-relay.bytedance.net/v1"
+            },
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "c3599992-a713-4312-b610-dc0ec5cb3e21",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "completion-isolation-experiment",
+        "version": "0.1.0",
+        "model_info": {
+            "name": "modelhub/gpt-5.6-terra",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 0,
+        "cost_usd": 0.0,
+        "model_usage": {
+            "openai/modelhub/gpt-5.6-terra": {
+                "n_input_tokens": 0,
+                "n_cache_tokens": 0,
+                "n_output_tokens": 0,
+                "cost_usd": 0.0
+            }
+        },
+        "rollout_details": null,
+        "metadata": {
+            "completion_isolation_experiment": {
+                "schema_version": 1,
+                "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
+                "task_name": "fix-ocaml-gc",
+                "attempt_ordinal": 1,
+                "source_journal_sha256": "136b11d84737d5ee5489ac047d5cf569e840a6e356f02f3a8a5680da722fba1b",
+                "proposal_event_line_sha256": "14f63d817fed95c0ffc95d4060a67e277dd9e110a033a20a63305a6105f2f72f",
+                "experiment_agent_source_sha256": "0fff8d46dfca221e8f46cbb59b7faac36c724cba11072e66139834fbc80595e7",
+                "docker_isolation_source_sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040",
+                "runtime_source_sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac",
+                "replay_command_count": 47,
+                "replay_last_sequence": 48,
+                "replay_last_work_epoch": 38,
+                "stop_reason": "budget_exhausted",
+                "failure_category": "completion_repair_budget",
+                "latest_evidence": {
+                    "work_epoch": 0,
+                    "checks": [
+                        {
+                            "sequence": 2,
+                            "command_id": "pool-sweep-stride-invariant",
+                            "script": "set -e\nsrc=runtime/shared_heap.c\nsed -n '/^static intnat pool_sweep(struct caml_heap_state\\* local, pool\\*\\* plist,/,/^static intnat large_alloc_sweep(/p' \"$src\" > /tmp/pool-sweep-check.$$\ntest -s /tmp/pool-sweep-check.$$\ngrep -Eq 'if[[:space:]]*\\(POOL_BLOCK_FREE_HD\\(hd\\)\\)' /tmp/pool-sweep-check.$$\ngrep -Eq 'p[[:space:]]*\\+=[[:space:]]*wh[[:space:]]*\\*[[:space:]]*\\([[:space:]]*1[[:space:]]*\\+[[:space:]]*Wosize_hd\\(hd\\)[[:space:]]*\\)' /tmp/pool-sweep-check.$$\ngrep -Eq 'p[[:space:]]*\\+=[[:space:]]*wh;' /tmp/pool-sweep-check.$$\nrm -f /tmp/pool-sweep-check.$$",
+                            "purpose": "pool_sweep recognizes compressed free headers, skips each encoded free run, and retains a one-slot stride for non-free blocks.",
+                            "cwd": "/app/ocaml",
+                            "mode": "observe",
+                            "work_epoch": 0,
+                            "return_code": 0,
+                            "failure": null,
+                            "duration_sec": 0.1274472909863107,
+                            "stdout": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "stderr": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "command_fingerprint": "9cc0e40da5312f0e41ea37f16e446b5833b5997b85edc2bcc9775cb9820bbef0",
+                            "observation_fingerprint": "b1d008a272c5c2884d85aab0de9044b966099e4d66d579800a88eb37630a4ac8"
+                        },
+                        {
+                            "sequence": 3,
+                            "command_id": "basic-testsuite-clean-result",
+                            "script": "set -e\nlog=testsuite/ocamltest.log\ntest -f \"$log\"\ngrep -Eq '40 tests passed' \"$log\"\ngrep -Eq '0 tests failed' \"$log\"\ngrep -Eq '0 unexpected errors' \"$log\"",
+                            "purpose": "The saved result of the exact required basic testsuite invocation is clean.",
+                            "cwd": "/app/ocaml",
+                            "mode": "observe",
+                            "work_epoch": 0,
+                            "return_code": 1,
+                            "failure": "nonzero",
+                            "duration_sec": 0.060266290965955704,
+                            "stdout": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "stderr": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "command_fingerprint": "a5f720ec926c097679fc89e135d54990ef3caff5689c61d7eb72d1c4edce7021",
+                            "observation_fingerprint": "fe73ee0902d483d17484660c59129442b74687cf55133e1952373488bb16c5bf"
+                        }
+                    ],
+                    "coverage": [
+                        {
+                            "requirement": "Fix the garbage collector issue that crashes compiler bootstrapping.",
+                            "check_ids": [
+                                "pool-sweep-stride-invariant"
+                            ]
+                        },
+                        {
+                            "requirement": "Ensure `make -C testsuite one DIR=tests/basic` runs cleanly.",
+                            "check_ids": [
+                                "basic-testsuite-clean-result"
+                            ]
+                        }
+                    ],
+                    "isolation": {
+                        "schema_version": 1,
+                        "backend": "docker-commit-v1",
+                        "attempt_id": 1,
+                        "work_epoch": 0,
+                        "candidate_image_id": "sha256:56aa0d2ea2d874df92179242f0355fbe7970bbe695d1798a22e2b118d6702791",
+                        "environment_identity_sha256": "21dd86aa913ad43de79349c897deeae787307caa44c0244cbde6aa295976dd21",
+                        "excluded_control_mounts": [
+                            "/logs/agent",
+                            "/logs/artifacts",
+                            "/logs/verifier"
+                        ],
+                        "checks": [
+                            {
+                                "check_id": "pool-sweep-stride-invariant",
+                                "receipt_sequence": 2,
+                                "receipt_observation_sha256": "b1d008a272c5c2884d85aab0de9044b966099e4d66d579800a88eb37630a4ac8",
+                                "child_id_sha256": "1f4ec837a2fbef6354fd2c58446e210daefcc432bb5350a1a5010c5c3345072f",
+                                "started_from_image_id": "sha256:56aa0d2ea2d874df92179242f0355fbe7970bbe695d1798a22e2b118d6702791",
+                                "delta": {
+                                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                    "added": [],
+                                    "modified": [],
+                                    "deleted": [],
+                                    "omitted_count": 0
+                                },
+                                "disposed": true
+                            },
+                            {
+                                "check_id": "basic-testsuite-clean-result",
+                                "receipt_sequence": 3,
+                                "receipt_observation_sha256": "fe73ee0902d483d17484660c59129442b74687cf55133e1952373488bb16c5bf",
+                                "child_id_sha256": "295ea9194b8e6959ab285691bbad3898f7c102248653f885c5d2a6ee4902682c",
+                                "started_from_image_id": "sha256:56aa0d2ea2d874df92179242f0355fbe7970bbe695d1798a22e2b118d6702791",
+                                "delta": {
+                                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                    "added": [],
+                                    "modified": [],
+                                    "deleted": [],
+                                    "omitted_count": 0
+                                },
+                                "disposed": true
+                            }
+                        ],
+                        "source": {
+                            "container_id_sha256": "eef34ee32cc82a208a2b72488f53dee38690231545dc971463b2e180f0c164f9",
+                            "diff_sha256_before": "e1572f473aead626018f47a987c3d4f43eead415a461339f765a6ed3dbf38915",
+                            "diff_sha256_after": "e1572f473aead626018f47a987c3d4f43eead415a461339f765a6ed3dbf38915",
+                            "remained_paused": true,
+                            "resumed": true
+                        },
+                        "snapshot_image_disposed": true,
+                        "cost": {
+                            "host_operations": 23,
+                            "child_count": 2,
+                            "duration_sec": 25.948598042014055
+                        }
+                    },
+                    "semantic_assessment": null,
+                    "accepted": false,
+                    "rejection_reasons": [
+                        "verification commands failed: ['basic-testsuite-clean-result']"
+                    ]
+                }
+            }
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "verifier_environment_mode": "shared",
+    "exception_info": null,
+    "started_at": "2026-09-27T20:56:49.192284Z",
+    "finished_at": "2026-09-27T21:33:24.852651Z",
+    "environment_setup": {
+        "started_at": "2026-09-27T20:56:49.329510Z",
+        "finished_at": "2026-09-27T20:56:50.311389Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-09-27T20:56:50.311466Z",
+        "finished_at": "2026-09-27T20:56:50.311845Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-09-27T20:56:50.311973Z",
+        "finished_at": "2026-09-27T21:12:41.916783Z"
+    },
+    "verifier": {
+        "started_at": "2026-09-27T21:12:42.416846Z",
+        "finished_at": "2026-09-27T21:33:13.848675Z"
+    },
+    "step_results": null
+}

@@ -1,4 +1,4 @@
-from conftest import FakeEnvironment, ScriptedModel
+from conftest import FakeCompletionIsolation, FakeEnvironment, ScriptedModel
 from harbor.models.agent.context import AgentContext
 
 from evidence_harness.harbor_agent import EvidenceHarnessAgent
@@ -46,6 +46,11 @@ async def test_harbor_adapter_populates_context(tmp_path, monkeypatch) -> None:
         max_environment_calls=8,
     )
     environment = FakeEnvironment()
+    isolation = FakeCompletionIsolation(environment)
+    monkeypatch.setattr(
+        "evidence_harness.harbor_agent.completion_isolation_for_harbor",
+        lambda **_: isolation,
+    )
     context = AgentContext()
 
     await agent.setup(environment)

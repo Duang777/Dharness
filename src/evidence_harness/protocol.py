@@ -198,10 +198,61 @@ class CommandReceipt(StrictModel):
         return self.failure is None and self.return_code == 0
 
 
+class FilesystemDelta(StrictModel):
+    sha256: str
+    added: tuple[str, ...] = ()
+    modified: tuple[str, ...] = ()
+    deleted: tuple[str, ...] = ()
+    omitted_count: int = Field(default=0, ge=0)
+
+
+class CheckIsolationEvidence(StrictModel):
+    check_id: str
+    receipt_sequence: int = Field(ge=1)
+    receipt_observation_sha256: str
+    child_id_sha256: str
+    started_from_image_id: str
+    delta: FilesystemDelta
+    disposed: bool
+
+
+class SourceAttestation(StrictModel):
+    container_id_sha256: str
+    diff_sha256_before: str
+    diff_sha256_after: str
+    remained_paused: bool
+    resumed: bool
+
+    @property
+    def unchanged(self) -> bool:
+        return self.diff_sha256_before == self.diff_sha256_after
+
+
+class IsolationCost(StrictModel):
+    host_operations: int = Field(ge=0)
+    child_count: int = Field(ge=0, le=3)
+    duration_sec: float = Field(ge=0)
+
+
+class CompletionIsolationEvidence(StrictModel):
+    schema_version: int = Field(default=1, ge=1, le=1)
+    backend: str
+    attempt_id: int = Field(ge=1)
+    work_epoch: int = Field(ge=0)
+    candidate_image_id: str
+    environment_identity_sha256: str
+    excluded_control_mounts: tuple[str, ...] = ()
+    checks: tuple[CheckIsolationEvidence, ...]
+    source: SourceAttestation
+    snapshot_image_disposed: bool
+    cost: IsolationCost
+
+
 class VerificationReceipt(StrictModel):
     work_epoch: int = Field(ge=0)
     checks: tuple[CommandReceipt, ...]
     coverage: tuple[RequirementCoverage, ...]
+    isolation: CompletionIsolationEvidence | None = None
     semantic_assessment: SemanticAssessment | None = None
     accepted: bool
     rejection_reasons: tuple[str, ...] = ()
@@ -259,6 +310,7 @@ class RunState:
     completion_review_count: int = 0
     work_epoch: int = 0
     next_sequence: int = 1
+    next_completion_attempt: int = 1
     observations: list[CommandReceipt] = field(default_factory=list)
     unresolved_errors: list[str] = field(default_factory=list)
     recovery_directive: str | None = None

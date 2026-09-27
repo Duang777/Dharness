@@ -5,7 +5,7 @@ import json
 import time
 
 import pytest
-from conftest import FakeEnvironment, FakeExecResult, ScriptedModel
+from conftest import FakeCompletionIsolation, FakeEnvironment, FakeExecResult, ScriptedModel
 
 from evidence_harness.journal import RunJournal
 from evidence_harness.protocol import (
@@ -22,6 +22,7 @@ from evidence_harness.protocol import (
     RunPhase,
     RunState,
     ShellCommand,
+    ShellEnvironment,
     StopReason,
     UsageTotals,
     VerificationCheck,
@@ -70,6 +71,12 @@ def _finish(script: str = "test -s answer.txt") -> AgentDecision:
     )
 
 
+class _LiveBoundTestLoop(EvidenceLoop):
+    async def run(self, instruction: str, environment: ShellEnvironment):
+        self._completion_isolation = FakeCompletionIsolation(environment)
+        return await super().run(instruction, environment)
+
+
 def _loop(tmp_path, model: ModelGateway, **option_overrides) -> EvidenceLoop:
     clock = option_overrides.pop("clock", time.monotonic)
     options = LoopOptions(
@@ -80,10 +87,11 @@ def _loop(tmp_path, model: ModelGateway, **option_overrides) -> EvidenceLoop:
         ),
         **option_overrides,
     )
-    return EvidenceLoop(
+    return _LiveBoundTestLoop(
         model=model,
         journal=RunJournal(tmp_path, inline_bytes=512),
         options=options,
+        completion_isolation=FakeCompletionIsolation(FakeEnvironment()),
         clock=clock,
     )
 
@@ -269,6 +277,7 @@ async def test_environment_call_cannot_exceed_remaining_wall_time(tmp_path) -> N
         model=ScriptedModel(()),
         journal=journal,
         options=options,
+        completion_isolation=FakeCompletionIsolation(environment),
         clock=clock,
     )
     runner = CommandRunner(environment, journal, options, clock)

@@ -2,7 +2,7 @@
 
 Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它把“任务完成”
 改造成控制器执行的证据协议：模型提出操作和验收条件，Harness 串行执行命令、保存观察、
-重新运行最终检查，只有新鲜证据覆盖全部任务要求时才结束。
+在候选快照中重新运行最终检查，只有新鲜证据覆盖全部任务要求时才结束。
 
 Terminal-Bench 2.0 全量评测已经完成。最终结果为 59/89，全部任务均已评分，
 canonical `error` 为 0。
@@ -67,7 +67,8 @@ journal SHA-256。最终成绩反映含恢复的工程闭环，不是严格 pass
 | 设计亮点 | Harness 的实现 |
 |---|---|
 | 结构化动作协议 | 模型只能返回 `execute`、`finish`、`replan` 或 `stop`。Pydantic 在模型边界解析动作，格式错误只允许一次 schema repair |
-| 证据驱动的完成协议 | `finish` 必须提交检查命令和 requirement-to-check 覆盖表。Harness 重跑检查，模型不能用自然语言自行宣布成功 |
+| 证据驱动的完成协议 | `finish` 必须提交检查命令和 requirement-to-check 覆盖表。Harness 在候选快照中重跑检查，模型不能用自然语言自行宣布成功 |
+| 隔离完成检查 | 每条检查从同一 Docker 候选镜像启动独立的无挂载、无网络子容器。源容器保持暂停，检查结束后校验源 diff 并清理全部临时资源 |
 | 基于 epoch 的证据新鲜度 | 每次修改环境都会推进 `work_epoch`。旧检查立即失效，避免修改后继续复用过期的通过结果 |
 | 单写者执行边界 | 只有 `CommandRunner` 可以调用 Harbor 环境。executor 和 reviewer 不会并发修改同一个容器 |
 | 独立的完成审查 | completion reviewer 只判断检查是否覆盖原始要求，不持有环境对象，也不执行命令 |
@@ -107,7 +108,10 @@ flowchart LR
     L --> P[Policy]
     P --> C[CommandRunner]
     C --> E[Harbor BaseEnvironment]
+    L --> I[DockerCompletionIsolation]
+    I --> K[候选快照子容器]
     C --> J[RunJournal]
+    I --> J
     L --> V[EvidenceGate]
     L --> S[RunState / RunReport]
 ```
@@ -118,7 +122,7 @@ flowchart LR
 | 执行策略 | 轻量 plan-in-action；每轮选择 `execute`、`finish`、`replan` 或 `stop` |
 | 错误恢复 | 命令分类、schema repair、模型超时、重复周期检测、恢复预算 |
 | 上下文管理 | 从状态重建 prompt；大输出写 journal，只传摘录与 SHA-256 |
-| 终止判断 | reviewer 审覆盖，Harness 重跑 checks，EvidenceGate 校验 epoch 与结果 |
+| 终止判断 | Harness 隔离执行 checks，EvidenceGate 校验快照与结果，reviewer 再审实际 receipts |
 
 完整状态机、组件职责、方案比较和取舍见[架构决策](docs/architecture-rationale.md)。
 
@@ -238,9 +242,9 @@ Trixie HTTPS 软件源。相同 `--run-name` 只能使用相同模型、矩阵�
 
 ## 完整验收
 
-一条命令运行 Ruff lint/format、mypy、pytest coverage、构建、两个 Harbor Agent
-schema、10/20/89 题 dry-run、交付物检查、结果复算、凭证扫描，以及真实 mock-model +
-Docker + Harbor verifier smoke：
+一条命令运行 Ruff lint/format、mypy、pytest coverage、构建、三个 Harbor Agent
+schema、10/20/89 题 dry-run、completion 校准、89 题隔离支持 census、前瞻隔离实验
+复算、交付物检查、凭证扫描，以及真实 mock-model + Docker + Harbor verifier smoke：
 
 ```bash
 uv run python scripts/verify_all.py
@@ -316,6 +320,13 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
   checksum、Terminal-Bench commit，以及原始结果和配置的 SHA-256。完整命令输出仍
   位于未提交的 `runs/`；没有原始运行目录的克隆只能验证已提交快照与清单的一致性，
   不能独立复算原始结果哈希。
+- 隔离支持 census 对 89 个任务的公开环境配置执行生产拒绝规则。89 题都通过静态
+  检查，但 census 不启动容器，因此不证明运行时支持。
+- 三个冻结 completion 候选通过 execute-only replay 进入真实 Docker 隔离路径。
+  提交的实验快照包含原始 source journal、replay journal、completion journal 和 Harbor
+  result，可由默认门禁逐条复算。`2/3` 通过机械隔离，`3/3` 获得官方 reward 1.0，
+  `0/3` 以内部 `verified` 结束。该实验验证 fail-closed 路径，不是新的全量 Agent
+  评测，不改变 59/89。
 
 ## 交付文档
 
@@ -332,6 +343,11 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [Completion 校准研究](docs/completion-calibration-research.md)
 - [22 例 Completion 分歧语料](evaluation/completion-disagreements.json)
 - [Completion 策略校准结果](evaluation/completion-calibration.json)
+- [隔离完成验证设计](docs/isolated-verification-design.md)
+- [隔离运行时研究](docs/isolated-verification-runtime-research.md)
+- [89 题隔离支持 census](docs/completion-isolation-support.md)
+- [隔离完成验证实验](docs/completion-isolation-experiments.md)
+- [终端 Agent 隔离与结项机制调研](docs/terminal-agent-isolation-research.md)
 - [如果再给 10 小时](docs/next-10-hours.md)
 - [AI Coding 工程日志](docs/vibe-coding-log.md)
 - [独立 fix-git replay 结果](evaluation/replay-results.md)

@@ -133,6 +133,25 @@ def test_verification_rejects_mutating_shell_commands(script: str) -> None:
         validate_check(check, 300)
 
 
+@pytest.mark.parametrize(
+    "script",
+    [
+        "make test",
+        "python3 verify.py > /tmp/result.json",
+        "rm -f /tmp/stale && ./verify",
+    ],
+)
+def test_isolated_verification_allows_potential_writes(script: str) -> None:
+    check = VerificationCheck(
+        id="isolated",
+        kind=CheckKind.BEHAVIOR,
+        script=script,
+        proves="repository behavior is correct",
+    )
+
+    validate_check(check, 300, allow_potential_writes=True)
+
+
 def test_cycle_detector_finds_repeated_two_command_cycle() -> None:
     receipts = [
         _receipt(index + 1, *pair)

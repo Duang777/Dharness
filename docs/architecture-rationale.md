@@ -14,7 +14,7 @@ Evidence Harness 因此把模型视为不稳定的决策组件，而不是系统
 
 | 不变量 | 约束 | 目的 |
 |---|---|---|
-| 单一环境写者 | 只有 `CommandRunner` 调用 `BaseEnvironment.exec` | 让每次副作用都能归因和排序 |
+| 单一任务写者 | 模型命令只通过 `CommandRunner` 进入任务环境；完成检查只在快照子容器中运行 | 让任务修改可归因，并阻止检查污染待评分状态 |
 | 状态由控制器持有 | 预算、epoch、回执和停止原因存入 `RunState` | 模型失忆或重试不会改写事实 |
 | 证据必须新鲜 | 修改后递增 `work_epoch`，旧检查立即失效 | 防止“先测试通过，再修改出错” |
 | 完成需要双重判定 | Harness 审核证据，Harbor verifier 评分 | 避免内部启发式冒充任务真相 |
@@ -65,7 +65,12 @@ uv run harbor run \
 核心循环也可以脱离 Harbor 做确定性测试：
 
 ```python
-loop = EvidenceLoop(model=fake_model, journal=journal, options=options)
+loop = EvidenceLoop(
+    model=fake_model,
+    journal=journal,
+    options=options,
+    completion_isolation=fake_isolation,
+)
 report = await loop.run(instruction, fake_environment)
 assert report.stop_reason == StopReason.VERIFIED
 ```
@@ -84,8 +89,10 @@ flowchart TB
         L <-->|AgentDecision 与 ReviewDecision| G[LiteLLMModelGateway]
         L --> P[Policy]
         P --> C[CommandRunner]
+        L --> I[DockerCompletionIsolation]
         L --> V[EvidenceGate]
         C --> J[RunJournal]
+        I --> J
         L --> J
         L --> X[AgentContext 与 RunReport]
     end
@@ -96,6 +103,9 @@ flowchart TB
     subgraph Task[隔离任务容器]
         E --> S[Shell 与任务文件]
     end
+
+    I -->|pause + commit| S
+    I -->|每项检查一个无挂载、无网络子容器| K[候选快照]
 ```
 
 控制路径和评分路径彼此独立。`EvidenceGate` 决定 Harness 能否声明完成，Harbor
@@ -120,6 +130,9 @@ verifier 在 Agent 退出后判断任务是否真正通过。Harness 不读取 v
 | `model_client.py` | 通过 LiteLLM 调用指定模型，解析 JSON，累计用量 | 直接访问任务容器 |
 | `policy.py` | 拒绝危险、无效或重复的命令和完成检查 | 充当容器隔离边界 |
 | `shell.py` | 串行调用 `BaseEnvironment.exec` 并生成命令回执 | 判断任务是否完成 |
+| `completion_isolation.py` | 定义一次完成验证事务及失败类型 | 依赖具体容器运行时 |
+| `docker_completion_isolation.py` | 暂停源容器、提交候选快照、隔离执行检查并清理资源 | 支持 sidecar、任务挂载和服务型检查 |
+| `source_binding.py` | 对运行时代码与依赖清单生成可复算的聚合指纹 | 判断实现行为是否正确 |
 | `evidence.py` | 检查覆盖关系、检查结果和证据时效 | 替代 Harbor verifier |
 | `journal.py` | 脱敏并归档事件和完整命令输出 | 把无限输出送入模型上下文 |
 | `evaluation.py` | 汇总固定评测矩阵和 Harbor `result.json` | 参与单题运行控制 |
@@ -151,6 +164,8 @@ class VerificationReceipt(BaseModel):
     work_epoch: int
     checks: tuple[CommandReceipt, ...]
     coverage: tuple[RequirementCoverage, ...]
+    isolation: CompletionIsolationEvidence | None
+    semantic_assessment: SemanticAssessment | None
     accepted: bool
 
 
@@ -180,11 +195,11 @@ stateDiagram-v2
     THINKING --> EXECUTING: execute
     EXECUTING --> THINKING: 命令批次结束
     THINKING --> THINKING: replan
-    THINKING --> REVIEWING: finish
-    REVIEWING --> REPAIRING: 提案或 reviewer 拒绝
-    REVIEWING --> VERIFYING: 完成提案通过
-    VERIFYING --> TERMINATED: 新鲜检查全部通过
-    VERIFYING --> REPAIRING: 检查失败
+    THINKING --> VERIFYING: finish 提案通过结构校验
+    VERIFYING --> REPAIRING: 隔离检查或机械门禁失败
+    VERIFYING --> REVIEWING: 隔离检查通过
+    REVIEWING --> TERMINATED: reviewer 与 EvidenceGate 接受
+    REVIEWING --> REPAIRING: reviewer 拒绝
     REPAIRING --> THINKING: 修复预算仍充足
     THINKING --> TERMINATED: stop、预算耗尽或模型故障
     EXECUTING --> TERMINATED: 恢复预算耗尽
@@ -216,6 +231,7 @@ sequenceDiagram
     participant L as EvidenceLoop
     participant M as 模型
     participant E as 任务容器
+    participant I as 隔离子容器
     participant G as EvidenceGate
 
     L->>E: bootstrap，epoch 0
@@ -223,9 +239,10 @@ sequenceDiagram
     L->>L: work_epoch = 1，清除旧证据
     L->>E: 执行修改命令
     M->>L: finish，提交检查和覆盖表
-    L->>E: 重新执行只读检查，epoch 1
-    E-->>L: 返回退出码和输出哈希
-    L->>G: 检查回执与 epoch 1
+    L->>E: 暂停并提交候选快照
+    L->>I: 每条检查在独立子容器执行，epoch 1
+    I-->>L: 返回退出码、输出哈希和文件变化
+    L->>G: 校验检查回执、隔离证据与 epoch 1
     G-->>L: accepted
 ```
 
@@ -244,25 +261,51 @@ Shell 是 Terminal-Bench 的必要通用能力，完全改成固定工具集合�
 - 相同命令加相同观察结果形成重复周期时，禁止继续机械重试。
 
 证据门禁不判断任务的业务真相，它只证明 Harness 的完成声明满足最低可审计条件：
-检查非空、检查 ID 唯一、覆盖表引用有效、脚本不是单纯 `echo/true`、检查均为只读且
-发生在最新修改之后。最终正确性仍由 Terminal-Bench verifier 决定。这样可以避免把
-Harness 自己的启发式规则误当作 benchmark oracle。
+检查非空、检查 ID 唯一、覆盖表引用有效、脚本不是单纯 `echo/true`，并且检查发生在
+最新修改之后。检查可以创建临时文件，但只能写入候选快照的子容器。`EvidenceGate`
+拒绝修改或删除快照中已有的非目录路径，也要求源容器在暂停期间保持相同
+`docker diff`。最终正确性仍由 Terminal-Bench verifier 决定。
 
-## 完成验证的四层职责
+## 完成验证的五层职责
 
-完成流程把结构、语义、执行结果和官方评分分开：
+完成流程把结构、隔离执行、机械证据、语义判断和官方评分分开：
 
-1. `EvidenceGate.validate_proposal` 检查命令是否只读且非平凡，并检查覆盖表引用是否
-   有效。
-2. 启用 completion review 时，reviewer 只判断拟执行的检查能否覆盖原始任务要求。
-   reviewer 不执行命令，也不能接受最终完成状态。
-3. `CommandRunner` 在当前 `work_epoch` 重新执行检查。`EvidenceGate.decide` 要求所有
-   检查成功且证据未过期。
-4. Harbor verifier 在 Harness 退出后独立评分。只有获得 reward 的结果进入 scored
+1. `EvidenceGate.validate_proposal` 检查命令是否非空、非平凡，并检查覆盖表引用是否
+   有效。危险路径和宿主控制命令仍由 policy 拒绝。
+2. `DockerCompletionIsolation` 暂停源容器并提交一次候选镜像。每条检查在各自的
+   无挂载、无网络子容器中执行。
+3. `EvidenceGate.decide` 校验 `attempt_id`、`work_epoch`、receipt 顺序、观察哈希、
+   文件变化、源容器不变和资源清理状态。
+4. 启用 completion review 时，reviewer 读取已经执行的 receipts 和隔离证据，再判断
+   检查是否覆盖原始要求。reviewer 故障或配额耗尽不能降级成成功。
+5. Harbor verifier 在 Harness 退出后独立评分。只有获得 reward 的结果进入 scored
    pass rate。
 
-前两层减少无证据的提前结束。第三层证明完成声明对应当前环境。第四层保留 benchmark
-的唯一评分权。
+前四层决定 Harness 能否声明 `verified`。第五层保留 benchmark 的唯一评分权。
+
+### 隔离完成检查的支持边界
+
+当前实现只支持 Harbor 0.23.0 的本地 Linux `DockerEnvironment`。运行时必须只有一个
+Compose `main` 容器，并且不能有 sidecar、任务挂载、镜像 `VOLUME`、设备请求、
+特权模式或后台进程。服务型完成检查也不支持。任一条件不满足时，Harness 以
+`completion_isolation_unsupported` 结束，不会退回源容器执行检查。
+
+每次完成尝试先暂停源容器，再记录源容器的规范化 `docker diff` 并创建一个候选镜像。
+每条检查从同一镜像启动独立子容器。子容器使用 `--network none`，不继承 Harbor 的
+日志挂载。检查结束后，provider 记录子容器文件变化并删除子容器。最后再次读取源容器
+diff，先恢复源容器，再删除候选镜像。普通操作为清理预留 95 秒，全部清理操作共用
+90 秒硬截止时间；即使 `docker pause` 的客户端调用超时，也会发送 `unpause` 并检查
+源容器状态。
+清理失败会使整个尝试失败。
+
+静态支持 census 对 89 个任务的 `task.toml` 和环境目录执行生产代码中的拒绝规则。
+它只能证明任务源码没有触发静态拒绝条件，不能证明运行时容器、进程树或检查依赖可用。
+三项冻结候选的前瞻实验补充了运行时证据：`3/3` 完整重放命令轨迹并保持退出状态，
+`2/3` 通过机械隔离，`3/3` 获得官方 reward 1.0，但 `0/3` 以内部 `verified` 结束。
+重放输出哈希允许变化，因此该实验不声称候选状态逐字节等价。`fix-ocaml-gc` 的历史检查
+依赖固定测试摘要文本，因此在官方 verifier 通过时仍返回非零。该结果证明隔离和
+fail-closed 路径有效，也说明旧检查会产生内部假阴性；它不改变 canonical `59/89`。
+详见 [completion isolation experiments](completion-isolation-experiments.md)。
 
 ## Prompt 与上下文
 

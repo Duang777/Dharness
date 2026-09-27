@@ -31,7 +31,10 @@ def _executor_reply(prompt: str) -> dict[str, object]:
             {
                 "id": "check-hello",
                 "kind": "artifact",
-                "script": "test \"$(cat /app/hello.txt)\" = 'Hello, world!'",
+                "script": (
+                    "test \"$(cat /app/hello.txt)\" = 'Hello, world!' && "
+                    "printf 'isolated\\n' > /app/verification-only.txt"
+                ),
                 "proves": "the file exists and contains exactly Hello, world!",
                 "cwd": "/app",
                 "timeout_sec": 30,

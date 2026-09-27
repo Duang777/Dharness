@@ -41,16 +41,35 @@ REQUIRED_FILES = (
     RESULTS_89_MARKDOWN,
     Path("evaluation/completion-calibration.json"),
     Path("evaluation/completion-disagreements.json"),
+    Path("evaluation/completion-isolation-experiments.json"),
+    Path("evaluation/completion-isolation-support.json"),
     Path("docs/architecture-rationale.md"),
     Path("docs/completion-calibration-design.md"),
     Path("docs/completion-calibration-research.md"),
+    Path("docs/completion-isolation-experiments.md"),
+    Path("docs/completion-isolation-support.md"),
     Path("docs/evaluation-report.md"),
     Path("docs/failure-analysis.md"),
+    Path("docs/isolated-verification-design.md"),
+    Path("docs/isolated-verification-runtime-research.md"),
     Path("docs/next-10-hours.md"),
+    Path("docs/terminal-agent-isolation-research.md"),
     Path("docs/ten-task-analysis.md"),
     Path("docs/expanded-ten-analysis.md"),
     Path("docs/vibe-coding-log.md"),
     Path("scripts/completion_calibration.py"),
+    Path("scripts/completion_isolation_census.py"),
+    Path("scripts/completion_isolation_experiments.py"),
+    *(
+        Path("evaluation/completion-isolation-trials") / task / relative
+        for task in ("crack-7z-hash", "fix-ocaml-gc", "write-compressor")
+        for relative in (
+            Path("result.json"),
+            Path("source-events.jsonl"),
+            Path("agent/completion-isolation-experiment/replay/events.jsonl"),
+            Path("agent/completion-isolation-experiment/completion/events.jsonl"),
+        )
+    ),
 )
 
 README_HEADINGS = (

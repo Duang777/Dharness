@@ -92,7 +92,8 @@ def test_completion_reviewer_uses_feasible_evidence_standard() -> None:
     assert "allows choosing among approaches" in prompt
     assert "task-mandated algorithm" in prompt
     assert "One full benchmark is enough" in prompt
-    assert "Do not require the finish checks to repeat" in prompt
+    assert "fresh disposable snapshot" in prompt
+    assert "verification-only output" in prompt
     assert "complete saved artifact" in prompt
     assert "downstream consumer will extract" in prompt
     assert "executed completion receipts" in prompt

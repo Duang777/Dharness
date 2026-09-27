@@ -144,14 +144,21 @@ def validate_command(command: ShellCommand, max_timeout_sec: int) -> None:
     )
 
 
-def validate_check(check: VerificationCheck, max_timeout_sec: int) -> None:
+def validate_check(
+    check: VerificationCheck,
+    max_timeout_sec: int,
+    *,
+    allow_potential_writes: bool = False,
+) -> None:
     _validate_script(
         check.script,
         check.timeout_sec,
         max_timeout_sec,
         cwd=check.cwd,
     )
-    if _CHECK_MUTATING_COMMAND.search(check.script) or _has_output_redirection(check.script):
+    if not allow_potential_writes and (
+        _CHECK_MUTATING_COMMAND.search(check.script) or _has_output_redirection(check.script)
+    ):
         raise PolicyViolation(f"verification check '{check.id}' appears to modify task state")
     if _TRIVIAL_CHECK.fullmatch(check.script):
         raise PolicyViolation(f"verification check '{check.id}' is display-only or a no-op")

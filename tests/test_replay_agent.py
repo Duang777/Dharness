@@ -11,9 +11,12 @@ from evidence_harness.policy import command_fingerprint, observation_fingerprint
 from evidence_harness.protocol import (
     ActionKind,
     AgentDecision,
+    CheckKind,
     CommandMode,
     FailureKind,
+    RequirementCoverage,
     ShellCommand,
+    VerificationCheck,
 )
 from evidence_harness.replay_agent import (
     JournalReplayAgent,
@@ -196,6 +199,100 @@ async def test_replay_can_continue_past_failures_recorded_in_source(tmp_path) ->
     assert metadata["recorded_failure_count"] == 1
     assert metadata["replay_mode"] == "recorded_receipts"
     assert metadata["completed"] is True
+
+
+async def test_schema2_replay_ignores_isolated_completion_checks(tmp_path) -> None:
+    change = ShellCommand(
+        id="change",
+        script="touch recovered.txt",
+        purpose="restore the artifact",
+        cwd="/workspace",
+        mode=CommandMode.CHANGE,
+    )
+    isolated_check = ShellCommand(
+        id="check",
+        script="printf verification-only > /tmp/isolated-output",
+        purpose="verify only in the disposable child",
+        cwd="/workspace",
+        mode=CommandMode.OBSERVE,
+    )
+    finish = AgentDecision(
+        action=ActionKind.FINISH,
+        rationale="verify the completed artifact",
+        checks=(
+            VerificationCheck(
+                id=isolated_check.id,
+                kind=CheckKind.BEHAVIOR,
+                script=isolated_check.script,
+                proves=isolated_check.purpose,
+                cwd=isolated_check.cwd,
+            ),
+        ),
+        coverage=(
+            RequirementCoverage(
+                requirement="the artifact is complete",
+                check_ids=(isolated_check.id,),
+            ),
+        ),
+    )
+    source = tmp_path / "source.jsonl"
+    source.write_text(
+        "\n".join(
+            (
+                json.dumps(
+                    {
+                        "type": "run_started",
+                        "payload": {"journal_schema_version": 2},
+                    }
+                ),
+                _event("agent_decision", _execute(change)),
+                _receipt(change, return_code=0),
+                _event("agent_decision", finish),
+                json.dumps(
+                    {
+                        "type": "completion_isolation_started",
+                        "payload": {"attempt_id": 1, "work_epoch": 1},
+                    }
+                ),
+                _receipt(
+                    isolated_check,
+                    return_code=0,
+                    sequence=2,
+                    work_epoch=1,
+                ),
+                json.dumps(
+                    {
+                        "type": "completion_check_isolated",
+                        "payload": {"check_id": "check"},
+                    }
+                ),
+                json.dumps(
+                    {
+                        "type": "completion_check_disposed",
+                        "payload": {"check_id": "check"},
+                    }
+                ),
+                json.dumps(
+                    {
+                        "type": "run_finished",
+                        "payload": {"stop_reason": "verified"},
+                    }
+                ),
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    environment = FakeEnvironment()
+    agent = JournalReplayAgent(
+        logs_dir=tmp_path / "logs",
+        journal_path=source,
+    )
+
+    await agent.setup(environment)
+    await agent.run("ignored during replay", environment, AgentContext())
+
+    assert [call[0] for call in environment.calls] == ["touch recovered.txt"]
 
 
 async def test_replay_still_rejects_new_failures(tmp_path) -> None:

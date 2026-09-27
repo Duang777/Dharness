@@ -23,6 +23,9 @@ ISOLATABLE_REJECTION_PATTERNS = (
     re.compile(r"^verification check shell syntax cannot be inspected$"),
 )
 OMITTED_OUTPUT = "[OMITTED FROM COMMITTED CORPUS]"
+LEGACY_DIALECT = "legacy_review_first_unversioned_v0"
+ISOLATED_DIALECT = "isolated_receipt_first_v2"
+MIXED_DIALECT = "mixed_legacy_v1_and_isolated_v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,6 +105,7 @@ def build_completion_corpus(
     replay_count = 0
     false_positive_count = 0
     false_negative_count = 0
+    source_dialects: set[str] = set()
 
     for row_value in canonical_tasks:
         row = _object(row_value, "canonical task")
@@ -131,17 +135,17 @@ def build_completion_corpus(
         else:
             disagreement = "false_negative"
             false_negative_count += 1
-        cases.append(
-            _build_case(
-                row=row,
-                source=source,
-                dataset=_required_string(canonical, "dataset"),
-                project_root=project_root,
-                disagreement=disagreement,
-                reward=reward,
-                harness=harness,
-            )
+        case, source_dialect = _build_case(
+            row=row,
+            source=source,
+            dataset=_required_string(canonical, "dataset"),
+            project_root=project_root,
+            disagreement=disagreement,
+            reward=reward,
+            harness=harness,
         )
+        cases.append(case)
+        source_dialects.add(source_dialect)
 
     observed = CohortExpectation(
         total=len(canonical_tasks),
@@ -155,7 +159,7 @@ def build_completion_corpus(
 
     return {
         "schema_version": 1,
-        "source_dialect": "legacy_review_first_unversioned_v0",
+        "source_dialect": _combined_source_dialect(source_dialects),
         "dataset": _required_string(canonical, "dataset"),
         "sources": {
             "canonical": _file_binding(canonical_path, canonical_bytes, project_root),
@@ -300,7 +304,11 @@ def analyze_completion_corpus(corpus: dict[str, Any]) -> dict[str, Any]:
 def validate_completion_corpus(corpus: dict[str, Any]) -> None:
     if corpus.get("schema_version") != 1:
         raise ValueError("unsupported completion corpus schema")
-    if corpus.get("source_dialect") != "legacy_review_first_unversioned_v0":
+    if corpus.get("source_dialect") not in {
+        LEGACY_DIALECT,
+        ISOLATED_DIALECT,
+        MIXED_DIALECT,
+    }:
         raise ValueError("unsupported completion corpus dialect")
     if _sanitize_for_export(corpus) != corpus:
         raise ValueError("completion corpus contains unsanitized values")
@@ -603,7 +611,7 @@ def _build_case(
     disagreement: str,
     reward: float,
     harness: dict[str, Any],
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], str]:
     result_path = Path(source["result_path"])
     journal_path = result_path.parent / "agent" / "evidence-harness" / "events.jsonl"
     journal_bytes = journal_path.read_bytes()
@@ -612,7 +620,12 @@ def _build_case(
     finished = _single_event(events, "run_finished", journal_path)
     if finished.line != events[-1].line:
         raise ValueError(f"run_finished is not the final journal event: {journal_path}")
-    attempts = _build_attempts(events, journal_path)
+    journal_schema_version, source_dialect = _journal_dialect(started, journal_path)
+    attempts = _build_attempts(
+        events,
+        journal_path,
+        journal_schema_version=journal_schema_version,
+    )
 
     stop_reason = _required_string(harness, "stop_reason")
     if finished.payload.get("stop_reason") != stop_reason:
@@ -674,10 +687,36 @@ def _build_case(
             "task_git_commit_id": row.get("task_git_commit_id"),
         },
     }
-    return _object(_sanitize_for_export(case), "sanitized corpus case")
+    return _object(_sanitize_for_export(case), "sanitized corpus case"), source_dialect
 
 
-def _build_attempts(events: list[_Event], journal_path: Path) -> list[dict[str, Any]]:
+def _build_attempts(
+    events: list[_Event],
+    journal_path: Path,
+    *,
+    journal_schema_version: int,
+) -> list[dict[str, Any]]:
+    if journal_schema_version == 1:
+        return _build_attempts_for_dialect(
+            events,
+            journal_path,
+            receipt_first=False,
+        )
+    if journal_schema_version == 2:
+        return _build_attempts_for_dialect(
+            events,
+            journal_path,
+            receipt_first=True,
+        )
+    raise ValueError(f"unsupported journal schema {journal_schema_version}: {journal_path}")
+
+
+def _build_attempts_for_dialect(
+    events: list[_Event],
+    journal_path: Path,
+    *,
+    receipt_first: bool,
+) -> list[dict[str, Any]]:
     decision_positions = [
         index
         for index, event in enumerate(events)
@@ -716,11 +755,18 @@ def _build_attempts(events: list[_Event], journal_path: Path) -> list[dict[str, 
         ]
         if len(reviews) > 1:
             raise ValueError(f"multiple completion reviews at {journal_path}:{events[start].line}")
-        if reviews and check_receipt_events and reviews[0].line > check_receipt_events[0].line:
-            raise ValueError(
-                f"receipt-first events do not match the legacy dialect at "
-                f"{journal_path}:{events[start].line}"
-            )
+        if reviews and check_receipt_events:
+            review_line = reviews[0].line
+            if not receipt_first and review_line > check_receipt_events[0].line:
+                raise ValueError(
+                    f"receipt-first events do not match the legacy dialect at "
+                    f"{journal_path}:{events[start].line}"
+                )
+            if receipt_first and review_line < check_receipt_events[-1].line:
+                raise ValueError(
+                    f"review-first events do not match journal schema 2 at "
+                    f"{journal_path}:{events[start].line}"
+                )
         verification_events = [event for event in segment if event.type == "verification_receipt"]
         if len(verification_events) > 1:
             raise ValueError(
@@ -740,11 +786,23 @@ def _build_attempts(events: list[_Event], journal_path: Path) -> list[dict[str, 
                     f"verification receipt coverage does not match proposal at "
                     f"{journal_path}:{verification_events[0].line}"
                 )
+        if receipt_first:
+            _validate_schema2_isolation(
+                segment=segment,
+                check_receipts=check_receipt_events,
+                verification_events=verification_events,
+                journal_path=journal_path,
+                proposal_line=events[start].line,
+            )
 
         rejection_events = [event for event in segment if event.type == "completion_rejected"]
         owned_completion_lines.update(event.line for event in reviews)
         owned_completion_lines.update(event.line for event in verification_events)
         owned_completion_lines.update(event.line for event in rejection_events)
+        if receipt_first:
+            owned_completion_lines.update(
+                event.line for event in segment if event.type.startswith("completion_")
+            )
         run_finished = [event for event in segment if event.type == "run_finished"]
         accepted = bool(
             verification_events
@@ -786,21 +844,82 @@ def _build_attempts(events: list[_Event], journal_path: Path) -> list[dict[str, 
                 "outcome": outcome,
             }
         )
-    completion_events = {
-        event.line
-        for event in events
-        if event.type
-        in {
-            "completion_review",
-            "completion_review_error",
-            "completion_rejected",
-            "verification_receipt",
-        }
-    }
+    completion_events = set()
+    for event in events:
+        if (
+            event.type == "verification_receipt"
+            or event.type
+            in {
+                "completion_review",
+                "completion_review_error",
+                "completion_rejected",
+            }
+            or (receipt_first and event.type.startswith("completion_"))
+        ):
+            completion_events.add(event.line)
     if completion_events != owned_completion_lines:
         orphaned = sorted(completion_events - owned_completion_lines)
         raise ValueError(f"orphaned completion events in {journal_path}: {orphaned}")
     return attempts
+
+
+def _validate_schema2_isolation(
+    *,
+    segment: list[_Event],
+    check_receipts: list[_Event],
+    verification_events: list[_Event],
+    journal_path: Path,
+    proposal_line: int,
+) -> None:
+    isolation_started = [event for event in segment if event.type == "completion_isolation_started"]
+    isolation_failed = [event for event in segment if event.type == "completion_isolation_failed"]
+    if len(isolation_started) > 1 or len(isolation_failed) > 1:
+        raise ValueError(f"multiple isolation lifecycle events at {journal_path}:{proposal_line}")
+    if check_receipts or verification_events:
+        if len(isolation_started) != 1:
+            raise ValueError(
+                f"journal schema 2 completion evidence has no isolation start at "
+                f"{journal_path}:{proposal_line}"
+            )
+        if check_receipts and isolation_started[0].line > check_receipts[0].line:
+            raise ValueError(
+                f"journal schema 2 isolation starts after its receipt at "
+                f"{journal_path}:{proposal_line}"
+            )
+    if verification_events:
+        isolation = _object(
+            verification_events[0].payload.get("isolation"),
+            "verification isolation",
+        )
+        attempt_id = _required_int(isolation, "attempt_id")
+        if isolation_started[0].payload.get("attempt_id") != attempt_id:
+            raise ValueError(
+                f"journal schema 2 isolation attempt does not match at "
+                f"{journal_path}:{proposal_line}"
+            )
+    if isolation_failed and verification_events:
+        raise ValueError(
+            f"failed isolation has a verification receipt at {journal_path}:{proposal_line}"
+        )
+
+
+def _journal_dialect(started: _Event, journal_path: Path) -> tuple[int, str]:
+    raw_version = started.payload.get("journal_schema_version")
+    if raw_version is None or raw_version == 1:
+        return 1, LEGACY_DIALECT
+    if raw_version == 2:
+        return 2, ISOLATED_DIALECT
+    raise ValueError(f"unsupported journal schema {raw_version}: {journal_path}")
+
+
+def _combined_source_dialect(source_dialects: set[str]) -> str:
+    if source_dialects == {LEGACY_DIALECT}:
+        return LEGACY_DIALECT
+    if source_dialects == {ISOLATED_DIALECT}:
+        return ISOLATED_DIALECT
+    if source_dialects == {LEGACY_DIALECT, ISOLATED_DIALECT}:
+        return MIXED_DIALECT
+    raise ValueError("completion corpus contains no supported journal dialect")
 
 
 def _validate_check_receipt(

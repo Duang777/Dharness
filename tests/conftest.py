@@ -1,15 +1,29 @@
 from __future__ import annotations
 
+import hashlib
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 
+from evidence_harness.completion_isolation import (
+    CompletionIsolationError,
+    CompletionIsolationRequest,
+    CompletionIsolationResult,
+)
 from evidence_harness.protocol import (
     AgentDecision,
+    CheckIsolationEvidence,
+    CompletionIsolationEvidence,
     EnvironmentResult,
+    FilesystemDelta,
+    IsolationCost,
     ReviewDecision,
+    ShellEnvironment,
+    SourceAttestation,
     UsageTotals,
 )
+
+_EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
 
 
 @dataclass
@@ -42,6 +56,67 @@ class FakeEnvironment:
         if command.startswith("set +e\n"):
             return FakeExecResult(stdout="/workspace\n")
         return FakeExecResult()
+
+
+class FakeCompletionIsolation:
+    def __init__(
+        self,
+        environment: ShellEnvironment,
+        *,
+        failure: CompletionIsolationError | None = None,
+    ) -> None:
+        self.environment = environment
+        self.failure = failure
+        self.requests: list[CompletionIsolationRequest] = []
+
+    async def verify(self, request, execute):
+        self.requests.append(request)
+        if self.failure is not None:
+            raise self.failure
+
+        receipts = []
+        isolated_checks = []
+        for index, check in enumerate(request.checks, start=1):
+            receipt = await execute(check, self.environment, request.deadline_monotonic)
+            receipts.append(receipt)
+            isolated_checks.append(
+                CheckIsolationEvidence(
+                    check_id=check.id,
+                    receipt_sequence=receipt.sequence,
+                    receipt_observation_sha256=receipt.observation_fingerprint,
+                    child_id_sha256=f"{request.attempt_id:032x}{index:032x}",
+                    started_from_image_id="sha256:test-candidate",
+                    delta=FilesystemDelta(sha256=_EMPTY_SHA256),
+                    disposed=True,
+                )
+            )
+            if not receipt.succeeded:
+                break
+
+        return CompletionIsolationResult(
+            receipts=tuple(receipts),
+            evidence=CompletionIsolationEvidence(
+                backend="test-isolation-v1",
+                attempt_id=request.attempt_id,
+                work_epoch=request.work_epoch,
+                candidate_image_id="sha256:test-candidate",
+                environment_identity_sha256="a" * 64,
+                checks=tuple(isolated_checks),
+                source=SourceAttestation(
+                    container_id_sha256="b" * 64,
+                    diff_sha256_before=_EMPTY_SHA256,
+                    diff_sha256_after=_EMPTY_SHA256,
+                    remained_paused=True,
+                    resumed=True,
+                ),
+                snapshot_image_disposed=True,
+                cost=IsolationCost(
+                    host_operations=len(isolated_checks),
+                    child_count=len(isolated_checks),
+                    duration_sec=0,
+                ),
+            ),
+        )
 
 
 class ScriptedModel:

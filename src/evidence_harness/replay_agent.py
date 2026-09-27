@@ -105,24 +105,7 @@ class JournalReplayAgent(BaseAgent):
             },
         )
 
-        for batch in batches:
-            for step in batch:
-                receipt = await runner.execute(
-                    step.command,
-                    sequence=step.sequence,
-                    work_epoch=step.work_epoch,
-                )
-                if (
-                    receipt.return_code != step.expected_return_code
-                    or receipt.failure is not step.expected_failure
-                ):
-                    raise RuntimeError(
-                        f"replayed command '{step.command.id}' produced "
-                        f"return_code={receipt.return_code}, "
-                        f"failure={_failure_name(receipt.failure)}; expected "
-                        f"return_code={step.expected_return_code}, "
-                        f"failure={_failure_name(step.expected_failure)}"
-                    )
+        await replay_recorded_batches(batches, runner)
 
         context.metadata["evidence_harness_replay"]["completed"] = True
         journal.append(
@@ -132,6 +115,33 @@ class JournalReplayAgent(BaseAgent):
                 "command_count": command_count,
             },
         )
+
+
+async def replay_recorded_batches(
+    batches: tuple[tuple[RecordedCommand, ...], ...],
+    runner: CommandRunner,
+) -> tuple[CommandReceipt, ...]:
+    receipts: list[CommandReceipt] = []
+    for batch in batches:
+        for step in batch:
+            receipt = await runner.execute(
+                step.command,
+                sequence=step.sequence,
+                work_epoch=step.work_epoch,
+            )
+            receipts.append(receipt)
+            if (
+                receipt.return_code != step.expected_return_code
+                or receipt.failure is not step.expected_failure
+            ):
+                raise RuntimeError(
+                    f"replayed command '{step.command.id}' produced "
+                    f"return_code={receipt.return_code}, "
+                    f"failure={_failure_name(receipt.failure)}; expected "
+                    f"return_code={step.expected_return_code}, "
+                    f"failure={_failure_name(step.expected_failure)}"
+                )
+    return tuple(receipts)
 
 
 def load_replay_batches(source_bytes: bytes) -> tuple[tuple[ShellCommand, ...], ...]:

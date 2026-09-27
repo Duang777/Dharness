@@ -183,6 +183,41 @@ def _legacy_false_negative_journal() -> list[dict[str, object]]:
     ]
 
 
+def _schema2_false_positive_journal() -> list[dict[str, object]]:
+    started, decision, receipt, review, verification, finished = _legacy_false_positive_journal(
+        receipt_first=True
+    )
+    started_payload = started["payload"]
+    verification_payload = verification["payload"]
+    assert isinstance(started_payload, dict)
+    assert isinstance(verification_payload, dict)
+    started_payload["journal_schema_version"] = 2
+    verification_payload["isolation"] = {
+        "attempt_id": 1,
+        "work_epoch": 1,
+    }
+    return [
+        started,
+        decision,
+        _event(
+            "completion_isolation_started",
+            {"attempt_id": 1, "work_epoch": 1},
+            3,
+        ),
+        _event("completion_candidate_committed", {"attempt_id": 1}, 3),
+        _event("completion_check_started", {"attempt_id": 1, "check_id": "behavior"}, 3),
+        receipt,
+        _event("completion_check_isolated", {"check_id": "behavior"}, 4),
+        _event("completion_check_disposed", {"check_id": "behavior"}, 4),
+        _event("completion_source_attested", {"attempt_id": 1}, 4),
+        _event("completion_snapshot_disposed", {"attempt_id": 1}, 4),
+        _event("completion_source_resumed", {"attempt_id": 1}, 4),
+        review,
+        verification,
+        finished,
+    ]
+
+
 def _write_trial(
     root: Path,
     *,
@@ -265,6 +300,7 @@ def _write_fixture(
     *,
     receipt_first: bool = False,
     include_review: bool = True,
+    schema2_false_positive: bool = False,
 ) -> tuple[Path, Path]:
     rows = [
         _write_trial(
@@ -273,9 +309,13 @@ def _write_fixture(
             task_name="false-positive",
             reward=0,
             stop_reason="verified",
-            events=_legacy_false_positive_journal(
-                receipt_first=receipt_first,
-                include_review=include_review,
+            events=(
+                _schema2_false_positive_journal()
+                if schema2_false_positive
+                else _legacy_false_positive_journal(
+                    receipt_first=receipt_first,
+                    include_review=include_review,
+                )
             ),
         ),
         _write_trial(
@@ -444,6 +484,25 @@ def test_legacy_decoder_rejects_receipt_first_event_order(tmp_path: Path) -> Non
             tmp_path,
             expected=CohortExpectation(3, 2, 1, 1, 1),
         )
+
+
+def test_schema2_decoder_accepts_isolated_receipt_first_event_order(
+    tmp_path: Path,
+) -> None:
+    canonical_path, matrix_path = _write_fixture(
+        tmp_path,
+        schema2_false_positive=True,
+    )
+
+    corpus = build_completion_corpus(
+        canonical_path,
+        matrix_path,
+        tmp_path,
+        expected=CohortExpectation(3, 2, 1, 1, 1),
+    )
+
+    assert corpus["source_dialect"] == "mixed_legacy_v1_and_isolated_v2"
+    assert corpus["cases"][0]["attempts"][0]["outcome"] == "accepted"
 
 
 def test_legacy_decoder_rejects_events_after_run_finished(tmp_path: Path) -> None:

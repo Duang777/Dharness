@@ -41,6 +41,17 @@ STATIC_GATES = (
         ),
     ),
     (
+        "CompletionIsolationExperimentAgent schema",
+        (
+            "uv",
+            "run",
+            "harbor",
+            "agent",
+            "schema",
+            "evidence_harness.isolation_experiment_agent:CompletionIsolationExperimentAgent",
+        ),
+    ),
+    (
         "10-task dry-run",
         (
             "uv",
@@ -105,6 +116,26 @@ STATIC_GATES = (
         ),
     ),
     (
+        "completion isolation support census",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/completion_isolation_census.py",
+            "check",
+        ),
+    ),
+    (
+        "completion isolation experiments",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/completion_isolation_experiments.py",
+            "check",
+        ),
+    ),
+    (
         "delivery artifacts",
         ("uv", "run", "python", "scripts/verify_delivery.py"),
     ),
@@ -134,6 +165,9 @@ def run_gate(name: str, command: tuple[str, ...]) -> bool:
 
 def run_smoke() -> bool:
     port = _available_port()
+    baseline_resources = _docker_isolation_resources()
+    if baseline_resources is None:
+        return False
     with tempfile.TemporaryDirectory(prefix="evidence-harness-smoke-") as temporary:
         jobs_dir = Path(temporary) / "jobs"
         server = subprocess.Popen(
@@ -192,7 +226,7 @@ def run_smoke() -> bool:
                     file=sys.stderr,
                 )
                 return False
-            return _validate_smoke_result(jobs_dir)
+            return _validate_smoke_result(jobs_dir, baseline_resources)
         finally:
             server.terminate()
             try:
@@ -221,7 +255,10 @@ def _wait_for_server(port: int, process: subprocess.Popen[bytes]) -> bool:
     return False
 
 
-def _validate_smoke_result(jobs_dir: Path) -> bool:
+def _validate_smoke_result(
+    jobs_dir: Path,
+    baseline_resources: frozenset[str],
+) -> bool:
     trial_results = []
     for result_path in jobs_dir.rglob("result.json"):
         try:
@@ -254,8 +291,98 @@ def _validate_smoke_result(jobs_dir: Path) -> bool:
             file=sys.stderr,
         )
         return False
-    print("Docker smoke passed: reward=1.0, stop_reason=verified")
+
+    journal_paths = list(jobs_dir.rglob("agent/evidence-harness/events.jsonl"))
+    if len(journal_paths) != 1:
+        print(
+            f"Docker smoke produced {len(journal_paths)} Harness journals instead of one",
+            file=sys.stderr,
+        )
+        return False
+    try:
+        events = [
+            json.loads(line)
+            for line in journal_paths[0].read_text(encoding="utf-8").splitlines()
+            if line
+        ]
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"Docker smoke journal is invalid: {exc}", file=sys.stderr)
+        return False
+    verification_events = [event for event in events if event.get("type") == "verification_receipt"]
+    if len(verification_events) != 1:
+        print("Docker smoke did not produce one verification receipt", file=sys.stderr)
+        return False
+    isolation = verification_events[0].get("payload", {}).get("isolation", {})
+    source = isolation.get("source", {}) if isinstance(isolation, dict) else {}
+    checks = isolation.get("checks", []) if isinstance(isolation, dict) else []
+    added_paths = {
+        path
+        for check in checks
+        if isinstance(check, dict)
+        for path in check.get("delta", {}).get("added", [])
+    }
+    if (
+        "/app/verification-only.txt" not in added_paths
+        or source.get("diff_sha256_before") != source.get("diff_sha256_after")
+        or source.get("remained_paused") is not True
+        or source.get("resumed") is not True
+        or isolation.get("snapshot_image_disposed") is not True
+    ):
+        print(
+            "Docker smoke did not prove isolated writes and unchanged live state",
+            file=sys.stderr,
+        )
+        return False
+    if _docker_isolation_resources() != baseline_resources:
+        print("Docker smoke leaked an isolation container or image", file=sys.stderr)
+        return False
+    print("Docker smoke passed: reward=1.0, isolated write observed, live source unchanged")
     return True
+
+
+def _docker_isolation_resources() -> frozenset[str] | None:
+    commands = (
+        (
+            "container",
+            (
+                "docker",
+                "ps",
+                "-aq",
+                "--filter",
+                "label=evidence-harness.isolation=true",
+            ),
+        ),
+        (
+            "image",
+            (
+                "docker",
+                "image",
+                "ls",
+                "--filter",
+                "reference=evidence-harness-isolation:*",
+                "--format",
+                "{{.ID}}",
+            ),
+        ),
+    )
+    resources: set[str] = set()
+    for kind, command in commands:
+        completed = subprocess.run(
+            command,
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        if completed.returncode:
+            print(
+                f"Could not inspect Docker isolation {kind} resources: {completed.stderr.strip()}",
+                file=sys.stderr,
+            )
+            return None
+        resources.update(f"{kind}:{item}" for item in completed.stdout.split())
+    return frozenset(resources)
 
 
 def main() -> int:

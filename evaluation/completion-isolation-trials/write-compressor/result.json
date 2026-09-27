@@ -1,0 +1,291 @@
+{
+    "id": "dd896459-7155-4ae6-85c0-092dbdcdee49",
+    "task_name": "write-compressor",
+    "trial_name": "write-compressor__3hTiuiE",
+    "trial_uri": "file:///Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-compressor-final4-20260927/write-compressor__3hTiuiE",
+    "task_id": {
+        "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+        "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "path": "write-compressor"
+    },
+    "source": "terminal-bench",
+    "task_checksum": "1b2f5f4e1df7950c0bfc0f9e1c2cc75072a0d6fe22b74755469d87bfeb3a57c0",
+    "config": {
+        "task": {
+            "path": "write-compressor",
+            "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+            "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": "terminal-bench"
+        },
+        "trial_name": "write-compressor__3hTiuiE",
+        "trials_dir": "/Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-compressor-final4-20260927",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": 2.0,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "evidence_harness.isolation_experiment_agent:CompletionIsolationExperimentAgent",
+            "import_path": null,
+            "model_name": "openai/modelhub/gpt-5.6-terra",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "corpus_path": "/Users/bytedance/develop/harness-4/evaluation/completion-disagreements.json",
+                "journal_path": "/Users/bytedance/develop/harness-4/evaluation/completion-isolation-trials/write-compressor/source-events.jsonl",
+                "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
+                "api_base": "https://xpa-relay.bytedance.net/v1"
+            },
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "b64ac9fd-6819-4449-887f-88c5b11e6ada",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "completion-isolation-experiment",
+        "version": "0.1.0",
+        "model_info": {
+            "name": "modelhub/gpt-5.6-terra",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 0,
+        "cost_usd": 0.0,
+        "model_usage": {
+            "openai/modelhub/gpt-5.6-terra": {
+                "n_input_tokens": 0,
+                "n_cache_tokens": 0,
+                "n_output_tokens": 0,
+                "cost_usd": 0.0
+            }
+        },
+        "rollout_details": null,
+        "metadata": {
+            "completion_isolation_experiment": {
+                "schema_version": 1,
+                "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
+                "task_name": "write-compressor",
+                "attempt_ordinal": 1,
+                "source_journal_sha256": "8feb2e6dd024590e8cc8ab0bedef29684804d30cb84b25485c7c76f4c00ad45a",
+                "proposal_event_line_sha256": "3fb9864924822dfd37aab2d064fa74ce3e2e9aa9d148eda4c19fbefafd1d29e0",
+                "experiment_agent_source_sha256": "0fff8d46dfca221e8f46cbb59b7faac36c724cba11072e66139834fbc80595e7",
+                "docker_isolation_source_sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040",
+                "runtime_source_sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac",
+                "replay_command_count": 37,
+                "replay_last_sequence": 38,
+                "replay_last_work_epoch": 37,
+                "stop_reason": "model_failure",
+                "failure_category": "completion_review_service",
+                "latest_evidence": {
+                    "work_epoch": 0,
+                    "checks": [
+                        {
+                            "sequence": 2,
+                            "command_id": "compressed-size",
+                            "script": "set -e\ncd /app\n[ -f data.comp ]\n[ \"$(wc -c < data.comp)\" -le 2500 ]\n[ \"$(wc -c < data.comp)\" -eq 2500 ]",
+                            "purpose": "data.comp exists and is no larger than the required 2500-byte maximum.",
+                            "cwd": "/app",
+                            "mode": "observe",
+                            "work_epoch": 0,
+                            "return_code": 0,
+                            "failure": null,
+                            "duration_sec": 0.10121379204792902,
+                            "stdout": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "stderr": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "command_fingerprint": "4685171a433b9bfdb61ffe078f2015118c578bbde64d2cbade06254a779ea4aa",
+                            "observation_fingerprint": "bb81bd80b1315eda91f92dae63fcc8aa78f93887da633661547fb83ec598062e"
+                        },
+                        {
+                            "sequence": 3,
+                            "command_id": "decode-byte-exact",
+                            "script": "set -e\ncd /app\nout=$(mktemp)\ntrap 'rm -f \"$out\"' EXIT\n/app/decomp < data.comp > \"$out\"\ncmp -s \"$out\" data.txt",
+                            "purpose": "Running the supplied decompressor on data.comp produces exactly the bytes in data.txt.",
+                            "cwd": "/app",
+                            "mode": "observe",
+                            "work_epoch": 0,
+                            "return_code": 0,
+                            "failure": null,
+                            "duration_sec": 0.10949670802801847,
+                            "stdout": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "stderr": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "command_fingerprint": "9a92949e2b9829ed6aac1ae60c2214e75434591e57793132c2513b9a7a0224f9",
+                            "observation_fingerprint": "49b1225e408537a1e308183cd9632f1de225e0f69dfed950baba036764c483fe"
+                        }
+                    ],
+                    "coverage": [
+                        {
+                            "requirement": "Create data.comp compressed so that cat data.comp | /app/decomp gives exactly data.txt.",
+                            "check_ids": [
+                                "decode-byte-exact"
+                            ]
+                        },
+                        {
+                            "requirement": "data.comp must be at most 2500 bytes.",
+                            "check_ids": [
+                                "compressed-size"
+                            ]
+                        }
+                    ],
+                    "isolation": {
+                        "schema_version": 1,
+                        "backend": "docker-commit-v1",
+                        "attempt_id": 1,
+                        "work_epoch": 0,
+                        "candidate_image_id": "sha256:4a1b9b81035e885f924f5af6a6c6c03e209d256befadd157c3e58c6da9a4f841",
+                        "environment_identity_sha256": "ed89378c5b951aa596f754d55f55280dd0c1809346b39004949fa202c0d8100f",
+                        "excluded_control_mounts": [
+                            "/logs/agent",
+                            "/logs/artifacts",
+                            "/logs/verifier"
+                        ],
+                        "checks": [
+                            {
+                                "check_id": "compressed-size",
+                                "receipt_sequence": 2,
+                                "receipt_observation_sha256": "bb81bd80b1315eda91f92dae63fcc8aa78f93887da633661547fb83ec598062e",
+                                "child_id_sha256": "fc546897301bbf6c14011ba4216ebf624cadd342e2502bdac2f16df3e66c2614",
+                                "started_from_image_id": "sha256:4a1b9b81035e885f924f5af6a6c6c03e209d256befadd157c3e58c6da9a4f841",
+                                "delta": {
+                                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                    "added": [],
+                                    "modified": [],
+                                    "deleted": [],
+                                    "omitted_count": 0
+                                },
+                                "disposed": true
+                            },
+                            {
+                                "check_id": "decode-byte-exact",
+                                "receipt_sequence": 3,
+                                "receipt_observation_sha256": "49b1225e408537a1e308183cd9632f1de225e0f69dfed950baba036764c483fe",
+                                "child_id_sha256": "ff9f104b02a6dc5abc6fc38e1c57be3a5b8e9c634e95af23012ad106223f53ec",
+                                "started_from_image_id": "sha256:4a1b9b81035e885f924f5af6a6c6c03e209d256befadd157c3e58c6da9a4f841",
+                                "delta": {
+                                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                    "added": [],
+                                    "modified": [],
+                                    "deleted": [],
+                                    "omitted_count": 0
+                                },
+                                "disposed": true
+                            }
+                        ],
+                        "source": {
+                            "container_id_sha256": "9f82b8bfb778e9a01400b79c4e076840ca8629e1336425a9a8725c1d03441c70",
+                            "diff_sha256_before": "5722ac858f27f4f5b53db8dec40f42d7764c54445be05d6cb15492126b7194ac",
+                            "diff_sha256_after": "5722ac858f27f4f5b53db8dec40f42d7764c54445be05d6cb15492126b7194ac",
+                            "remained_paused": true,
+                            "resumed": true
+                        },
+                        "snapshot_image_disposed": true,
+                        "cost": {
+                            "host_operations": 23,
+                            "child_count": 2,
+                            "duration_sec": 3.590100832981989
+                        }
+                    },
+                    "semantic_assessment": null,
+                    "accepted": false,
+                    "rejection_reasons": [
+                        "completion semantic review was not accepted"
+                    ]
+                }
+            }
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "verifier_environment_mode": "shared",
+    "exception_info": null,
+    "started_at": "2026-09-27T20:56:48.641834Z",
+    "finished_at": "2026-09-27T21:01:22.791102Z",
+    "environment_setup": {
+        "started_at": "2026-09-27T20:56:48.805499Z",
+        "finished_at": "2026-09-27T20:56:49.938484Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-09-27T20:56:49.938563Z",
+        "finished_at": "2026-09-27T20:56:49.939094Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-09-27T20:56:49.939276Z",
+        "finished_at": "2026-09-27T20:59:54.145834Z"
+    },
+    "verifier": {
+        "started_at": "2026-09-27T20:59:54.517029Z",
+        "finished_at": "2026-09-27T21:01:11.804494Z"
+    },
+    "step_results": null
+}

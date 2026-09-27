@@ -10,6 +10,9 @@ from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext, ModelUsage
 from pydantic import Field, model_validator
 
+from evidence_harness.docker_completion_isolation import (
+    completion_isolation_for_harbor,
+)
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import LiteLLMModelGateway
 from evidence_harness.process_containment import contain_harbor_environment
@@ -104,6 +107,10 @@ class EvidenceHarnessAgent(BaseAgent):
             max_output_tokens=self.options.max_output_tokens,
             transport_attempts=self.options.transport_attempts,
         )
+        completion_isolation = completion_isolation_for_harbor(
+            journal=journal,
+            environment=environment,
+        )
 
         def update_context(state: RunState) -> None:
             usage = model.usage
@@ -137,6 +144,7 @@ class EvidenceHarnessAgent(BaseAgent):
             model=model,
             journal=journal,
             options=self.options.loop_options(),
+            completion_isolation=completion_isolation,
             on_progress=update_context,
         )
         report = await loop.run(instruction, contain_harbor_environment(environment))

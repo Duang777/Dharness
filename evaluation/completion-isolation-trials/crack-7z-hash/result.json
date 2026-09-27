@@ -1,0 +1,286 @@
+{
+    "id": "d046f773-82bd-4773-81fa-65a0ddc13d69",
+    "task_name": "crack-7z-hash",
+    "trial_name": "crack-7z-hash__SWgFHgr",
+    "trial_uri": "file:///Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-crack-final4-20260927/crack-7z-hash__SWgFHgr",
+    "task_id": {
+        "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+        "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "path": "crack-7z-hash"
+    },
+    "source": "terminal-bench",
+    "task_checksum": "6557afcd0ab96deef7a8292019ea507be18f91433df61618b622866a293525a8",
+    "config": {
+        "task": {
+            "path": "crack-7z-hash",
+            "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+            "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": "terminal-bench"
+        },
+        "trial_name": "crack-7z-hash__SWgFHgr",
+        "trials_dir": "/Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-crack-final4-20260927",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": 2.0,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "evidence_harness.isolation_experiment_agent:CompletionIsolationExperimentAgent",
+            "import_path": null,
+            "model_name": "openai/modelhub/gpt-5.6-terra",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "corpus_path": "/Users/bytedance/develop/harness-4/evaluation/completion-disagreements.json",
+                "journal_path": "/Users/bytedance/develop/harness-4/evaluation/completion-isolation-trials/crack-7z-hash/source-events.jsonl",
+                "case_id": "fd77206e60930b6f3d8829a21892810a4ad4f8aaeda3bfd662466788309bdb36",
+                "api_base": "https://xpa-relay.bytedance.net/v1"
+            },
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "875acb95-b321-4455-a98d-332a855f9e8c",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "completion-isolation-experiment",
+        "version": "0.1.0",
+        "model_info": {
+            "name": "modelhub/gpt-5.6-terra",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 0,
+        "cost_usd": 0.0,
+        "model_usage": {
+            "openai/modelhub/gpt-5.6-terra": {
+                "n_input_tokens": 0,
+                "n_cache_tokens": 0,
+                "n_output_tokens": 0,
+                "cost_usd": 0.0
+            }
+        },
+        "rollout_details": null,
+        "metadata": {
+            "completion_isolation_experiment": {
+                "schema_version": 1,
+                "case_id": "fd77206e60930b6f3d8829a21892810a4ad4f8aaeda3bfd662466788309bdb36",
+                "task_name": "crack-7z-hash",
+                "attempt_ordinal": 1,
+                "source_journal_sha256": "eb617ae439d45b82f039d4430918c7e10c74c30d60e664b17b84ff49ce908f5c",
+                "proposal_event_line_sha256": "39ec1edf10c4479eb3d0f2b776b41b6debc4867c2428f1b122a9a0be851172b2",
+                "experiment_agent_source_sha256": "0fff8d46dfca221e8f46cbb59b7faac36c724cba11072e66139834fbc80595e7",
+                "docker_isolation_source_sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040",
+                "runtime_source_sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac",
+                "replay_command_count": 43,
+                "replay_last_sequence": 44,
+                "replay_last_work_epoch": 39,
+                "stop_reason": "model_failure",
+                "failure_category": "completion_review_service",
+                "latest_evidence": {
+                    "work_epoch": 0,
+                    "checks": [
+                        {
+                            "sequence": 2,
+                            "command_id": "solution-exact-bytes",
+                            "script": "set -e\ncd /app\ncmp -s /app/solution.txt <(printf 'honeybear\\n')\ntest \"$(wc -c < /app/solution.txt)\" -eq 10",
+                            "purpose": "The required output file exists and its saved bytes are exactly the recovered word honeybear followed by one newline.",
+                            "cwd": "/app",
+                            "mode": "observe",
+                            "work_epoch": 0,
+                            "return_code": 0,
+                            "failure": null,
+                            "duration_sec": 0.0937891670037061,
+                            "stdout": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "stderr": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "command_fingerprint": "5d60243753a4c9cb8a7758694f57a839a916cc9978a0381f574e1e17c55a8f80",
+                            "observation_fingerprint": "017c3b622efbcb2a03662715648fba418553ace9a09996a185a93cfdbe8a9790"
+                        },
+                        {
+                            "sequence": 3,
+                            "command_id": "archive-plaintext-contains-solution",
+                            "script": "set -e\ncd /app\nkey=$(perl -MDigest::SHA -MEncode -e '\n  my $pw = Encode::encode(q{UTF-16LE}, q{1998});\n  my $s = Digest::SHA->new(256);\n  for (my $i = 0; $i < (1 << 19); ++$i) { $s->add($pw); $s->add(pack(q{Q<}, $i)); }\n  print $s->hexdigest;\n')\ntest \"${#key}\" -eq 64\ndd if=/app/secrets.7z bs=1 skip=32 count=144 status=none | openssl enc -aes-256-cbc -d -nopad -K \"$key\" -iv 7f2aeca3d70f5f1298c191ab0faf61fc | perl -e '\n  binmode STDIN; my $plain = do { local $/; <STDIN> };\n  open my $f, q{<}, q{/app/solution.txt} or die;\n  binmode $f; my $saved = do { local $/; <$f> };\n  die unless defined($saved) && $saved =~ /\\A([^\\r\\n]+)\\n\\z/;\n  die unless defined($plain) && index($plain, $1) >= 0;\n'",
+                            "purpose": "The word saved in solution.txt is present in bytes decrypted from the task-owned secrets.7z archive.",
+                            "cwd": "/app",
+                            "mode": "observe",
+                            "work_epoch": 0,
+                            "return_code": 0,
+                            "failure": null,
+                            "duration_sec": 0.38556349999271333,
+                            "stdout": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "stderr": {
+                                "head": "",
+                                "tail": "",
+                                "total_bytes": 0,
+                                "omitted_bytes": 0,
+                                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "archive_path": null
+                            },
+                            "command_fingerprint": "2bbdaf3fd3fd36c419a946e730d5191804c4870b274faefcbc07ad09cbe625a1",
+                            "observation_fingerprint": "2b363400bcce1003bcc8f31b4a791a115445b3a04e2dcfbde950614efffe5e19"
+                        }
+                    ],
+                    "coverage": [
+                        {
+                            "requirement": "Create /app/solution.txt containing the word found in secret_file.txt in secrets.7z.",
+                            "check_ids": [
+                                "solution-exact-bytes",
+                                "archive-plaintext-contains-solution"
+                            ]
+                        }
+                    ],
+                    "isolation": {
+                        "schema_version": 1,
+                        "backend": "docker-commit-v1",
+                        "attempt_id": 1,
+                        "work_epoch": 0,
+                        "candidate_image_id": "sha256:75e24c870703ca18806257884591aeeeb3b612dddc043f00aada43e310faee40",
+                        "environment_identity_sha256": "768bfd44342c3d3604fb2542f08336d08cb5602587ecfde973cabcb0ac08aa63",
+                        "excluded_control_mounts": [
+                            "/logs/agent",
+                            "/logs/artifacts",
+                            "/logs/verifier"
+                        ],
+                        "checks": [
+                            {
+                                "check_id": "solution-exact-bytes",
+                                "receipt_sequence": 2,
+                                "receipt_observation_sha256": "017c3b622efbcb2a03662715648fba418553ace9a09996a185a93cfdbe8a9790",
+                                "child_id_sha256": "8c3594980b928e4c9ea41b56b2a5263954d562becf23efd266159742aca1f208",
+                                "started_from_image_id": "sha256:75e24c870703ca18806257884591aeeeb3b612dddc043f00aada43e310faee40",
+                                "delta": {
+                                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                    "added": [],
+                                    "modified": [],
+                                    "deleted": [],
+                                    "omitted_count": 0
+                                },
+                                "disposed": true
+                            },
+                            {
+                                "check_id": "archive-plaintext-contains-solution",
+                                "receipt_sequence": 3,
+                                "receipt_observation_sha256": "2b363400bcce1003bcc8f31b4a791a115445b3a04e2dcfbde950614efffe5e19",
+                                "child_id_sha256": "be262a2208b1fa077f86808111f5c30179d25f708f4e2e91784d1ba4bb374b65",
+                                "started_from_image_id": "sha256:75e24c870703ca18806257884591aeeeb3b612dddc043f00aada43e310faee40",
+                                "delta": {
+                                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                    "added": [],
+                                    "modified": [],
+                                    "deleted": [],
+                                    "omitted_count": 0
+                                },
+                                "disposed": true
+                            }
+                        ],
+                        "source": {
+                            "container_id_sha256": "4c15ddc320b947452879db59b5abe0118dfe89dda2715f8e8d078487635ba4a4",
+                            "diff_sha256_before": "24213d249b759f089d4c0b51c46670b9661fdff16195f2e93d38b3a6e6a31a73",
+                            "diff_sha256_after": "24213d249b759f089d4c0b51c46670b9661fdff16195f2e93d38b3a6e6a31a73",
+                            "remained_paused": true,
+                            "resumed": true
+                        },
+                        "snapshot_image_disposed": true,
+                        "cost": {
+                            "host_operations": 23,
+                            "child_count": 2,
+                            "duration_sec": 6.757892500027083
+                        }
+                    },
+                    "semantic_assessment": null,
+                    "accepted": false,
+                    "rejection_reasons": [
+                        "completion semantic review was not accepted"
+                    ]
+                }
+            }
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "verifier_environment_mode": "shared",
+    "exception_info": null,
+    "started_at": "2026-09-27T20:56:48.641866Z",
+    "finished_at": "2026-09-27T21:10:45.004746Z",
+    "environment_setup": {
+        "started_at": "2026-09-27T20:56:48.805490Z",
+        "finished_at": "2026-09-27T20:56:49.938475Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-09-27T20:56:49.938560Z",
+        "finished_at": "2026-09-27T20:56:49.939054Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-09-27T20:56:49.939270Z",
+        "finished_at": "2026-09-27T21:08:49.006287Z"
+    },
+    "verifier": {
+        "started_at": "2026-09-27T21:08:49.450584Z",
+        "finished_at": "2026-09-27T21:10:34.022363Z"
+    },
+    "step_results": null
+}

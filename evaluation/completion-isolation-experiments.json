@@ -1,0 +1,420 @@
+{
+  "experiments": [
+    {
+      "attempt_ordinal": 1,
+      "case_id": "fd77206e60930b6f3d8829a21892810a4ad4f8aaeda3bfd662466788309bdb36",
+      "checks": [
+        {
+          "child_disposed": true,
+          "command_sha256": "5d60243753a4c9cb8a7758694f57a839a916cc9978a0381f574e1e17c55a8f80",
+          "delta": {
+            "added": [],
+            "deleted": [],
+            "modified": [],
+            "omitted_count": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "failure": null,
+          "id": "solution-exact-bytes",
+          "observation_sha256": "017c3b622efbcb2a03662715648fba418553ace9a09996a185a93cfdbe8a9790",
+          "return_code": 0
+        },
+        {
+          "child_disposed": true,
+          "command_sha256": "2bbdaf3fd3fd36c419a946e730d5191804c4870b274faefcbc07ad09cbe625a1",
+          "delta": {
+            "added": [],
+            "deleted": [],
+            "modified": [],
+            "omitted_count": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "failure": null,
+          "id": "archive-plaintext-contains-solution",
+          "observation_sha256": "2b363400bcce1003bcc8f31b4a791a115445b3a04e2dcfbde950614efffe5e19",
+          "return_code": 0
+        }
+      ],
+      "command_trajectory_replayed": true,
+      "external_reward": 1.0,
+      "historical_source": {
+        "journal_sha256": "eb617ae439d45b82f039d4430918c7e10c74c30d60e664b17b84ff49ce908f5c",
+        "proposal_event_line_sha256": "39ec1edf10c4479eb3d0f2b776b41b6debc4867c2428f1b122a9a0be851172b2",
+        "result_sha256": "1973b48f3a835b751554816ba4c9f95063a7928c71148a6364e37af79e2e978c",
+        "task_checksum": "6557afcd0ab96deef7a8292019ea507be18f91433df61618b622866a293525a8",
+        "task_git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c"
+      },
+      "internal_failure_category": "completion_review_service",
+      "internal_stop_reason": "model_failure",
+      "isolation_cost": {
+        "child_count": 2,
+        "duration_sec": 6.757892500027083,
+        "host_operations": 23
+      },
+      "mechanical_isolation_passed": true,
+      "mechanical_rejection_reasons": [],
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "prospective_sources": {
+        "completion_journal": {
+          "bytes": 17380,
+          "path": "evaluation/completion-isolation-trials/crack-7z-hash/agent/completion-isolation-experiment/completion/events.jsonl",
+          "sha256": "f63edce28a5c9b33b6af38882c9345f80adf54ee48c3ab4fcb3e5aab607804c0"
+        },
+        "replay_journal": {
+          "bytes": 277697,
+          "path": "evaluation/completion-isolation-trials/crack-7z-hash/agent/completion-isolation-experiment/replay/events.jsonl",
+          "sha256": "ec5bd256aa7727e2aeb70af131c799a7591d08b9321e0c3d08f0e30684ec4fab"
+        },
+        "result": {
+          "bytes": 14695,
+          "path": "evaluation/completion-isolation-trials/crack-7z-hash/result.json",
+          "sha256": "ac13733ab51edafeebb5254e68f242ec945ee3d13aa92d24c386fa6bc90d6041"
+        },
+        "source_journal": {
+          "bytes": 436180,
+          "path": "evaluation/completion-isolation-trials/crack-7z-hash/source-events.jsonl",
+          "sha256": "eb617ae439d45b82f039d4430918c7e10c74c30d60e664b17b84ff49ce908f5c"
+        }
+      },
+      "replay_command_count": 43,
+      "replay_last_sequence": 44,
+      "replay_last_work_epoch": 39,
+      "semantic_review_status": "unavailable",
+      "snapshot_image_disposed": true,
+      "source_attestation": {
+        "container_id_sha256": "4c15ddc320b947452879db59b5abe0118dfe89dda2715f8e8d078487635ba4a4",
+        "diff_sha256_after": "24213d249b759f089d4c0b51c46670b9661fdff16195f2e93d38b3a6e6a31a73",
+        "diff_sha256_before": "24213d249b759f089d4c0b51c46670b9661fdff16195f2e93d38b3a6e6a31a73",
+        "remained_paused": true,
+        "resumed": true
+      },
+      "task_name": "crack-7z-hash"
+    },
+    {
+      "attempt_ordinal": 1,
+      "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
+      "checks": [
+        {
+          "child_disposed": true,
+          "command_sha256": "9cc0e40da5312f0e41ea37f16e446b5833b5997b85edc2bcc9775cb9820bbef0",
+          "delta": {
+            "added": [],
+            "deleted": [],
+            "modified": [],
+            "omitted_count": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "failure": null,
+          "id": "pool-sweep-stride-invariant",
+          "observation_sha256": "b1d008a272c5c2884d85aab0de9044b966099e4d66d579800a88eb37630a4ac8",
+          "return_code": 0
+        },
+        {
+          "child_disposed": true,
+          "command_sha256": "a5f720ec926c097679fc89e135d54990ef3caff5689c61d7eb72d1c4edce7021",
+          "delta": {
+            "added": [],
+            "deleted": [],
+            "modified": [],
+            "omitted_count": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "failure": "nonzero",
+          "id": "basic-testsuite-clean-result",
+          "observation_sha256": "fe73ee0902d483d17484660c59129442b74687cf55133e1952373488bb16c5bf",
+          "return_code": 1
+        }
+      ],
+      "command_trajectory_replayed": true,
+      "external_reward": 1.0,
+      "historical_source": {
+        "journal_sha256": "136b11d84737d5ee5489ac047d5cf569e840a6e356f02f3a8a5680da722fba1b",
+        "proposal_event_line_sha256": "14f63d817fed95c0ffc95d4060a67e277dd9e110a033a20a63305a6105f2f72f",
+        "result_sha256": "93f4b9d44b80609b39fdb48fca4af9e1928efe4836be35e07ecf99b9ffb882f0",
+        "task_checksum": "faa983dd79f63daa168b41c753bddb0621822820ba6f16661a9767b815e436e8",
+        "task_git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c"
+      },
+      "internal_failure_category": "completion_repair_budget",
+      "internal_stop_reason": "budget_exhausted",
+      "isolation_cost": {
+        "child_count": 2,
+        "duration_sec": 25.948598042014055,
+        "host_operations": 23
+      },
+      "mechanical_isolation_passed": false,
+      "mechanical_rejection_reasons": [
+        "verification commands failed: ['basic-testsuite-clean-result']"
+      ],
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "prospective_sources": {
+        "completion_journal": {
+          "bytes": 18906,
+          "path": "evaluation/completion-isolation-trials/fix-ocaml-gc/agent/completion-isolation-experiment/completion/events.jsonl",
+          "sha256": "8657c856bcab20b3a2e340c5d9ae7fc107dbac866f51aa3514c9ffcff2112a84"
+        },
+        "replay_journal": {
+          "bytes": 281855,
+          "path": "evaluation/completion-isolation-trials/fix-ocaml-gc/agent/completion-isolation-experiment/replay/events.jsonl",
+          "sha256": "be61b24c9c9a7e39f600f0ead4bb013b8889033d2fe82307295e8fba94adf307"
+        },
+        "result": {
+          "bytes": 14851,
+          "path": "evaluation/completion-isolation-trials/fix-ocaml-gc/result.json",
+          "sha256": "99c00ae1b54090795488347432a15da067c8e541deb5ede4b358d9e1693da7b1"
+        },
+        "source_journal": {
+          "bytes": 416392,
+          "path": "evaluation/completion-isolation-trials/fix-ocaml-gc/source-events.jsonl",
+          "sha256": "136b11d84737d5ee5489ac047d5cf569e840a6e356f02f3a8a5680da722fba1b"
+        }
+      },
+      "replay_command_count": 47,
+      "replay_last_sequence": 48,
+      "replay_last_work_epoch": 38,
+      "semantic_review_status": "missing",
+      "snapshot_image_disposed": true,
+      "source_attestation": {
+        "container_id_sha256": "eef34ee32cc82a208a2b72488f53dee38690231545dc971463b2e180f0c164f9",
+        "diff_sha256_after": "e1572f473aead626018f47a987c3d4f43eead415a461339f765a6ed3dbf38915",
+        "diff_sha256_before": "e1572f473aead626018f47a987c3d4f43eead415a461339f765a6ed3dbf38915",
+        "remained_paused": true,
+        "resumed": true
+      },
+      "task_name": "fix-ocaml-gc"
+    },
+    {
+      "attempt_ordinal": 1,
+      "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
+      "checks": [
+        {
+          "child_disposed": true,
+          "command_sha256": "4685171a433b9bfdb61ffe078f2015118c578bbde64d2cbade06254a779ea4aa",
+          "delta": {
+            "added": [],
+            "deleted": [],
+            "modified": [],
+            "omitted_count": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "failure": null,
+          "id": "compressed-size",
+          "observation_sha256": "bb81bd80b1315eda91f92dae63fcc8aa78f93887da633661547fb83ec598062e",
+          "return_code": 0
+        },
+        {
+          "child_disposed": true,
+          "command_sha256": "9a92949e2b9829ed6aac1ae60c2214e75434591e57793132c2513b9a7a0224f9",
+          "delta": {
+            "added": [],
+            "deleted": [],
+            "modified": [],
+            "omitted_count": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "failure": null,
+          "id": "decode-byte-exact",
+          "observation_sha256": "49b1225e408537a1e308183cd9632f1de225e0f69dfed950baba036764c483fe",
+          "return_code": 0
+        }
+      ],
+      "command_trajectory_replayed": true,
+      "external_reward": 1.0,
+      "historical_source": {
+        "journal_sha256": "8feb2e6dd024590e8cc8ab0bedef29684804d30cb84b25485c7c76f4c00ad45a",
+        "proposal_event_line_sha256": "3fb9864924822dfd37aab2d064fa74ce3e2e9aa9d148eda4c19fbefafd1d29e0",
+        "result_sha256": "08cec4d2f345d2843d22fd341c218409462a28497bc32f51cf7c9b1fe3de449e",
+        "task_checksum": "1b2f5f4e1df7950c0bfc0f9e1c2cc75072a0d6fe22b74755469d87bfeb3a57c0",
+        "task_git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c"
+      },
+      "internal_failure_category": "completion_review_service",
+      "internal_stop_reason": "model_failure",
+      "isolation_cost": {
+        "child_count": 2,
+        "duration_sec": 3.590100832981989,
+        "host_operations": 23
+      },
+      "mechanical_isolation_passed": true,
+      "mechanical_rejection_reasons": [],
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "prospective_sources": {
+        "completion_journal": {
+          "bytes": 16037,
+          "path": "evaluation/completion-isolation-trials/write-compressor/agent/completion-isolation-experiment/completion/events.jsonl",
+          "sha256": "66498ff306b2a9d2fd5af4377d158008975d8e56cf6933fe7ff2afa86bca64f5"
+        },
+        "replay_journal": {
+          "bytes": 120600,
+          "path": "evaluation/completion-isolation-trials/write-compressor/agent/completion-isolation-experiment/replay/events.jsonl",
+          "sha256": "a4fd12654ec02ec9952455743171f3be5db77aa5608d3cf12a89be1fe030f08b"
+        },
+        "result": {
+          "bytes": 14214,
+          "path": "evaluation/completion-isolation-trials/write-compressor/result.json",
+          "sha256": "7015da50e7ad9b39cc5f077616331fae0bc3e0c70dbb3f76de137029b2a0fa3f"
+        },
+        "source_journal": {
+          "bytes": 292248,
+          "path": "evaluation/completion-isolation-trials/write-compressor/source-events.jsonl",
+          "sha256": "8feb2e6dd024590e8cc8ab0bedef29684804d30cb84b25485c7c76f4c00ad45a"
+        }
+      },
+      "replay_command_count": 37,
+      "replay_last_sequence": 38,
+      "replay_last_work_epoch": 37,
+      "semantic_review_status": "unavailable",
+      "snapshot_image_disposed": true,
+      "source_attestation": {
+        "container_id_sha256": "9f82b8bfb778e9a01400b79c4e076840ca8629e1336425a9a8725c1d03441c70",
+        "diff_sha256_after": "5722ac858f27f4f5b53db8dec40f42d7764c54445be05d6cb15492126b7194ac",
+        "diff_sha256_before": "5722ac858f27f4f5b53db8dec40f42d7764c54445be05d6cb15492126b7194ac",
+        "remained_paused": true,
+        "resumed": true
+      },
+      "task_name": "write-compressor"
+    }
+  ],
+  "schema_version": 1,
+  "scope": {
+    "benchmark_score_updated": false,
+    "kind": "prospective_source_bound_replay",
+    "statement": "These experiments replay frozen historical candidates and test the new isolation path. They are not fresh full-agent benchmark trials."
+  },
+  "sources": {
+    "calibration": {
+      "bytes": 16251,
+      "path": "evaluation/completion-calibration.json",
+      "sha256": "6b725b42a0c9cb22f72f0a27519ca8e8e5b9c7b15cdab420780e5d78503d15df"
+    },
+    "corpus": {
+      "bytes": 1672034,
+      "path": "evaluation/completion-disagreements.json",
+      "sha256": "7a9ba0da1cde18f3103bd6f49573bed20fe5e367374a568e6c1db2c462e7c54a"
+    },
+    "docker_isolation": {
+      "bytes": 50569,
+      "path": "src/evidence_harness/docker_completion_isolation.py",
+      "sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040"
+    },
+    "experiment_agent": {
+      "bytes": 13528,
+      "path": "src/evidence_harness/isolation_experiment_agent.py",
+      "sha256": "0fff8d46dfca221e8f46cbb59b7faac36c724cba11072e66139834fbc80595e7"
+    },
+    "runtime": {
+      "bytes": 493397,
+      "files": [
+        {
+          "bytes": 1108,
+          "path": "pyproject.toml",
+          "sha256": "1fd33327fccabdc522357c0477306a5990ef5bf550ccc568231ab0c40219ef7c"
+        },
+        {
+          "bytes": 301116,
+          "path": "uv.lock",
+          "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+        },
+        {
+          "bytes": 498,
+          "path": "src/evidence_harness/__init__.py",
+          "sha256": "e6f800ec62e909801c872b610f1a1e81afe919d1befa7bf3f8b9adb8935d2981"
+        },
+        {
+          "bytes": 359,
+          "path": "src/evidence_harness/budget.py",
+          "sha256": "3350c8797e47a26f55a40dff2dd042931773e6ec3c9a91b3c9333e8ab980c2d2"
+        },
+        {
+          "bytes": 2048,
+          "path": "src/evidence_harness/completion_isolation.py",
+          "sha256": "8837eff2afc87a33a1b6463d8f85038bb2f68773c59132a37f1f232fac336d84"
+        },
+        {
+          "bytes": 50569,
+          "path": "src/evidence_harness/docker_completion_isolation.py",
+          "sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040"
+        },
+        {
+          "bytes": 12366,
+          "path": "src/evidence_harness/evaluation.py",
+          "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+        },
+        {
+          "bytes": 6936,
+          "path": "src/evidence_harness/evidence.py",
+          "sha256": "c787c37c78e0ffb0fceb7da6dfe68b4b56e1909ae8294acf51a00fdb3d3d08dd"
+        },
+        {
+          "bytes": 6847,
+          "path": "src/evidence_harness/harbor_agent.py",
+          "sha256": "c0cd2098032b95bb5dce0f122dc42e3d4633c9adff9271806d9f1e879185d3bb"
+        },
+        {
+          "bytes": 13528,
+          "path": "src/evidence_harness/isolation_experiment_agent.py",
+          "sha256": "0fff8d46dfca221e8f46cbb59b7faac36c724cba11072e66139834fbc80595e7"
+        },
+        {
+          "bytes": 3261,
+          "path": "src/evidence_harness/journal.py",
+          "sha256": "a59e8df63548b92c629717c01523d414dde64fb25b5d96d3c7ce6dead8e20c6d"
+        },
+        {
+          "bytes": 6292,
+          "path": "src/evidence_harness/model_client.py",
+          "sha256": "d3c1e00169d941896e58588de45df22a832b479c34aaaf9de5d151418669349e"
+        },
+        {
+          "bytes": 8731,
+          "path": "src/evidence_harness/policy.py",
+          "sha256": "14744d9cb85a745d38d2e68ea9a404343d182d612a0c41e5bc973a2251a5e3ec"
+        },
+        {
+          "bytes": 3743,
+          "path": "src/evidence_harness/process_containment.py",
+          "sha256": "6eb17b9aa1cfe07c12634792e7f81a982cc02f0e8b7a93990a7eb735e9a09359"
+        },
+        {
+          "bytes": 12502,
+          "path": "src/evidence_harness/prompting.py",
+          "sha256": "5ce1171e2e4313cfca113dbe650e0ed93617193277264eab30930c381815c6df"
+        },
+        {
+          "bytes": 11391,
+          "path": "src/evidence_harness/protocol.py",
+          "sha256": "35fd9f378c692105fedfc2c8f570014c8645337640306911b2370355306d94d3"
+        },
+        {
+          "bytes": 14572,
+          "path": "src/evidence_harness/replay_agent.py",
+          "sha256": "ab3f7f967cc152eee6c037cea01073ffcf12fc75a7d805279bd78996cdbabc81"
+        },
+        {
+          "bytes": 31435,
+          "path": "src/evidence_harness/run_loop.py",
+          "sha256": "a107aa5c1152a271bb21ab49e086e421ae3ecac581bc69953a10340a58e49f10"
+        },
+        {
+          "bytes": 4584,
+          "path": "src/evidence_harness/shell.py",
+          "sha256": "b108d510b842baabc82e41545cc56882a0a141dbe6fd3e0f6716473aa38520af"
+        },
+        {
+          "bytes": 1511,
+          "path": "src/evidence_harness/source_binding.py",
+          "sha256": "d4647c0397fde5dd9819c3ffc86423dfef8b5291bf46c42a332c5ebd330b83d3"
+        }
+      ],
+      "path": "pyproject.toml, uv.lock, and src/evidence_harness/**/*.py",
+      "sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac"
+    }
+  },
+  "summary": {
+    "command_trajectories_replayed": 3,
+    "experiments": 3,
+    "external_verifier_passed": 3,
+    "internally_verified": 0,
+    "mechanical_isolation_passed": 2,
+    "semantic_review_accepted": 0,
+    "semantic_review_unavailable": 2
+  }
+}

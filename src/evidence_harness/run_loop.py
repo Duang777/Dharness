@@ -9,6 +9,11 @@ from evidence_harness.budget import (
     finalization_turn_reserve,
     finalization_wall_time_reserve_sec,
 )
+from evidence_harness.completion_isolation import (
+    CompletionIsolation,
+    CompletionIsolationError,
+    CompletionIsolationRequest,
+)
 from evidence_harness.evidence import EvidenceGate
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import ModelProtocolError, ModelServiceError
@@ -18,6 +23,7 @@ from evidence_harness.policy import (
     repeated_command_block_reason,
     validate_command,
 )
+from evidence_harness.process_containment import contain_harbor_environment
 from evidence_harness.prompting import build_executor_prompt, build_review_prompt
 from evidence_harness.protocol import (
     ActionKind,
@@ -36,6 +42,7 @@ from evidence_harness.protocol import (
     ShellCommand,
     ShellEnvironment,
     StopReason,
+    VerificationCheck,
 )
 from evidence_harness.shell import CommandRunner
 
@@ -81,12 +88,14 @@ class EvidenceLoop:
         model: ModelGateway,
         journal: RunJournal,
         options: LoopOptions,
+        completion_isolation: CompletionIsolation,
         clock: Callable[[], float] = time.monotonic,
         on_progress: ProgressCallback | None = None,
     ) -> None:
         self._model = model
         self._journal = journal
         self._options = options
+        self._completion_isolation = completion_isolation
         self._clock = clock
         self._on_progress = on_progress
         self._gate = EvidenceGate(options)
@@ -102,7 +111,11 @@ class EvidenceLoop:
         runner = CommandRunner(environment, self._journal, self._options, self._clock)
         self._journal.append(
             "run_started",
-            {"instruction": instruction, "options": asdict(self._options)},
+            {
+                "journal_schema_version": 2,
+                "instruction": instruction,
+                "options": asdict(self._options),
+            },
         )
 
         bootstrap = await self._run_command(state, runner, _BOOTSTRAP)
@@ -237,7 +250,7 @@ class EvidenceLoop:
                     state.finalization_repair_used = True
                 await self._handle_execute(state, runner, decision)
             elif decision.action is ActionKind.FINISH:
-                await self._handle_finish(state, runner, decision)
+                await self._handle_finish(state, decision)
             elif decision.action is ActionKind.REPLAN:
                 self._handle_replan(state, decision)
             else:
@@ -338,10 +351,13 @@ class EvidenceLoop:
     async def _handle_finish(
         self,
         state: RunState,
-        runner: CommandRunner,
         decision: AgentDecision,
     ) -> None:
-        rejection_reasons = self._gate.validate_proposal(decision.checks, decision.coverage)
+        rejection_reasons = self._gate.validate_proposal(
+            decision.checks,
+            decision.coverage,
+            isolated=True,
+        )
         if rejection_reasons:
             self._reject_completion(state, rejection_reasons)
             return
@@ -370,27 +386,59 @@ class EvidenceLoop:
 
         supporting_observations = list(state.observations)
         state.phase = RunPhase.VERIFYING
-        receipts: list[CommandReceipt] = []
-        for check in decision.checks:
-            command = ShellCommand(
-                id=check.id,
-                script=check.script,
-                purpose=check.proves,
-                cwd=check.cwd,
-                timeout_sec=check.timeout_sec,
-                mode=CommandMode.OBSERVE,
-                repeat_reason="fresh completion verification",
+        attempt_id = state.next_completion_attempt
+        state.next_completion_attempt += 1
+
+        async def execute_check(
+            check: VerificationCheck,
+            environment: ShellEnvironment,
+            command_deadline_monotonic: float,
+        ) -> CommandReceipt:
+            return await self._run_completion_check(
+                state,
+                check,
+                environment,
+                command_deadline_monotonic,
             )
-            receipt = await self._run_command(state, runner, command)
-            receipts.append(receipt)
-            if not receipt.succeeded:
-                break
+
+        try:
+            isolated = await self._completion_isolation.verify(
+                CompletionIsolationRequest(
+                    attempt_id=attempt_id,
+                    work_epoch=state.work_epoch,
+                    checks=decision.checks,
+                    deadline_monotonic=state.deadline_monotonic,
+                ),
+                execute_check,
+            )
+        except CompletionIsolationError as exc:
+            state.unresolved_errors.append(str(exc))
+            self._journal.append(
+                "completion_isolation_failed",
+                {
+                    "attempt_id": exc.attempt_id,
+                    "failure_kind": exc.kind,
+                    "detail": exc.detail,
+                },
+            )
+            self._finish(
+                state,
+                StopReason.INFRA_FAILURE,
+                failure_category=exc.kind.value,
+            )
+            return
+
+        receipts = isolated.receipts
 
         semantic_assessment: SemanticAssessment | None = None
         mechanical_evidence = self._gate.decide(
             work_epoch=state.work_epoch,
-            checks=tuple(receipts),
+            checks=receipts,
             coverage=decision.coverage,
+            expected_check_ids=tuple(check.id for check in decision.checks),
+            attempt_id=attempt_id,
+            isolation=isolated.evidence,
+            require_isolation=True,
         )
         if not mechanical_evidence.accepted:
             state.latest_evidence = mechanical_evidence
@@ -404,7 +452,8 @@ class EvidenceLoop:
                 instruction=state.instruction,
                 checks=decision.checks,
                 coverage=decision.coverage,
-                verification_receipts=tuple(receipts),
+                verification_receipts=receipts,
+                isolation=isolated.evidence,
                 supporting_observations=supporting_observations,
                 prior_findings=state.completion_findings,
             )
@@ -422,8 +471,12 @@ class EvidenceLoop:
                 )
                 evidence = self._gate.decide(
                     work_epoch=state.work_epoch,
-                    checks=tuple(receipts),
+                    checks=receipts,
                     coverage=decision.coverage,
+                    expected_check_ids=tuple(check.id for check in decision.checks),
+                    attempt_id=attempt_id,
+                    isolation=isolated.evidence,
+                    require_isolation=True,
                     require_semantic_review=True,
                 )
                 state.latest_evidence = evidence
@@ -442,8 +495,12 @@ class EvidenceLoop:
 
         evidence = self._gate.decide(
             work_epoch=state.work_epoch,
-            checks=tuple(receipts),
+            checks=receipts,
             coverage=decision.coverage,
+            expected_check_ids=tuple(check.id for check in decision.checks),
+            attempt_id=attempt_id,
+            isolation=isolated.evidence,
+            require_isolation=True,
             semantic_assessment=semantic_assessment,
             require_semantic_review=self._options.enable_completion_review,
         )
@@ -456,6 +513,35 @@ class EvidenceLoop:
             return
 
         self._reject_completion(state, evidence.rejection_reasons)
+
+    async def _run_completion_check(
+        self,
+        state: RunState,
+        check: VerificationCheck,
+        environment: ShellEnvironment,
+        command_deadline_monotonic: float,
+    ) -> CommandReceipt:
+        command = ShellCommand(
+            id=check.id,
+            script=check.script,
+            purpose=check.proves,
+            cwd=check.cwd,
+            timeout_sec=check.timeout_sec,
+            mode=CommandMode.OBSERVE,
+            repeat_reason="fresh isolated completion verification",
+        )
+        runner = CommandRunner(
+            contain_harbor_environment(environment),
+            self._journal,
+            self._options,
+            self._clock,
+        )
+        return await self._run_command(
+            state,
+            runner,
+            command,
+            wall_deadline_monotonic=command_deadline_monotonic,
+        )
 
     def _handle_replan(self, state: RunState, decision: AgentDecision) -> None:
         if state.must_replan:
