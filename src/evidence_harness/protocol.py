@@ -59,6 +59,9 @@ class RunPhase(StrEnum):
     TERMINATED = "terminated"
 
 
+FinalizationTrigger = Literal["turn_budget", "wall_clock"]
+
+
 class ShellCommand(StrictModel):
     id: str = Field(min_length=1, max_length=80)
     script: str = Field(min_length=1, max_length=20_000)
@@ -262,6 +265,7 @@ class RunState:
     must_replan: bool = False
     completion_findings: tuple[str, ...] = ()
     finalization_started: bool = False
+    finalization_triggers: tuple[FinalizationTrigger, ...] = ()
     finalization_repair_used: bool = False
     latest_evidence: VerificationReceipt | None = None
     final_summary: str | None = None

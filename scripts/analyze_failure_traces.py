@@ -9,6 +9,8 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
+from evidence_harness.budget import finalization_wall_time_reserve_sec
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CANONICAL = PROJECT_ROOT / "evaluation" / "canonical-89.json"
 DEFAULT_STOP_REASONS = frozenset({"verified", "budget_exhausted"})
@@ -32,6 +34,10 @@ class TraceMetrics:
     completion_reviews: int
     review_repairs: int
     completion_rejections: int
+    wall_finalization_boundary_reached: bool
+    decisions_after_wall_finalization_boundary: int
+    change_commands_after_wall_finalization_boundary: int
+    finish_attempts_after_wall_finalization_boundary: int
     long_commands: int
     truncated_receipts: int
     duplicate_plan_items: int
@@ -140,6 +146,13 @@ def _analyze_journal(
         if first_finish_event
         else None
     )
+    wall_finalization_boundary_elapsed = max_wall - finalization_wall_time_reserve_sec(max_wall)
+    decisions_after_wall_finalization_boundary = [
+        event
+        for event in decisions
+        if (_timestamp(event, journal_path) - start_time).total_seconds()
+        >= wall_finalization_boundary_elapsed
+    ]
 
     review_events = [event for event in events if event.get("type") == "completion_review"]
     plan_items = [item for event in decisions for item in _string_list(_payload(event).get("plan"))]
@@ -170,6 +183,17 @@ def _analyze_journal(
         completion_reviews=len(review_events),
         review_repairs=sum(_payload(event).get("verdict") == "repair" for event in review_events),
         completion_rejections=sum(event.get("type") == "completion_rejected" for event in events),
+        wall_finalization_boundary_reached=elapsed_sec >= wall_finalization_boundary_elapsed,
+        decisions_after_wall_finalization_boundary=len(decisions_after_wall_finalization_boundary),
+        change_commands_after_wall_finalization_boundary=sum(
+            command.get("mode") == "change"
+            for event in decisions_after_wall_finalization_boundary
+            for command in _commands(_payload(event))
+        ),
+        finish_attempts_after_wall_finalization_boundary=sum(
+            _payload(event).get("action") == "finish"
+            for event in decisions_after_wall_finalization_boundary
+        ),
         long_commands=sum(
             float(_payload(event).get("duration_sec", 0)) >= 30 for event in command_receipts
         ),
@@ -191,6 +215,18 @@ def _summarize_group(rows: list[TraceMetrics]) -> dict[str, Any]:
         "completion_reviews": sum(row.completion_reviews for row in rows),
         "review_repairs": sum(row.review_repairs for row in rows),
         "completion_rejections": sum(row.completion_rejections for row in rows),
+        "tasks_reaching_wall_finalization_boundary": sum(
+            row.wall_finalization_boundary_reached for row in rows
+        ),
+        "decisions_after_wall_finalization_boundary": sum(
+            row.decisions_after_wall_finalization_boundary for row in rows
+        ),
+        "change_commands_after_wall_finalization_boundary": sum(
+            row.change_commands_after_wall_finalization_boundary for row in rows
+        ),
+        "finish_attempts_after_wall_finalization_boundary": sum(
+            row.finish_attempts_after_wall_finalization_boundary for row in rows
+        ),
         "long_commands": sum(row.long_commands for row in rows),
         "truncated_receipts": sum(row.truncated_receipts for row in rows),
         "tasks_with_duplicate_plan_items": sum(row.duplicate_plan_items > 0 for row in rows),

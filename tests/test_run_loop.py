@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import time
 
 import pytest
@@ -12,6 +13,7 @@ from evidence_harness.protocol import (
     AgentDecision,
     CheckKind,
     CommandMode,
+    EnvironmentResult,
     FailureKind,
     LoopOptions,
     ModelGateway,
@@ -159,6 +161,75 @@ class ReleasableEnvironment:
             self.cancelled = True
             raise
         return FakeExecResult()
+
+
+class MutableClock:
+    def __init__(self) -> None:
+        self.now = 0.0
+
+    def __call__(self) -> float:
+        return self.now
+
+
+class AdvancingEnvironment(FakeEnvironment):
+    def __init__(self, clock: MutableClock, script: str, target: float) -> None:
+        super().__init__()
+        self._clock = clock
+        self._script = script
+        self._target = target
+
+    async def exec(
+        self,
+        command: str,
+        cwd: str | None = None,
+        timeout_sec: int | None = None,
+    ) -> EnvironmentResult:
+        result = await super().exec(command, cwd, timeout_sec)
+        if command == self._script:
+            self._clock.now = self._target
+        return result
+
+
+class AdvancingModel(ScriptedModel):
+    def __init__(
+        self,
+        decisions: list[AgentDecision],
+        clock: MutableClock,
+        target: float,
+        reviews: list[ReviewDecision] | None = None,
+    ) -> None:
+        super().__init__(decisions, reviews or ())
+        self._clock = clock
+        self._target = target
+
+    async def decide(self, prompt: str) -> AgentDecision:
+        decision = await super().decide(prompt)
+        if len(self.prompts) == 1:
+            self._clock.now = self._target
+        return decision
+
+
+class BoundaryTimeoutModel:
+    def __init__(self, clock: MutableClock) -> None:
+        self._clock = clock
+        self._interrupted = False
+        self.prompts: list[str] = []
+
+    @property
+    def usage(self) -> UsageTotals:
+        return UsageTotals(model_calls=len(self.prompts))
+
+    async def decide(self, prompt: str) -> AgentDecision:
+        self.prompts.append(prompt)
+        if not self._interrupted:
+            self._interrupted = True
+            self._clock.now = 900.0
+            raise TimeoutError
+        return _finish()
+
+    async def review(self, prompt: str) -> ReviewDecision:
+        del prompt
+        return ReviewDecision(verdict="accept", rationale="the receipt proves the value")
 
 
 async def test_model_call_cannot_exceed_its_timeout(tmp_path) -> None:
@@ -507,6 +578,181 @@ async def test_finalization_blocks_late_exploration_but_allows_finish(tmp_path) 
     assert '"allowed_actions": [' in model.prompts[1]
     assert '"finish"' in model.prompts[1]
     assert '"execute"' not in model.prompts[1].split('"allowed_actions": [', 1)[1].split("]", 1)[0]
+
+
+async def test_wall_time_reserve_starts_finalization_before_turn_reserve(tmp_path) -> None:
+    clock = MutableClock()
+    initial_change = "printf good > answer.txt"
+    model = ScriptedModel(
+        [
+            _execute(initial_change, command_id="write-answer"),
+            _execute("touch too-late", command_id="late-exploration"),
+            _finish('test "$(cat answer.txt)" = good'),
+        ],
+        [ReviewDecision(verdict="accept", rationale="the receipt proves the value")],
+    )
+    environment = AdvancingEnvironment(clock, initial_change, target=900.0)
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_turns=12,
+        max_wall_time_sec=1_000,
+        clock=clock,
+    ).run("Write good to answer.txt", environment)
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert "touch too-late" not in [call[0] for call in environment.calls]
+    assert '"finalization_triggers": [\n      "wall_clock"\n    ]' in model.prompts[1]
+    assert '"finalization_wall_time_reserve_sec": 100.0' in model.prompts[1]
+    events = [
+        json.loads(line)
+        for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    finalization = next(event for event in events if event["type"] == "finalization_started")
+    assert finalization["payload"]["triggers"] == ["wall_clock"]
+    assert finalization["payload"]["wall_time_remaining_sec"] == 100.0
+    assert finalization["payload"]["wall_time_reserve_sec"] == 100.0
+
+
+async def test_work_command_cannot_consume_wall_time_reserve(tmp_path) -> None:
+    clock = MutableClock()
+    change = "printf good > answer.txt"
+    model = AdvancingModel(
+        [_execute(change, command_id="write-answer"), _finish()],
+        clock,
+        target=850.0,
+        reviews=[ReviewDecision(verdict="accept", rationale="the receipt proves the value")],
+    )
+    environment = FakeEnvironment()
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_wall_time_sec=1_000,
+        clock=clock,
+    ).run("Write good to answer.txt", environment)
+
+    assert report.stop_reason is StopReason.VERIFIED
+    change_call = next(call for call in environment.calls if call[0] == change)
+    assert change_call[2] == 50
+
+
+async def test_model_call_crossing_wall_boundary_rechecks_allowed_actions(tmp_path) -> None:
+    clock = MutableClock()
+    late_change = "touch too-late"
+    model = AdvancingModel(
+        [_execute(late_change, command_id="late-change"), _finish()],
+        clock,
+        target=900.0,
+        reviews=[ReviewDecision(verdict="accept", rationale="the receipt proves the value")],
+    )
+    environment = FakeEnvironment()
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_wall_time_sec=1_000,
+        clock=clock,
+    ).run("Ensure answer.txt is ready", environment)
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert late_change not in [call[0] for call in environment.calls]
+    assert '"phase": "thinking"' in model.prompts[0]
+    assert '"phase": "finalizing"' in model.prompts[1]
+
+
+async def test_model_timeout_at_wall_boundary_transitions_to_finalization(tmp_path) -> None:
+    clock = MutableClock()
+    model = BoundaryTimeoutModel(clock)
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_wall_time_sec=1_000,
+        clock=clock,
+    ).run("Ensure answer.txt is ready", FakeEnvironment())
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert '"phase": "thinking"' in model.prompts[0]
+    assert '"phase": "finalizing"' in model.prompts[1]
+    events = [
+        json.loads(line)
+        for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    interrupted = next(
+        event for event in events if event["type"] == "model_decision_interrupted_for_finalization"
+    )
+    assert interrupted["payload"]["triggers"] == ["wall_clock"]
+
+
+def test_model_timeout_preserves_wall_time_reserve(tmp_path) -> None:
+    clock = MutableClock()
+    clock.now = 850.0
+    loop = _loop(
+        tmp_path,
+        ScriptedModel(()),
+        max_wall_time_sec=1_000,
+        clock=clock,
+    )
+    state = RunState(
+        instruction="finish before the deadline",
+        phase=RunPhase.THINKING,
+        started_monotonic=0.0,
+        deadline_monotonic=1_000.0,
+    )
+
+    assert loop._model_call_timeout_sec(state, preserve_finalization_reserve=True) == 50.0
+    state.finalization_started = True
+    assert loop._model_call_timeout_sec(state, preserve_finalization_reserve=True) == 145.0
+
+
+async def test_work_batch_stops_when_a_command_reaches_wall_boundary(tmp_path) -> None:
+    clock = MutableClock()
+    first_change = "touch first"
+    decision = AgentDecision(
+        action=ActionKind.EXECUTE,
+        rationale="apply both changes",
+        plan=("write the artifacts", "verify them"),
+        commands=(
+            ShellCommand(
+                id="first",
+                script=first_change,
+                purpose="write the first artifact",
+                mode=CommandMode.CHANGE,
+            ),
+            ShellCommand(
+                id="second",
+                script="touch second",
+                purpose="write the second artifact",
+                mode=CommandMode.CHANGE,
+            ),
+        ),
+    )
+    model = ScriptedModel(
+        [decision, _finish()],
+        [ReviewDecision(verdict="accept", rationale="the receipt proves the value")],
+    )
+    environment = AdvancingEnvironment(clock, first_change, target=900.0)
+
+    report = await _loop(
+        tmp_path,
+        model,
+        max_wall_time_sec=1_000,
+        clock=clock,
+    ).run("Write the requested artifacts", environment)
+
+    assert report.stop_reason is StopReason.VERIFIED
+    assert "touch second" not in [call[0] for call in environment.calls]
+    events = [
+        json.loads(line)
+        for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    interrupted = next(
+        event for event in events if event["type"] == "work_batch_interrupted_for_finalization"
+    )
+    assert interrupted["payload"]["commands_completed"] == 1
+    assert interrupted["payload"]["commands_remaining"] == 1
 
 
 async def test_finalization_allows_one_repair_batch_then_requires_finish(tmp_path) -> None:

@@ -73,10 +73,20 @@ journal，并跳过没有 Harness metadata 的 replay trial。它只分析上述
 | 最终仍剩余的环境调用中位数 | 48.5 | 36.5 |
 | 最后五次决策仍有 change 的任务 | 5 | 10 |
 | 出现重复 plan item 的任务 | 2 | 9 |
+| 到达 10% 墙钟 finalization 边界的任务 | 0 | 3 |
+| 墙钟边界后的决策 | 0 | 12 |
+| 墙钟边界后的 change 命令 | 0 | 6 |
+| 墙钟边界后的 finish 尝试 | 0 | 0 |
 
 这组数据排除了“环境调用额度普遍不足”作为主因。假阳性组有 31 次 finish，却只有 20 次
 review，说明两次 review 上限在旧控制器中变成了语义检查旁路。预算组的环境调用仍充足，
 但一半任务从未进入 finish，另一半首次 finish 已到第 35 回合。
+
+10% 墙钟边界的离线模拟进一步定位了三个纯时间风险。`build-pov-ray` 在边界后仍有
+10 次决策和 5 条 change 命令，`train-fasttext` 仍有 2 次决策和 1 条 change 命令；
+`extract-moves-from-video` 没有边界后决策，因为一条边界前启动的长命令直接跨过了剩余
+时间。三题在边界后都没有尝试 finish。因此，仅在决策之间切换 phase 不足以保护时间，
+普通工作命令的截止时间也必须收紧到 finalization 边界。
 
 基于该证据，后续控制器改为先执行 completion checks，再让 reviewer 读取实际 receipt；
 启用 review 时，配额耗尽或 reviewer 故障都失败关闭。最后三个 executor 决策进入
@@ -84,6 +94,12 @@ controller 强制的 finalization，保留一次 finish、一次定向 repair �
 finish 的路径。失败的 change receipt 不再重置停滞计数，`max_repairs=N` 只允许 N 次
 repair。设计与取舍见
 [receipt-aware completion control](completion-control-design.md)。
+
+随后增加的墙钟门禁在剩余 10% 时间时进入同一 finalization 状态。控制器会在模型响应
+后重新检查边界，并把普通阶段的模型调用和工作命令都限制在保留窗口之前，避免慢响应或
+长命令从工作阶段直接耗尽整个运行时间。边界处的模型超时会转入新的 finalization 决策，
+而不是记为模型服务失败。该行为已有 fake-clock 状态机测试和上述离线轨迹模拟，尚未进行
+新的付费模型回归。
 
 这些是 canonical 评测完成后的控制器修正，尚未产生新的 89 题分数。当前 59/89 仍只代表
 已冻结 trial。

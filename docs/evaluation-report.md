@@ -92,10 +92,15 @@ hard 组占全部任务的 33.7%，却占失败的 56.7%。主要损失来自需
 
 冻结评测后的轨迹分析进一步确认，旧控制器在两次 completion review 后允许后续 finish
 跳过语义复核。当前源码已改为 receipt-first review、review 失败关闭和末三回合
-finalization，并用 136 项测试及 Docker smoke 验证控制器行为。该改动没有重跑 89 题，
+finalization，并用 143 项测试及 Docker smoke 验证控制器行为。该改动没有重跑 89 题，
 所以不得据此调整 59/89。数据、设计和外部系统调研分别见
 [失败分析](failure-analysis.md)、[completion control 设计](completion-control-design.md)
 和 [Terminal-Agent Harness Research](terminal-agent-research.md)。
+
+下一轮离线模拟显示，10 个预算耗尽任务中有 3 个触及最后 10% 墙钟窗口。旧轨迹在该
+边界后仍有 12 次决策和 6 条 change 命令，且没有 finish 尝试。当前源码因此把这段时间
+纳入 controller finalization，并限制普通阶段的模型调用和工作命令不能跨入保留窗口。
+该结果只证明策略会改变已知失败轨迹的后段调度，不是新的 benchmark 成绩。
 
 ### 资源
 

@@ -5,6 +5,10 @@ import time
 from collections.abc import Callable
 from dataclasses import asdict
 
+from evidence_harness.budget import (
+    finalization_turn_reserve,
+    finalization_wall_time_reserve_sec,
+)
 from evidence_harness.evidence import EvidenceGate
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import ModelProtocolError, ModelServiceError
@@ -21,6 +25,7 @@ from evidence_harness.protocol import (
     CommandMode,
     CommandReceipt,
     FailureKind,
+    FinalizationTrigger,
     LoopOptions,
     ModelGateway,
     ReviewDecision,
@@ -36,7 +41,6 @@ from evidence_harness.shell import CommandRunner
 
 ProgressCallback = Callable[[RunState], None]
 MODEL_CALL_SHUTDOWN_RESERVE_SEC = 5.0
-FINALIZATION_TURN_RESERVE = 3
 
 _BOOTSTRAP = ShellCommand(
     id="bootstrap-environment",
@@ -129,7 +133,11 @@ class EvidenceLoop:
                 self._clock(),
                 allowed_actions=allowed_actions,
             )
-            model_timeout_sec = self._model_call_timeout_sec(state)
+            finalization_started_before_decision = state.finalization_started
+            model_timeout_sec = self._model_call_timeout_sec(
+                state,
+                preserve_finalization_reserve=True,
+            )
             try:
                 async with asyncio.timeout(model_timeout_sec):
                     decision = await self._model.decide(prompt)
@@ -153,6 +161,16 @@ class EvidenceLoop:
                     failure_category="model_service",
                 )
             except TimeoutError:
+                self._enter_finalization_if_needed(state, include_turn_trigger=False)
+                if state.finalization_started:
+                    self._journal.append(
+                        "model_decision_interrupted_for_finalization",
+                        {
+                            "timeout_sec": model_timeout_sec,
+                            "triggers": state.finalization_triggers,
+                        },
+                    )
+                    continue
                 error = f"model decision exceeded {model_timeout_sec:g}s timeout"
                 state.unresolved_errors.append(error)
                 self._journal.append("model_service_error", {"error": error})
@@ -175,6 +193,9 @@ class EvidenceLoop:
 
             state.turn_count += 1
             self._journal.append("agent_decision", decision)
+            self._enter_finalization_if_needed(state, include_turn_trigger=False)
+            if state.finalization_started and not finalization_started_before_decision:
+                allowed_actions = self._allowed_actions(state)
             if decision.action not in allowed_actions:
                 feedback = (
                     f"Action '{decision.action}' is not allowed during finalization. "
@@ -187,6 +208,10 @@ class EvidenceLoop:
                         "action": decision.action,
                         "allowed_actions": allowed_actions,
                         "turns_remaining": (self._options.max_turns - state.turn_count),
+                        "wall_time_remaining_sec": max(
+                            0.0,
+                            state.deadline_monotonic - self._clock(),
+                        ),
                     },
                 )
                 if state.turn_count >= self._options.max_turns:
@@ -256,8 +281,27 @@ class EvidenceLoop:
         state.latest_evidence = None
         receipts_before = {item.observation_fingerprint for item in state.observations}
         batch_progressed = False
+        started_in_finalization = state.finalization_started
+        command_deadline_monotonic = (
+            state.deadline_monotonic
+            if started_in_finalization
+            else state.deadline_monotonic
+            - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+        )
 
-        for command in decision.commands:
+        for command_index, command in enumerate(decision.commands):
+            if not started_in_finalization:
+                self._enter_finalization_if_needed(state, include_turn_trigger=False)
+                if state.finalization_started:
+                    self._journal.append(
+                        "work_batch_interrupted_for_finalization",
+                        {
+                            "commands_completed": command_index,
+                            "commands_remaining": len(decision.commands) - command_index,
+                            "triggers": state.finalization_triggers,
+                        },
+                    )
+                    break
             try:
                 validate_command(command, self._options.max_command_timeout_sec)
             except PolicyViolation as exc:
@@ -269,7 +313,12 @@ class EvidenceLoop:
                 self._record_policy_rejection(state, command.id, repeat_reason)
                 break
 
-            receipt = await self._run_command(state, runner, command)
+            receipt = await self._run_command(
+                state,
+                runner,
+                command,
+                wall_deadline_monotonic=command_deadline_monotonic,
+            )
             if receipt.succeeded and (
                 receipt.mode is CommandMode.CHANGE
                 or receipt.observation_fingerprint not in receipts_before
@@ -435,8 +484,13 @@ class EvidenceLoop:
         state: RunState,
         runner: CommandRunner,
         command: ShellCommand,
+        *,
+        wall_deadline_monotonic: float | None = None,
     ) -> CommandReceipt:
-        wall_timeout_sec = max(0.0, state.deadline_monotonic - self._clock())
+        effective_deadline = (
+            state.deadline_monotonic if wall_deadline_monotonic is None else wall_deadline_monotonic
+        )
+        wall_timeout_sec = max(0.0, effective_deadline - self._clock())
         receipt = await runner.execute(
             command,
             sequence=state.next_sequence,
@@ -473,13 +527,25 @@ class EvidenceLoop:
             },
         )
 
-    def _model_call_timeout_sec(self, state: RunState) -> float:
-        remaining = state.deadline_monotonic - self._clock()
+    def _model_call_timeout_sec(
+        self,
+        state: RunState,
+        *,
+        preserve_finalization_reserve: bool = False,
+    ) -> float:
+        effective_deadline = state.deadline_monotonic - MODEL_CALL_SHUTDOWN_RESERVE_SEC
+        if preserve_finalization_reserve and not state.finalization_started:
+            effective_deadline = min(
+                effective_deadline,
+                state.deadline_monotonic
+                - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec),
+            )
+        remaining = effective_deadline - self._clock()
         return max(
             0.001,
             min(
                 float(self._options.max_model_call_timeout_sec),
-                remaining - MODEL_CALL_SHUTDOWN_RESERVE_SEC,
+                remaining,
             ),
         )
 
@@ -514,24 +580,37 @@ class EvidenceLoop:
                 failure_category="completion_repair_budget",
             )
 
-    def _enter_finalization_if_needed(self, state: RunState) -> None:
+    def _enter_finalization_if_needed(
+        self,
+        state: RunState,
+        *,
+        include_turn_trigger: bool = True,
+    ) -> None:
         if state.finalization_started:
             return
-        reserve = min(
-            FINALIZATION_TURN_RESERVE,
-            max(1, self._options.max_turns - 1),
-        )
+        turn_reserve = finalization_turn_reserve(self._options.max_turns)
+        wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
         turns_remaining = self._options.max_turns - state.turn_count
-        if turns_remaining > reserve:
+        wall_time_remaining_sec = max(0.0, state.deadline_monotonic - self._clock())
+        triggers: list[FinalizationTrigger] = []
+        if include_turn_trigger and turns_remaining <= turn_reserve:
+            triggers.append("turn_budget")
+        if wall_time_remaining_sec <= wall_time_reserve_sec:
+            triggers.append("wall_clock")
+        if not triggers:
             return
         state.finalization_started = True
+        state.finalization_triggers = tuple(triggers)
         state.must_replan = False
         state.recovery_directive = None
         self._journal.append(
             "finalization_started",
             {
+                "triggers": state.finalization_triggers,
                 "turns_remaining": turns_remaining,
-                "turn_reserve": reserve,
+                "turn_reserve": turn_reserve,
+                "wall_time_remaining_sec": wall_time_remaining_sec,
+                "wall_time_reserve_sec": wall_time_reserve_sec,
                 "completion_findings": state.completion_findings,
             },
         )

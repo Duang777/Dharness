@@ -159,9 +159,100 @@ def test_analyze_failure_traces_measures_completion_and_budget_behavior(
     assert row["completion_reviews"] == 2
     assert row["review_repairs"] == 1
     assert row["completion_rejections"] == 1
+    assert row["wall_finalization_boundary_reached"] is False
+    assert row["decisions_after_wall_finalization_boundary"] == 0
+    assert row["change_commands_after_wall_finalization_boundary"] == 0
+    assert row["finish_attempts_after_wall_finalization_boundary"] == 0
     assert row["long_commands"] == 1
     assert row["truncated_receipts"] == 1
     assert row["duplicate_plan_items"] == 1
     assert row["changed_state_in_final_five_decisions"] is True
     assert report["groups"]["verified"]["tasks"] == 1
     assert report["groups"]["budget_exhausted"]["tasks"] == 0
+
+
+def test_analyze_failure_traces_simulates_wall_finalization_boundary(
+    tmp_path: Path,
+) -> None:
+    result_path = tmp_path / "runs" / "task-late" / "result.json"
+    journal_path = result_path.parent / "agent" / "evidence-harness" / "events.jsonl"
+    _write_json(
+        tmp_path / "evaluation" / "canonical.json",
+        {
+            "tasks": [
+                {
+                    "name": "task-late",
+                    "reward": 0,
+                    "result_path": str(result_path.relative_to(tmp_path)),
+                }
+            ]
+        },
+    )
+    _write_json(
+        result_path,
+        {
+            "agent_result": {
+                "metadata": {
+                    "evidence_harness": {
+                        "stop_reason": "budget_exhausted",
+                        "turns_used": 3,
+                        "environment_calls_used": 1,
+                    }
+                }
+            }
+        },
+    )
+    events = [
+        _event(
+            "2026-09-27T00:00:00+00:00",
+            "run_started",
+            {
+                "options": {
+                    "max_turns": 40,
+                    "max_environment_calls": 80,
+                    "max_wall_time_sec": 100,
+                }
+            },
+        ),
+        _event(
+            "2026-09-27T00:00:50+00:00",
+            "agent_decision",
+            {"action": "execute", "commands": [{"mode": "observe"}]},
+        ),
+        _event(
+            "2026-09-27T00:01:31+00:00",
+            "agent_decision",
+            {"action": "execute", "commands": [{"mode": "change"}]},
+        ),
+        _event(
+            "2026-09-27T00:01:35+00:00",
+            "agent_decision",
+            {"action": "finish", "commands": []},
+        ),
+        _event(
+            "2026-09-27T00:01:40+00:00",
+            "run_finished",
+            {"stop_reason": "budget_exhausted"},
+        ),
+    ]
+    journal_path.parent.mkdir(parents=True, exist_ok=True)
+    journal_path.write_text(
+        "".join(json.dumps(event) + "\n" for event in events),
+        encoding="utf-8",
+    )
+
+    report = analyze_failure_traces(
+        tmp_path / "evaluation" / "canonical.json",
+        tmp_path,
+    )
+
+    row = report["tasks"][0]
+    assert row["wall_finalization_boundary_reached"] is True
+    assert row["decisions_after_wall_finalization_boundary"] == 2
+    assert row["change_commands_after_wall_finalization_boundary"] == 1
+    assert row["finish_attempts_after_wall_finalization_boundary"] == 1
+    group = report["groups"]["budget_exhausted"]
+    assert group["tasks_reaching_wall_finalization_boundary"] == 1
+    assert group["decisions_after_wall_finalization_boundary"] == 2
+    assert group["change_commands_after_wall_finalization_boundary"] == 1
+    assert group["finish_attempts_after_wall_finalization_boundary"] == 1

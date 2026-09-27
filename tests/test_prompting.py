@@ -66,6 +66,8 @@ def test_compaction_preserves_task_and_complete_schema() -> None:
     assert len(prompt) < 25_000
     assert payload["budget"]["max_model_call_timeout_sec"] == 360
     assert payload["budget"]["max_command_timeout_sec"] == 300
+    assert payload["budget"]["finalization_wall_time_reserve_sec"] == 180
+    assert payload["completion_control"]["finalization_triggers"] == []
     assert all("command" not in item for item in payload["known_changes"])
     assert all("command_sha256" in item for item in payload["known_changes"])
     assert "z" * 3_000 not in prompt

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from evidence_harness.budget import finalization_wall_time_reserve_sec
 from evidence_harness.protocol import (
     ActionKind,
     AgentDecision,
@@ -162,12 +163,16 @@ def _executor_payload(
             "max_model_call_timeout_sec": options.max_model_call_timeout_sec,
             "max_command_timeout_sec": options.max_command_timeout_sec,
             "verification_environment_reserve": options.verification_environment_reserve,
+            "finalization_wall_time_reserve_sec": finalization_wall_time_reserve_sec(
+                options.max_wall_time_sec
+            ),
         },
         "work_epoch": state.work_epoch,
         "completion_control": {
             "allowed_actions": allowed_actions,
             "active_findings": state.completion_findings,
             "finalization_started": state.finalization_started,
+            "finalization_triggers": state.finalization_triggers,
             "repair_batch_used": state.finalization_repair_used,
         },
         "recovery_directive": state.recovery_directive,

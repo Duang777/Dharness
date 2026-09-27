@@ -207,6 +207,16 @@ phase and reserve in the prompt.
 and completion repairs without lowering external reward or increasing median
 runtime.
 
+**Implementation status, 2026-09-27:** the controller now enters its existing
+sticky finalization state when 10% of wall time remains, rechecks the boundary
+after model calls and between batched commands, and prevents ordinary work
+commands from crossing into the reserve. Retrospective analysis found 3
+budget-exhausted tasks at this boundary, with 12 later decisions, 6 change
+commands, and no finish attempts. Fake-clock tests cover the state transitions
+and command deadline. A same-model live regression is still required before
+claiming a score or runtime improvement. See
+[wall-time finalization research](wall-time-finalization-research.md).
+
 ### P1: Add failure-family and publish-state middleware
 
 Derive stable signatures from command purpose, return code, stderr class, and
