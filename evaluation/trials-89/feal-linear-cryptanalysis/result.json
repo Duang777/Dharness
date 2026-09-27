@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 8,
+        "failure_category": "model_service",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": "model_failure",
+        "turns_used": 6,
+        "work_epoch": 6
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 56122,
+    "n_output_tokens": 15416
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "feal-linear-cryptanalysis"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T18:34:25.876907Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "b1ec96b74a5b7d4b801d923555080b610c4f34fd6be04ccedcc71a96b0bf0470",
+    "source_result_sha256": "0e2abc5e974cd9b32543c11fb964bb091e3f648a356d608721fb1bd516b82b04"
+  },
+  "started_at": "2026-09-25T18:30:03.522022Z",
+  "task": {
+    "checksum": "3ee298ac4e31a90a460afa5fc10d34fdca7c1e591ccda5fc2c5faee2963991f2",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "feal-linear-cryptanalysis",
+  "trial_name": "feal-linear-cryptanalysis__gwQeLB5",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

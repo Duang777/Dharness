@@ -4,31 +4,30 @@ Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它�
 改造成控制器执行的证据协议：模型提出操作和验收条件，Harness 串行执行命令、保存观察、
 重新运行最终检查，只有新鲜证据覆盖全部任务要求时才结束。
 
-> **全量评测进行中：** `full89-terra-20260925` 正在以并发 1 运行 Terminal-Bench
-> 2.0 的全部 89 道任务。进度记录在
-> `runs/terminal-bench-2/full89-terra-20260925/progress.jsonl`。下方 20 题是已经
-> 完成并冻结的阶段性结果，不代表 89 题全量最终成绩。
+Terminal-Bench 2.0 全量评测已经完成。最终结果为 59/89，全部任务均已评分，
+canonical `error` 为 0。
 
 ## 成绩
 
-当前已冻结的扩展矩阵覆盖 4 easy、10 medium、6 hard，共 20 个系统运维、软件工程、
-安全、数据处理、科学计算和数学任务。
+固定矩阵覆盖官方 Terminal-Bench 2.0 的全部 89 题。85 个任务使用
+`openai/modelhub/gpt-5.6-terra` 实时运行，4 个任务使用同一批运行中保存的 Agent
+命令进行 journal replay，以恢复被 verifier 超时或运行环境中断的评分。
 
-| 指标 | 当前结果 |
+| 指标 | 最终结果 |
 |---|---:|
-| 已尝试 | 20 / 20 |
-| Harbor reward 1.0 | 18 |
-| 普通 verifier 失败 | 1 |
-| 基础设施错误 | 1 |
-| Attempted pass rate | 90% |
-| Scored pass rate | 94.7% |
-| Execution / scored coverage | 100% / 95% |
+| 已执行并评分 | 89 / 89 |
+| Harbor reward 1.0 | 59 |
+| Harbor reward 0 | 30 |
+| Canonical error | 0 |
+| Attempted / scored pass rate | 66.3% / 66.3% |
+| Execution / scored coverage | 100% / 100% |
 
-这不是同一模型的一次完整 20 题成绩。18 个通过结果由 17 个 live trial 和 1 个 journal
-replay 组成；live trial 使用 GLM 5.3 与 `modelhub/gpt-5.6-terra`。评分失败
-`vulnerable-secret` 被模型供应商的 `cyber_policy` 拒绝；唯一基础设施错误
-`qemu-startup` 发生在 Apple Silicon 宿主的 Rosetta amd64 容器中。逐题模型、模式、
-reward 和停止原因见[20 题冻结评测结果](evaluation/results-20.md)。
+首轮结果为 46 passed、23 failed、20 error。按故障域恢复并复核后，最终 canonical
+相较首轮增加 13 个 passed、7 个可评分 failed，并清除全部 20 个 error。逐题 reward、
+执行模式和停止原因见
+[89 题冻结评测结果](evaluation/results-89.md)。选择来源和完成时间保存在
+[`canonical-89.json`](evaluation/canonical-89.json)，每个原始 `result.json` 都由
+SHA-256 绑定。
 
 ### 如何解读成绩
 
@@ -36,34 +35,30 @@ reward 和停止原因见[20 题冻结评测结果](evaluation/results-20.md)。
 Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifier 正常给出评分的
 任务，用于区分解题失败与运行环境错误。
 
-| 分组 | 通过 | 失败 | 错误 | 结论 |
+| 分组 | 通过 | 失败 | 通过率 |
 |---|---:|---:|---:|---|
-| easy | 4 / 4 | 0 | 0 | 基础代码与调试任务全部通过 |
-| medium | 8 / 10 | 1 | 1 | 唯一策略拒绝和唯一基础设施错误都在此组 |
-| hard | 6 / 6 | 0 | 0 | 并发、服务配置、安全修复和科学计算任务全部通过 |
-| GLM 5.3 live | 5 / 6 | 0 | 1 | `qemu-startup` 因运行环境失败 |
-| Terra live | 12 / 13 | 1 | 0 | `vulnerable-secret` 被供应商策略拒绝 |
-| journal replay | 1 / 1 | 0 | 0 | 只证明记录轨迹可复现，不代表新的模型推理 |
+| easy | 4 / 4 | 0 | 100.0% |
+| medium | 42 / 55 | 13 | 76.4% |
+| hard | 13 / 30 | 17 | 43.3% |
+| Terra live | 57 / 85 | 28 | 67.1% |
+| journal replay | 2 / 4 | 2 | 50.0% |
 
-这 20 题不是随机抽样，也不是单模型对照实验。矩阵只根据公开 `task.toml` 的难度、类别
-和标签确定；选样阶段不读取 solution 或 verifier。所有 live trial 使用并发 1。恢复
-批次只重跑首次没有通过的四题，最终快照为每个任务保留一个明确来源。
+85 个 live canonical trial 都使用 Terra 模型和并发 1，但来自受控恢复运行，期间
+Harness 配置和源码有修订。replay 不发起新模型调用，只重放已记录的命令，并保留源
+journal SHA-256。最终成绩反映含恢复的工程闭环，不是严格 pass@1。
 
 ### 实验结论
 
-1. **证据门禁能减少无依据的提前结束，但门禁本身也会失败。** `fix-git` 的首轮解法
-   已完成，旧策略却连续五次拒绝合法检查。修复命令解析后，同模型、同任务、同预算的
-   turns 从 11 降到 4，repairs 从 5 降到 0，输入 token 减少 62.9%。
-2. **外部 reward 与内部 `verified` 必须分开。** 17 个 live 通过任务中，10 个以
-   `verified` 结束，7 个以 `budget_exhausted` 结束但仍获得 reward 1.0。这说明当前
-   主要缺口已从“不会做题”转向“完成审查和只读策略不能稳定达成一致”。
-3. **验证器必须按消费者语义读取产物。** `dna-assembly` 首轮内部状态为 `verified`，
-   官方 verifier 却发现引物 Tm 差值超限。改为解析完整扩增产物、BsaI 位点和环形拼接
-   后，恢复 trial 获得 reward 1.0。
-4. **错误分类决定优化方向。** `query-optimize` 是算法和证据不足，修正后查询中位耗时
-   比参考快 1.22 倍；Docker manifest EOF 是可重试的环境错误；QEMU 缺少 syscall 和
-   KVM 是 runner 能力问题；`cyber_policy` 是模型通道边界。这四类问题不能用同一个
-   “重试”策略处理。
+1. **Harbor reward 必须保持最终权威。** 85 个 live trial 中有 10 个内部
+   `verified` 但 reward 为 0，另有 12 个 reward 1.0 的任务未以 `verified` 结束。
+   内部状态与外部评分共出现 22 次错位。
+2. **预算是主要失败边界。** 10 个失败在预算耗尽时仍未交付合格产物，其中 9 个属于
+   `harness_control`，1 个属于 completion 协议。hard 组通过率为 43.3%，低于 medium
+   组的 76.4%。
+3. **模型通道直接造成 4 个失败。** 三个安全任务触发 `cyber_policy`；`caffe-cifar-10`
+   在耗尽墙钟后只剩 0.001 秒模型调用预算，训练产物未完成。
+4. **恢复流程清除了基础设施错误。** Docker EOF、镜像启动超时和 verifier 超时没有
+   留在最终 `error` 中。恢复后要么得到 reward 1.0，要么得到可归因的 reward 0。
 
 ## 核心亮点
 
@@ -93,10 +88,11 @@ Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifi
 | `write` | 中文化并统一报告语气 |
 | `unslop` | 删除模板化表述和重复结论 |
 
-20 道任务也扩大了技术覆盖。项目实际处理了 Coq 证明、Nginx、OpenSSL、ELF32/ELF64、
+89 道任务扩大了技术覆盖。项目实际处理了 Coq 证明、Nginx、OpenSSL、ELF32/ELF64、
 SQLite 查询优化、JSON/CSV/Parquet 合并、CWE-93、文件系统取证、Python 科学计算栈和
-Golden Gate DNA assembly。每项只按本次任务的实现和验证结果陈述，不把一次评测写成
-长期生产经验。完整记录见 [AI Coding 工程日志](docs/vibe-coding-log.md)。
+Golden Gate DNA assembly，也覆盖 QEMU、分布式 PyTorch、编译器、图像处理和逆向工程。
+每项只按本次任务的实现和验证结果陈述。完整记录见
+[AI Coding 工程日志](docs/vibe-coding-log.md)。
 
 ## 架构
 
@@ -232,9 +228,9 @@ uv run python scripts/run_full_evaluation.py \
 
 进度写入
 `runs/terminal-bench-2/<run-name>/progress.jsonl`。编排器始终传递
-`--n-concurrent 1`，并且只为 `fix-git` 挂载 HTTPS Debian 源。相同 `--run-name`
-只能使用相同模型、矩阵、凭证文件、Agent 参数和 Harness 源码；配置变化时请使用新的
-名称。
+`--n-concurrent 1`，并按任务镜像分别挂载 Bookworm HTTPS、Bullseye main-only 或
+Trixie HTTPS 软件源。相同 `--run-name` 只能使用相同模型、矩阵、凭证文件、Agent
+参数和 Harness 源码；配置变化时请使用新的名称。
 
 评测预算可用 `--agent-kwarg max_turns=...`、
 `--agent-kwarg max_environment_calls=...` 和
@@ -243,7 +239,7 @@ uv run python scripts/run_full_evaluation.py \
 ## 完整验收
 
 一条命令运行 Ruff lint/format、mypy、pytest coverage、构建、两个 Harbor Agent
-schema、10/20 题 dry-run、交付物检查、结果复算、凭证扫描，以及真实 mock-model +
+schema、10/20/89 题 dry-run、交付物检查、结果复算、凭证扫描，以及真实 mock-model +
 Docker + Harbor verifier smoke：
 
 ```bash
@@ -283,25 +279,50 @@ uv run python scripts/summarize_results.py evaluation/trials-20 \
   --markdown-out evaluation/results-20.md
 ```
 
+89 题恢复运行跨越多个 job，因此先生成 canonical 选择清单，再按清单冻结：
+
+```bash
+uv run python scripts/collect_evaluation_results.py \
+  --matrix evaluation/matrix-89.json \
+  --manifest-out evaluation/canonical-89.json \
+  --retry-matrix-out evaluation/matrix-89-errors.json \
+  --retry-status error \
+  runs/terminal-bench-2/full89-terra-* \
+  runs/terminal-bench-2/torch-replay-*
+
+uv run python scripts/freeze_evaluation.py \
+  --manifest evaluation/canonical-89.json \
+  --matrix evaluation/matrix-89.json \
+  --output-dir evaluation/trials-89
+
+uv run python scripts/summarize_results.py evaluation/trials-89 \
+  --matrix evaluation/matrix-89.json \
+  --json-out evaluation/results-89.json \
+  --markdown-out evaluation/results-89.md
+```
+
 本地 smoke 使用固定 fixture 和确定性 mock server，只证明 Harness、Docker、Harbor 与
 verifier 的集成链路，不计入 Terminal-Bench 成绩。
 
 ## 结果与限制
 
-- 当前结果来自混合模型和一次 replay，不能解读为单模型排行榜成绩。
-- `qemu-startup` 需要原生 x86_64 Linux 或支持相应系统调用与嵌套虚拟化的 runner。
-- `vulnerable-secret` 连续两次被供应商 `cyber_policy` 拒绝。该结果反映当前模型通道的
-  策略边界，不是 verifier 基础设施错误。
-- `overfull-hbox` 与 `model-extraction-relu-logits` 已获 reward 1.0，但 reviewer 曾要求
-  运行会生成 PDF、日志或 `.npy` 的检查。只读 policy 不允许它们写任务目录，因此内部
-  状态为 `budget_exhausted`。正确改进是隔离验证工作区，不是放开任意写入。
-- 扩展批次发现的 `query-optimize` 性能不足、Docker 拉取 EOF 和 `dna-assembly` 产物
-  语义验证缺口均已通过独立 recovery trial 复测。
+- 4 个 replay 结果重放同一批 Terra 轨迹，但不代表新的模型推理。最终结果不能当作
+  严格的一次性 pass@1。
+- `qemu-alpine-ssh` 和 `qemu-startup` 的早期 verifier 都遇到 Bullseye 包索引问题。
+  使用任务级 Bullseye main 源重跑后，两题的官方 verifier 均以 1/1 通过；一次遗漏
+  `api_base` 的无效试跑已从 canonical 排除。
+- 三个安全任务被供应商 `cyber_policy` 拒绝。它们反映当前模型通道的策略边界。
+- 冻结快照保留 allowlist 字段、模型与非敏感参数、reward、Harness 元数据、任务
+  checksum、Terminal-Bench commit，以及原始结果和配置的 SHA-256。完整命令输出仍
+  位于未提交的 `runs/`；没有原始运行目录的克隆只能验证已提交快照与清单的一致性，
+  不能独立复算原始结果哈希。
 
 ## 交付文档
 
 - [架构决策](docs/architecture-rationale.md)
 - [评测报告](docs/evaluation-report.md)
+- [89 题逐题结果与统计口径](evaluation/results-89.md)
+- [89 题 canonical 选择清单](evaluation/canonical-89.json)
 - [20 题逐题结果与统计口径](evaluation/results-20.md)
 - [首批 10 题冻结结果](evaluation/results.md)
 - [首批 10 题逐题分析](docs/ten-task-analysis.md)

@@ -13,6 +13,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix.json"
 DEBIAN_HTTPS_SOURCES = PROJECT_ROOT / "evaluation" / "debian-https.sources"
+DEBIAN_BULLSEYE_MAIN_SOURCES = PROJECT_ROOT / "evaluation" / "debian-bullseye-main.list"
+DEBIAN_TRIXIE_HTTPS_SOURCES = PROJECT_ROOT / "evaluation" / "debian-trixie-https.sources"
 AGENT_IMPORT = "evidence_harness.harbor_agent:EvidenceHarnessAgent"
 
 
@@ -46,7 +48,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--debian-https-sources",
         action="store_true",
-        help="Mount the repository's HTTPS Debian apt sources into task containers.",
+        help="Mount the repository's HTTPS Debian Bookworm sources into task containers.",
+    )
+    parser.add_argument(
+        "--debian-trixie-https-sources",
+        action="store_true",
+        help="Mount the repository's HTTPS Debian Trixie sources into task containers.",
+    )
+    parser.add_argument(
+        "--debian-bullseye-main-sources",
+        action="store_true",
+        help="Mount Bullseye main sources without the inconsistent security repository.",
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument(
@@ -91,6 +103,15 @@ def build_command(args: argparse.Namespace) -> list[str]:
         raise ValueError("--n-concurrent must be at least 1")
     if args.env_file is not None and not args.env_file.is_file():
         raise ValueError(f"env file does not exist: {args.env_file}")
+    source_mount_count = sum(
+        (
+            args.debian_https_sources,
+            args.debian_bullseye_main_sources,
+            args.debian_trixie_https_sources,
+        )
+    )
+    if source_mount_count > 1:
+        raise ValueError("Debian source mounts are mutually exclusive")
 
     dataset, matrix_task_names = load_matrix(args.matrix)
     task_names = args.include_task_name or matrix_task_names
@@ -140,12 +161,21 @@ def build_command(args: argparse.Namespace) -> list[str]:
 
     if args.env_file is not None:
         command.extend(("--env-file", str(args.env_file)))
+    debian_sources = None
+    debian_sources_target = "/etc/apt/sources.list.d/debian.sources"
     if args.debian_https_sources:
+        debian_sources = DEBIAN_HTTPS_SOURCES
+    elif args.debian_bullseye_main_sources:
+        debian_sources = DEBIAN_BULLSEYE_MAIN_SOURCES
+        debian_sources_target = "/etc/apt/sources.list"
+    elif args.debian_trixie_https_sources:
+        debian_sources = DEBIAN_TRIXIE_HTTPS_SOURCES
+    if debian_sources is not None:
         mounts = [
             {
                 "type": "bind",
-                "source": str(DEBIAN_HTTPS_SOURCES.resolve()),
-                "target": "/etc/apt/sources.list.d/debian.sources",
+                "source": str(debian_sources.resolve()),
+                "target": debian_sources_target,
                 "read_only": True,
             }
         ]

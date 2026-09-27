@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 20,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 3,
+        "stop_reason": "verified",
+        "turns_used": 16,
+        "work_epoch": 12
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 141217,
+    "n_output_tokens": 17148
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "sqlite-with-gcov"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T10:49:19.351550Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "17fd39e076d7ac3fddaff9b454f7380613037ae5156fad9b758e1d2092dd8445",
+    "source_result_sha256": "665532e278ffbd53a52af7f418db9857436fda7a67f346989c69cb4a768dcf2d"
+  },
+  "started_at": "2026-09-26T10:40:14.593231Z",
+  "task": {
+    "checksum": "5901f1d2fc3b9b97ab1b215461175a59f0568e224b67caa6f4cbbc38f6f33a04",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "sqlite-with-gcov",
+  "trial_name": "sqlite-with-gcov__RSm8A8f",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

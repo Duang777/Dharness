@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 17,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 10,
+        "work_epoch": 7
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 73408,
+    "n_output_tokens": 16144
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "openssl-selfsigned-cert"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T23:59:43.573449Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "eb5b71082521ac765d1467b3db95443ab4c9adf423b701423e28e7b9194a3fe0",
+    "source_result_sha256": "d09251f4bcb6877e6d315e1f620569f69c1ebdfff75f5440ee75ec1587fd398a"
+  },
+  "started_at": "2026-09-25T23:56:25.704268Z",
+  "task": {
+    "checksum": "8c096d8af92f88d8f876e26efc7f495ff13f50586736e56f35140fbb080ff390",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "openssl-selfsigned-cert",
+  "trial_name": "openssl-selfsigned-cert__ibjUerH",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

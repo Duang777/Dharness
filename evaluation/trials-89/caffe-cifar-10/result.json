@@ -1,0 +1,63 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 29,
+        "failure_category": "model_service",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": "model_failure",
+        "turns_used": 28,
+        "work_epoch": 25
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 324611,
+    "n_output_tokens": 16014
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "caffe-cifar-10"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T14:04:17.329989Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "35c87afe1db9ded6dc2392044b2f657a2d5b1dbca8e4c8cbde3b5eb8ae1e9ff8",
+    "source_result_sha256": "38c6554dc1478dc3eff8daba2019eec8b660c79662c25dbe36bf1e7a49e2a944"
+  },
+  "started_at": "2026-09-25T13:25:40.043074Z",
+  "task": {
+    "checksum": "69e68a75ace210a7fdbce0d1605c0d530a7b5119791d91c6786f84313b30fc3a",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "caffe-cifar-10",
+  "trial_name": "caffe-cifar-10__fA4Ymuk",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

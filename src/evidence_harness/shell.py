@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import asyncio
+import math
 import time
 from collections.abc import Callable
+from contextlib import suppress
 
 from evidence_harness.journal import RunJournal
 from evidence_harness.policy import (
@@ -11,6 +14,7 @@ from evidence_harness.policy import (
 )
 from evidence_harness.protocol import (
     CommandReceipt,
+    EnvironmentResult,
     FailureKind,
     LoopOptions,
     ShellCommand,
@@ -37,6 +41,7 @@ class CommandRunner:
         *,
         sequence: int,
         work_epoch: int,
+        wall_timeout_sec: float | None = None,
     ) -> CommandReceipt:
         validate_command(command, self._options.max_command_timeout_sec)
         started = self._clock()
@@ -46,11 +51,28 @@ class CommandRunner:
         stderr = ""
 
         try:
-            result = await self._environment.exec(
-                command=command.script,
-                cwd=command.cwd,
-                timeout_sec=command.timeout_sec,
+            environment_timeout_sec = command.timeout_sec
+            if wall_timeout_sec is not None:
+                environment_timeout_sec = max(
+                    1,
+                    min(command.timeout_sec, math.ceil(wall_timeout_sec)),
+                )
+            environment_task = asyncio.create_task(
+                self._environment.exec(
+                    command=command.script,
+                    cwd=command.cwd,
+                    timeout_sec=environment_timeout_sec,
+                )
             )
+            try:
+                if wall_timeout_sec is None:
+                    result = await asyncio.shield(environment_task)
+                else:
+                    async with asyncio.timeout(max(0.0, wall_timeout_sec)):
+                        result = await asyncio.shield(environment_task)
+            except BaseException:
+                await _drain_environment_task(environment_task)
+                raise
             stdout = result.stdout or ""
             stderr = result.stderr or ""
             return_code = result.return_code
@@ -59,7 +81,13 @@ class CommandRunner:
         except TimeoutError as exc:
             return_code = None
             failure = FailureKind.TIMEOUT
-            stderr = str(exc) or f"command exceeded {command.timeout_sec}s"
+            if wall_timeout_sec is not None and wall_timeout_sec <= command.timeout_sec:
+                stderr = (
+                    str(exc)
+                    or f"command exceeded remaining wall-clock budget ({wall_timeout_sec:g}s)"
+                )
+            else:
+                stderr = str(exc) or f"command exceeded {command.timeout_sec}s"
         except Exception as exc:
             return_code = None
             failure = FailureKind.TRANSPORT
@@ -93,3 +121,19 @@ class CommandRunner:
         )
         self._journal.append("command_receipt", receipt)
         return receipt
+
+
+async def _drain_environment_task(
+    task: asyncio.Task[EnvironmentResult],
+) -> None:
+    while not task.done():
+        try:
+            await asyncio.shield(task)
+        except asyncio.CancelledError:
+            if task.cancelled():
+                break
+        except BaseException:
+            break
+    if task.done() and not task.cancelled():
+        with suppress(BaseException):
+            task.result()

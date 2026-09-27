@@ -22,6 +22,13 @@ CATEGORY_LABELS = {
     "mathematics": "数学",
     "file-operations": "文件操作",
     "data-science": "数据科学",
+    "machine-learning": "机器学习",
+    "model-training": "模型训练",
+    "optimization": "优化",
+    "personal-assistant": "个人助理",
+    "games": "游戏",
+    "video-processing": "视频处理",
+    "data-querying": "数据查询",
     "test": "测试",
 }
 MODE_LABELS = {

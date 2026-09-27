@@ -1,0 +1,6 @@
+{
+  "dataset": "terminal-bench@2.0",
+  "schema_version": 1,
+  "selection_method": "Canonical tasks with status in: error.",
+  "tasks": []
+}

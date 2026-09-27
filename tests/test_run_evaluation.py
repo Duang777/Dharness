@@ -54,6 +54,77 @@ def test_build_command_can_select_one_task_and_mount_https_apt_sources(
     )
 
 
+def test_build_command_can_mount_trixie_https_apt_sources(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(run_evaluation.shutil, "which", lambda _: "/usr/local/bin/harbor")
+    args = _parse_args(
+        monkeypatch,
+        "--model",
+        "openai/test-model",
+        "--matrix",
+        str(run_evaluation.PROJECT_ROOT / "evaluation" / "matrix-89.json"),
+        "--include-task-name",
+        "build-pmars",
+        "--debian-trixie-https-sources",
+    )
+
+    command = run_evaluation.build_command(args)
+
+    mounts_index = command.index("--mounts")
+    mounts = json.loads(command[mounts_index + 1])
+    assert mounts[0]["source"] == str(run_evaluation.DEBIAN_TRIXIE_HTTPS_SOURCES.resolve())
+    assert (
+        run_evaluation.DEBIAN_TRIXIE_HTTPS_SOURCES.read_text(encoding="utf-8").count(
+            "URIs: https://deb.debian.org"
+        )
+        == 2
+    )
+
+
+def test_build_command_can_mount_bullseye_main_sources_without_security(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(run_evaluation.shutil, "which", lambda _: "/usr/local/bin/harbor")
+    args = _parse_args(
+        monkeypatch,
+        "--model",
+        "openai/test-model",
+        "--matrix",
+        str(run_evaluation.PROJECT_ROOT / "evaluation" / "matrix-89.json"),
+        "--include-task-name",
+        "qemu-startup",
+        "--debian-bullseye-main-sources",
+    )
+
+    command = run_evaluation.build_command(args)
+
+    mounts_index = command.index("--mounts")
+    mounts = json.loads(command[mounts_index + 1])
+    assert mounts[0]["source"] == str(run_evaluation.DEBIAN_BULLSEYE_MAIN_SOURCES.resolve())
+    assert mounts[0]["target"] == "/etc/apt/sources.list"
+    source_text = run_evaluation.DEBIAN_BULLSEYE_MAIN_SOURCES.read_text(encoding="utf-8")
+    assert " bullseye main" in source_text
+    assert " bullseye-updates main" in source_text
+    assert "security" not in source_text
+
+
+def test_build_command_rejects_multiple_debian_source_mounts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    args = _parse_args(
+        monkeypatch,
+        "--model",
+        "openai/test-model",
+        "--debian-https-sources",
+        "--debian-bullseye-main-sources",
+        "--debian-trixie-https-sources",
+    )
+
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        run_evaluation.build_command(args)
+
+
 def test_build_command_rejects_task_outside_fixed_matrix(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -12,6 +12,7 @@ from pydantic import Field, model_validator
 
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import LiteLLMModelGateway
+from evidence_harness.process_containment import contain_harbor_environment
 from evidence_harness.protocol import LoopOptions, RunState
 from evidence_harness.run_loop import EvidenceLoop
 
@@ -21,7 +22,7 @@ class EvidenceHarnessOptions(AgentOptions):
     max_environment_calls: int = Field(default=80, ge=4, le=500)
     max_repairs: int = Field(default=4, ge=0, le=20)
     max_recoveries: int = Field(default=2, ge=0, le=10)
-    max_completion_reviews: int = Field(default=4, ge=0, le=20)
+    max_completion_reviews: int = Field(default=2, ge=0, le=20)
     max_wall_time_sec: int = Field(default=1_800, ge=60, le=14_400)
     max_model_call_timeout_sec: int = Field(default=360, ge=30, le=1_800)
     max_command_timeout_sec: int = Field(default=300, ge=5, le=3_600)
@@ -138,7 +139,7 @@ class EvidenceHarnessAgent(BaseAgent):
             options=self.options.loop_options(),
             on_progress=update_context,
         )
-        report = await loop.run(instruction, environment)
+        report = await loop.run(instruction, contain_harbor_environment(environment))
         metadata = context.metadata or {}
         metadata["evidence_harness"] = {
             **metadata.get("evidence_harness", {}),

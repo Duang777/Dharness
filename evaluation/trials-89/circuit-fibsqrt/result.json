@@ -1,0 +1,63 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 45,
+        "failure_category": "harness_control",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 39,
+        "work_epoch": 37
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 583101,
+    "n_output_tokens": 45801
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "circuit-fibsqrt"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T15:34:13.976956Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "14ee615d08f00a28d739c43d9e3c381a4585d0f6f1cfa6b00efbe1020ac889a8",
+    "source_result_sha256": "685112c89bcdfe914038eed6f9932ee9d472b9a21f0bc26ea834071131ffd709"
+  },
+  "started_at": "2026-09-25T14:58:28.705869Z",
+  "task": {
+    "checksum": "c0e478819545e6c9db2d42b3996441ca0ee55fde09d4cea5b7f9fbdf83bfd337",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "circuit-fibsqrt",
+  "trial_name": "circuit-fibsqrt__r8YiFqn",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

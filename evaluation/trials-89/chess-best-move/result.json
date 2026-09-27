@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 18,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 1,
+        "stop_reason": "verified",
+        "turns_used": 14,
+        "work_epoch": 12
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 211907,
+    "n_output_tokens": 45942
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "chess-best-move"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-27T12:10:12.849925Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "94f86d2d627aea2a5d8d8a73b50699ee07669d1bcd016ef299d9df872d2dc844",
+    "source_result_sha256": "646285c96e632ef68e37e187fc77cb5e0b40a5a1a75f0c06334e69edd31053db"
+  },
+  "started_at": "2026-09-27T12:01:16.336070Z",
+  "task": {
+    "checksum": "a31d482d846322d57f0e3ee3c56d4ff2171fe39908dadd8092d036f17114fbef",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "chess-best-move",
+  "trial_name": "chess-best-move__WrUwqSV",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

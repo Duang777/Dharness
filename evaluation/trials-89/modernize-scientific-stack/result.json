@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 18,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 11,
+        "work_epoch": 8
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 82535,
+    "n_output_tokens": 11523
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "modernize-scientific-stack"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T23:26:56.017670Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "fac6285acb337438cb980b7fe2c67b14ff25fe2dc72ed1cba1231703b205401b",
+    "source_result_sha256": "bbe08bc29f5e2f21e7a3778149150139d65f30fe25e1e9b90380b57eb7b0184c"
+  },
+  "started_at": "2026-09-25T23:23:36.253585Z",
+  "task": {
+    "checksum": "7adc1cfbf5f90a260af478606d0286ccc9ca975fed4b14aee0c8c1d86cb7185e",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "modernize-scientific-stack",
+  "trial_name": "modernize-scientific-stack__dgnJkaj",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -33,6 +33,7 @@ from evidence_harness.protocol import (
 from evidence_harness.shell import CommandRunner
 
 ProgressCallback = Callable[[RunState], None]
+MODEL_CALL_SHUTDOWN_RESERVE_SEC = 5.0
 
 _BOOTSTRAP = ShellCommand(
     id="bootstrap-environment",
@@ -355,10 +356,12 @@ class EvidenceLoop:
         runner: CommandRunner,
         command: ShellCommand,
     ) -> CommandReceipt:
+        wall_timeout_sec = max(0.0, state.deadline_monotonic - self._clock())
         receipt = await runner.execute(
             command,
             sequence=state.next_sequence,
             work_epoch=state.work_epoch,
+            wall_timeout_sec=wall_timeout_sec,
         )
         state.next_sequence += 1
         state.environment_call_count += 1
@@ -394,7 +397,10 @@ class EvidenceLoop:
         remaining = state.deadline_monotonic - self._clock()
         return max(
             0.001,
-            min(float(self._options.max_model_call_timeout_sec), remaining - 5),
+            min(
+                float(self._options.max_model_call_timeout_sec),
+                remaining - MODEL_CALL_SHUTDOWN_RESERVE_SEC,
+            ),
         )
 
     def _reject_completion(self, state: RunState, reasons: tuple[str, ...]) -> None:
@@ -431,7 +437,7 @@ class EvidenceLoop:
         self._apply_recovery_policy(state)
 
     def _budget_exhaustion(self, state: RunState) -> str | None:
-        if self._clock() >= state.deadline_monotonic:
+        if self._clock() >= state.deadline_monotonic - MODEL_CALL_SHUTDOWN_RESERVE_SEC:
             return "wall-clock budget exhausted"
         if state.turn_count >= self._options.max_turns:
             return "model turn budget exhausted"

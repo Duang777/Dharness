@@ -1,0 +1,54 @@
+{
+  "agent_result": {
+    "cost_usd": null,
+    "metadata": {
+      "evidence_harness": {},
+      "evidence_harness_replay": {
+        "command_count": 28,
+        "completed": true,
+        "recorded_failure_count": 9,
+        "replay_mode": "recorded_receipts_v1",
+        "source_sha256": "87091260be69411ce9bcc45273a155e750cb80c07bf43cc02df5e62efda01648"
+      }
+    },
+    "n_cache_tokens": null,
+    "n_input_tokens": null,
+    "n_output_tokens": null
+  },
+  "config": {
+    "agent": {
+      "model_name": null,
+      "name": "evidence_harness.replay_agent:JournalReplayAgent",
+      "options": {
+        "continue_on_recorded_failure": true
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "torch-tensor-parallelism"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T21:30:59.507041Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "f3af747c6b90891f55cc92035b6f6e890b57470189830011c936cdfc6fb7bb50",
+    "source_result_sha256": "94c7a8865f83ac4496749bd19c3e8a31295221e6bd519e2bc2ce574417da67dd"
+  },
+  "started_at": "2026-09-26T21:28:41.539614Z",
+  "task": {
+    "checksum": "2637b586b22a779d1a4f01508f5f2caeea21d0b126b53d938e06ae8e717b8d19",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "torch-tensor-parallelism",
+  "trial_name": "torch-tensor-parallelism__q34Brim",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

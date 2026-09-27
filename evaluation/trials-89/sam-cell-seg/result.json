@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 40,
+        "failure_category": "model_blocked",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "model_stopped",
+        "turns_used": 29,
+        "work_epoch": 25
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 427319,
+    "n_output_tokens": 43105
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "sam-cell-seg"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T17:56:27.086590Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "cf6f12291b8a83fa5d441a92714c940855591ce32df9cf7e479e2657d038e07c",
+    "source_result_sha256": "9a6c002030940c6548f2b630804e27a11970fde6aef975f8a7db43c63793b84d"
+  },
+  "started_at": "2026-09-26T16:41:08.172576Z",
+  "task": {
+    "checksum": "1bc7f69e2e775b9ceac4b65975556b8c838b2d77cc0f50b01162adfea1630eb5",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "sam-cell-seg",
+  "trial_name": "sam-cell-seg__q68X94j",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

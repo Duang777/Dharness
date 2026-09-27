@@ -214,7 +214,7 @@ class LoopOptions:
     max_environment_calls: int = 80
     max_repairs: int = 4
     max_recoveries: int = 2
-    max_completion_reviews: int = 4
+    max_completion_reviews: int = 2
     max_wall_time_sec: int = 1_800
     max_model_call_timeout_sec: int = 360
     max_command_timeout_sec: int = 300

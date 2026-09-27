@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 40,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 32,
+        "work_epoch": 29
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 422370,
+    "n_output_tokens": 42234
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "adaptive-rejection-sampler"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-27T11:59:56.280389Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "6e6ba36469490c9ad19fdbc0e465aac4576b2f9c479a11f41e06531f7363ebac",
+    "source_result_sha256": "45a0e313f1b8ae62530cb11c1c148ecbcc7b2d91ca7910c8489431314e954892"
+  },
+  "started_at": "2026-09-27T11:45:00.996907Z",
+  "task": {
+    "checksum": "4fde6e809c475b000ae3ea4135f906ffe4775bccae7dafd0b123f4ecc9fcf697",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "adaptive-rejection-sampler",
+  "trial_name": "adaptive-rejection-sampler__fDwri5L",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 13,
+        "failure_category": "model_impossible",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "model_stopped",
+        "turns_used": 15,
+        "work_epoch": 11
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 110998,
+    "n_output_tokens": 21455
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "large-scale-text-editing"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T21:51:39.074987Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "91ce41e1122fee5a43ac93c74afde70a4888e659b84fa3cb8fe39d1de690d196",
+    "source_result_sha256": "e92d6a210c0165788b6b3213bc5ef3c5e1f6342c8205bd2f1eed90a5ea771e7c"
+  },
+  "started_at": "2026-09-25T21:44:36.343568Z",
+  "task": {
+    "checksum": "c7e5e082f251c7c83d53f7b645d97ab3152cc5fffe42d88ff9cce5c62c35ce16",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "large-scale-text-editing",
+  "trial_name": "large-scale-text-editing__y6zLno4",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 28,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 4,
+        "stop_reason": "verified",
+        "turns_used": 24,
+        "work_epoch": 18
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 293212,
+    "n_output_tokens": 45604
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "git-multibranch"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T20:43:01.593216Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "ddebe0a5920b4d75b30568757fffce1f50aea28a46f3b67879078e361d2f42c0",
+    "source_result_sha256": "b25764a61c2b30e1c65506426eba92a9f2ee60a6cec4e970f61098ca934ce230"
+  },
+  "started_at": "2026-09-25T20:32:25.118287Z",
+  "task": {
+    "checksum": "b569c7f37491065e1c14c8074024ffa47cad6f9c4e797213af81ef8617bccb9c",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "git-multibranch",
+  "trial_name": "git-multibranch__mNbuFar",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

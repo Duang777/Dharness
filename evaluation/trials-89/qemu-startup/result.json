@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 35,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 36,
+        "work_epoch": 31
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 598127,
+    "n_output_tokens": 38989
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "qemu-startup"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-27T04:36:09.927712Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "c6f15f08e70e005e9d976ea7958b0d4e9000bd8734842071fc60215fbd45462b",
+    "source_result_sha256": "b290e7e44a9421acfe3c19e80216dbfe75d746e58bef3e1e36aca2ce92c700d3"
+  },
+  "started_at": "2026-09-27T04:08:56.897605Z",
+  "task": {
+    "checksum": "0f33bbc23fc771ea1ee1cadd076a439733e19bf3ef15bbf2d728bfe948ea44dd",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "qemu-startup",
+  "trial_name": "qemu-startup__Z4RyPpD",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

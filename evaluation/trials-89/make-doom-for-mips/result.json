@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 30,
+        "failure_category": "model_impossible",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "model_stopped",
+        "turns_used": 33,
+        "work_epoch": 21
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 500816,
+    "n_output_tokens": 32505
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "make-doom-for-mips"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T22:24:17.998635Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "5029eb4a315fac95056183cde60d008493bfacd1983df4807030c38462bd4694",
+    "source_result_sha256": "eff90dde27bfc20d354ce8df6e7c056a232746fcd59c36f5ebe852dcdea6a103"
+  },
+  "started_at": "2026-09-25T22:15:19.526785Z",
+  "task": {
+    "checksum": "48c24358a58435a97de86cc88255b6faf1cd3cb28bd27ff6a918e01655095981",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "make-doom-for-mips",
+  "trial_name": "make-doom-for-mips__D9SHkh4",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

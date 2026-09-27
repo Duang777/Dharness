@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 9,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 0,
+        "stop_reason": "verified",
+        "turns_used": 6,
+        "work_epoch": 5
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 40108,
+    "n_output_tokens": 7876
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "multi-source-data-merger"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T23:51:25.800652Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "c12b530c1a38312988ac05c9c8fce610a966ce64dc75317ac34386360dd24082",
+    "source_result_sha256": "e415627831be7142ebba3b95f9938c13a86a720a126c3a79046c3bc070497185"
+  },
+  "started_at": "2026-09-25T23:47:25.811960Z",
+  "task": {
+    "checksum": "0f86ced6d81948760d828ee03060c28c44eb7244e7ef72442c18dc1c71115280",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "multi-source-data-merger",
+  "trial_name": "multi-source-data-merger__Apjku9G",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

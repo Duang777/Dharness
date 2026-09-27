@@ -1,0 +1,54 @@
+{
+  "agent_result": {
+    "cost_usd": null,
+    "metadata": {
+      "evidence_harness": {},
+      "evidence_harness_replay": {
+        "command_count": 45,
+        "completed": true,
+        "recorded_failure_count": 4,
+        "replay_mode": "recorded_receipts_v1",
+        "source_sha256": "7a1c3bfdbb64385580a4480ea12337f8593e0189f13396bb39820ab78eac166f"
+      }
+    },
+    "n_cache_tokens": null,
+    "n_input_tokens": null,
+    "n_output_tokens": null
+  },
+  "config": {
+    "agent": {
+      "model_name": null,
+      "name": "evidence_harness.replay_agent:JournalReplayAgent",
+      "options": {
+        "continue_on_recorded_failure": true
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "code-from-image"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T21:08:11.075282Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "651da16d57638f417d4d83dc19f24fa5643a18712344460641a38726f0b37a29",
+    "source_result_sha256": "b81c7fb2f0a513d7d349adbd31d94efc92e401269bb16b66fc717fab7d9d7c05"
+  },
+  "started_at": "2026-09-26T21:02:36.397705Z",
+  "task": {
+    "checksum": "179258dd4d90a45c225beff94152358b15906668f95bde3330a7d3c755dcf387",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "code-from-image",
+  "trial_name": "code-from-image__wSgKH27",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

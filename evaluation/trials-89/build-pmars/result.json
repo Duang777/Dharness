@@ -1,0 +1,54 @@
+{
+  "agent_result": {
+    "cost_usd": null,
+    "metadata": {
+      "evidence_harness": {},
+      "evidence_harness_replay": {
+        "command_count": 40,
+        "completed": true,
+        "recorded_failure_count": 15,
+        "replay_mode": "recorded_receipts_v1",
+        "source_sha256": "78ae8b9ca73d40a871d186fa41a7f4617d3fa0738abece469bf43a26d62ae03a"
+      }
+    },
+    "n_cache_tokens": null,
+    "n_input_tokens": null,
+    "n_output_tokens": null
+  },
+  "config": {
+    "agent": {
+      "model_name": null,
+      "name": "evidence_harness.replay_agent:JournalReplayAgent",
+      "options": {
+        "continue_on_recorded_failure": true
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "build-pmars"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T20:47:46.874554Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "4f78f6f788126af499e55f110b93e850e07b5280b7870cfb84b36d458c816ca3",
+    "source_result_sha256": "b6436407523df47349f90b79fc723261152aced51ec9aa3c5d8511e07a96b594"
+  },
+  "started_at": "2026-09-26T20:45:28.225369Z",
+  "task": {
+    "checksum": "55f554b8d07c2ec69aa88e385675925e684eb09c256610e0abca10375efc3876",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "build-pmars",
+  "trial_name": "build-pmars__8uHmjBT",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 24,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 16,
+        "work_epoch": 13
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 143921,
+    "n_output_tokens": 21436
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_environment_calls": 80,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "hf-model-inference"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T20:59:19.997610Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "0fd70571a5f91bd97eeca4e9eaaee6ba90ef9d5e53ac0e281bd5c7b6ddf3eacf",
+    "source_result_sha256": "1810edfc3b0393006c8c59f3f1535b1e148433b1b2c5b8ad6ab40df15bafdf38"
+  },
+  "started_at": "2026-09-26T20:48:01.651135Z",
+  "task": {
+    "checksum": "b96307ee0e1a454b667fb19da4b08116252525a2897250a9d7f8825fa0b86088",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "hf-model-inference",
+  "trial_name": "hf-model-inference__EPsadQE",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

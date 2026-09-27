@@ -67,8 +67,8 @@ def test_build_task_command_is_serial_and_scopes_https_mount() -> None:
         env_file=Path("/tmp/test.env"),
         matrix=Path("/tmp/matrix.json"),
         run_root=Path("/tmp/jobs/full"),
-        job_name="001-fix-git",
-        task_name="fix-git",
+        job_name="008-cancel-async-tasks",
+        task_name="cancel-async-tasks",
         agent_kwargs=["api_base=https://example.test/v1"],
     )
 
@@ -87,6 +87,32 @@ def test_build_task_command_is_serial_and_scopes_https_mount() -> None:
         agent_kwargs=[],
     )
     assert "--debian-https-sources" not in other_command
+    assert "--debian-trixie-https-sources" not in other_command
+
+    trixie_command = run_full_evaluation.build_task_command(
+        model="openai/test-model",
+        env_file=Path("/tmp/test.env"),
+        matrix=Path("/tmp/matrix.json"),
+        run_root=Path("/tmp/jobs/full"),
+        job_name="005-build-pmars",
+        task_name="build-pmars",
+        agent_kwargs=[],
+    )
+    assert "--debian-trixie-https-sources" in trixie_command
+    assert "--debian-https-sources" not in trixie_command
+
+    bullseye_command = run_full_evaluation.build_task_command(
+        model="openai/test-model",
+        env_file=Path("/tmp/test.env"),
+        matrix=Path("/tmp/matrix.json"),
+        run_root=Path("/tmp/jobs/full"),
+        job_name="069-qemu-startup",
+        task_name="qemu-startup",
+        agent_kwargs=[],
+    )
+    assert "--debian-bullseye-main-sources" in bullseye_command
+    assert "--debian-https-sources" not in bullseye_command
+    assert "--debian-trixie-https-sources" not in bullseye_command
 
 
 def test_completed_task_results_reads_trials_and_ignores_job_summary(tmp_path: Path) -> None:
@@ -138,6 +164,7 @@ def test_full_run_resumes_from_real_result_and_runs_remaining_task(
         jobs_dir=jobs_dir,
         run_name="full-run",
         agent_kwarg=[],
+        start_at=None,
         dry_run=False,
     )
 
@@ -168,6 +195,52 @@ def test_full_run_resumes_from_real_result_and_runs_remaining_task(
     assert events[-4]["reward"] == 0.0
 
 
+def test_full_run_can_start_at_a_named_task(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    matrix = tmp_path / "matrix.json"
+    env_file = tmp_path / "provider.env"
+    jobs_dir = tmp_path / "jobs"
+    run_root = jobs_dir / "full-run"
+    _write_matrix(matrix, ["task-a", "task-b", "task-c"])
+    env_file.write_text("OPENAI_API_KEY=secret\n", encoding="utf-8")
+    calls: list[str] = []
+
+    def fake_run(
+        _command: list[str],
+        child_run_root: Path,
+        task_name: str,
+        job_name: str,
+    ) -> int:
+        calls.append(task_name)
+        _write_trial_result(child_run_root / job_name, task_name)
+        return 0
+
+    monkeypatch.setattr(run_full_evaluation, "_run_child", fake_run)
+    args = argparse.Namespace(
+        model="openai/test-model",
+        env_file=env_file,
+        matrix=matrix,
+        jobs_dir=jobs_dir,
+        run_name="full-run",
+        agent_kwarg=[],
+        start_at="task-b",
+        dry_run=False,
+    )
+
+    assert run_full_evaluation.run_full_evaluation(args) == 0
+    assert calls == ["task-b", "task-c"]
+    events = [
+        json.loads(line)
+        for line in (run_root / "progress.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert events[0]["start_at"] == "task-b"
+    assert events[0]["start_index"] == 2
+    assert events[-1]["completed"] == 2
+    assert events[-1]["skipped_before_start"] == 1
+
+
 def test_full_run_rejects_configuration_drift(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -195,6 +268,7 @@ def test_full_run_rejects_configuration_drift(
         jobs_dir=jobs_dir,
         run_name="full-run",
         agent_kwarg=[],
+        start_at=None,
         dry_run=False,
     )
     assert run_full_evaluation.run_full_evaluation(args) == 0
@@ -225,6 +299,7 @@ def test_full_run_rechecks_configuration_before_each_task(
         jobs_dir=jobs_dir,
         run_name="full-run",
         agent_kwarg=[],
+        start_at=None,
         dry_run=False,
     )
     initial_config = run_full_evaluation.run_configuration(args)
@@ -276,6 +351,7 @@ def test_full_run_records_child_launch_failure(
         jobs_dir=jobs_dir,
         run_name="full-run",
         agent_kwarg=[],
+        start_at=None,
         dry_run=False,
     )
 

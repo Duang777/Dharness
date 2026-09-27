@@ -2,32 +2,30 @@
 
 ## 结论
 
-截至 2026-09-25，扩展矩阵 20/20 题均已运行。18 题获得 Harbor reward 1.0，
-`vulnerable-secret` 因模型供应商策略拒绝获得 reward 0，`qemu-startup` 因
-`AgentTimeoutError` 记为 `error`。
+截至 2026-09-27，固定矩阵中的 89 题全部执行并评分。最终结果为 59 passed、
+30 failed、0 error，通过率 66.3%，执行覆盖率和评分覆盖率均为 100%。
 
-- 数据集：`terminal-bench@2.0`，官方 registry 显示 89 题
-- 扩展样本：20 题，4 easy + 10 medium + 6 hard
-- Harbor dry-run：通过，解析为 20 trials
-- 实时运行：19 题，17 题通过、1 题失败、1 题错误
-- 日志回放：1 题，1 题通过
-- 已尝试任务通过率：90%
-- 已评分任务通过率：94.7%
-- 执行覆盖率：100%
-- 评分覆盖率：95%
-- 普通 verifier 失败数：1
-- 基础设施错误数：1
+- 数据集：`terminal-bench@2.0`，官方固定矩阵 89 题
+- 难度：4 easy、55 medium、30 hard
+- 实时运行：85 题，57 passed、28 failed
+- 日志回放：4 题，2 passed、2 failed
+- 已尝试任务通过率：66.3%
+- 已评分任务通过率：66.3%
+- Canonical error：0
 - 未运行：0
-- 当前阻塞：`qemu-startup` 需要兼容的 x86_64 runner；`vulnerable-secret` 需要允许该
-  授权安全评测的模型通道
 
-`qemu-startup` 已执行并返回 reward 0，但同一 trial 带有 `AgentTimeoutError`。汇总器
-按 `error` 处理，因此它进入 attempted pass rate，不进入 scored pass rate。矩阵包含
-一个 replay，逐题结果保留 `execution_mode`，不会把 replay 写成新的模型调用。
-`vulnerable-secret` 没有 Harbor 异常，reward 0，因此记为普通 `failed`。
+首轮 canonical 为 46 passed、23 failed、20 error。20 个 error 来自 Docker 拉取 EOF、
+镜像启动超时、verifier 超时和同类基础设施问题。按故障域恢复并复核后，最终 canonical
+相较首轮增加 13 个 passed、7 个可评分 failed，并清除全部 20 个 error。最终清单没有
+把无评分异常伪装成模型失败。
 
 当前汇总文件：
 
+- 全量矩阵与汇总：[matrix-89.json](../evaluation/matrix-89.json)、
+  [results-89.json](../evaluation/results-89.json)、
+  [results-89.md](../evaluation/results-89.md)
+- Canonical 选择清单：[canonical-89.json](../evaluation/canonical-89.json)
+- 89 个脱敏 Harbor trial：[evaluation/trials-89](../evaluation/trials-89)
 - 20 题矩阵与汇总：[matrix-20.json](../evaluation/matrix-20.json)、
   [results-20.json](../evaluation/results-20.json)、
   [results-20.md](../evaluation/results-20.md)
@@ -38,6 +36,70 @@
   [新增 10 题](expanded-ten-analysis.md)
 - 独立 `fix-git` replay：[replay-results.json](../evaluation/replay-results.json)、
   [replay-results.md](../evaluation/replay-results.md)
+
+## 全量结果
+
+### 按难度
+
+| 难度 | 任务数 | 通过 | 失败 | 通过率 |
+|---|---:|---:|---:|---:|
+| easy | 4 | 4 | 0 | 100.0% |
+| medium | 55 | 42 | 13 | 76.4% |
+| hard | 30 | 13 | 17 | 43.3% |
+
+hard 组占全部任务的 33.7%，却占失败的 56.7%。主要损失来自需要长时间编译、训练、
+逆向或数值逼近的任务。固定 40 turns 和 1800 秒墙钟在这些任务上更容易先耗尽。
+
+### 按类别
+
+| 类别 | 任务数 | 通过 | 失败 | 通过率 |
+|---|---:|---:|---:|---:|
+| data-processing | 4 | 4 | 0 | 100.0% |
+| data-querying | 1 | 1 | 0 | 100.0% |
+| data-science | 8 | 6 | 2 | 75.0% |
+| debugging | 5 | 5 | 0 | 100.0% |
+| file-operations | 5 | 3 | 2 | 60.0% |
+| games | 1 | 1 | 0 | 100.0% |
+| machine-learning | 3 | 2 | 1 | 66.7% |
+| mathematics | 4 | 2 | 2 | 50.0% |
+| model-training | 4 | 3 | 1 | 75.0% |
+| optimization | 1 | 1 | 0 | 100.0% |
+| personal-assistant | 1 | 1 | 0 | 100.0% |
+| scientific-computing | 8 | 4 | 4 | 50.0% |
+| security | 8 | 4 | 4 | 50.0% |
+| software-engineering | 26 | 14 | 12 | 53.8% |
+| system-administration | 9 | 8 | 1 | 88.9% |
+| video-processing | 1 | 0 | 1 | 0.0% |
+
+单题类别不适合比较能力。类别表的用途是定位失败集中区域。软件工程贡献了 12 个失败，
+安全任务中有 3 个因模型供应商 `cyber_policy` 中断。
+
+### 失败停止原因
+
+| 内部状态 | 失败数 | 含义 |
+|---|---:|---|
+| `verified` | 10 | 内部检查通过，但官方 verifier 找到产物缺陷 |
+| `budget_exhausted/harness_control` | 9 | 达到 turn 或墙钟边界时仍未完成 |
+| `model_failure/model_service` | 4 | 三次策略拒绝，一次墙钟余量耗尽 |
+| `model_stopped/model_blocked` | 3 | 模型判断所需运行时或依赖不可用 |
+| `model_stopped/model_impossible` | 1 | 缺少 MIPS 交叉工具链 |
+| `budget_exhausted/model_protocol` | 1 | completion 协议反复未收敛 |
+| replay | 2 | 重放已有命令后由 verifier 确认产物缺陷 |
+
+85 个 live trial 中，45 个 `verified` 与 reward 1.0 一致，10 个 `verified` 与 reward 0
+冲突。另有 12 个 reward 1.0 的 live trial 没有以 `verified` 结束。内部状态与外部评分
+共出现 22 次错位，因此报告只以 Harbor reward 计算成绩。
+
+### 资源
+
+85 个 live canonical trial 共使用 1,933 turns、2,359 次环境调用、28,565,991 个输入
+token 和 2,557,279 个输出 token。89 个 canonical trial 的累计运行时间为 72,092 秒，
+约 20 小时 2 分。成本字段由端点返回为 0，本报告不据此估算实际费用。
+
+## 20 题阶段性实验记录
+
+以下章节保留首批 20 题阶段性实验的设计、修复和对照数据。它们解释 Harness 如何演进，
+不代表全量最终成绩。
 
 ## 评测问题
 
@@ -277,19 +339,24 @@ completion reviewer 要求运行会产生文件的检查，而 policy 禁止 com
 任务状态，因此 Harness 没有进入 `verified`。这属于完成检查契约缺口，不影响已返回的
 Harbor reward。修复不能简单放开写操作，后续应在隔离工作区运行这类检查。
 
-## QEMU 环境错误
+## QEMU 阶段性错误与最终恢复
 
-`qemu-startup` 已真实运行。容器内存在 `qemu-system-x86_64`，但没有 `/dev/kvm`。
-QEMU 启动时立即返回：
+阶段性 `qemu-startup` trial 中，容器存在 `qemu-system-x86_64`，但没有 `/dev/kvm`。
+QEMU 启动时返回：
 
 ```text
 rosetta error: Unimplemented syscall number 282
 ```
 
-当前宿主是 Apple Silicon，amd64 容器由 Rosetta 执行，容器内再次启动 x86 QEMU。该
-嵌套模拟缺少 QEMU 所需的系统调用。启动失败后，下一次 GLM 请求又停滞，最终触发 Harbor
-的 `AgentTimeoutError`。汇总器因此把 trial 记为 `error`，不是 `failed`。更换模型不能
-补齐该运行时能力；需要原生 x86_64 Linux 或支持所需系统调用与嵌套虚拟化的 runner。
+当前宿主是 Apple Silicon，amd64 容器由 Rosetta 执行，容器内再次启动 x86 QEMU。该次
+启动失败后，下一次 GLM 请求又停滞，最终触发 Harbor 的 `AgentTimeoutError`。阶段性
+20 题汇总因此把 trial 记为 `error`，不是 `failed`。
+
+全量恢复阶段为两道 QEMU 题挂载了任务级 Bullseye main 软件源，并使用 Terra 重新运行。
+`qemu-startup` 在 36 turns、35 次环境调用后进入 `verified`；`qemu-alpine-ssh` 在
+40 turns、45 次环境调用后耗尽 Harness 预算，但产物已完成。两题的官方 verifier 均
+以 1/1 通过，canonical reward 都是 1.0。另一次遗漏 `api_base` 的试跑在 turn 0
+发生 `model_failure`，属于配置错误，未进入 canonical。
 
 ## Harness 修正
 
@@ -314,8 +381,8 @@ rosetta error: Unimplemented syscall number 282
 裁决权。
 
 第二，恢复策略必须按故障域选择。协议空响应可以进入 schema repair，单次请求停滞可以
-由模型调用超时截断，Docker 拉取 EOF 可以重试，QEMU 能力缺失则必须更换 runner。
-不区分故障域的统一重试只会增加 token 和墙钟时间。
+由模型调用超时截断，Docker 拉取 EOF 可以重试，QEMU verifier 的软件源问题需要
+任务级挂载并重新评分。不区分故障域的统一重试只会增加 token 和墙钟时间。
 
 第三，单写者结构值得保留。19 个 live trial 的 343 次环境调用都由
 `CommandRunner` 串行执行。reviewer 只读取证据覆盖关系，没有与 executor 竞争环境
@@ -327,14 +394,19 @@ rosetta error: Unimplemented syscall number 282
 
 ## 有效性边界
 
-- 样本量只有 20，且选样强调类别和难度覆盖，不代表 Terminal-Bench 2.0 全部 89 题。
-- 结果混合两个模型通道和一次 replay，不能用于模型排名。
-- 恢复批次使用了首次失败后的诊断信息。最终 18/20 反映工程闭环结果，不是严格的一次性
-  pass@1。
-- 当前运行位于 Apple Silicon 和 OrbStack。QEMU 结论只适用于该运行环境。
-- 部分 provider 成本字段为 0。token 可以复算，真实费用不能从当前快照推导。
-- 冻结快照只保留 allowlist 字段和源结果 SHA-256。它支持结果复算和来源核对，但不包含
-  完整任务输出或模型推理内容。
+- 最终结果包含恢复运行和 4 个 journal replay，因此是工程闭环成绩，不是严格 pass@1。
+- 85 个 live canonical trial 使用同一 Terra 模型和并发 1，但来自多次受控恢复运行；
+  期间修复过 Harness 的进程隔离、预算判断、completion review 上限和 replay 逻辑。
+  canonical 结果保留每题最终采用的来源，不能视为固定源码的一次性运行。
+- 当前运行位于 Apple Silicon 和 OrbStack。QEMU 任务的表现包含该运行环境的影响。
+- `qemu-alpine-ssh` 和 `qemu-startup` 的早期 verifier 受 Bullseye 包索引影响；修正
+  软件源后，两题的最终 verifier 均通过。遗漏 `api_base` 的试跑已明确排除。
+- provider 成本字段为 0。token 可以复算，实际费用不能从快照推导。
+- 冻结快照保留 allowlist 字段、任务 checksum、Terminal-Bench commit、非敏感 Agent
+  参数，以及源结果和源配置 SHA-256。它不包含完整任务输出或模型推理内容。
+- `runs/` 不提交到 Git。包含原始运行目录的环境可复算 manifest 中的结果哈希；普通
+  克隆只能验证已提交快照、结果汇总和 canonical 清单的一致性，不能把源结果哈希当成
+  独立的远程证明。
 
 ## 可复现命令
 
@@ -387,6 +459,15 @@ uv run python scripts/summarize_results.py evaluation/trials-20 \
   --json-out evaluation/results-20.json \
   --markdown-out evaluation/results-20.md
 
+uv run python scripts/freeze_evaluation.py \
+  --manifest evaluation/canonical-89.json \
+  --matrix evaluation/matrix-89.json \
+  --output-dir evaluation/trials-89
+uv run python scripts/summarize_results.py evaluation/trials-89 \
+  --matrix evaluation/matrix-89.json \
+  --json-out evaluation/results-89.json \
+  --markdown-out evaluation/results-89.md
+
 uv run python scripts/verify_delivery.py
 ```
 
@@ -394,5 +475,5 @@ uv run python scripts/verify_delivery.py
 缺少 reward 记 `error`。找不到 trial 记 `not_run`。一个 job 里同一任务存在多个
 trial 时，汇总器拒绝生成结果。报告必须同时给出两种通过率、任务状态、execution
 coverage 和 scored coverage。冻结快照还记录模型名称、原始 `result.json` SHA-256
-和 replay journal SHA-256；API base、凭证、绝对路径、任务输出及 traceback 不进入
-快照。
+和 replay journal SHA-256；任务 checksum、Terminal-Bench commit、源配置 SHA-256
+及公开 API base 也进入快照。凭证、绝对路径、任务输出及 traceback 不进入快照。

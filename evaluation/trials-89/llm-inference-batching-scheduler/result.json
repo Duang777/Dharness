@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 17,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 14,
+        "work_epoch": 11
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 228062,
+    "n_output_tokens": 17412
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "llm-inference-batching-scheduler"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T22:00:08.173637Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "06f606541b30c159d177487614d268b774424c12e4e49a57149277ee034ef463",
+    "source_result_sha256": "31ad2bf9c7784fa16361332c2ef8454738417a78848313ef2c1a30b21443624a"
+  },
+  "started_at": "2026-09-25T21:56:21.420611Z",
+  "task": {
+    "checksum": "3a08e63e0643ea5914eedeecb08cb93a1f0a10b9dc7d19d1f570004af84531c8",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "llm-inference-batching-scheduler",
+  "trial_name": "llm-inference-batching-scheduler__6jozSQ6",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

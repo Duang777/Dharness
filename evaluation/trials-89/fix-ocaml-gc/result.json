@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 48,
+        "failure_category": "harness_control",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 40,
+        "work_epoch": 38
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 728578,
+    "n_output_tokens": 21057
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "fix-ocaml-gc"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T20:09:50.056184Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "389d48ce93a5226a29573902e9d2ba1b401423e92e15124b68b666649ebc1fc6",
+    "source_result_sha256": "93f4b9d44b80609b39fdb48fca4af9e1928efe4836be35e07ecf99b9ffb882f0"
+  },
+  "started_at": "2026-09-25T19:21:43.597315Z",
+  "task": {
+    "checksum": "faa983dd79f63daa168b41c753bddb0621822820ba6f16661a9767b815e436e8",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "fix-ocaml-gc",
+  "trial_name": "fix-ocaml-gc__29jmdAt",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

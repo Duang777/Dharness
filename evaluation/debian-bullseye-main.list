@@ -1,0 +1,2 @@
+deb https://deb.debian.org/debian bullseye main
+deb https://deb.debian.org/debian bullseye-updates main

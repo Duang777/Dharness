@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 45,
+        "failure_category": "harness_control",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "budget_exhausted",
+        "turns_used": 40,
+        "work_epoch": 37
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 505104,
+    "n_output_tokens": 37754
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "qemu-alpine-ssh"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-27T04:50:33.012837Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "6d8bff1946ef3fcdc08a683942537719bdd3181c33d688d8b1a52866b947e8d9",
+    "source_result_sha256": "1b2dfe11d1dab1026ff258364fc747bb91edbc9c29607e1ba9dabeef5bf5ac95"
+  },
+  "started_at": "2026-09-27T04:36:09.970583Z",
+  "task": {
+    "checksum": "a6cd0bf0752902f3e284a6a9672d801de83fb9d0cf769c95f09fed2fd213548c",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "qemu-alpine-ssh",
+  "trial_name": "qemu-alpine-ssh__tnXfj2b",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

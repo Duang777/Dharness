@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 42,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 37,
+        "work_epoch": 33
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 633610,
+    "n_output_tokens": 49991
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "install-windows-3.11"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T21:38:42.439952Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "8cac78f49245a9b42b60c27eea73ea4b96580b831dbba95998d9e73d4568d2df",
+    "source_result_sha256": "96a86b7e82e93d3819969f73829d6195aabc3cdadc30d025a05ea8ae2487eb0a"
+  },
+  "started_at": "2026-09-25T21:11:10.491207Z",
+  "task": {
+    "checksum": "917afbb6fd42db76b132a41359c8511be11faed2a8b74f17b802b4928f52313e",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "install-windows-3.11",
+  "trial_name": "install-windows-3.11__E6bjCEN",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

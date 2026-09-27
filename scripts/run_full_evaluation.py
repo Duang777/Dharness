@@ -18,7 +18,50 @@ from typing import Any, TextIO
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix-89.json"
 DEFAULT_JOBS_DIR = PROJECT_ROOT / "runs" / "terminal-bench-2"
-HTTPS_APT_TASKS = frozenset({"fix-git"})
+DEBIAN_BOOKWORM_HTTPS_TASKS = frozenset(
+    {
+        "break-filter-js-from-html",
+        "cancel-async-tasks",
+        "circuit-fibsqrt",
+        "cobol-modernization",
+        "code-from-image",
+        "count-dataset-tokens",
+        "distribution-search",
+        "feal-differential-cryptanalysis",
+        "feal-linear-cryptanalysis",
+        "filter-js-from-html",
+        "fix-git",
+        "gcode-to-text",
+        "headless-terminal",
+        "large-scale-text-editing",
+        "llm-inference-batching-scheduler",
+        "log-summary-date-ranges",
+        "make-doom-for-mips",
+        "make-mips-interpreter",
+        "model-extraction-relu-logits",
+        "modernize-scientific-stack",
+        "mteb-leaderboard",
+        "mteb-retrieve",
+        "nginx-request-logging",
+        "openssl-selfsigned-cert",
+        "portfolio-optimization",
+        "protein-assembly",
+        "pypi-server",
+        "pytorch-model-cli",
+        "pytorch-model-recovery",
+        "raman-fitting",
+        "regex-chess",
+        "sanitize-git-repo",
+        "schemelike-metacircular-eval",
+        "sqlite-db-truncate",
+        "train-fasttext",
+        "tune-mjcf",
+        "video-processing",
+        "vulnerable-secret",
+    }
+)
+DEBIAN_BULLSEYE_MAIN_TASKS = frozenset({"qemu-alpine-ssh", "qemu-startup"})
+DEBIAN_TRIXIE_HTTPS_TASKS = frozenset({"build-pmars"})
 RUN_CONFIG_NAME = "run-config.json"
 ACTIVE_CHILD_NAME = "active-child.json"
 SIGNAL_GRACE_SEC = 5.0
@@ -48,6 +91,10 @@ def parse_args() -> argparse.Namespace:
         action="append",
         default=[],
         metavar="KEY=VALUE",
+    )
+    parser.add_argument(
+        "--start-at",
+        help="Start at this matrix task and skip earlier tasks in a new run.",
     )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
@@ -103,7 +150,10 @@ def run_configuration(args: argparse.Namespace) -> dict[str, object]:
         "env_file_sha256": _sha256_file(args.env_file),
         "agent_kwargs_sha256": hashlib.sha256(agent_kwargs.encode()).hexdigest(),
         "source_sha256": _source_sha256(),
-        "https_apt_tasks": sorted(HTTPS_APT_TASKS),
+        "start_at": args.start_at,
+        "debian_bookworm_https_tasks": sorted(DEBIAN_BOOKWORM_HTTPS_TASKS),
+        "debian_bullseye_main_tasks": sorted(DEBIAN_BULLSEYE_MAIN_TASKS),
+        "debian_trixie_https_tasks": sorted(DEBIAN_TRIXIE_HTTPS_TASKS),
     }
 
 
@@ -170,8 +220,12 @@ def build_task_command(
         "--include-task-name",
         task_name,
     ]
-    if task_name in HTTPS_APT_TASKS:
+    if task_name in DEBIAN_BOOKWORM_HTTPS_TASKS:
         command.append("--debian-https-sources")
+    elif task_name in DEBIAN_BULLSEYE_MAIN_TASKS:
+        command.append("--debian-bullseye-main-sources")
+    elif task_name in DEBIAN_TRIXIE_HTTPS_TASKS:
+        command.append("--debian-trixie-https-sources")
     for value in agent_kwargs:
         command.extend(("--agent-kwarg", value))
     return command
@@ -186,10 +240,14 @@ def run_full_evaluation(args: argparse.Namespace) -> int:
         raise ValueError("--run-name must be a single path component")
 
     task_names = load_task_names(args.matrix)
+    if args.start_at is not None and args.start_at not in task_names:
+        raise ValueError(f"--start-at task is not in the matrix: {args.start_at}")
     current_config = run_configuration(args)
     if args.dry_run:
+        start_index = task_names.index(args.start_at) + 1 if args.start_at else 1
         print(
-            f"Dry run OK - {len(task_names)} serial task(s); "
+            f"Dry run OK - {len(task_names) - start_index + 1} serial task(s) "
+            f"starting at {start_index}/{len(task_names)}; "
             f"configuration {current_config['matrix_sha256']}"
         )
         return 0
@@ -217,14 +275,19 @@ def _run_tasks(
     progress_path = run_root / "progress.jsonl"
     pid_path.write_text(f"{os.getpid()}\n", encoding="ascii")
     completed = completed_task_results(run_root)
+    start_index = task_names.index(args.start_at) + 1 if args.start_at else 1
     _append_event(
         progress_path,
         "run_started",
         completed=len(completed),
+        start_at=args.start_at,
+        start_index=start_index,
         total=len(task_names),
     )
 
     for index, task_name in enumerate(task_names, start=1):
+        if index < start_index:
+            continue
         current_config = run_configuration(args)
         if current_config != bound_config:
             raise ValueError("run configuration changed after the orchestrator started")
@@ -304,7 +367,14 @@ def _run_tasks(
         )
         print(f"[{index}/{len(task_names)}] completed {task_name}", flush=True)
 
-    _append_event(progress_path, "run_completed", completed=len(task_names), total=len(task_names))
+    completed = completed_task_results(run_root)
+    _append_event(
+        progress_path,
+        "run_completed",
+        completed=len(completed),
+        skipped_before_start=start_index - 1,
+        total=len(task_names),
+    )
     return 0
 
 
@@ -413,6 +483,8 @@ def _source_sha256() -> str:
         PROJECT_ROOT / "pyproject.toml",
         PROJECT_ROOT / "uv.lock",
         PROJECT_ROOT / "evaluation" / "debian-https.sources",
+        PROJECT_ROOT / "evaluation" / "debian-bullseye-main.list",
+        PROJECT_ROOT / "evaluation" / "debian-trixie-https.sources",
         PROJECT_ROOT / "scripts" / "run_evaluation.py",
         PROJECT_ROOT / "scripts" / "run_full_evaluation.py",
         *sorted((PROJECT_ROOT / "src" / "evidence_harness").rglob("*.py")),

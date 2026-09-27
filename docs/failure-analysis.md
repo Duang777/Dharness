@@ -1,8 +1,63 @@
 # 失败分析
 
-扩展矩阵 20/20 题均已运行。18 题获得 reward 1.0，`vulnerable-secret` 因模型供应商
-策略拒绝记为 `failed`，`qemu-startup` 因运行环境异常记为 `error`。以下问题来自评测
-预检、真实运行和恢复批次，并分别归因到模型通道、Harness 或评测基础设施。
+Terminal-Bench 2.0 全量 canonical 结果为 59 passed、30 failed、0 error。全部 89 题
+都有正常 Harbor reward。下表按最终采用的 trial 记录 30 个 reward 0，不把内部
+`verified`、模型自述或恢复意图当作通过证据。
+
+## 全量 30 个失败
+
+| 任务 | 内部停止 | 官方失败证据 | 根因 |
+|---|---|---|---|
+| `break-filter-js-from-html` | `model_failure` | 浏览器没有触发 alert | 4 turns 后触发供应商 `cyber_policy`，绕过产物未完成 |
+| `build-pov-ray` | `budget_exhausted` | 2/3 通过，缺少 `file_id.diz` | 只保留了可构建源码，未保留 verifier 要求的完整官方源码树 |
+| `caffe-cifar-10` | `model_failure` | 2/6 通过，无 500 次训练模型 | 数据获取和训练耗尽墙钟，solver 仍为 GPU，下一次模型调用只剩 0.001 秒 |
+| `code-from-image` | replay | 输出只有 `bee26a` | OCR 只恢复了目标字符串前缀，重放 45 条命令后仍缺少其余字符 |
+| `dna-assembly` | `verified` | 两条引物 Tm 相差 7.32°C | 内部检查没有复现 verifier 的完整引物 Tm 计算 |
+| `dna-insert` | `model_stopped` | 两条引物 Tm 相差 9.93°C | 模型因找不到本地 `oligotm` 停止，保留了未验证的引物 |
+| `extract-moves-from-video` | `budget_exhausted` | `solution.txt` 不存在 | 视频棋局识别未形成最终交付文件 |
+| `feal-linear-cryptanalysis` | `model_failure` | `plaintexts.txt` 不存在 | 6 turns 后触发供应商 `cyber_policy` |
+| `filter-js-from-html` | `verified` | XSS 漏过且干净 HTML 被改写 | 过滤规则同时存在漏报和破坏性改写，内部样例覆盖不足 |
+| `gcode-to-text` | `budget_exhausted` | 输出 `JUST-PRINTING`，不是 flag | 40 turns 后仍未解出 G-code 隐藏文本 |
+| `gpt2-codegolf` | `budget_exhausted` | 程序输出包含非法 UTF-8 | 小于 5 KB 的实现能运行，但 token 解码输出不符合接口 |
+| `install-windows-3.11` | `verified` | QEMU monitor socket 不存在 | 内部检查没有覆盖 verifier 的键盘与屏幕交互路径 |
+| `make-doom-for-mips` | `model_stopped` | 3/3 失败，无 `frame.bmp` | 缺少本地 MIPS 交叉工具链，模型删除了不可信的手写 ELF 后停止 |
+| `make-mips-interpreter` | `budget_exhausted` | 缺少预期初始化文本，找不到 `tnt.wad` | VM 能启动但没有正确装载要求的 DOOM 数据与执行路径 |
+| `model-extraction-relu-logits` | `budget_exhausted` | 权重矩阵第 15、26 行不匹配 | 恢复算法接近正确，但 completion 协议耗尽后仍留下两行误差 |
+| `path-tracing` | `budget_exhausted` | 图像相似度 0.97163，要求 0.99 | 逆向实现的场景或采样参数不够精确 |
+| `path-tracing-reverse` | `budget_exhausted` | 图像相似度 0.994823，要求 0.995 | 结果接近阈值，但低位数值或随机序列仍不一致 |
+| `polyglot-c-py` | `model_stopped` | 目录含 `cmain` 和 receipt | 产物功能未进入最终断言，额外构建文件先违反单文件契约 |
+| `polyglot-rust-c` | `verified` | 目录含 4 个额外构建文件 | 内部检查验证编译运行，却漏掉目录只能有 `main.rs` 的要求 |
+| `protein-assembly` | `verified` | donor 序列未找到，蛋白顺序失败 | 生成的 gBlock 没有编码完整的指定融合蛋白 |
+| `query-optimize` | `verified` | 1.066 秒对 0.738 秒，超过 1.05 倍上限 | 正确性通过，但最终查询比参考慢约 44.6% |
+| `raman-fitting` | `verified` | G 与 2D 峰参数大幅偏离 | 拟合使用了错误尺度或峰选择，内部检查没有使用目标参数 |
+| `regex-chess` | `budget_exhausted` | 1/4 通过，三个棋局 FEN 不匹配 | 输出省略或错误维护 castling、en-passant 等 FEN 状态字段 |
+| `sam-cell-seg` | `model_stopped` | 1/9 通过，转换命令退出 2 | 模型认为依赖和权重不可用后停止，最终脚本不能生成 CSV |
+| `sanitize-git-repo` | `verified` | secret 仍在、替换错误、改了额外文件 | 内部检查没有扫描完整目标集合，也没有约束修改范围 |
+| `schemelike-metacircular-eval` | `verified` | 58/63 通过 | 简单 I/O、闭包和计算器等 5 个解释器用例仍失败 |
+| `torch-pipeline-parallelism` | replay | world size 2 反向传播最大差 0.01778 | AFAB pipeline 的跨 rank 梯度时序或累积不一致 |
+| `train-fasttext` | `budget_exhausted` | `model.bin` 不存在 | 训练未在 1800 秒内产出模型 |
+| `video-processing` | `verified` | 起跳或落地帧偏 1 帧 | 边界检测规则与 verifier 的闭区间定义不一致 |
+| `vulnerable-secret` | `model_failure` | 3/3 失败，`results.txt` 不存在 | 2 turns 后触发供应商 `cyber_policy` |
+
+### 归因汇总
+
+| 失败边界 | 数量 | 说明 |
+|---|---:|---|
+| 内部 `verified` 假阳性 | 10 | Harness 接受的检查没有覆盖官方消费者语义 |
+| 预算耗尽 | 10 | 9 个 `harness_control`，1 个 `model_protocol` |
+| 模型服务失败 | 4 | 三次 `cyber_policy`，一次墙钟余量耗尽 |
+| 模型主动停止 | 4 | 三个 `model_blocked`，一个 `model_impossible` |
+| Replay 后确认产物缺陷 | 2 | replay 只恢复评分，不改变原解法 |
+
+这 30 个结果不是同一种“模型没做出来”。最直接的 Harness 缺口是 10 个假阳性：
+completion reviewer 接受了局部或自写检查，而官方 verifier 仍找到内容、性能、文件布局
+或端到端行为错误。预算耗尽的 10 题则需要更早选择决定性验证和更少的重复探索。模型服务
+与依赖缺失应继续单独报告，不能通过增加 prompt 文字解决。
+
+## 20 题阶段性问题记录
+
+以下案例记录评测过程中的 Harness 和基础设施修正。它们解释最终全量运行的配置来源，
+不替代上面的 89 题终态。
 
 每道题的任务目标、执行方法、内部停止状态和设计启示见
 [前 10 题逐题分析](ten-task-analysis.md)。
@@ -224,30 +279,35 @@ check 不得修改任务状态。reviewer 的证据要求与 policy 的只读限
 改变待评分状态。后续需要为 completion check 提供隔离的临时工作区或环境快照，使验证
 产生的文件无法回写任务目录。
 
-## 9. QEMU 在 Rosetta 中无法启动
+## 9. QEMU 阶段性失败与最终恢复
 
 **现象**
 
-`qemu-startup` 的容器可以找到 `qemu-system-x86_64`，但没有 `/dev/kvm`。Agent 提取并
-检查 Alpine 内核和 initramfs 后启动 QEMU，进程立即退出：
+阶段性 `qemu-startup` trial 的容器可以找到 `qemu-system-x86_64`，但没有
+`/dev/kvm`。Agent 提取并检查 Alpine 内核和 initramfs 后启动 QEMU，进程立即退出：
 
 ```text
 rosetta error: Unimplemented syscall number 282
 ```
 
-随后一次模型请求停滞，Harbor 最终记录 `AgentTimeoutError`。verifier 返回 reward 0，
-但汇总器因 trial 同时带异常而将其记为 `error`，不记为普通评分失败。
+随后一次模型请求停滞，Harbor 最终记录 `AgentTimeoutError`。该 trial 属于阶段性
+20 题记录，汇总器因其带异常而将它记为 `error`，不记为普通评分失败。
 
 **根因**
 
-宿主是 Apple Silicon。amd64 任务容器通过 Rosetta 运行，容器内又启动 x86 QEMU，形成
-嵌套模拟。Rosetta 不支持 QEMU 启动所需的 syscall 282，且容器没有 KVM 可回退。模型
-选择或 Harness prompt 无法补齐这个运行时能力。
+宿主是 Apple Silicon。amd64 任务容器通过 Rosetta 运行，容器内又启动 x86 QEMU。该次
+尝试命中了 Rosetta 不支持的 syscall 282，且容器没有 KVM 可回退。这个证据只能解释该
+次失败，不能证明任务在当前宿主上必然无法完成。
 
-**处理**
+**修正与验证**
 
-该题需要在原生 x86_64 Linux runner，或支持所需系统调用和嵌套虚拟化的环境中重跑。
-新的单次模型超时能避免环境错误后的模型停滞耗尽整个 trial，但不能修复 QEMU 启动条件。
+全量恢复阶段为 `qemu-startup` 和 `qemu-alpine-ssh` 使用任务级 Bullseye main 软件源
+重新评分。前者在 36 turns、35 次环境调用后进入 `verified`，后者在 40 turns、45 次
+环境调用后达到预算边界；两题的官方 verifier 都以 1/1 通过，最终 reward 均为 1.0。
+
+第一次全量 QEMU 重跑遗漏了 `api_base`，两题均在 turn 0 以 `model_failure` 结束。该次
+运行是无效配置探测，未进入 canonical。最终清单只选择配置完整的
+`full89-terra-qemu-rescore2-20260927` 结果。
 
 ## 10. 查询正确但性能不达标
 
@@ -323,10 +383,20 @@ executor 和 reviewer 现在要求从已保存字节读取生成产物，并使�
 仅有两个终端 BsaI 位点、三个线性模板不环绕，以及最终环形拼接序列。Harness 在
 22 turns、25 次环境调用后进入 `verified`，官方 verifier 通过。
 
-## 14. 最终状态
+## 14. 阶段性 20 题状态
 
 - 20/20 题已尝试，execution coverage 为 100%。
 - 18 题获得 reward 1.0，`vulnerable-secret` 是唯一普通 `failed`。
 - `qemu-startup` 是唯一 `error`，attempted pass rate 为 90%。
 - 19 个可评分 trial 中 18 个通过，scored pass rate 为 94.7%，scored coverage 为 95%。
 - 18 个通过结果中有 17 个 live trial 和 1 个 replay trial。
+
+## 15. 全量 89 题状态
+
+- 89/89 题已执行并评分，execution coverage 和 scored coverage 均为 100%。
+- 59 题获得 reward 1.0，30 题获得 reward 0，通过率为 66.3%。
+- Canonical `error` 为 0，`evaluation/matrix-89-errors.json` 不含待重试任务。
+- 85 个 live trial 得到 57 passed 和 28 failed。
+- 4 个 replay trial 得到 2 passed 和 2 failed，均保留源 journal SHA-256。
+- `evaluation/canonical-89.json` 固定每题采用的原始结果，`evaluation/trials-89/` 保存
+  对应的脱敏快照。

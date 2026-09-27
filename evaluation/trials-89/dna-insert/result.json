@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 13,
+        "failure_category": "model_blocked",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 1,
+        "stop_reason": "model_stopped",
+        "turns_used": 13,
+        "work_epoch": 9
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 145967,
+    "n_output_tokens": 14402
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "dna-insert"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T18:15:03.101460Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "abc9a1a98fca9fc79ff9c1cf1d40d46c3fa6c727722f370bda6e843609a2fb8f",
+    "source_result_sha256": "b0f0f834b62e3d5d35dc1c496f37ddabd54b5fa30aa759f5b6f66da25d11a6ae"
+  },
+  "started_at": "2026-09-25T18:10:22.645175Z",
+  "task": {
+    "checksum": "162cd54836ca70b3a4c62f7fab0e369007f76488213865efdf563b20dceebb15",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "dna-insert",
+  "trial_name": "dna-insert__3VkvSEd",
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.0
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 14,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "verified",
+        "turns_used": 11,
+        "work_epoch": 8
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 93506,
+    "n_output_tokens": 18853
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "headless-terminal"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-25T21:00:37.776651Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "cd2ebcbf4692c1823f6ca9778240e63c5eec7eb1147b72d28576d67e350517d5",
+    "source_result_sha256": "8f64b26ef111dcf29cbca6223b7b91fcd9398f5dbdbc87c82318cb03663ef810"
+  },
+  "started_at": "2026-09-25T20:56:25.695625Z",
+  "task": {
+    "checksum": "0f08b1ccc560ac08b8420b4a493a3b4c5354e2ace9f0cbe63a44e861e46c780d",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "headless-terminal",
+  "trial_name": "headless-terminal__anpMB6B",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

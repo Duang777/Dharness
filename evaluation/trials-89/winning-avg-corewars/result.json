@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 32,
+        "failure_category": "model_blocked",
+        "latest_evidence_accepted": false,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 2,
+        "stop_reason": "model_stopped",
+        "turns_used": 29,
+        "work_epoch": 26
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 362790,
+    "n_output_tokens": 17782
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "winning-avg-corewars"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T12:15:17.526425Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "5a6dcbead1458620f32fb6dd07eb7a333594c950630f01b56e915de0dc74bda2",
+    "source_result_sha256": "e41f90686ca9d5e296a1d7d7a23dc41c306b9c49b404c2c42378ecc9444a52cf"
+  },
+  "started_at": "2026-09-26T11:33:12.926709Z",
+  "task": {
+    "checksum": "693d17797b3d2920f9f0316b3f758aee6b228e816c78bab22b75eae684853f13",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "winning-avg-corewars",
+  "trial_name": "winning-avg-corewars__xbNVnj4",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "agent_result": {
+    "cost_usd": 0.0,
+    "metadata": {
+      "evidence_harness": {
+        "environment_calls_used": 46,
+        "failure_category": null,
+        "latest_evidence_accepted": true,
+        "phase": "terminated",
+        "recoveries_used": 0,
+        "repairs_used": 3,
+        "stop_reason": "verified",
+        "turns_used": 36,
+        "work_epoch": 32
+      }
+    },
+    "n_cache_tokens": 0,
+    "n_input_tokens": 541454,
+    "n_output_tokens": 36583
+  },
+  "config": {
+    "agent": {
+      "model_name": "openai/modelhub/gpt-5.6-terra",
+      "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
+      "options": {
+        "api_base": "https://xpa-relay.bytedance.net/v1",
+        "max_completion_reviews": 2,
+        "max_environment_calls": 80,
+        "max_model_call_timeout_sec": 360,
+        "max_output_tokens": 8192,
+        "max_turns": 40,
+        "max_wall_time_sec": 1800,
+        "verification_environment_reserve": 3
+      }
+    },
+    "environment": {
+      "type": "docker"
+    },
+    "task": {
+      "name": "rstan-to-pystan"
+    }
+  },
+  "exception_info": null,
+  "finished_at": "2026-09-26T07:51:32.967044Z",
+  "snapshot": {
+    "schema_version": 2,
+    "source_config_sha256": "4e1253e5fd904b0bbf778622ab545af998e2752fa9fa4864b2afcd601fedc05a",
+    "source_result_sha256": "f2e9ebff50ed0d94fcbdddfae8dffee6476b52d893a063363fcc27b7582e0fa4"
+  },
+  "started_at": "2026-09-26T07:28:16.819895Z",
+  "task": {
+    "checksum": "1404a5a663c5ad348382a3374bf1ac11e28c2d10de5af6630ddd5ab69ff8f2e3",
+    "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
+    "source": "terminal-bench"
+  },
+  "task_name": "rstan-to-pystan",
+  "trial_name": "rstan-to-pystan__jV9o8oM",
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0
+    }
+  }
+}
