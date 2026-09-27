@@ -1,0 +1,429 @@
+{
+  "claim_boundary": "historical_evidence_only_no_benchmark_score_projection",
+  "corpus_sha256": "7a9ba0da1cde18f3103bd6f49573bed20fe5e367374a568e6c1db2c462e7c54a",
+  "coverage": {
+    "counterfactual_isolation_cases": 3,
+    "distinct_cases": 11,
+    "known_disagreement_cases": 22,
+    "proven_control_path_cases": 8
+  },
+  "isolation_experiment_candidates": [
+    {
+      "attempt_ordinal": 1,
+      "attribution": "same_artifact",
+      "case_id": "fd77206e60930b6f3d8829a21892810a4ad4f8aaeda3bfd662466788309bdb36",
+      "check_ids": [
+        "solution-exact-bytes",
+        "archive-plaintext-contains-solution"
+      ],
+      "later_change_receipts": [],
+      "rejection_reasons": [
+        "verification check shell syntax cannot be inspected"
+      ],
+      "required_experiment": "execute checks in a disposable writable workspace, verify the live workspace digest is unchanged, then run receipt-first review",
+      "task_name": "crack-7z-hash"
+    },
+    {
+      "attempt_ordinal": 1,
+      "attribution": "same_artifact",
+      "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
+      "check_ids": [
+        "pool-sweep-stride-invariant",
+        "basic-testsuite-clean-result"
+      ],
+      "later_change_receipts": [],
+      "rejection_reasons": [
+        "verification check 'pool-sweep-stride-invariant' appears to modify task state"
+      ],
+      "required_experiment": "execute checks in a disposable writable workspace, verify the live workspace digest is unchanged, then run receipt-first review",
+      "task_name": "fix-ocaml-gc"
+    },
+    {
+      "attempt_ordinal": 1,
+      "attribution": "same_artifact",
+      "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
+      "check_ids": [
+        "compressed-size",
+        "decode-byte-exact"
+      ],
+      "later_change_receipts": [],
+      "rejection_reasons": [
+        "verification check 'decode-byte-exact' appears to modify task state"
+      ],
+      "required_experiment": "execute checks in a disposable writable workspace, verify the live workspace digest is unchanged, then run receipt-first review",
+      "task_name": "write-compressor"
+    }
+  ],
+  "limitations": [
+    "The corpus contains only disagreements, so it cannot measure overall accuracy or collateral changes on agreement cases.",
+    "Legacy completion reviews ran before check receipts and are not evidence that the current receipt-first reviewer would accept.",
+    "Isolation candidates identify blocked checks only. They do not predict check success, semantic-review acceptance, or external reward.",
+    "Journal hashes bind the bytes present now; canonical collection did not attest to those journals originally."
+  ],
+  "observed": {
+    "cases": 22,
+    "false_negative": 12,
+    "false_positive": 10
+  },
+  "policies": [
+    {
+      "cases": [
+        {
+          "case_id": "4fd8382401c7fdeff210a4bd55059c0b1673cd4043fa1fddc16db2859aa3622c",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "build-cython-ext"
+        },
+        {
+          "case_id": "a5f1ef506461df508a33e29a03e36225ecadaeabc2509f9ae158fcb77d192d9d",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "circuit-fibsqrt"
+        },
+        {
+          "case_id": "fd77206e60930b6f3d8829a21892810a4ad4f8aaeda3bfd662466788309bdb36",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "crack-7z-hash"
+        },
+        {
+          "case_id": "f643d6e41c8b3bdc2a82d29d671b31a40eed9f77e099e7dc8ca9f55e476c6dbd",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "dna-assembly"
+        },
+        {
+          "case_id": "ee3571108050ef9cb2a7118dc01f00fa17aed39c7ada10c3b83e78b993a04b4c",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "feal-differential-cryptanalysis"
+        },
+        {
+          "case_id": "f357977cd31b2c0596b460980dd74aead9e4ef9f38d355271f4f627c9e542ee5",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "filter-js-from-html"
+        },
+        {
+          "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "fix-ocaml-gc"
+        },
+        {
+          "case_id": "89e19bf6f2e951bb46dcca952aaafdff22c86cfc54fd364b303125ab595fa6fd",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "install-windows-3.11"
+        },
+        {
+          "case_id": "aaa307eff6900032fe838cd8c450541128a97b309d6cfc238daa38f732634970",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "large-scale-text-editing"
+        },
+        {
+          "case_id": "d79fcc5aa90412efa90b3b5a6a759f88d9db403041c0ced77a8340ba61084974",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "mailman"
+        },
+        {
+          "case_id": "55748ff64725317c01b30b6af8eaa871649c8844ee154e5e28321d3b3ce42189",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "mcmc-sampling-stan"
+        },
+        {
+          "case_id": "401f03e70cba4141f852494f8dbac65650bfaad8bbdc818ecebc4dc9d6245c9f",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "polyglot-rust-c"
+        },
+        {
+          "case_id": "2a19dc31c62e8c52e0426c5ad456dbd99e8922a2f9618fde8156b934337651c1",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "protein-assembly"
+        },
+        {
+          "case_id": "50719ba14b8334af52e293c43610682d7b8f173b7a1349053c83f2211012010c",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "qemu-alpine-ssh"
+        },
+        {
+          "case_id": "9664fe16fcc98401cd4e3f1b895fbc457fce92ae0fa645358faa008b21052de9",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "query-optimize"
+        },
+        {
+          "case_id": "0231a4dfc220d86af9b5be6c21b3bb0b0961ace6a5f86e978112f62742366015",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "raman-fitting"
+        },
+        {
+          "case_id": "231adca5d25d6d5d96b30812a02a53589b6903c694dccd1f680d502cba85a0c3",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "regex-log"
+        },
+        {
+          "case_id": "2ecfb6fd3d17b291a6bb41217ac7bda1c9632cb7bda6b2e588fb1119289027bb",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "sanitize-git-repo"
+        },
+        {
+          "case_id": "318c0d7ee3af76b6048b93d38100a17b3ff8e55a68fdb0c1f9eba1e7c17b652c",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "schemelike-metacircular-eval"
+        },
+        {
+          "case_id": "b732e620e7293eaafb1771e37d62ab99cf971d8d232bf1a9ee72decb3191895c",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "video-processing"
+        },
+        {
+          "case_id": "c5a1e226f9decc97e5a9eef672bf4c29c3583761707901bfce69319b9c26521f",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "winning-avg-corewars"
+        },
+        {
+          "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "write-compressor"
+        }
+      ],
+      "decisions": {
+        "accept": 10,
+        "changed_from_recorded": 0,
+        "conflicts_external": 22,
+        "matches_external": 0,
+        "reject": 12
+      },
+      "description": "Reproduce the terminal Harness decision recorded by the source run.",
+      "name": "recorded_terminal_v1"
+    },
+    {
+      "cases": [
+        {
+          "case_id": "4fd8382401c7fdeff210a4bd55059c0b1673cd4043fa1fddc16db2859aa3622c",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "build-cython-ext"
+        },
+        {
+          "case_id": "a5f1ef506461df508a33e29a03e36225ecadaeabc2509f9ae158fcb77d192d9d",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "circuit-fibsqrt"
+        },
+        {
+          "case_id": "fd77206e60930b6f3d8829a21892810a4ad4f8aaeda3bfd662466788309bdb36",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "crack-7z-hash"
+        },
+        {
+          "case_id": "f643d6e41c8b3bdc2a82d29d671b31a40eed9f77e099e7dc8ca9f55e476c6dbd",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "dna-assembly"
+        },
+        {
+          "case_id": "ee3571108050ef9cb2a7118dc01f00fa17aed39c7ada10c3b83e78b993a04b4c",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "feal-differential-cryptanalysis"
+        },
+        {
+          "case_id": "f357977cd31b2c0596b460980dd74aead9e4ef9f38d355271f4f627c9e542ee5",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "filter-js-from-html"
+        },
+        {
+          "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "fix-ocaml-gc"
+        },
+        {
+          "case_id": "89e19bf6f2e951bb46dcca952aaafdff22c86cfc54fd364b303125ab595fa6fd",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "install-windows-3.11"
+        },
+        {
+          "case_id": "aaa307eff6900032fe838cd8c450541128a97b309d6cfc238daa38f732634970",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "large-scale-text-editing"
+        },
+        {
+          "case_id": "d79fcc5aa90412efa90b3b5a6a759f88d9db403041c0ced77a8340ba61084974",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "mailman"
+        },
+        {
+          "case_id": "55748ff64725317c01b30b6af8eaa871649c8844ee154e5e28321d3b3ce42189",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "mcmc-sampling-stan"
+        },
+        {
+          "case_id": "401f03e70cba4141f852494f8dbac65650bfaad8bbdc818ecebc4dc9d6245c9f",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "polyglot-rust-c"
+        },
+        {
+          "case_id": "2a19dc31c62e8c52e0426c5ad456dbd99e8922a2f9618fde8156b934337651c1",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "protein-assembly"
+        },
+        {
+          "case_id": "50719ba14b8334af52e293c43610682d7b8f173b7a1349053c83f2211012010c",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "qemu-alpine-ssh"
+        },
+        {
+          "case_id": "9664fe16fcc98401cd4e3f1b895fbc457fce92ae0fa645358faa008b21052de9",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "query-optimize"
+        },
+        {
+          "case_id": "0231a4dfc220d86af9b5be6c21b3bb0b0961ace6a5f86e978112f62742366015",
+          "changed_from_recorded": false,
+          "decision": "accept",
+          "matches_external": false,
+          "task_name": "raman-fitting"
+        },
+        {
+          "case_id": "231adca5d25d6d5d96b30812a02a53589b6903c694dccd1f680d502cba85a0c3",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "regex-log"
+        },
+        {
+          "case_id": "2ecfb6fd3d17b291a6bb41217ac7bda1c9632cb7bda6b2e588fb1119289027bb",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "sanitize-git-repo"
+        },
+        {
+          "case_id": "318c0d7ee3af76b6048b93d38100a17b3ff8e55a68fdb0c1f9eba1e7c17b652c",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "schemelike-metacircular-eval"
+        },
+        {
+          "case_id": "b732e620e7293eaafb1771e37d62ab99cf971d8d232bf1a9ee72decb3191895c",
+          "changed_from_recorded": true,
+          "decision": "reject",
+          "matches_external": true,
+          "task_name": "video-processing"
+        },
+        {
+          "case_id": "c5a1e226f9decc97e5a9eef672bf4c29c3583761707901bfce69319b9c26521f",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "winning-avg-corewars"
+        },
+        {
+          "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
+          "changed_from_recorded": false,
+          "decision": "reject",
+          "matches_external": false,
+          "task_name": "write-compressor"
+        }
+      ],
+      "decisions": {
+        "accept": 2,
+        "changed_from_recorded": 8,
+        "conflicts_external": 14,
+        "matches_external": 8,
+        "reject": 20
+      },
+      "description": "Accept only when the accepted verification receipt belongs to an attempt with an accepting review in the same event window.",
+      "name": "same_attempt_review_required_v1"
+    }
+  ],
+  "proven_control_path_corrections": {
+    "case_ids": [
+      "f643d6e41c8b3bdc2a82d29d671b31a40eed9f77e099e7dc8ca9f55e476c6dbd",
+      "f357977cd31b2c0596b460980dd74aead9e4ef9f38d355271f4f627c9e542ee5",
+      "89e19bf6f2e951bb46dcca952aaafdff22c86cfc54fd364b303125ab595fa6fd",
+      "401f03e70cba4141f852494f8dbac65650bfaad8bbdc818ecebc4dc9d6245c9f",
+      "2a19dc31c62e8c52e0426c5ad456dbd99e8922a2f9618fde8156b934337651c1",
+      "2ecfb6fd3d17b291a6bb41217ac7bda1c9632cb7bda6b2e588fb1119289027bb",
+      "318c0d7ee3af76b6048b93d38100a17b3ff8e55a68fdb0c1f9eba1e7c17b652c",
+      "b732e620e7293eaafb1771e37d62ab99cf971d8d232bf1a9ee72decb3191895c"
+    ],
+    "count": 8,
+    "meaning": "The recorded unsafe acceptance used a no-review terminal path that the review-required controller rejects.",
+    "task_names": [
+      "dna-assembly",
+      "filter-js-from-html",
+      "install-windows-3.11",
+      "polyglot-rust-c",
+      "protein-assembly",
+      "sanitize-git-repo",
+      "schemelike-metacircular-eval",
+      "video-processing"
+    ]
+  },
+  "schema_version": 1
+}

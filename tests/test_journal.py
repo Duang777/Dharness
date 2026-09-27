@@ -5,17 +5,22 @@ from evidence_harness.journal import RunJournal
 
 def test_output_is_redacted_archived_and_truncated(tmp_path) -> None:
     journal = RunJournal(tmp_path, inline_bytes=256)
-    raw = "API_KEY=top-secret\n" + ("x" * 600) + "\npassword: swordfish"
+    raw = (
+        "API_KEY=top-secret\n"
+        '"admin_pass": "runtime-password"\n' + ("x" * 600) + "\npassword: swordfish"
+    )
 
     excerpt = journal.capture_output(1, "stdout", raw)
 
     assert "top-secret" not in excerpt.head
+    assert "runtime-password" not in excerpt.head
     assert "swordfish" not in excerpt.tail
     assert excerpt.total_bytes > excerpt.omitted_bytes > 0
     assert excerpt.archive_path is not None
     archived = (tmp_path / excerpt.archive_path).read_text()
     assert "[REDACTED]" in archived
     assert "top-secret" not in archived
+    assert "runtime-password" not in archived
 
 
 def test_journal_writes_one_json_event_per_line(tmp_path) -> None:
@@ -42,7 +47,11 @@ def test_journal_redacts_secrets_in_structured_events(tmp_path) -> None:
         "decision",
         {
             "script": f"curl -H 'Authorization: {bearer}' https://example.invalid",
-            "nested": [provider_key, {"token": jwt}],
+            "nested": [
+                provider_key,
+                {"token": jwt},
+                {"admin_pass": "runtime-password"},
+            ],
         },
     )
 
@@ -50,4 +59,5 @@ def test_journal_redacts_secrets_in_structured_events(tmp_path) -> None:
     assert bearer not in encoded
     assert provider_key not in encoded
     assert jwt not in encoded
-    assert encoded.count("[REDACTED]") >= 3
+    assert "runtime-password" not in encoded
+    assert encoded.count("[REDACTED]") >= 4

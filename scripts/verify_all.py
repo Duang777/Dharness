@@ -95,6 +95,16 @@ STATIC_GATES = (
         ),
     ),
     (
+        "completion calibration artifacts",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/completion_calibration.py",
+            "check",
+        ),
+    ),
+    (
         "delivery artifacts",
         ("uv", "run", "python", "scripts/verify_delivery.py"),
     ),

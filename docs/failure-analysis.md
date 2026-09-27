@@ -457,3 +457,18 @@ executor 和 reviewer 现在要求从已保存字节读取生成产物，并使�
 - 4 个 replay trial 得到 2 passed 和 2 failed，均保留源 journal SHA-256。
 - `evaluation/canonical-89.json` 固定每题采用的原始结果，`evaluation/trials-89/` 保存
   对应的脱敏快照。
+
+## 16. Completion 分歧校准集
+
+`evaluation/completion-disagreements.json` 从 canonical 指向的原始结果和 journal
+确定性生成，固定了 10 个 `verified/reward=0` 与 12 个
+`reward=1/not-verified` live case。每个 case 保存原始需求、每次 finish 的 checks 与
+coverage、review、check receipt、verification receipt、终态和 verifier outcome，并
+补充 journal SHA-256。生成器会先校验全部 89 个 canonical result/config，再排除 4 个
+replay，避免从局部样本反推总体。
+
+`evaluation/completion-calibration.json` 的回放结果显示，8 个假阳性通过旧版
+review 配额耗尽后的无 review 接受路径结束；当前 fail-closed 规则会阻止该路径。另有
+3 个外部已通过任务的 finish proposal 在执行前仅被静态写入策略拦截，适合作为隔离
+验证实验对象。后者仍需真实执行和 receipt-first review，不能计作已修复，也不能据此
+改写 59/89 的 canonical 成绩。

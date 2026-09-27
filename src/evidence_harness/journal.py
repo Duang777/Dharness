@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from evidence_harness.policy import redact_sensitive
+from evidence_harness.policy import is_sensitive_field, redact_sensitive
 from evidence_harness.protocol import OutputExcerpt
 
 
@@ -80,7 +80,14 @@ def _redact_value(value: Any) -> Any:
     if isinstance(value, str):
         return redact_sensitive(value)
     if isinstance(value, dict):
-        return {key: _redact_value(item) for key, item in value.items()}
+        return {
+            key: (
+                "[REDACTED]"
+                if is_sensitive_field(key) and item is not None
+                else _redact_value(item)
+            )
+            for key, item in value.items()
+        }
     if isinstance(value, list):
         return [_redact_value(item) for item in value]
     if isinstance(value, tuple):

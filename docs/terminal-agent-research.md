@@ -185,6 +185,21 @@ semantic checks and canonical-entry-point warnings against this frozen set.
 increase in `verified/reward=0`. Then run at least five fresh trials per selected
 task before attributing a gain.
 
+**Calibration status, 2026-09-27:** `scripts/completion_calibration.py` now
+freezes the 22 live disagreements from canonical result and journal bytes. It
+preserves each finish proposal, requirement mapping, review, check receipt,
+verification receipt, terminal state, and external outcome. The corpus is
+deterministic and binds previously unhashed journals with new SHA-256 values.
+
+Retrospective replay finds eight false positives whose accepted terminal
+attempt had no accepting review in the same event window. The current
+review-required controller blocks that exact path. Three external-pass cases
+were blocked before execution by the static completion-check policy and are
+isolation experiment candidates. These counts cover 11 of 22 known
+disagreements, but only the first eight are proven control-path corrections.
+The other three still require an isolated execution and receipt-first review.
+No score change is claimed.
+
 ### P0: Run completion checks in an isolated snapshot
 
 Allow compilers and programs to create temporary verification artifacts in a

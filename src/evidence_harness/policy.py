@@ -45,9 +45,14 @@ _CHECK_MUTATING_COMMAND = re.compile(
 _WHITESPACE = re.compile(r"\s+")
 _SENSITIVE_VALUE = re.compile(
     r"""(?ix)
-    \b(api[_-]?key|access[_-]?token|auth(?:orization)?|password|passwd|secret)
-    (\s*[:=]\s*)
-    (["']?)[^\s"'`]+(\3)
+    (?P<key>
+        \b(?:[a-z0-9]+[_-])*
+        (?:api[_-]?key|access[_-]?token|auth(?:orization)?|password|passwd|
+           passphrase|pass|pwd|secret|token|credential)
+    )
+    (?P<key_quote>["']?)
+    (?P<separator>\s*[:=]\s*)
+    (?P<value>"[^"\r\n]*"|'[^'\r\n]*'|[^\s"'`]+)
     """
 )
 _BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
@@ -60,6 +65,19 @@ _OPAQUE_SECRET = re.compile(
     )\b"""
 )
 _JWT = re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")
+_SENSITIVE_FIELD_PARTS = frozenset(
+    {
+        "authorization",
+        "credential",
+        "pass",
+        "passphrase",
+        "passwd",
+        "password",
+        "pwd",
+        "secret",
+        "token",
+    }
+)
 
 
 class PolicyViolation(ValueError):
@@ -95,10 +113,26 @@ def observation_fingerprint(
 
 
 def redact_sensitive(text: str) -> str:
-    text = _SENSITIVE_VALUE.sub(r"\1\2[REDACTED]", text)
+    text = _SENSITIVE_VALUE.sub(_redact_named_value, text)
     text = _BEARER_TOKEN.sub("Bearer [REDACTED]", text)
     text = _OPAQUE_SECRET.sub("[REDACTED]", text)
     return _JWT.sub("[REDACTED]", text)
+
+
+def is_sensitive_field(name: str) -> bool:
+    normalized = name.lower().replace("-", "_")
+    if normalized in {"api_key", "apikey", "access_token"}:
+        return True
+    return bool(_SENSITIVE_FIELD_PARTS.intersection(normalized.split("_")))
+
+
+def _redact_named_value(match: re.Match[str]) -> str:
+    value = match.group("value")
+    quote = value[0] if value.startswith(("'", '"')) else ""
+    return (
+        f"{match.group('key')}{match.group('key_quote')}"
+        f"{match.group('separator')}{quote}[REDACTED]{quote}"
+    )
 
 
 def validate_command(command: ShellCommand, max_timeout_sec: int) -> None:

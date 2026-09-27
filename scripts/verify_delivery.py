@@ -39,13 +39,18 @@ REQUIRED_FILES = (
     CANONICAL_89_PATH,
     RESULTS_89_JSON,
     RESULTS_89_MARKDOWN,
+    Path("evaluation/completion-calibration.json"),
+    Path("evaluation/completion-disagreements.json"),
     Path("docs/architecture-rationale.md"),
+    Path("docs/completion-calibration-design.md"),
+    Path("docs/completion-calibration-research.md"),
     Path("docs/evaluation-report.md"),
     Path("docs/failure-analysis.md"),
     Path("docs/next-10-hours.md"),
     Path("docs/ten-task-analysis.md"),
     Path("docs/expanded-ten-analysis.md"),
     Path("docs/vibe-coding-log.md"),
+    Path("scripts/completion_calibration.py"),
 )
 
 README_HEADINGS = (
