@@ -63,7 +63,23 @@ uv run python scripts/collect_evaluation_results.py \
   runs/terminal-bench-2/prefixbench-v1-development-20261002 \
   --matrix evaluation/matrix-prefixbench-development.json \
   --collection-profile prefixbench-v1 \
-  --manifest-out evaluation/prefixbench-v1-canonical.json
+  --manifest-out evaluation/prefixbench-v1-development-canonical.json
+```
+
+Build and verify the development-cohort readiness report:
+
+```bash
+uv run python scripts/prefixbench.py build \
+  --canonical evaluation/prefixbench-v1-development-canonical.json \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --expected-task-count 28 \
+  --out evaluation/prefixbench-v1-development-readiness.json
+
+uv run python scripts/prefixbench.py check \
+  --canonical evaluation/prefixbench-v1-development-canonical.json \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --expected-task-count 28 \
+  --report evaluation/prefixbench-v1-development-readiness.json
 ```
 
 Without `--collection-profile`, both evaluation launchers and the collector preserve their

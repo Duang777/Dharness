@@ -285,7 +285,23 @@ uv run python scripts/collect_evaluation_results.py \
   runs/terminal-bench-2/prefixbench-v1-development-20261002 \
   --matrix evaluation/matrix-prefixbench-development.json \
   --collection-profile prefixbench-v1 \
-  --manifest-out evaluation/prefixbench-v1-canonical.json
+  --manifest-out evaluation/prefixbench-v1-development-canonical.json
+```
+
+再生成并复核仅包含 28 题 development cohort 的 readiness v2：
+
+```bash
+uv run python scripts/prefixbench.py build \
+  --canonical evaluation/prefixbench-v1-development-canonical.json \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --expected-task-count 28 \
+  --out evaluation/prefixbench-v1-development-readiness.json
+
+uv run python scripts/prefixbench.py check \
+  --canonical evaluation/prefixbench-v1-development-canonical.json \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --expected-task-count 28 \
+  --report evaluation/prefixbench-v1-development-readiness.json
 ```
 
 完整来源链、phase event 和 readiness v2 契约见
