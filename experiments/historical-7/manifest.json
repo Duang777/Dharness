@@ -1,0 +1,402 @@
+{
+  "schema_version": 2,
+  "suite_id": "historical-7",
+  "uv_lock_sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8",
+  "cases": [
+    {
+      "case_id": "review_timeout_fallback",
+      "property": {
+        "id": "review_timeout_fails_closed",
+        "statement": "A review timeout cannot produce verified when completion review is required."
+      },
+      "entrypoint": "EvidenceLoop.run",
+      "scenario": {
+        "kind": "review_timeout",
+        "instruction": "Create a non-empty answer.txt.",
+        "options": {
+          "max_turns": 4,
+          "max_environment_calls": 4,
+          "max_repairs": 1,
+          "max_recoveries": 1,
+          "max_completion_reviews": 2,
+          "max_wall_time_sec": 1800,
+          "max_model_call_timeout_sec": 1,
+          "max_command_timeout_sec": 300,
+          "verification_environment_reserve": 1,
+          "enable_completion_review": true
+        },
+        "checks": [
+          {
+            "id": "check-answer",
+            "kind": "artifact",
+            "script": "test -s answer.txt",
+            "proves": "answer.txt is non-empty",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          }
+        ],
+        "coverage": [
+          {
+            "requirement": "create a non-empty answer.txt",
+            "check_ids": [
+              "check-answer"
+            ]
+          }
+        ],
+        "review_error": "injected completion review timeout"
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+          "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+          "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03",
+          "expected_outcome": "killed"
+        }
+      ]
+    },
+    {
+      "case_id": "reorder_check_receipts",
+      "property": {
+        "id": "receipts_match_proposal_order",
+        "statement": "Accepted receipts must be complete, successful, and in proposal order."
+      },
+      "entrypoint": "EvidenceGate.decide",
+      "scenario": {
+        "kind": "reorder_receipts",
+        "work_epoch": 1,
+        "checks": [
+          {
+            "id": "behavior",
+            "kind": "behavior",
+            "script": "test -s answer.txt",
+            "proves": "answer.txt exists",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          },
+          {
+            "id": "content",
+            "kind": "artifact",
+            "script": "grep -qx good answer.txt",
+            "proves": "answer.txt contains the requested value",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          }
+        ],
+        "coverage": [
+          {
+            "requirement": "answer.txt contains good",
+            "check_ids": [
+              "behavior",
+              "content"
+            ]
+          }
+        ]
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "6f74c19f74b68dd7d79d64c4c205274ae2cd1788",
+          "tree": "283427564a6972ca2c3019e811e3a75541e214f5",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "289bea40d10e0e94b98b1247617d06a12fc46f52",
+          "tree": "a87bee24f82ca14f4cf49c2582b5d71553b1eb99",
+          "expected_outcome": "killed"
+        }
+      ]
+    },
+    {
+      "case_id": "review_receipt_order",
+      "property": {
+        "id": "review_sees_executed_receipts",
+        "statement": "The completion reviewer must evaluate executed receipts before acceptance."
+      },
+      "entrypoint": "EvidenceLoop.run",
+      "scenario": {
+        "kind": "review_receipt_order",
+        "instruction": "Write good to answer.txt.",
+        "options": {
+          "max_turns": 4,
+          "max_environment_calls": 4,
+          "max_repairs": 0,
+          "max_recoveries": 1,
+          "max_completion_reviews": 2,
+          "max_wall_time_sec": 1800,
+          "max_model_call_timeout_sec": 360,
+          "max_command_timeout_sec": 300,
+          "verification_environment_reserve": 1,
+          "enable_completion_review": true
+        },
+        "checks": [
+          {
+            "id": "inspect-answer",
+            "kind": "behavior",
+            "script": "python3 inspect_answer.py",
+            "proves": "answer.txt contains good",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          }
+        ],
+        "coverage": [
+          {
+            "requirement": "answer.txt contains good",
+            "check_ids": [
+              "inspect-answer"
+            ]
+          }
+        ],
+        "receipt_marker": "expected=good actual=bad"
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+          "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+          "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03",
+          "expected_outcome": "killed"
+        }
+      ]
+    },
+    {
+      "case_id": "review_quota_no_bypass",
+      "property": {
+        "id": "review_quota_fails_closed",
+        "statement": "Exhausting the review quota cannot bypass required semantic review."
+      },
+      "entrypoint": "EvidenceLoop.run",
+      "scenario": {
+        "kind": "review_quota_no_bypass",
+        "instruction": "Write good to answer.txt.",
+        "options": {
+          "max_turns": 8,
+          "max_environment_calls": 8,
+          "max_repairs": 4,
+          "max_recoveries": 1,
+          "max_completion_reviews": 2,
+          "max_wall_time_sec": 1800,
+          "max_model_call_timeout_sec": 360,
+          "max_command_timeout_sec": 300,
+          "verification_environment_reserve": 1,
+          "enable_completion_review": true
+        },
+        "checks": [
+          {
+            "id": "check-answer",
+            "kind": "artifact",
+            "script": "test -s answer.txt",
+            "proves": "answer.txt contains the requested value",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          }
+        ],
+        "coverage": [
+          {
+            "requirement": "answer.txt contains good",
+            "check_ids": [
+              "check-answer"
+            ]
+          }
+        ],
+        "rejection_rationales": [
+          "first evidence gap",
+          "second evidence gap"
+        ]
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+          "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+          "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03",
+          "expected_outcome": "killed"
+        }
+      ]
+    },
+    {
+      "case_id": "failed_change_progress",
+      "property": {
+        "id": "failed_changes_do_not_count_as_progress",
+        "statement": "A failed change command cannot count as productive progress."
+      },
+      "entrypoint": "EvidenceLoop.run",
+      "scenario": {
+        "kind": "failed_change_progress",
+        "instruction": "Make the requested change.",
+        "options": {
+          "max_turns": 8,
+          "max_environment_calls": 8,
+          "max_repairs": 1,
+          "max_recoveries": 0,
+          "max_completion_reviews": 2,
+          "max_wall_time_sec": 1800,
+          "max_model_call_timeout_sec": 360,
+          "max_command_timeout_sec": 300,
+          "verification_environment_reserve": 1,
+          "enable_completion_review": true
+        },
+        "failed_commands": [
+          {
+            "id": "change-0",
+            "script": "change-0",
+            "purpose": "attempt change zero",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          },
+          {
+            "id": "change-1",
+            "script": "change-1",
+            "purpose": "attempt change one",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          },
+          {
+            "id": "change-2",
+            "script": "change-2",
+            "purpose": "attempt change two",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          }
+        ],
+        "failure_stderr": "injected change failure",
+        "terminal_stop_category": "blocked"
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+          "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+          "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03",
+          "expected_outcome": "killed"
+        }
+      ]
+    },
+    {
+      "case_id": "max_repairs_exact",
+      "property": {
+        "id": "repair_budget_counts_granted_repairs",
+        "statement": "max_repairs=N grants exactly N repair cycles."
+      },
+      "entrypoint": "EvidenceLoop.run",
+      "scenario": {
+        "kind": "max_repairs_exact",
+        "instruction": "Create answer.txt.",
+        "options": {
+          "max_turns": 8,
+          "max_environment_calls": 6,
+          "max_repairs": 1,
+          "max_recoveries": 1,
+          "max_completion_reviews": 10,
+          "max_wall_time_sec": 1800,
+          "max_model_call_timeout_sec": 360,
+          "max_command_timeout_sec": 300,
+          "verification_environment_reserve": 1,
+          "enable_completion_review": false
+        },
+        "checks": [
+          {
+            "id": "check-answer",
+            "kind": "artifact",
+            "script": "test -s answer.txt",
+            "proves": "answer.txt exists and is non-empty",
+            "cwd": "/workspace",
+            "timeout_sec": 30
+          }
+        ],
+        "coverage": [
+          {
+            "requirement": "create answer.txt",
+            "check_ids": [
+              "check-answer"
+            ]
+          }
+        ],
+        "failure_stderr": "answer.txt is missing"
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+          "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+          "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03",
+          "expected_outcome": "killed"
+        }
+      ]
+    },
+    {
+      "case_id": "wall_time_command_deadline",
+      "property": {
+        "id": "work_preserves_finalization_time",
+        "statement": "Ordinary work commands cannot consume reserved finalization wall time."
+      },
+      "entrypoint": "EvidenceLoop.run",
+      "scenario": {
+        "kind": "wall_time_command_deadline",
+        "instruction": "Make the requested change without consuming finalization time.",
+        "options": {
+          "max_turns": 12,
+          "max_environment_calls": 6,
+          "max_repairs": 1,
+          "max_recoveries": 1,
+          "max_completion_reviews": 2,
+          "max_wall_time_sec": 1000,
+          "max_model_call_timeout_sec": 360,
+          "max_command_timeout_sec": 300,
+          "verification_environment_reserve": 1,
+          "enable_completion_review": false
+        },
+        "command": {
+          "id": "long-change",
+          "script": "python3 long_change.py",
+          "purpose": "apply a long-running change",
+          "cwd": "/workspace",
+          "timeout_sec": 300
+        },
+        "model_clock_target_sec": 850,
+        "command_duration_sec": 80,
+        "terminal_stop_category": "blocked"
+      },
+      "revisions": [
+        {
+          "role": "vulnerable",
+          "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+          "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03",
+          "expected_outcome": "survived"
+        },
+        {
+          "role": "fixed",
+          "commit": "3a3b83f8315304d2fd39130c524fa2d41e4807d5",
+          "tree": "98ef1b63b7d368ffed6d0391178c4a8a2134d373",
+          "expected_outcome": "killed"
+        }
+      ]
+    }
+  ]
+}

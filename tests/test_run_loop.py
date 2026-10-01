@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import time
+from typing import Any
 
 import pytest
 from conftest import FakeCompletionIsolation, FakeEnvironment, FakeExecResult, ScriptedModel
@@ -69,6 +70,13 @@ def _finish(script: str = "test -s answer.txt") -> AgentDecision:
             ),
         ),
     )
+
+
+def _events(tmp_path) -> list[dict[str, Any]]:
+    return [
+        json.loads(line)
+        for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
 
 
 class _LiveBoundTestLoop(EvidenceLoop):
@@ -364,6 +372,10 @@ async def test_reviewer_timeout_cannot_fall_back_to_verified(tmp_path) -> None:
     assert report.environment_calls_used == 2
     assert report.latest_evidence is not None
     assert report.latest_evidence.accepted is False
+    event_types = [event["type"] for event in _events(tmp_path)]
+    assert event_types.index("completion_review_started") < event_types.index(
+        "completion_review_error"
+    )
 
 
 async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
@@ -387,6 +399,30 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
         "printf good > answer.txt",
         "test -s answer.txt",
     ]
+    events = _events(tmp_path)
+    event_types = [event["type"] for event in events]
+    assert event_types.count("executor_turn_started") == 2
+    assert event_types.index("agent_decision") < event_types.index("work_batch_started")
+    work_index = event_types.index("work_batch_started")
+    change_index = next(
+        index
+        for index, event in enumerate(events)
+        if event["type"] == "command_receipt" and event["payload"]["command_id"] == "change"
+    )
+    review_index = event_types.index("completion_review_started")
+    review_result_index = event_types.index("completion_review")
+    assert work_index < change_index
+    assert review_index < review_result_index
+    assert events[work_index]["payload"] == {
+        "command_ids": ["change"],
+        "started_in_finalization": False,
+        "work_epoch": 1,
+    }
+    assert events[review_index]["payload"] == {
+        "attempt_id": 1,
+        "review_ordinal": 1,
+        "work_epoch": 1,
+    }
 
 
 async def test_failed_verification_returns_to_repair(tmp_path) -> None:
@@ -883,3 +919,54 @@ async def test_review_findings_fit_the_full_review_schema(tmp_path) -> None:
     assert report.latest_evidence is not None
     assert report.latest_evidence.semantic_assessment is not None
     assert len(report.latest_evidence.semantic_assessment.findings) == 25
+
+
+async def test_finalization_model_calls_are_not_thinking_entries(tmp_path) -> None:
+    model = ScriptedModel(
+        [_finish()],
+        [ReviewDecision(verdict="accept", rationale="the receipt proves completion")],
+    )
+
+    report = await _loop(tmp_path, model, max_turns=1).run(
+        "Ensure answer.txt is ready",
+        FakeEnvironment(),
+    )
+
+    assert report.stop_reason is StopReason.VERIFIED
+    events = _events(tmp_path)
+    event_types = [event["type"] for event in events]
+    assert event_types.count("finalization_started") == 1
+    assert "executor_turn_started" not in event_types
+    assert event_types.index("finalization_started") < event_types.index("agent_decision")
+
+
+def test_recovery_entry_is_unique_per_open_episode(tmp_path) -> None:
+    loop = _loop(
+        tmp_path,
+        ScriptedModel(()),
+        max_recoveries=2,
+    )
+    state = RunState(
+        instruction="recover",
+        phase=RunPhase.THINKING,
+        started_monotonic=0,
+        deadline_monotonic=1_000,
+        stagnant_batches=3,
+    )
+
+    loop._apply_recovery_policy(state)
+    loop._apply_recovery_policy(state)
+    loop._handle_replan(
+        state,
+        AgentDecision(
+            action=ActionKind.REPLAN,
+            rationale="try another path",
+            plan=("inspect a different input",),
+        ),
+    )
+    state.stagnant_batches = 3
+    loop._apply_recovery_policy(state)
+
+    recoveries = [event for event in _events(tmp_path) if event["type"] == "recovery_required"]
+    assert [event["payload"]["recovery_ordinal"] for event in recoveries] == [1, 2]
+    assert all(event["payload"]["work_epoch"] == 0 for event in recoveries)

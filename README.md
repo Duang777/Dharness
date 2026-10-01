@@ -240,6 +240,35 @@ Trixie HTTPS 软件源。相同 `--run-name` 只能使用相同模型、矩阵�
 `--agent-kwarg max_environment_calls=...` 和
 `--agent-kwarg max_wall_time_sec=...` 调整。
 
+### PrefixBench 采集
+
+PrefixBench 使用独立的冻结 profile。它要求当前 runtime source 与 `git archive HEAD`
+完全一致，并把 commit、tree 和 source SHA-256 写入每个 live journal：
+
+```bash
+uv run python scripts/run_full_evaluation.py \
+  --matrix evaluation/matrix-89.json \
+  --run-name prefixbench-v1-development \
+  --model provider/model \
+  --env-file /tmp/evidence-harness.env \
+  --collection-profile prefixbench-v1 \
+  --dry-run
+```
+
+先保留 `--dry-run` 检查来源与参数。工作树包含未提交的 Harness runtime 修改时，preflight
+会拒绝启动。采集完成后，用同一 profile 生成绑定 journal 的 canonical schema 2：
+
+```bash
+uv run python scripts/collect_evaluation_results.py \
+  runs/terminal-bench-2/prefixbench-v1-development \
+  --matrix evaluation/matrix-89.json \
+  --collection-profile prefixbench-v1 \
+  --manifest-out evaluation/prefixbench-v1-canonical.json
+```
+
+完整来源链、phase event 和 readiness v2 契约见
+[PrefixBench live collection design](docs/prefixbench-collection-design.md)。
+
 ## 完整验收
 
 一条命令运行 Ruff lint/format、mypy、pytest coverage、构建、三个 Harbor Agent

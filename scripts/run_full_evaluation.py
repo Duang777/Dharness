@@ -15,6 +15,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, TextIO
 
+from evidence_harness.collection_profile import (
+    collection_profile,
+    reject_provenance_overrides,
+)
+from evidence_harness.source_binding import (
+    attest_git_runtime_source,
+    runtime_project_root,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix-89.json"
 DEFAULT_JOBS_DIR = PROJECT_ROOT / "runs" / "terminal-bench-2"
@@ -93,6 +102,11 @@ def parse_args() -> argparse.Namespace:
         metavar="KEY=VALUE",
     )
     parser.add_argument(
+        "--collection-profile",
+        choices=("prefixbench-v1",),
+        help="Use a frozen, source-attested collection profile.",
+    )
+    parser.add_argument(
         "--start-at",
         help="Start at this matrix task and skip earlier tasks in a new run.",
     )
@@ -142,9 +156,11 @@ def load_task_names(matrix_path: Path) -> list[str]:
 
 
 def run_configuration(args: argparse.Namespace) -> dict[str, object]:
+    profile_name = getattr(args, "collection_profile", None)
+    reject_provenance_overrides(args.agent_kwarg)
     agent_kwargs = json.dumps(args.agent_kwarg, separators=(",", ":"), ensure_ascii=True)
-    return {
-        "schema_version": 1,
+    configuration: dict[str, object] = {
+        "schema_version": 2 if profile_name is not None else 1,
         "matrix_sha256": _sha256_file(args.matrix),
         "model": args.model,
         "env_file_sha256": _sha256_file(args.env_file),
@@ -155,6 +171,15 @@ def run_configuration(args: argparse.Namespace) -> dict[str, object]:
         "debian_bullseye_main_tasks": sorted(DEBIAN_BULLSEYE_MAIN_TASKS),
         "debian_trixie_https_tasks": sorted(DEBIAN_TRIXIE_HTTPS_TASKS),
     }
+    if profile_name is not None:
+        profile = collection_profile(profile_name)
+        profile.reject_reserved_overrides(args.agent_kwarg)
+        producer = attest_git_runtime_source(runtime_project_root())
+        configuration["collection"] = {
+            "profile": profile.name,
+            "producer": producer.model_dump(mode="json"),
+        }
+    return configuration
 
 
 def bind_run_configuration(run_root: Path, current: dict[str, object]) -> None:
@@ -201,6 +226,7 @@ def build_task_command(
     job_name: str,
     task_name: str,
     agent_kwargs: list[str],
+    collection_profile_name: str | None = None,
 ) -> list[str]:
     command = [
         sys.executable,
@@ -228,6 +254,8 @@ def build_task_command(
         command.append("--debian-trixie-https-sources")
     for value in agent_kwargs:
         command.extend(("--agent-kwarg", value))
+    if collection_profile_name is not None:
+        command.extend(("--collection-profile", collection_profile_name))
     return command
 
 
@@ -305,6 +333,7 @@ def _run_tasks(
             job_name=job_name,
             task_name=task_name,
             agent_kwargs=args.agent_kwarg,
+            collection_profile_name=getattr(args, "collection_profile", None),
         )
         print(f"[{index}/{len(task_names)}] start {task_name}", flush=True)
         _append_event(

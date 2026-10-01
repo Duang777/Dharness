@@ -2,13 +2,29 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Literal, Protocol
+from typing import Annotated, Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
 
 
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+
+Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+GitObjectId = Annotated[str, Field(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")]
+
+
+class ProducerAttestation(StrictModel):
+    commit: GitObjectId
+    tree: GitObjectId
+    source_sha256: Sha256
+
+
+class CollectionAttestation(StrictModel):
+    prefixbench_profile: Literal["prefixbench-v1"]
+    producer: ProducerAttestation
+    options: dict[str, JsonValue]
 
 
 class ActionKind(StrEnum):
@@ -60,6 +76,41 @@ class RunPhase(StrEnum):
 
 
 FinalizationTrigger = Literal["turn_budget", "wall_clock"]
+
+
+class ExecutorTurnStarted(StrictModel):
+    attempt_id: int = Field(ge=1)
+    turns_completed: int = Field(ge=0)
+    work_epoch: int = Field(ge=0)
+    recovery_required: bool
+
+
+class WorkBatchStarted(StrictModel):
+    work_epoch: int = Field(ge=1)
+    command_ids: tuple[str, ...] = Field(min_length=1)
+    started_in_finalization: bool
+
+
+class CompletionReviewStarted(StrictModel):
+    attempt_id: int = Field(ge=1)
+    review_ordinal: int = Field(ge=1)
+    work_epoch: int = Field(ge=0)
+
+
+class FinalizationStarted(StrictModel):
+    triggers: tuple[FinalizationTrigger, ...] = Field(min_length=1)
+    turns_remaining: int = Field(ge=0)
+    turn_reserve: int = Field(ge=0)
+    wall_time_remaining_sec: float = Field(ge=0)
+    wall_time_reserve_sec: float = Field(ge=0)
+    completion_findings: tuple[str, ...]
+
+
+class RecoveryRequired(StrictModel):
+    recovery_ordinal: int = Field(ge=1)
+    cycle: tuple[str, ...] | None
+    stagnant_batches: int = Field(ge=0)
+    work_epoch: int = Field(ge=0)
 
 
 class ShellCommand(StrictModel):
@@ -311,6 +362,7 @@ class RunState:
     work_epoch: int = 0
     next_sequence: int = 1
     next_completion_attempt: int = 1
+    next_executor_attempt: int = 1
     observations: list[CommandReceipt] = field(default_factory=list)
     unresolved_errors: list[str] = field(default_factory=list)
     recovery_directive: str | None = None

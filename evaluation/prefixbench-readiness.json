@@ -1,0 +1,4248 @@
+{
+  "benchmark": "PrefixBench",
+  "claim_boundary": "readiness_only_no_five_phase_benchmark_results",
+  "dataset": "terminal-bench@2.0",
+  "phase_contract": [
+    {
+      "event_type": "executor_turn_started",
+      "phase": "thinking"
+    },
+    {
+      "event_type": "work_batch_started",
+      "phase": "executing"
+    },
+    {
+      "event_type": "finalization_started",
+      "phase": "finalizing"
+    },
+    {
+      "event_type": "completion_review_started",
+      "phase": "reviewing"
+    },
+    {
+      "event_type": "recovery_required",
+      "phase": "recovering"
+    }
+  ],
+  "schema_version": 1,
+  "sources": {
+    "canonical": {
+      "bytes": 75015,
+      "path": "evaluation/canonical-89.json",
+      "sha256": "acded5ef1d3c8b9e2990df7d1c6566fa80c98873133ae6fba51218817e02efc2"
+    },
+    "matrix": {
+      "bytes": 17531,
+      "path": "evaluation/matrix-89.json",
+      "sha256": "51a6e58f5591d3d247543b53dc4f7008d663a085ca0928b2d4d2852f813f9939"
+    }
+  },
+  "split_policy": {
+    "algorithm": "sha256_first_8_bytes_mod_10",
+    "development_buckets": [
+      0,
+      1,
+      2
+    ],
+    "namespace": "prefixbench-task-split-v1",
+    "test_buckets": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "status": "source_cohort_unavailable",
+  "summary": {
+    "admitted": 0,
+    "development": 28,
+    "excluded": 89,
+    "exclusions": {
+      "journal_not_bound_by_canonical": 85,
+      "non_live_result": 4,
+      "phase_evidence_incomplete": 85,
+      "prefixbench_profile_missing": 85,
+      "producer_commit_unattested": 85,
+      "unsupported_journal_schema": 85
+    },
+    "journal_schemas": {
+      "missing": 4,
+      "other": 0,
+      "schema_1": 85,
+      "schema_2": 0
+    },
+    "legacy_events": {
+      "completion_rejections": 147,
+      "completion_reviews": 132,
+      "finish_proposals": 202,
+      "replans": 56
+    },
+    "live": 85,
+    "phase_events": {
+      "executing": 0,
+      "finalizing": 0,
+      "recovering": 0,
+      "reviewing": 0,
+      "thinking": 0
+    },
+    "replay": 4,
+    "tasks": 89,
+    "test": 61
+  },
+  "tasks": [
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 1,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "adaptive-rejection-sampler",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1015,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-adaptive-retry2-20260927/adaptive-rejection-sampler__fDwri5L/config.json",
+          "sha256": "6e6ba36469490c9ad19fdbc0e465aac4576b2f9c479a11f41e06531f7363ebac"
+        },
+        "journal": {
+          "bytes": 372581,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-adaptive-retry2-20260927/adaptive-rejection-sampler__fDwri5L/agent/evidence-harness/events.jsonl",
+          "sha256": "67d7d1d1897667f256aa7b188d7ea1fb064223be03916b127adf049d24920332"
+        },
+        "result": {
+          "bytes": 5739,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-adaptive-retry2-20260927/adaptive-rejection-sampler__fDwri5L/result.json",
+          "sha256": "45a0e313f1b8ae62530cb11c1c148ecbcc7b2d91ca7910c8489431314e954892"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "9bb84d746e13f13bb4912a89fbdbc298c86bc51511852c525d6f99dcd9c37b8f"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 2,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "bn-fit-modify",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1028,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/001-bn-fit-modify/bn-fit-modify__XeY49cA/config.json",
+          "sha256": "18f8cf5cd41189ab507d0c00a5cf6cfaeab0dd0e48343593142e7dd30c5b9bec"
+        },
+        "journal": {
+          "bytes": 159609,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/001-bn-fit-modify/bn-fit-modify__XeY49cA/agent/evidence-harness/events.jsonl",
+          "sha256": "923288ef8654484e1f1da6cc2714cc6503d8a611105c3de57f0af5bd6a8f18fa"
+        },
+        "result": {
+          "bytes": 5730,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/001-bn-fit-modify/bn-fit-modify__XeY49cA/result.json",
+          "sha256": "30dceb97e7d160d2c5c9a2cabf6511b1465452894473c925d6e7f58c5ca82a7d"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "fe4ef680a5b2b74b918cb7592cf165a323aab9b199db1185fea5538e47e8132a"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 3,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "break-filter-js-from-html",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1406,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/002-break-filter-js-from-html/break-filter-js-from-html__Uaqv6bN/config.json",
+          "sha256": "82979712518bf84526e4d3ab41d54fe8fd0ae0a7011c8fc3977acf11c37e5acb"
+        },
+        "journal": {
+          "bytes": 29081,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/002-break-filter-js-from-html/break-filter-js-from-html__Uaqv6bN/agent/evidence-harness/events.jsonl",
+          "sha256": "706015fa66c61f5b42b71f95df69f913ccfcdf641d7f8fcf23b42f6ea4476ca8"
+        },
+        "result": {
+          "bytes": 5929,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/002-break-filter-js-from-html/break-filter-js-from-html__Uaqv6bN/result.json",
+          "sha256": "66b60be59bb2faa5e05f3bf8bb283bf95222926128f06b9ecb8a9d84d1e6f92b"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "20c47e0503b16377f660e5643dfee44b0c0029704fac625ec9afe05066ad3eda"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 4,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "build-cython-ext",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 949,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/004-build-cython-ext/build-cython-ext__xaeL8PR/config.json",
+          "sha256": "5c270a5dddd8423e10b638ea1c2db1e937d63d3caa04de6a3f72584b9f42e1be"
+        },
+        "journal": {
+          "bytes": 370427,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/004-build-cython-ext/build-cython-ext__xaeL8PR/agent/evidence-harness/events.jsonl",
+          "sha256": "1c6a986275c9a1a71932204b933a342d04ecd1be65779d7056e55257ea25b18a"
+        },
+        "result": {
+          "bytes": 5407,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/004-build-cython-ext/build-cython-ext__xaeL8PR/result.json",
+          "sha256": "4b61909e145c25f595f6170fcfd32d83ad4a98759120f55adfe19d3891d29d35"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "4bcbb0ec8b97a0ea52c026ad6af63ed1f84593ea65edda33ecd7f3c52b4ff91e"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "non_live_result"
+      ],
+      "execution_mode": "replay",
+      "index": 5,
+      "journal_schema_version": null,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "build-pmars",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1220,
+          "path": "runs/terminal-bench-2/full89-terra-verifier-replay2-20260927/001-build-pmars/build-pmars__8uHmjBT/config.json",
+          "sha256": "4f78f6f788126af499e55f110b93e850e07b5280b7870cfb84b36d458c816ca3"
+        },
+        "journal": null,
+        "result": {
+          "bytes": 4936,
+          "path": "runs/terminal-bench-2/full89-terra-verifier-replay2-20260927/001-build-pmars/build-pmars__8uHmjBT/result.json",
+          "sha256": "b6436407523df47349f90b79fc723261152aced51ec9aa3c5d8511e07a96b594"
+        }
+      },
+      "split": "test",
+      "split_bucket": 8,
+      "task_identity_sha256": "7fc2276671d82294c26832284fd45b84b7e1e6865fe9fdbf1a83fc9a0360b1e7"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 6,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "build-pov-ray",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 940,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/006-build-pov-ray/build-pov-ray__92Xb5P4/config.json",
+          "sha256": "2eeb17a5c3666373e7c0bf9e1356dec2950ef4352e871b38f0812f20b7d72951"
+        },
+        "journal": {
+          "bytes": 410930,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/006-build-pov-ray/build-pov-ray__92Xb5P4/agent/evidence-harness/events.jsonl",
+          "sha256": "b191ea3f30864a804b6e9a981f0bf2e0b283946ed7422e74581980109bf3fcc8"
+        },
+        "result": {
+          "bytes": 5377,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/006-build-pov-ray/build-pov-ray__92Xb5P4/result.json",
+          "sha256": "b09a5d9cdf83a17fedd4f3e3c755a763ce7a957c0ac8ebc337375e647408da84"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "5edcbd68eb2974a58f51864b751b2cb0ba0ec18380a634af0f7de2e30f437ddc"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 7,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 3
+      },
+      "name": "caffe-cifar-10",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 943,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/007-caffe-cifar-10/caffe-cifar-10__fA4Ymuk/config.json",
+          "sha256": "35c87afe1db9ded6dc2392044b2f657a2d5b1dbca8e4c8cbde3b5eb8ae1e9ff8"
+        },
+        "journal": {
+          "bytes": 193384,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/007-caffe-cifar-10/caffe-cifar-10__fA4Ymuk/agent/evidence-harness/events.jsonl",
+          "sha256": "07b51cc03ba38715e4cd53d66ebff3e9d19cfb146fe15f3749c2e85a51b0c557"
+        },
+        "result": {
+          "bytes": 5382,
+          "path": "runs/terminal-bench-2/full89-terra-20260925/007-caffe-cifar-10/caffe-cifar-10__fA4Ymuk/result.json",
+          "sha256": "38c6554dc1478dc3eff8daba2019eec8b660c79662c25dbe36bf1e7a49e2a944"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "c9c9327596f36a06dfe7a1a85abe32885afdfea7bd286379b1fc43479e9eef84"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 8,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "cancel-async-tasks",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1303,
+          "path": "runs/terminal-bench-2/full89-terra-https-20260925/008-cancel-async-tasks/cancel-async-tasks__efGgME6/config.json",
+          "sha256": "71d3d1c8f50aa073e508ee64d623078b38cf1165b7fb8982e8f1dfad240af86b"
+        },
+        "journal": {
+          "bytes": 40698,
+          "path": "runs/terminal-bench-2/full89-terra-https-20260925/008-cancel-async-tasks/cancel-async-tasks__efGgME6/agent/evidence-harness/events.jsonl",
+          "sha256": "37ef218a8b0b917ecdad0d6f9f0398617491227032efbc0d955fcca21fc7b9ec"
+        },
+        "result": {
+          "bytes": 5855,
+          "path": "runs/terminal-bench-2/full89-terra-https-20260925/008-cancel-async-tasks/cancel-async-tasks__efGgME6/result.json",
+          "sha256": "315b291ea42e519aeb6e856f4e14d03a2362dacb89dba6a20b49d5b02dcbb18a"
+        }
+      },
+      "split": "test",
+      "split_bucket": 8,
+      "task_identity_sha256": "dd2ff9e8e40fd6164b15437dc039bafbd6cf2669ac116298424a225124bdb9ac"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 9,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "chess-best-move",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1025,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-chess-retry2-20260927/chess-best-move__WrUwqSV/config.json",
+          "sha256": "94f86d2d627aea2a5d8d8a73b50699ee07669d1bcd016ef299d9df872d2dc844"
+        },
+        "journal": {
+          "bytes": 193065,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-chess-retry2-20260927/chess-best-move__WrUwqSV/agent/evidence-harness/events.jsonl",
+          "sha256": "7213fb89f75feb25ca11d90eaf1fd767efef7df3f887222d812d37ddbe44dc6c"
+        },
+        "result": {
+          "bytes": 5560,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-chess-retry2-20260927/chess-best-move__WrUwqSV/result.json",
+          "sha256": "646285c96e632ef68e37e187fc77cb5e0b40a5a1a75f0c06334e69edd31053db"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "3b795773ef1d4c72b057bd0b0f63f1349d91a5fb04c05e7c99a19d5f75003313"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 10,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "circuit-fibsqrt",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1298,
+          "path": "runs/terminal-bench-2/full89-terra-contained-20260925/010-circuit-fibsqrt/circuit-fibsqrt__r8YiFqn/config.json",
+          "sha256": "14ee615d08f00a28d739c43d9e3c381a4585d0f6f1cfa6b00efbe1020ac889a8"
+        },
+        "journal": {
+          "bytes": 373586,
+          "path": "runs/terminal-bench-2/full89-terra-contained-20260925/010-circuit-fibsqrt/circuit-fibsqrt__r8YiFqn/agent/evidence-harness/events.jsonl",
+          "sha256": "90a67301698a9416252904e43e3a59f61b650c7d15b62189145ec38f5373b40b"
+        },
+        "result": {
+          "bytes": 5720,
+          "path": "runs/terminal-bench-2/full89-terra-contained-20260925/010-circuit-fibsqrt/circuit-fibsqrt__r8YiFqn/result.json",
+          "sha256": "685112c89bcdfe914038eed6f9932ee9d472b9a21f0bc26ea834071131ffd709"
+        }
+      },
+      "split": "test",
+      "split_bucket": 5,
+      "task_identity_sha256": "02bfbff75a2ff3e5a27b28049d2c55b3f5a5eb1bc91cf7bc0ead3e02dad1f758"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 11,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 4,
+        "completion_reviews": 2,
+        "finish_proposals": 5,
+        "replans": 1
+      },
+      "name": "cobol-modernization",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1375,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-cobol-retry2-20260927/cobol-modernization__TAmSCrP/config.json",
+          "sha256": "1fdf07ca15a8fd74ab7910aa731493d06758723327b3b893ea60dffd953c8ba4"
+        },
+        "journal": {
+          "bytes": 384400,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-cobol-retry2-20260927/cobol-modernization__TAmSCrP/agent/evidence-harness/events.jsonl",
+          "sha256": "5feaab247763bfe91412228885d8ba748ed1caa0bb4bbcae2c185a99d75cf9fc"
+        },
+        "result": {
+          "bytes": 6098,
+          "path": "runs/terminal-bench-2/full89-terra-reviewcap-cobol-retry2-20260927/cobol-modernization__TAmSCrP/result.json",
+          "sha256": "b1926a5d1481825f21c9fc1a4ffc3ab67c2caa2933cce6daae1e5b55f95de649"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "f68b51bfb57118902af5435adbb5a158312c957703ed8b428486655c9e110eae"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "non_live_result"
+      ],
+      "execution_mode": "replay",
+      "index": 12,
+      "journal_schema_version": null,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "code-from-image",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1233,
+          "path": "runs/terminal-bench-2/full89-terra-verifier-replay2-20260927/002-code-from-image/code-from-image__wSgKH27/config.json",
+          "sha256": "651da16d57638f417d4d83dc19f24fa5643a18712344460641a38726f0b37a29"
+        },
+        "journal": null,
+        "result": {
+          "bytes": 4968,
+          "path": "runs/terminal-bench-2/full89-terra-verifier-replay2-20260927/002-code-from-image/code-from-image__wSgKH27/result.json",
+          "sha256": "b81c7fb2f0a513d7d349adbd31d94efc92e401269bb16b66fc717fab7d9d7c05"
+        }
+      },
+      "split": "test",
+      "split_bucket": 5,
+      "task_identity_sha256": "3faeb9511446993b2e783fe7167ed81480af03d94a85f102bd8783c6214743bf"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 13,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "compile-compcert",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 998,
+          "path": "runs/terminal-bench-2/full89-terra-review2-20260925/013-compile-compcert/compile-compcert__E3FZpZY/config.json",
+          "sha256": "4a61c309322b3f17023ccab541d081c3751c41ecd2ace822b30c9f89bdea6cdb"
+        },
+        "journal": {
+          "bytes": 375829,
+          "path": "runs/terminal-bench-2/full89-terra-review2-20260925/013-compile-compcert/compile-compcert__E3FZpZY/agent/evidence-harness/events.jsonl",
+          "sha256": "df9a2e9433d64101e98c44632d4d171bf75f64f083df60144b21627926fe6e19"
+        },
+        "result": {
+          "bytes": 5649,
+          "path": "runs/terminal-bench-2/full89-terra-review2-20260925/013-compile-compcert/compile-compcert__E3FZpZY/result.json",
+          "sha256": "a4e0ed7875f3949699d10061eea3189499e4e17ab28229020478acaa04871e3d"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "0a3b99b61a384c82ae747ebf6e83bc694d5c070ea33c03e1bdab03f213f6359b"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 14,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 1
+      },
+      "name": "configure-git-webserver",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1021,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/014-configure-git-webserver/configure-git-webserver__X7rDPZp/config.json",
+          "sha256": "573bf53ce9af1abe0508f5767995c529b75a952b445c3a3c72641e6c570d975f"
+        },
+        "journal": {
+          "bytes": 220464,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/014-configure-git-webserver/configure-git-webserver__X7rDPZp/agent/evidence-harness/events.jsonl",
+          "sha256": "dfcc71dba7e1652fce33bcc9312eb650201dd1d5839c182689dc950b85a2ae25"
+        },
+        "result": {
+          "bytes": 5765,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/014-configure-git-webserver/configure-git-webserver__X7rDPZp/result.json",
+          "sha256": "ac1289f14538a6d929a47c5326f3351e055dea58cd3d826c4388f71f5f1adea7"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "6da22167c2c73067b6c5abc19f5f937d663c1bd12988f239a222d812259bb432"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 15,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 4
+      },
+      "name": "constraints-scheduling",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1055,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/005-constraints-scheduling/constraints-scheduling__qHR4NpC/config.json",
+          "sha256": "04f2f26d6b5a91cec8a7622ae122da4349fd5c8c7b98dce05104c17451df8e61"
+        },
+        "journal": {
+          "bytes": 240353,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/005-constraints-scheduling/constraints-scheduling__qHR4NpC/agent/evidence-harness/events.jsonl",
+          "sha256": "239ed7173fbbdf0d2a1a1423159b2f192847fe781e7167a23c9af979bd74175d"
+        },
+        "result": {
+          "bytes": 5674,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/005-constraints-scheduling/constraints-scheduling__qHR4NpC/result.json",
+          "sha256": "5dea8da6c24c459f76750ec98c78b86505539ad91a918a76dd470a8bcb899b35"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "8d71931c310ece1d4c9fd1ad314ace5228cd52a5a53d73751f4c998ef329a403"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 16,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 3
+      },
+      "name": "count-dataset-tokens",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1354,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/016-count-dataset-tokens/count-dataset-tokens__MbrKBPu/config.json",
+          "sha256": "1afacf3d325452b53e4596f7991d5ca2d7d72546abe8435bcbdb28b1302a9637"
+        },
+        "journal": {
+          "bytes": 252700,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/016-count-dataset-tokens/count-dataset-tokens__MbrKBPu/agent/evidence-harness/events.jsonl",
+          "sha256": "64b1bd9b9a582baac77d5f6fd366b55dcba640aa80b64178a9fcac3bcc10aba3"
+        },
+        "result": {
+          "bytes": 5817,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/016-count-dataset-tokens/count-dataset-tokens__MbrKBPu/result.json",
+          "sha256": "ef0d2f36339a3162e3a672b18a70ec47d584309dcc462f4b2c73cc81074a4f88"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "45ba33c8e7f1b398a0ff29e98baf700fc65623374032d2cb01d9b72e9fafc3fb"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 17,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "crack-7z-hash",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1028,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/006-crack-7z-hash/crack-7z-hash__krfVtFL/config.json",
+          "sha256": "508cf971a4abdd08a47e4d7236edfb3482562db887cdfdbf5dfc153b3bd33a2d"
+        },
+        "journal": {
+          "bytes": 436180,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/006-crack-7z-hash/crack-7z-hash__krfVtFL/agent/evidence-harness/events.jsonl",
+          "sha256": "eb617ae439d45b82f039d4430918c7e10c74c30d60e664b17b84ff49ce908f5c"
+        },
+        "result": {
+          "bytes": 5528,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/006-crack-7z-hash/crack-7z-hash__krfVtFL/result.json",
+          "sha256": "1973b48f3a835b751554816ba4c9f95063a7928c71148a6364e37af79e2e978c"
+        }
+      },
+      "split": "test",
+      "split_bucket": 3,
+      "task_identity_sha256": "79afa6936b7a816fe28562d22af572e38bd155517901235f8dc1c5790810a8ce"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 18,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "custom-memory-heap-crash",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 942,
+          "path": "runs/terminal-bench-2/full89-terra-custom-memory-retry-20260927/001-custom-memory-heap-crash/custom-memory-heap-crash__gnvBkgR/config.json",
+          "sha256": "9c983fd8c6f71b07470d687f100e16150790f478f7268dc1a98b724f6c646e41"
+        },
+        "journal": {
+          "bytes": 187814,
+          "path": "runs/terminal-bench-2/full89-terra-custom-memory-retry-20260927/001-custom-memory-heap-crash/custom-memory-heap-crash__gnvBkgR/agent/evidence-harness/events.jsonl",
+          "sha256": "dab637832b58141e6e7026d72795a1e37ff3816a28c0329d843403aad809ecb5"
+        },
+        "result": {
+          "bytes": 5655,
+          "path": "runs/terminal-bench-2/full89-terra-custom-memory-retry-20260927/001-custom-memory-heap-crash/custom-memory-heap-crash__gnvBkgR/result.json",
+          "sha256": "9591f5cf03d2b90be4303600ed989de0cc0492e3bab45b740fc573e79f6f3730"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "4b4533d15394ad217ae42bddddd8b0e4c6dfdee470bfc35bf78a90241dcef590"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 19,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 2
+      },
+      "name": "db-wal-recovery",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 997,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/019-db-wal-recovery/db-wal-recovery__CB5vJUB/config.json",
+          "sha256": "975e3ffb51cff16f1ceb09f8bcddc235fcb9bda4048951dd78353d2c869ea3d1"
+        },
+        "journal": {
+          "bytes": 81782,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/019-db-wal-recovery/db-wal-recovery__CB5vJUB/agent/evidence-harness/events.jsonl",
+          "sha256": "5262037289110160336d28abfdf2ae58093de64ad7e304fdb32ee99875b97096"
+        },
+        "result": {
+          "bytes": 5587,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/019-db-wal-recovery/db-wal-recovery__CB5vJUB/result.json",
+          "sha256": "b3e6f5447bf00605d4b1cd468b860e4a68a0ab981292c7a3c82c4b9c62a02188"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "9c40899eb1bd7303d600a3508d335bfcb4fcb74c718c7954c92d9d0478280cd7"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 20,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "distribution-search",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1351,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/020-distribution-search/distribution-search__qwVhXqb/config.json",
+          "sha256": "5d7e5a294ec5aed199c4ead2c5a274b0d05a9c8aaecbfdf63668eb4cc94daf94"
+        },
+        "journal": {
+          "bytes": 128306,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/020-distribution-search/distribution-search__qwVhXqb/agent/evidence-harness/events.jsonl",
+          "sha256": "6d89a9bab12bb75e4ce9dc298e7632919398efc8f431a488a77a6f964e9c4b05"
+        },
+        "result": {
+          "bytes": 5917,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/020-distribution-search/distribution-search__qwVhXqb/result.json",
+          "sha256": "5dd9a5142a72b7eb00cc741139a5f460c75615e84ec7a6a537f558ccf144f304"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "76ce4f0cb9ce396ad10f0085ef263e689164b7acdea0d93b79e959158d8b3245"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 21,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "dna-assembly",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 988,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/021-dna-assembly/dna-assembly__HeTwkpF/config.json",
+          "sha256": "0fee0bf66981fdb5923b3e121ff5822152c3e4af482930a47d785c280bec040f"
+        },
+        "journal": {
+          "bytes": 361176,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/021-dna-assembly/dna-assembly__HeTwkpF/agent/evidence-harness/events.jsonl",
+          "sha256": "8bcaaf29cc07ae8947f9e10879f6a72b9a32b999600136d3d38d12713a63a294"
+        },
+        "result": {
+          "bytes": 5518,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/021-dna-assembly/dna-assembly__HeTwkpF/result.json",
+          "sha256": "3f33db1c14544a81680b78baf5857587b6d14bb8bd00c9f6f9f3e54e53797877"
+        }
+      },
+      "split": "test",
+      "split_bucket": 3,
+      "task_identity_sha256": "12f670afe429433d9c2d106c123ec21b540c3878e96e1bf82e5ebf2a6d052b54"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 22,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 2
+      },
+      "name": "dna-insert",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 982,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/022-dna-insert/dna-insert__3VkvSEd/config.json",
+          "sha256": "abc9a1a98fca9fc79ff9c1cf1d40d46c3fa6c727722f370bda6e843609a2fb8f"
+        },
+        "journal": {
+          "bytes": 98053,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/022-dna-insert/dna-insert__3VkvSEd/agent/evidence-harness/events.jsonl",
+          "sha256": "7749407174c04e3f4a92816e346ced985087b7884fa4225041ea078cece90764"
+        },
+        "result": {
+          "bytes": 5601,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/022-dna-insert/dna-insert__3VkvSEd/result.json",
+          "sha256": "b0f0f834b62e3d5d35dc1c496f37ddabd54b5fa30aa759f5b6f66da25d11a6ae"
+        }
+      },
+      "split": "test",
+      "split_bucket": 3,
+      "task_identity_sha256": "e54cb3310d4bae0db22be53fe2c25e2becb40054ecaae2be328592901c9f5141"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 23,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 3
+      },
+      "name": "extract-elf",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 985,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/023-extract-elf/extract-elf__pZJVWgh/config.json",
+          "sha256": "9c70b4332866e38e80c10c2999d6763409dc3b3cd59085841a6ea5e9cfc9ddfa"
+        },
+        "journal": {
+          "bytes": 127647,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/023-extract-elf/extract-elf__pZJVWgh/agent/evidence-harness/events.jsonl",
+          "sha256": "ab074d9b45aab04a872b2abf118b6973b8494b2c86cc47e97bd3daef2f6fc307"
+        },
+        "result": {
+          "bytes": 5657,
+          "path": "runs/terminal-bench-2/full89-terra-markerfix-20260925/023-extract-elf/extract-elf__pZJVWgh/result.json",
+          "sha256": "fbf4c16535b4e3730b040c2b7b91d8a7700e697faa6633eb54f5ef5735318db9"
+        }
+      },
+      "split": "test",
+      "split_bucket": 8,
+      "task_identity_sha256": "7d3ea5985bca1fdcaa8cd936995a943783c8e3d8ca3675f9bcf8a06fa29774e8"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 24,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "extract-moves-from-video",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1061,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/008-extract-moves-from-video/extract-moves-from-video__nJEiNaQ/config.json",
+          "sha256": "e6d249d852cd2ae0529a395e9b0a6a22898b52f863c9c23efdf73261f3f3e422"
+        },
+        "journal": {
+          "bytes": 224377,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/008-extract-moves-from-video/extract-moves-from-video__nJEiNaQ/agent/evidence-harness/events.jsonl",
+          "sha256": "1cc99b79db9e110dd44606ec337ae58f8e8643581b275741ce5eb9d4d37765f0"
+        },
+        "result": {
+          "bytes": 5638,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/008-extract-moves-from-video/extract-moves-from-video__nJEiNaQ/result.json",
+          "sha256": "08d8214b620dfc21429748423836940c8d589560a6152eace183453de19bcf85"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "acc22fcbd288eda074156a085915ee4db90ae7274109b631d5cef521f5f6fe9b"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 25,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "feal-differential-cryptanalysis",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1386,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/025-feal-differential-cryptanalysis/feal-differential-cryptanalysis__ixELYDe/config.json",
+          "sha256": "6ad20b1c1f7018fceebef9e05ec1421ed457905bde8c06eb027c880a124bd6f4"
+        },
+        "journal": {
+          "bytes": 80508,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/025-feal-differential-cryptanalysis/feal-differential-cryptanalysis__ixELYDe/agent/evidence-harness/events.jsonl",
+          "sha256": "90e6d8075d45c7d91e87d8b584aeda32cca548d428bebec08f79e03c9a0dc4d2"
+        },
+        "result": {
+          "bytes": 5914,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/025-feal-differential-cryptanalysis/feal-differential-cryptanalysis__ixELYDe/result.json",
+          "sha256": "0b24c8c62786f555eafb39e93dd637d13e44cd7bd63309726815ec3736fc6dcb"
+        }
+      },
+      "split": "test",
+      "split_bucket": 5,
+      "task_identity_sha256": "fe5010be9756a855c8e2ef09215d4c108249ce608fdb68fbf9a59093780d06f0"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 26,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "feal-linear-cryptanalysis",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1368,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/026-feal-linear-cryptanalysis/feal-linear-cryptanalysis__gwQeLB5/config.json",
+          "sha256": "b1ec96b74a5b7d4b801d923555080b610c4f34fd6be04ccedcc71a96b0bf0470"
+        },
+        "journal": {
+          "bytes": 79267,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/026-feal-linear-cryptanalysis/feal-linear-cryptanalysis__gwQeLB5/agent/evidence-harness/events.jsonl",
+          "sha256": "5da08c4ead639b983ea206e22f1b9fc535339348ec562ab43012eef9efe94e78"
+        },
+        "result": {
+          "bytes": 5852,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/026-feal-linear-cryptanalysis/feal-linear-cryptanalysis__gwQeLB5/result.json",
+          "sha256": "0e2abc5e974cd9b32543c11fb964bb091e3f648a356d608721fb1bd516b82b04"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "4d1789cde50d5a76ad52032e9a2ce7d765ef067edbce20bf7865c97e452a0119"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 27,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "filter-js-from-html",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1388,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/009-filter-js-from-html/filter-js-from-html__Bo7pLLs/config.json",
+          "sha256": "6677bbf6a5476cf2ceb28b52b0f2be2df99f20af3dbd3b36239b959a6d8d244f"
+        },
+        "journal": {
+          "bytes": 186978,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/009-filter-js-from-html/filter-js-from-html__Bo7pLLs/agent/evidence-harness/events.jsonl",
+          "sha256": "cb4fc50221c9a0d50c5ca65b595a2a9dbcd0fe5dd23184d591278b6e787e152c"
+        },
+        "result": {
+          "bytes": 6063,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/009-filter-js-from-html/filter-js-from-html__Bo7pLLs/result.json",
+          "sha256": "51f2414bfd02ad0e339bf7783f29b811270c0448569bc1b9d232653ec0798037"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "4368816ede186ee9e3cb7dc3ee50ed267dda8b0385d788ac7d525d99b4eac9cd"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 28,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "financial-document-processor",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1035,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/028-financial-document-processor/financial-document-processor__22WXpuV/config.json",
+          "sha256": "a04b91fd52173c40962d8b1fa5624281144da4692e80903acd2b3fb4de46696e"
+        },
+        "journal": {
+          "bytes": 449330,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/028-financial-document-processor/financial-document-processor__22WXpuV/agent/evidence-harness/events.jsonl",
+          "sha256": "0a73520da31a9f48ee571aac030ad4e57a8a4578b49d0199fd0faca6897294ba"
+        },
+        "result": {
+          "bytes": 5739,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/028-financial-document-processor/financial-document-processor__22WXpuV/result.json",
+          "sha256": "992b1ee18b9e3990e64d4dc5d24aaa0b8c6264b8b573b2a146bc8ab353edde87"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "c1026086b607bcdeed3ff60aba3b72ab1b337ec7df5f1adb74f4d5b7f6eddf10"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 29,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "fix-code-vulnerability",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1017,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/029-fix-code-vulnerability/fix-code-vulnerability__PXfkNba/config.json",
+          "sha256": "e520dbbe5d5435ed07f9b428958927769fd38e03032e57234dcf09a934c08664"
+        },
+        "journal": {
+          "bytes": 117210,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/029-fix-code-vulnerability/fix-code-vulnerability__PXfkNba/agent/evidence-harness/events.jsonl",
+          "sha256": "47f983f4c4acf2e3542e57c6a6e6a00271c590d5e2033219b67fd295a6f73f67"
+        },
+        "result": {
+          "bytes": 5742,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/029-fix-code-vulnerability/fix-code-vulnerability__PXfkNba/result.json",
+          "sha256": "47925fb78f2dade9715ee2c04744c69b76e0d5730c11ef8af01e1316a1b830e0"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "6c6dda8bafc7ffca45d8077ff3bfbb06dc6327f41de1d707d3666dba9f93062d"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 30,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "fix-git",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1314,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/030-fix-git/fix-git__RDJag4a/config.json",
+          "sha256": "3036345d4f1e5d14578a2394bae82dec64f2b1e506dba442f1b418963513a1a2"
+        },
+        "journal": {
+          "bytes": 68370,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/030-fix-git/fix-git__RDJag4a/agent/evidence-harness/events.jsonl",
+          "sha256": "a1853ddf9888ce53d32f0b163e8c13ac33019c2ae88eb08ff6f047a8a0a7fd1f"
+        },
+        "result": {
+          "bytes": 5885,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/030-fix-git/fix-git__RDJag4a/result.json",
+          "sha256": "cd4aa213a58cd25a2a8bd2eee8878be56283f689a7c9324c378a20911de127af"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "ead1eb0f22b73470ecd260f4072b112509603696b90b889cdc23f22b488cbf83"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 31,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 0,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "fix-ocaml-gc",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 987,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/031-fix-ocaml-gc/fix-ocaml-gc__29jmdAt/config.json",
+          "sha256": "389d48ce93a5226a29573902e9d2ba1b401423e92e15124b68b666649ebc1fc6"
+        },
+        "journal": {
+          "bytes": 416392,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/031-fix-ocaml-gc/fix-ocaml-gc__29jmdAt/agent/evidence-harness/events.jsonl",
+          "sha256": "136b11d84737d5ee5489ac047d5cf569e840a6e356f02f3a8a5680da722fba1b"
+        },
+        "result": {
+          "bytes": 5439,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/031-fix-ocaml-gc/fix-ocaml-gc__29jmdAt/result.json",
+          "sha256": "93f4b9d44b80609b39fdb48fca4af9e1928efe4836be35e07ecf99b9ffb882f0"
+        }
+      },
+      "split": "test",
+      "split_bucket": 8,
+      "task_identity_sha256": "e879480babe020aa216bf9c7b805c315828c070a3c4bb1f1b2f7e49367bd89c4"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 32,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "gcode-to-text",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1332,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/032-gcode-to-text/gcode-to-text__NvBWENU/config.json",
+          "sha256": "0d520620dae539dd3387efc727a6a7b40439909e36f9d342ca73b4d1614e08e9"
+        },
+        "journal": {
+          "bytes": 663429,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/032-gcode-to-text/gcode-to-text__NvBWENU/agent/evidence-harness/events.jsonl",
+          "sha256": "55e893cb44cc63bf7ffa6b984672826a9a4c1cc867bc11e8d79fe59684183c50"
+        },
+        "result": {
+          "bytes": 5742,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/032-gcode-to-text/gcode-to-text__NvBWENU/result.json",
+          "sha256": "f70538721ccbf9198fa06d9e59a482c865db9077e47432fc95343d71233276ea"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "dafad5dda764bfbb06deb47794ccf7b453978d396b6427f97aca148d447a3a10"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 33,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 4,
+        "completion_reviews": 2,
+        "finish_proposals": 5,
+        "replans": 0
+      },
+      "name": "git-leak-recovery",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1002,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/033-git-leak-recovery/git-leak-recovery__VswJ92x/config.json",
+          "sha256": "221c263e7b1ed9584ef3a65e0b1fa88516bf243ad1b3688ee47349bfd3a4d3b6"
+        },
+        "journal": {
+          "bytes": 178991,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/033-git-leak-recovery/git-leak-recovery__VswJ92x/agent/evidence-harness/events.jsonl",
+          "sha256": "faeaae98fae78915a7785a1ebada15d5837f7c5a183d0e24a9aec6b4a5977760"
+        },
+        "result": {
+          "bytes": 5699,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/033-git-leak-recovery/git-leak-recovery__VswJ92x/result.json",
+          "sha256": "fb5e52847482554601bc95de298d813fccb23c351e1ad5599b4ca71c0ea32d95"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "ca079dbb880dc205dbc3acf1e8abf2b50fcd9f4352c9d768f1b3881a8192f1ce"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 34,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 4,
+        "completion_reviews": 2,
+        "finish_proposals": 5,
+        "replans": 1
+      },
+      "name": "git-multibranch",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 996,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/034-git-multibranch/git-multibranch__mNbuFar/config.json",
+          "sha256": "ddebe0a5920b4d75b30568757fffce1f50aea28a46f3b67879078e361d2f42c0"
+        },
+        "journal": {
+          "bytes": 266795,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/034-git-multibranch/git-multibranch__mNbuFar/agent/evidence-harness/events.jsonl",
+          "sha256": "d5e1b97d869958c377d644830e42506fdbda6c6845d8a15fa3667aff003b73ca"
+        },
+        "result": {
+          "bytes": 5667,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/034-git-multibranch/git-multibranch__mNbuFar/result.json",
+          "sha256": "b25764a61c2b30e1c65506426eba92a9f2ee60a6cec4e970f61098ca934ce230"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "ee81a496a0ae3315d2e3977b6819be0739c6a672a3162e74267962d34a25d1e6"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 35,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 1,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "gpt2-codegolf",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 990,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/035-gpt2-codegolf/gpt2-codegolf__osfYvsw/config.json",
+          "sha256": "4b7a7f0b15610445d49032801f6eb4c7864da666f197629367ad9cd09321f23a"
+        },
+        "journal": {
+          "bytes": 312555,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/035-gpt2-codegolf/gpt2-codegolf__osfYvsw/agent/evidence-harness/events.jsonl",
+          "sha256": "43f11ff1f50974fd1e8baa6d2aa715442fa26754f6f0fef085830d17b214886a"
+        },
+        "result": {
+          "bytes": 5449,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/035-gpt2-codegolf/gpt2-codegolf__osfYvsw/result.json",
+          "sha256": "560ee802c206b1e0154cec380542bb1b1138c84206475f6bae06bfd7b7965203"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "d4b6ab8061550cac8fc3ee95773fb3bda387aa0013e1a189472f90db24f7b412"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 36,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "headless-terminal",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1344,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/036-headless-terminal/headless-terminal__anpMB6B/config.json",
+          "sha256": "cd2ebcbf4692c1823f6ca9778240e63c5eec7eb1147b72d28576d67e350517d5"
+        },
+        "journal": {
+          "bytes": 133377,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/036-headless-terminal/headless-terminal__anpMB6B/agent/evidence-harness/events.jsonl",
+          "sha256": "1ff6c35de459e26a51ada004df88fe98f13f8bb15d5adadea846f876d77c7247"
+        },
+        "result": {
+          "bytes": 5898,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/036-headless-terminal/headless-terminal__anpMB6B/result.json",
+          "sha256": "8f64b26ef111dcf29cbca6223b7b91fcd9398f5dbdbc87c82318cb03663ef810"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "cc77ed09128aeac1e099ee92999dc19015067bf8c98cb5cea0e559fb7d36ac53"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 37,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "hf-model-inference",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 913,
+          "path": "runs/terminal-bench-2/full89-terra-hf-retry-20260927/001-hf-model-inference/hf-model-inference__EPsadQE/config.json",
+          "sha256": "0fd70571a5f91bd97eeca4e9eaaee6ba90ef9d5e53ac0e281bd5c7b6ddf3eacf"
+        },
+        "journal": {
+          "bytes": 216368,
+          "path": "runs/terminal-bench-2/full89-terra-hf-retry-20260927/001-hf-model-inference/hf-model-inference__EPsadQE/agent/evidence-harness/events.jsonl",
+          "sha256": "8db522abdcb9ffde1528f82b16d45cc4b6eb1db6c423a57a770b515dc310253a"
+        },
+        "result": {
+          "bytes": 5598,
+          "path": "runs/terminal-bench-2/full89-terra-hf-retry-20260927/001-hf-model-inference/hf-model-inference__EPsadQE/result.json",
+          "sha256": "1810edfc3b0393006c8c59f3f1535b1e148433b1b2c5b8ad6ab40df15bafdf38"
+        }
+      },
+      "split": "test",
+      "split_bucket": 3,
+      "task_identity_sha256": "1665f799da3b929313af5be1231517a3680fa25b43b8bac4f6ce14688205259c"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 38,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "install-windows-3.11",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1011,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/038-install-windows-3.11/install-windows-3.11__E6bjCEN/config.json",
+          "sha256": "8cac78f49245a9b42b60c27eea73ea4b96580b831dbba95998d9e73d4568d2df"
+        },
+        "journal": {
+          "bytes": 459890,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/038-install-windows-3.11/install-windows-3.11__E6bjCEN/agent/evidence-harness/events.jsonl",
+          "sha256": "c3fbe57e77ad4d1db1c9f442a1cdd062b25a36f6c7b8aa625b26541df8e62621"
+        },
+        "result": {
+          "bytes": 5691,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/038-install-windows-3.11/install-windows-3.11__E6bjCEN/result.json",
+          "sha256": "96a86b7e82e93d3819969f73829d6195aabc3cdadc30d025a05ea8ae2487eb0a"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "3507e6d59c2e5168749b40aab998627591dc5856c00ec4111b7cf6374e9dab9b"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 39,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "kv-store-grpc",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 990,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/039-kv-store-grpc/kv-store-grpc__p7Syeai/config.json",
+          "sha256": "3f26f7bf3ad964f9a9de265adb552b6621d4843bd2074f4013322946b8e52492"
+        },
+        "journal": {
+          "bytes": 257644,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/039-kv-store-grpc/kv-store-grpc__p7Syeai/agent/evidence-harness/events.jsonl",
+          "sha256": "e9aeef7c76ec282012c15ad49ff8d43803a03c0a0cdf2dc6da3057c3ac39a9dc"
+        },
+        "result": {
+          "bytes": 5509,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/039-kv-store-grpc/kv-store-grpc__p7Syeai/result.json",
+          "sha256": "d62a67e1c27262b55817a71dcef54d21969e3afddc59e247e5408441ecad8f66"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "7add103655be18dcc9e56b2ee361a1533d19cc6db48fce2b7055ef2d63b75336"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 40,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "large-scale-text-editing",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1365,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/040-large-scale-text-editing/large-scale-text-editing__y6zLno4/config.json",
+          "sha256": "91ce41e1122fee5a43ac93c74afde70a4888e659b84fa3cb8fe39d1de690d196"
+        },
+        "journal": {
+          "bytes": 98730,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/040-large-scale-text-editing/large-scale-text-editing__y6zLno4/agent/evidence-harness/events.jsonl",
+          "sha256": "e3a0256b1e06201a7e86a3bf761ab0a7127817683153f6ed7f1d833f950170e9"
+        },
+        "result": {
+          "bytes": 6020,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/040-large-scale-text-editing/large-scale-text-editing__y6zLno4/result.json",
+          "sha256": "e92d6a210c0165788b6b3213bc5ef3c5e1f6342c8205bd2f1eed90a5ea771e7c"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "62d1fce58cfa8c27923f4a1f0463b0a05f299b31854229727d976b25a3fe3a11"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 41,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "largest-eigenval",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 999,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/041-largest-eigenval/largest-eigenval__CTHwDMF/config.json",
+          "sha256": "2cb4dde722320168405cceecc9175f06c5ad04862615b901861d19bc5761b42d"
+        },
+        "journal": {
+          "bytes": 145856,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/041-largest-eigenval/largest-eigenval__CTHwDMF/agent/evidence-harness/events.jsonl",
+          "sha256": "f80442189a3a07bf21e76556008b9aa184b81164f628e2bb82c577f9b26b6f7b"
+        },
+        "result": {
+          "bytes": 5720,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/041-largest-eigenval/largest-eigenval__CTHwDMF/result.json",
+          "sha256": "446145e561251d6458bd8eacf055edcb57e13702c1538b16cbf46ecde092635e"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "393e67506aca46fa4b68ada6bbcf1a7346fd2ea45ef838998a1da95818e9cf3b"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 42,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "llm-inference-batching-scheduler",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1389,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/042-llm-inference-batching-scheduler/llm-inference-batching-scheduler__6jozSQ6/config.json",
+          "sha256": "06f606541b30c159d177487614d268b774424c12e4e49a57149277ee034ef463"
+        },
+        "journal": {
+          "bytes": 191173,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/042-llm-inference-batching-scheduler/llm-inference-batching-scheduler__6jozSQ6/agent/evidence-harness/events.jsonl",
+          "sha256": "3cfda8c801142c6420fdcc925290bef103db0c2d8ab2a78d834452b40b65093f"
+        },
+        "result": {
+          "bytes": 6151,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/042-llm-inference-batching-scheduler/llm-inference-batching-scheduler__6jozSQ6/result.json",
+          "sha256": "31ad2bf9c7784fa16361332c2ef8454738417a78848313ef2c1a30b21443624a"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "fe462365892eb016eb105ff34870c47bde9a10447ca51aaf7731fc6a7be37dfc"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 43,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "log-summary-date-ranges",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1362,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/043-log-summary-date-ranges/log-summary-date-ranges__LAGMo5H/config.json",
+          "sha256": "3b36074824daee0929f1f069cac4c27b2122c372c6a7c3129a67c4b38bb5da1f"
+        },
+        "journal": {
+          "bytes": 51114,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/043-log-summary-date-ranges/log-summary-date-ranges__LAGMo5H/agent/evidence-harness/events.jsonl",
+          "sha256": "110ebceda7335a0a91b345c4cc2e528b69cfbac79551013d6efa782ab5681b17"
+        },
+        "result": {
+          "bytes": 5885,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/043-log-summary-date-ranges/log-summary-date-ranges__LAGMo5H/result.json",
+          "sha256": "82c4f8a21fd9c17485f1088d747b3b2f4d158bfa6aac2e0223ff1cbec16ae4d4"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "f5f615bf6a034870c9a338ff9f7477cf6c232a215bcc31547d3f87f965736f2c"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 44,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 1
+      },
+      "name": "mailman",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 972,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/044-mailman/mailman__o8Gzurw/config.json",
+          "sha256": "b43d8263e2a356d31f3c68168aa7e32fb6fa83904b95d83ca316bb1aa3731415"
+        },
+        "journal": {
+          "bytes": 618351,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/044-mailman/mailman__o8Gzurw/agent/evidence-harness/events.jsonl",
+          "sha256": "49d436c1e8a4385ebdf7d981283c125047698dc827b838975b16b200d2a9082b"
+        },
+        "result": {
+          "bytes": 5389,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/044-mailman/mailman__o8Gzurw/result.json",
+          "sha256": "3fa6bda931e342d9764b75ae08a854dec55d49fe8b2a468c3610cb41f255c4e2"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "5e1da8f52f9b8e562a952ec4c447995767a085cb585047769caee7dd27c3eda0"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 45,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 9
+      },
+      "name": "make-doom-for-mips",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1347,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/045-make-doom-for-mips/make-doom-for-mips__D9SHkh4/config.json",
+          "sha256": "5029eb4a315fac95056183cde60d008493bfacd1983df4807030c38462bd4694"
+        },
+        "journal": {
+          "bytes": 333332,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/045-make-doom-for-mips/make-doom-for-mips__D9SHkh4/agent/evidence-harness/events.jsonl",
+          "sha256": "7ec12498e9041609d5e858a88bb5748982873035c313d61780d7d919ae7858a0"
+        },
+        "result": {
+          "bytes": 5945,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/045-make-doom-for-mips/make-doom-for-mips__D9SHkh4/result.json",
+          "sha256": "eff90dde27bfc20d354ce8df6e7c056a232746fcd59c36f5ebe852dcdea6a103"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "5eaf261031b1a01ec625728465511333ed7fd50038a49552202641446646161a"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 46,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "make-mips-interpreter",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1356,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/046-make-mips-interpreter/make-mips-interpreter__WCnp4jm/config.json",
+          "sha256": "41ff3743d2e93b8b906a3ef981bdbe85838ee77be0dd563512ddb7312880b6ce"
+        },
+        "journal": {
+          "bytes": 416523,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/046-make-mips-interpreter/make-mips-interpreter__WCnp4jm/agent/evidence-harness/events.jsonl",
+          "sha256": "8c5dcbca77e8d06c440f03e0e5a74924da20c96a0dca912ecd1f11dd2cc2c946"
+        },
+        "result": {
+          "bytes": 5822,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/046-make-mips-interpreter/make-mips-interpreter__WCnp4jm/result.json",
+          "sha256": "d648ef7bd8f3f1dfde2aed76b1999d14efe1a7bbefdce7335ce848b57199fc7b"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "92ac370dd6b4f2cc27ea6ef9f5e416e7006c89dbaac33197a40d8b8d27913580"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 47,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "mcmc-sampling-stan",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1005,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/047-mcmc-sampling-stan/mcmc-sampling-stan__NSmZgNn/config.json",
+          "sha256": "f390f95e28e294f64b89c13ae4f5debdf6b97f951aa6774dbecf9c0646e97b02"
+        },
+        "journal": {
+          "bytes": 419248,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/047-mcmc-sampling-stan/mcmc-sampling-stan__NSmZgNn/agent/evidence-harness/events.jsonl",
+          "sha256": "5e13d60c63c312d1ced18dc4aea7b58ef352422e2c5f97bbfcb0ad6604686415"
+        },
+        "result": {
+          "bytes": 5499,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/047-mcmc-sampling-stan/mcmc-sampling-stan__NSmZgNn/result.json",
+          "sha256": "f3a1f59937b9ee42226caedc4629ada7e892428312358157748db81f7e55d4c2"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "6f1cbabf53f7a5d5cea9b5f6ebdebbe7209d7d6e540ccf39153aaf0bb59199a8"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 48,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "merge-diff-arc-agi-task",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1020,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/048-merge-diff-arc-agi-task/merge-diff-arc-agi-task__BV9jKHs/config.json",
+          "sha256": "11f2bbab52dd0f734732600aacfcc5a2a2c497cf8e67b7f11b3079853db9fb19"
+        },
+        "journal": {
+          "bytes": 173412,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/048-merge-diff-arc-agi-task/merge-diff-arc-agi-task__BV9jKHs/agent/evidence-harness/events.jsonl",
+          "sha256": "871d96a87162d676fac2aa0f7788d07bb1ddcb23976f2928179c90b9175d4d23"
+        },
+        "result": {
+          "bytes": 5791,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/048-merge-diff-arc-agi-task/merge-diff-arc-agi-task__BV9jKHs/result.json",
+          "sha256": "4f7c44c8ae9e2379fbe589637ec29e022334be0f2765a38a4e700bfae99a6e15"
+        }
+      },
+      "split": "test",
+      "split_bucket": 5,
+      "task_identity_sha256": "027363e614560cbf80c30dbbd9895700155f335e77dc4488186c967fee5436c8"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 49,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 5,
+        "completion_reviews": 2,
+        "finish_proposals": 5,
+        "replans": 3
+      },
+      "name": "model-extraction-relu-logits",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1377,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/049-model-extraction-relu-logits/model-extraction-relu-logits__iM53LsS/config.json",
+          "sha256": "c992beb0f3f0190a8cc61d89a4316c9fcd300520800a83a03c42c44ac8a79d7a"
+        },
+        "journal": {
+          "bytes": 331204,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/049-model-extraction-relu-logits/model-extraction-relu-logits__iM53LsS/agent/evidence-harness/events.jsonl",
+          "sha256": "974a118c358e215e14168c6edab7e0e4d36a2e1a306356c2f056bf730f45d3fa"
+        },
+        "result": {
+          "bytes": 5891,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/049-model-extraction-relu-logits/model-extraction-relu-logits__iM53LsS/result.json",
+          "sha256": "692f636fbc5f92491c610f9ae226d0d2dcef249d80d3fa4c924101ff845eb772"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "59fd4b59975a7797b1e50b840af8131a450cbda6b5095eeb414057a574a20ed4"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 50,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "modernize-scientific-stack",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1371,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/050-modernize-scientific-stack/modernize-scientific-stack__dgnJkaj/config.json",
+          "sha256": "fac6285acb337438cb980b7fe2c67b14ff25fe2dc72ed1cba1231703b205401b"
+        },
+        "journal": {
+          "bytes": 128090,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/050-modernize-scientific-stack/modernize-scientific-stack__dgnJkaj/agent/evidence-harness/events.jsonl",
+          "sha256": "fc619fea5c2546660d3ac719d793d857363d3653f40136f6865bca81824b29d9"
+        },
+        "result": {
+          "bytes": 6058,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/050-modernize-scientific-stack/modernize-scientific-stack__dgnJkaj/result.json",
+          "sha256": "bbe08bc29f5e2f21e7a3778149150139d65f30fe25e1e9b90380b57eb7b0184c"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "62d7385bf4673e6ef3160e6f622ad63ddfa967c56a2c0b1677adfaa016662bf5"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 51,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "mteb-leaderboard",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1341,
+          "path": "runs/terminal-bench-2/full89-terra-final-mteb-leaderboard-retry2-20260927/mteb-leaderboard__M5zSZ54/config.json",
+          "sha256": "ac51b0305ac5f8762d433f9dd05e3b9390143d457d6ab2ca2cdaae305d0d1e4a"
+        },
+        "journal": {
+          "bytes": 443862,
+          "path": "runs/terminal-bench-2/full89-terra-final-mteb-leaderboard-retry2-20260927/mteb-leaderboard__M5zSZ54/agent/evidence-harness/events.jsonl",
+          "sha256": "115453fb196f990e50ec3fab9090d6a81501b16df523b4d6deb36e7126013335"
+        },
+        "result": {
+          "bytes": 5921,
+          "path": "runs/terminal-bench-2/full89-terra-final-mteb-leaderboard-retry2-20260927/mteb-leaderboard__M5zSZ54/result.json",
+          "sha256": "6db0064ec8f59ab69c796f931212994fddf983dde0225b39c3167f30b49d9c1b"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "0830f738e1ca966c09e1b839462c2b3c4a222c91dc1196958f6c27003ce7fbaf"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 52,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 1
+      },
+      "name": "mteb-retrieve",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1429,
+          "path": "runs/terminal-bench-2/full89-terra-final-mteb-retrieve-retry2-20260927/mteb-retrieve__DPdqbeS/config.json",
+          "sha256": "5f73ced350be1ec39e3dbca1a7eab7b932ae68c864cc48ec384e36616cfaa74f"
+        },
+        "journal": {
+          "bytes": 109686,
+          "path": "runs/terminal-bench-2/full89-terra-final-mteb-retrieve-retry2-20260927/mteb-retrieve__DPdqbeS/agent/evidence-harness/events.jsonl",
+          "sha256": "fe890a769bc298a20892322f41297a8e4af64ad15d6c53e66591fe18c90f6524"
+        },
+        "result": {
+          "bytes": 5932,
+          "path": "runs/terminal-bench-2/full89-terra-final-mteb-retrieve-retry2-20260927/mteb-retrieve__DPdqbeS/result.json",
+          "sha256": "55271e12eb02e90fc5d7e777311fedb45f8f08088cb1d2e369ec4b1e94ee87e9"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "8556e1bb5facb19850a2dc2c2ef6ebac6725604a4a8ec4cd054c9b6dc8318b02"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 53,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "multi-source-data-merger",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1023,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/053-multi-source-data-merger/multi-source-data-merger__Apjku9G/config.json",
+          "sha256": "c12b530c1a38312988ac05c9c8fce610a966ce64dc75317ac34386360dd24082"
+        },
+        "journal": {
+          "bytes": 83419,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/053-multi-source-data-merger/multi-source-data-merger__Apjku9G/agent/evidence-harness/events.jsonl",
+          "sha256": "d8b19a20620851493c986b47cb46aab6f301a06ad6bd3d88e8d57f4e259580e3"
+        },
+        "result": {
+          "bytes": 5641,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/053-multi-source-data-merger/multi-source-data-merger__Apjku9G/result.json",
+          "sha256": "e415627831be7142ebba3b95f9938c13a86a720a126c3a79046c3bc070497185"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "5ac5f952391bb110118480fd2e38ebbaf13e367e77e216281ce93e73fde21f41"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 54,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "nginx-request-logging",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1356,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/054-nginx-request-logging/nginx-request-logging__xXxE9HV/config.json",
+          "sha256": "d3707173a39e8eff9883dca28169a2bcb8a8eb4f67aa49ca820259a00fa1ac84"
+        },
+        "journal": {
+          "bytes": 173975,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/054-nginx-request-logging/nginx-request-logging__xXxE9HV/agent/evidence-harness/events.jsonl",
+          "sha256": "8a87685cd0dbb9af4ce3b8ca5f0d8e7a98fab2a3fbf792166272298d26f1fb8f"
+        },
+        "result": {
+          "bytes": 6000,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/054-nginx-request-logging/nginx-request-logging__xXxE9HV/result.json",
+          "sha256": "3f65fde3e41b81343d2d9a1723d8fd63cba5e48c01382552ce220a95444e7dcb"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "f75f45062d7af60b514550a70a68eb23cd5c4b25a24569ca00c8260d69dacc62"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 55,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "openssl-selfsigned-cert",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1362,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/055-openssl-selfsigned-cert/openssl-selfsigned-cert__ibjUerH/config.json",
+          "sha256": "eb5b71082521ac765d1467b3db95443ab4c9adf423b701423e28e7b9194a3fe0"
+        },
+        "journal": {
+          "bytes": 142426,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/055-openssl-selfsigned-cert/openssl-selfsigned-cert__ibjUerH/agent/evidence-harness/events.jsonl",
+          "sha256": "42f4fdf90185753688cd3d6875cc6d3db3e973cec62d1ef760b9190de3185307"
+        },
+        "result": {
+          "bytes": 6025,
+          "path": "runs/terminal-bench-2/full89-terra-resume25-20260925/055-openssl-selfsigned-cert/openssl-selfsigned-cert__ibjUerH/result.json",
+          "sha256": "d09251f4bcb6877e6d315e1f620569f69c1ebdfff75f5440ee75ec1587fd398a"
+        }
+      },
+      "split": "test",
+      "split_bucket": 8,
+      "task_identity_sha256": "bca13c34583996c0bdb04c10b56d0169573df4187c8c535e67053dbb71ff7b5f"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 56,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "overfull-hbox",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 990,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/056-overfull-hbox/overfull-hbox__juqTH9G/config.json",
+          "sha256": "9fa0e620fb8f08141115aa85365246f3591713cee630088c59b129f15f2d7428"
+        },
+        "journal": {
+          "bytes": 280716,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/056-overfull-hbox/overfull-hbox__juqTH9G/agent/evidence-harness/events.jsonl",
+          "sha256": "02b152d246126de8bdbaa670d22234b403859b0c5122ca8fb73e5f5e947055ef"
+        },
+        "result": {
+          "bytes": 5576,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/056-overfull-hbox/overfull-hbox__juqTH9G/result.json",
+          "sha256": "64f1325e5fbcc22d5ff51189a011d0b113a06ad0bbf2b8befd153f4feb144694"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "5225cb3a3e9ca3141a51cb6a7a2c9cbf6fb607b7ca0c73611d6db80d9350b2dc"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 57,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "password-recovery",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1002,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/057-password-recovery/password-recovery__vWR3w63/config.json",
+          "sha256": "bf912c71ba5ff7277704fbdcc8ff4c3c3bc7526d0d3f40ee7e591e04eb0c8156"
+        },
+        "journal": {
+          "bytes": 193262,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/057-password-recovery/password-recovery__vWR3w63/agent/evidence-harness/events.jsonl",
+          "sha256": "3a468e84d405bfc39ff363a81056178ec0280f089a66a5572bd8f2ae436d439c"
+        },
+        "result": {
+          "bytes": 5548,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/057-password-recovery/password-recovery__vWR3w63/result.json",
+          "sha256": "d249986010087c5a70bfef553b3688638d66ab8a268cc4371c9383b821945d56"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "2424f296d488637822d68710a39dba638ebdd017c59b0574f40396512c4ef4a8"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 58,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 2
+      },
+      "name": "path-tracing",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 987,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/058-path-tracing/path-tracing__vtRNh2S/config.json",
+          "sha256": "e229bd7e3d34d24f450c0442d4a91b0b4eefa1a5ed87c79d9b3561df3793fb8d"
+        },
+        "journal": {
+          "bytes": 689536,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/058-path-tracing/path-tracing__vtRNh2S/agent/evidence-harness/events.jsonl",
+          "sha256": "468b3118512b18a69650a5b55f0c4ee37b41aab23b4cef92078e6661a20f93d3"
+        },
+        "result": {
+          "bytes": 5441,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/058-path-tracing/path-tracing__vtRNh2S/result.json",
+          "sha256": "8463a6887fbd38576fe6509d4fc6084a338b584deb9564356c0b83dab3d2c165"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "ba687c2a2d0aa5b8fe61f8f7b9f34fb9bc048f54c376b1b03c359f1fa6f8ce48"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 59,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "path-tracing-reverse",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1011,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/059-path-tracing-reverse/path-tracing-reverse__rti58No/config.json",
+          "sha256": "e8546c304e716189550110f4dabf6d51a7b24b6f84f8081fe757ae9df4eabc69"
+        },
+        "journal": {
+          "bytes": 656806,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/059-path-tracing-reverse/path-tracing-reverse__rti58No/agent/evidence-harness/events.jsonl",
+          "sha256": "79d885d5b370f18b5158d1070e42143150108b352f86944a2a6625e1dd4b70fc"
+        },
+        "result": {
+          "bytes": 5521,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/059-path-tracing-reverse/path-tracing-reverse__rti58No/result.json",
+          "sha256": "aca0d34a0d0bf1ba74f07c696ae621585ba3d499ea315e51994c0464b67e2293"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "572075ffc06a903d48e9d082fd3eec24d604043c9bd9de8897217c6fa68d2a41"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 60,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "polyglot-c-py",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 990,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/060-polyglot-c-py/polyglot-c-py__Lo3NVME/config.json",
+          "sha256": "806e093eb7ae2f0c4606c76d792e6bbaa10e76fe19ab4676585b1e63bfe89fb3"
+        },
+        "journal": {
+          "bytes": 176942,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/060-polyglot-c-py/polyglot-c-py__Lo3NVME/agent/evidence-harness/events.jsonl",
+          "sha256": "95683d0c9aba380915d66dd357bb43e02e78ada77f4209c542956840ed494960"
+        },
+        "result": {
+          "bytes": 5546,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/060-polyglot-c-py/polyglot-c-py__Lo3NVME/result.json",
+          "sha256": "97abea5582460b67d5c6d86d1783c1ae44e86c758343d2004825e19933dac294"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "76bc1528605a9744291f52e4c97a6779eb7869db59eadd404fe8f3c16f30e807"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 61,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "polyglot-rust-c",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 996,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/061-polyglot-rust-c/polyglot-rust-c__ZCxmKvW/config.json",
+          "sha256": "0037be673cdf8723a9b57c4e06643d9f070a332268b7d7caf814dfd90c682c78"
+        },
+        "journal": {
+          "bytes": 94899,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/061-polyglot-rust-c/polyglot-rust-c__ZCxmKvW/agent/evidence-harness/events.jsonl",
+          "sha256": "00a28f1a607efe05ad1d0cf1eaa7d4f418d3e7d595e7aa14aee4ce320f1f2117"
+        },
+        "result": {
+          "bytes": 5543,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/061-polyglot-rust-c/polyglot-rust-c__ZCxmKvW/result.json",
+          "sha256": "48a7697af31c5cfdf966f59779ee50102f9d0af78c79d822214a92bfea98dd72"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "668f57c1abd308019d55ae72657d98b66ad111e344631d78264255ec00defc31"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 62,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "portfolio-optimization",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1359,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/062-portfolio-optimization/portfolio-optimization__HsHFw5C/config.json",
+          "sha256": "6b1621917d898a0dd5d21f61842328409177418867bb0e7b5782edb5ec8d5771"
+        },
+        "journal": {
+          "bytes": 165628,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/062-portfolio-optimization/portfolio-optimization__HsHFw5C/agent/evidence-harness/events.jsonl",
+          "sha256": "0fbc126f44cb85dc4d4d8801bbda4c8ac13dbe1bdc2624de1bd647a5208e5bc0"
+        },
+        "result": {
+          "bytes": 5993,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/062-portfolio-optimization/portfolio-optimization__HsHFw5C/result.json",
+          "sha256": "46c0587a9abdb975407c508b144c11b4b079d08bf923aec71408dfdf57b00ea4"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "7e6433b02eb01a684990773bd29d42edb923f1512acb890c4aa90eeb3929d059"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 63,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "protein-assembly",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1341,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/063-protein-assembly/protein-assembly__6Ff6JaF/config.json",
+          "sha256": "706b8ce5a307cca0745661e7118953145b164a721487e591c8d4208e218c7cda"
+        },
+        "journal": {
+          "bytes": 498343,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/063-protein-assembly/protein-assembly__6Ff6JaF/agent/evidence-harness/events.jsonl",
+          "sha256": "c57230784614be934fc2372bbb53d879eb1dd96ed77de2a73f4ff83fa8781b12"
+        },
+        "result": {
+          "bytes": 5867,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/063-protein-assembly/protein-assembly__6Ff6JaF/result.json",
+          "sha256": "174c65a21c8daa3f77933ec508fe47a907b181d7cb2c2d3607508e49675558c8"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "353c3452215b91b9e563038dfcbeabb2805082adf4f5e71b00c574b63cb77d7a"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 64,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "prove-plus-comm",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 996,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/064-prove-plus-comm/prove-plus-comm__zMH4nKs/config.json",
+          "sha256": "31485e5b1efdc4459fcf7e1f91be0c62fda48a0a4bff391aef1a17aaf32f650a"
+        },
+        "journal": {
+          "bytes": 102755,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/064-prove-plus-comm/prove-plus-comm__zMH4nKs/agent/evidence-harness/events.jsonl",
+          "sha256": "3c27a43a2cf4b5f677a57a91a785da95c40e437821927448e0c6764ff452e995"
+        },
+        "result": {
+          "bytes": 5658,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/064-prove-plus-comm/prove-plus-comm__zMH4nKs/result.json",
+          "sha256": "a6748c49ea39030b3ae09e3a7a2b630a12a19bd581c826197286dc5751857626"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "cf709616611d4f4028a4e3b02ea5b62d801dd45d176c2b7baea968483b502526"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 65,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "pypi-server",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1326,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/065-pypi-server/pypi-server__NLVZjgW/config.json",
+          "sha256": "f5fe2311a50f6bc921882ed3c4bfc75fc47e322458cdaaaeea5b4e2bec4092dd"
+        },
+        "journal": {
+          "bytes": 90370,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/065-pypi-server/pypi-server__NLVZjgW/agent/evidence-harness/events.jsonl",
+          "sha256": "4cdc38e212ff50d32a98534c05986f750b44e6fb2f05c6f5d293e5e14bb1f43f"
+        },
+        "result": {
+          "bytes": 5985,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/065-pypi-server/pypi-server__NLVZjgW/result.json",
+          "sha256": "a8b4d3d04c08fd57201d304c2ab58836f7d17e9911faddabafeb77eaf4f3ecbb"
+        }
+      },
+      "split": "test",
+      "split_bucket": 3,
+      "task_identity_sha256": "6a52593057081a4de4899d37068eb7b28ba717a441adaeb26f7d176246584402"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 66,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 1
+      },
+      "name": "pytorch-model-cli",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1344,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/066-pytorch-model-cli/pytorch-model-cli__vrxmk4h/config.json",
+          "sha256": "d23075f3bf9531267b8db0394ed3bd48698943df17fc815cd7ef366430a7a05a"
+        },
+        "journal": {
+          "bytes": 202750,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/066-pytorch-model-cli/pytorch-model-cli__vrxmk4h/agent/evidence-harness/events.jsonl",
+          "sha256": "7bf9b3b507c88b2ca0c1e16b1adfcbd888bd59b39efdf69d7d4d0d8683fee944"
+        },
+        "result": {
+          "bytes": 5963,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/066-pytorch-model-cli/pytorch-model-cli__vrxmk4h/result.json",
+          "sha256": "8ef4e286de979fe7da66f660f3f339f958cc402c0c78b7c721edfac2ca686241"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "7e6edf513f70ffd6d33ec7ae1bc318f390953de20d6d51c70ca7a136c75605c6"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 67,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "pytorch-model-recovery",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1449,
+          "path": "runs/terminal-bench-2/full89-terra-final-pytorch-model-recovery-20260927/pytorch-model-recovery__geSTFcJ/config.json",
+          "sha256": "3a493f61e349a4964553696684a2fad40f7041901ce67eeaba3c961a2d87ed0b"
+        },
+        "journal": {
+          "bytes": 118041,
+          "path": "runs/terminal-bench-2/full89-terra-final-pytorch-model-recovery-20260927/pytorch-model-recovery__geSTFcJ/agent/evidence-harness/events.jsonl",
+          "sha256": "4a56e67b405c70482f40a708131f7ed019f569b448362f5e8b4e286424347a64"
+        },
+        "result": {
+          "bytes": 6037,
+          "path": "runs/terminal-bench-2/full89-terra-final-pytorch-model-recovery-20260927/pytorch-model-recovery__geSTFcJ/result.json",
+          "sha256": "5efd8be40181ef9daeca9c99723818a73c9dd670764b78c63c9e91a42ed2ae93"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "cc6e4fb88cb2df29583d1d6117828bb335fe3704a759cc76de5045a430363898"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 68,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "qemu-alpine-ssh",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1311,
+          "path": "runs/terminal-bench-2/full89-terra-qemu-rescore2-20260927/qemu-alpine-ssh__tnXfj2b/config.json",
+          "sha256": "6d8bff1946ef3fcdc08a683942537719bdd3181c33d688d8b1a52866b947e8d9"
+        },
+        "journal": {
+          "bytes": 309672,
+          "path": "runs/terminal-bench-2/full89-terra-qemu-rescore2-20260927/qemu-alpine-ssh__tnXfj2b/agent/evidence-harness/events.jsonl",
+          "sha256": "383b6ca3342c93d4c8b7b02a50f461ac0c78eeba8e7277854f1e4a356d83ab56"
+        },
+        "result": {
+          "bytes": 5705,
+          "path": "runs/terminal-bench-2/full89-terra-qemu-rescore2-20260927/qemu-alpine-ssh__tnXfj2b/result.json",
+          "sha256": "1b2dfe11d1dab1026ff258364fc747bb91edbc9c29607e1ba9dabeef5bf5ac95"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "d6b6633b07127d1b128733b9e29c9fbce9cabe1c1c9861a8f00b5ab4f0790ace"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 69,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 2
+      },
+      "name": "qemu-startup",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1305,
+          "path": "runs/terminal-bench-2/full89-terra-qemu-rescore2-20260927/qemu-startup__Z4RyPpD/config.json",
+          "sha256": "c6f15f08e70e005e9d976ea7958b0d4e9000bd8734842071fc60215fbd45462b"
+        },
+        "journal": {
+          "bytes": 339636,
+          "path": "runs/terminal-bench-2/full89-terra-qemu-rescore2-20260927/qemu-startup__Z4RyPpD/agent/evidence-harness/events.jsonl",
+          "sha256": "b6af6a35d43021aab7d96dba5f7108e411986a3767ea2460d676fae4de0b95c2"
+        },
+        "result": {
+          "bytes": 5754,
+          "path": "runs/terminal-bench-2/full89-terra-qemu-rescore2-20260927/qemu-startup__Z4RyPpD/result.json",
+          "sha256": "b290e7e44a9421acfe3c19e80216dbfe75d746e58bef3e1e36aca2ce92c700d3"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "54306eae5c24b51832f2b40eeae985afb129a532e92afc4faa8d5c1de2105e5d"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 70,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "query-optimize",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 993,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/070-query-optimize/query-optimize__QMeZWWC/config.json",
+          "sha256": "3cf50223445bb75fe3ef3d8e6f5f79eb6997409a10a287b10382e15d939024ae"
+        },
+        "journal": {
+          "bytes": 104863,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/070-query-optimize/query-optimize__QMeZWWC/agent/evidence-harness/events.jsonl",
+          "sha256": "ef427ed2c453507abebaf04b8e5931d02fc77ca08737025ee05b9a314eb1c00a"
+        },
+        "result": {
+          "bytes": 5720,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/070-query-optimize/query-optimize__QMeZWWC/result.json",
+          "sha256": "e4c2cccfa8b556379bc6d88e017dbdbf64e1c27160da4dd32c1dc906befa16c6"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "901eb61de2823681f71dcc50861f770c3dda55021c72c40fd444248b6d6486c9"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 71,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "raman-fitting",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1332,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/071-raman-fitting/raman-fitting__DorfrUk/config.json",
+          "sha256": "e523e8e01f59b399c90712d6f976dbfdf4142812701ee70686a73179b52c3cbc"
+        },
+        "journal": {
+          "bytes": 132048,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/071-raman-fitting/raman-fitting__DorfrUk/agent/evidence-harness/events.jsonl",
+          "sha256": "34ba95096bae0acaa8013aebba16d8efd6de822405a42c101eeff304e3c543a3"
+        },
+        "result": {
+          "bytes": 5868,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/071-raman-fitting/raman-fitting__DorfrUk/result.json",
+          "sha256": "f4e9e67a9017edb1948d09da6c10ad4da2c9937df289d493ef643276cb28804b"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "07f5fa83ad767276840fde923c90c20b97770a00e488080166d314a41aa88b16"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 72,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 1
+      },
+      "name": "regex-chess",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1326,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/072-regex-chess/regex-chess__7ay68cd/config.json",
+          "sha256": "a80ae10f66849da309480ad38eb3181723fc8341a487e19c8b28b9feda6ec2a3"
+        },
+        "journal": {
+          "bytes": 331304,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/072-regex-chess/regex-chess__7ay68cd/agent/evidence-harness/events.jsonl",
+          "sha256": "7c9a06f83c7ae18d392b3a6b6f676f60549a9dd6f492fcd891048ee6428803fa"
+        },
+        "result": {
+          "bytes": 5722,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/072-regex-chess/regex-chess__7ay68cd/result.json",
+          "sha256": "ed6cb1e9371541660616bcb74cd6db385993af772bdf3b72036cf5011997d198"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "fb8838ad1847889620d3ced8f607aba9a20568bbae0f7a2e9a4d36122b3fc3be"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 73,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "regex-log",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 978,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/073-regex-log/regex-log__bbdXnxV/config.json",
+          "sha256": "f7c5bf72893e4e3e6f36cb5cac85081998a17c9aae07055231f5170155b90055"
+        },
+        "journal": {
+          "bytes": 341462,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/073-regex-log/regex-log__bbdXnxV/agent/evidence-harness/events.jsonl",
+          "sha256": "1316f229968d3feab96d9d49d36364efdb6e11f586ab1e92ddbca5ac6337749c"
+        },
+        "result": {
+          "bytes": 5409,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/073-regex-log/regex-log__bbdXnxV/result.json",
+          "sha256": "ee3c01a5d5d400e81473fa8a0f8b7dcbfa8cdf9c7142dcb4f5d49a3f976d76b2"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "c4bd933b7464f561d7226cb60ea31c49ccfa23676bd5561f9e2a0a35bf001349"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 74,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "reshard-c4-data",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 996,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/074-reshard-c4-data/reshard-c4-data__eGtsRsS/config.json",
+          "sha256": "e746ab54ebe7fd967259bcd38aa55eae822c3836297ad26a61efb502a2b08f83"
+        },
+        "journal": {
+          "bytes": 200908,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/074-reshard-c4-data/reshard-c4-data__eGtsRsS/agent/evidence-harness/events.jsonl",
+          "sha256": "aea98fb05de3333c18b6477dad1827b319ed9567fbbfbb991252cf57cd767d8f"
+        },
+        "result": {
+          "bytes": 5693,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/074-reshard-c4-data/reshard-c4-data__eGtsRsS/result.json",
+          "sha256": "253a3b07bc44e4b376d107fb30129251affc8b4da80df7bc2d9baee361247598"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "01edde029abbe0dc5b4caeb60815ae66ebd88da5ddf81a3e37f68dc6ca3ff865"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 75,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "rstan-to-pystan",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 996,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/075-rstan-to-pystan/rstan-to-pystan__jV9o8oM/config.json",
+          "sha256": "4e1253e5fd904b0bbf778622ab545af998e2752fa9fa4864b2afcd601fedc05a"
+        },
+        "journal": {
+          "bytes": 422713,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/075-rstan-to-pystan/rstan-to-pystan__jV9o8oM/agent/evidence-harness/events.jsonl",
+          "sha256": "101030bb14a1bd6fbe563065be7e349bec6244e1a59913827831d74b4ca90eaa"
+        },
+        "result": {
+          "bytes": 5635,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/075-rstan-to-pystan/rstan-to-pystan__jV9o8oM/result.json",
+          "sha256": "f2e9ebff50ed0d94fcbdddfae8dffee6476b52d893a063363fcc27b7582e0fa4"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "dab383f69f43d27e42708a8959f8c02010e6c43a17b18b3114dc9a2322d2ae5c"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 76,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 1,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "sam-cell-seg",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1025,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/015-sam-cell-seg/sam-cell-seg__q68X94j/config.json",
+          "sha256": "cf6f12291b8a83fa5d441a92714c940855591ce32df9cf7e479e2657d038e07c"
+        },
+        "journal": {
+          "bytes": 321547,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/015-sam-cell-seg/sam-cell-seg__q68X94j/agent/evidence-harness/events.jsonl",
+          "sha256": "a43126a1873e7bc6598ef2a19564b22a570b9c2adbba8c26e1526a0b4e18d56c"
+        },
+        "result": {
+          "bytes": 5670,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/015-sam-cell-seg/sam-cell-seg__q68X94j/result.json",
+          "sha256": "9a6c002030940c6548f2b630804e27a11970fde6aef975f8a7db43c63793b84d"
+        }
+      },
+      "split": "test",
+      "split_bucket": 8,
+      "task_identity_sha256": "871070453be34c2c71d8b0011c5e6760d17cffe1f59c4d65b4076b1a17bddfe3"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 77,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "sanitize-git-repo",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1344,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/077-sanitize-git-repo/sanitize-git-repo__6Y9heKt/config.json",
+          "sha256": "c88d1407d6a83dd8abc1634ef730408af177fd61a8435fb59d00f59e0c1f10b4"
+        },
+        "journal": {
+          "bytes": 557256,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/077-sanitize-git-repo/sanitize-git-repo__6Y9heKt/agent/evidence-harness/events.jsonl",
+          "sha256": "df9a30b53ff3f84b3de0b8b90e63c865ff8ff38d69856cadc6fccbbb2b65a86d"
+        },
+        "result": {
+          "bytes": 5890,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/077-sanitize-git-repo/sanitize-git-repo__6Y9heKt/result.json",
+          "sha256": "a0b13f34c487ae17481bb1bc1cf590c5566f647c0639a70873977eebea2646f4"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "a742c4cbaa2173e2de7763f6e3afec33f04e3fcabe2cff1b74b538276da0e9e7"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 78,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "schemelike-metacircular-eval",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1377,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/078-schemelike-metacircular-eval/schemelike-metacircular-eval__7unN77T/config.json",
+          "sha256": "0a7f127c4405f022b44c55ba01803d6eb713991fc4810096a6b4560ee18801cd"
+        },
+        "journal": {
+          "bytes": 305369,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/078-schemelike-metacircular-eval/schemelike-metacircular-eval__7unN77T/agent/evidence-harness/events.jsonl",
+          "sha256": "bd819fbfc148900fe18acf18b370e994efb364e4836b46d4bfd45dcc3e2fd51f"
+        },
+        "result": {
+          "bytes": 6062,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/078-schemelike-metacircular-eval/schemelike-metacircular-eval__7unN77T/result.json",
+          "sha256": "ceb95b15cf976462704e545bcd3246aadbb0d289a4e6562db27380945465ef56"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "b2a0e79a2056dcd69dbc949923f3b282b6219a048bd44e50fffb522faf285644"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 79,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "sparql-university",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1002,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/079-sparql-university/sparql-university__qaU8teX/config.json",
+          "sha256": "3b0be29bcb203b2e3b049250feee2930a82680bcb3441beaa6d44fa99c92f399"
+        },
+        "journal": {
+          "bytes": 314096,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/079-sparql-university/sparql-university__qaU8teX/agent/evidence-harness/events.jsonl",
+          "sha256": "9e0c07041bf95b09753712339ec4672e4efa115562ed4f0296e391a95538b260"
+        },
+        "result": {
+          "bytes": 5537,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/079-sparql-university/sparql-university__qaU8teX/result.json",
+          "sha256": "11ab561c8e842c11c09f03997b2da9df889de50c1dbaced666ef89a5cd579eb4"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "76b488cd8db29aea306327e59bd172a7618f4df4c430e04032f0ee15b2c4c08b"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 80,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "sqlite-db-truncate",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1347,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/080-sqlite-db-truncate/sqlite-db-truncate__RYhkAmh/config.json",
+          "sha256": "7fdc234bdc16ce45636ebaed31747943be387cc9dc8803af9050afcd4e962ef6"
+        },
+        "journal": {
+          "bytes": 176548,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/080-sqlite-db-truncate/sqlite-db-truncate__RYhkAmh/agent/evidence-harness/events.jsonl",
+          "sha256": "771d7920b3edcce3bf4d859e238cc7dcf5385c401345e66a143372505407fc13"
+        },
+        "result": {
+          "bytes": 5905,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/080-sqlite-db-truncate/sqlite-db-truncate__RYhkAmh/result.json",
+          "sha256": "6fd5a765666eafa046517d90d9ae922be177a98736ff8034d7a3fe548695d0a6"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "22802798fd27037c807296dcf705800f1612c6293e785154676696b7c53a3d2f"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 81,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 4,
+        "replans": 0
+      },
+      "name": "sqlite-with-gcov",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 999,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/081-sqlite-with-gcov/sqlite-with-gcov__RSm8A8f/config.json",
+          "sha256": "17fd39e076d7ac3fddaff9b454f7380613037ae5156fad9b758e1d2092dd8445"
+        },
+        "journal": {
+          "bytes": 146970,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/081-sqlite-with-gcov/sqlite-with-gcov__RSm8A8f/agent/evidence-harness/events.jsonl",
+          "sha256": "8e03615472cc4caeafbe9fadc325ae66346cd9498caf337afb6eb9a5d915ebae"
+        },
+        "result": {
+          "bytes": 5605,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/081-sqlite-with-gcov/sqlite-with-gcov__RSm8A8f/result.json",
+          "sha256": "665532e278ffbd53a52af7f418db9857436fda7a67f346989c69cb4a768dcf2d"
+        }
+      },
+      "split": "test",
+      "split_bucket": 4,
+      "task_identity_sha256": "5af703eef9808cb84ef07b4b65975a752f51556bd91eedcb68728b2bdb945e35"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "non_live_result"
+      ],
+      "execution_mode": "replay",
+      "index": 82,
+      "journal_schema_version": null,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "torch-pipeline-parallelism",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1054,
+          "path": "runs/terminal-bench-2/torch-replay-pipeline-20260927/torch-pipeline-parallelism__XGgL9BB/config.json",
+          "sha256": "19e00b689d2514e7bbcd87fc60a1d16d1b22b3c8ad222c4fadf2a8c7223f0403"
+        },
+        "journal": null,
+        "result": {
+          "bytes": 4811,
+          "path": "runs/terminal-bench-2/torch-replay-pipeline-20260927/torch-pipeline-parallelism__XGgL9BB/result.json",
+          "sha256": "2de1dbd01769965d07d64d0e4bca4fd0bf6f3ecc9aee9d4357f928501ff40a23"
+        }
+      },
+      "split": "test",
+      "split_bucket": 3,
+      "task_identity_sha256": "6da8ea72e619afb72c2232630abf75f8b0d7fffeea16afe83cee36fc2b60911f"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "non_live_result"
+      ],
+      "execution_mode": "replay",
+      "index": 83,
+      "journal_schema_version": null,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "torch-tensor-parallelism",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1044,
+          "path": "runs/terminal-bench-2/torch-replay-tensor-20260927/torch-tensor-parallelism__q34Brim/config.json",
+          "sha256": "f3af747c6b90891f55cc92035b6f6e890b57470189830011c936cdfc6fb7bb50"
+        },
+        "journal": null,
+        "result": {
+          "bytes": 4791,
+          "path": "runs/terminal-bench-2/torch-replay-tensor-20260927/torch-tensor-parallelism__q34Brim/result.json",
+          "sha256": "94c7a8865f83ac4496749bd19c3e8a31295221e6bd519e2bc2ce574417da67dd"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "1091a2f2f75561d027f83786bc034449b6b58babc9a73475475290cc84b747b7"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 84,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 1
+      },
+      "name": "train-fasttext",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1373,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/018-train-fasttext/train-fasttext__EaecQYv/config.json",
+          "sha256": "14a4b238d0379a472219b386628a39877980bb017bd349141e406d7c54961513"
+        },
+        "journal": {
+          "bytes": 159445,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/018-train-fasttext/train-fasttext__EaecQYv/agent/evidence-harness/events.jsonl",
+          "sha256": "59b12d23b2e0be609789483b4446071861ef9f16b1bdfab6fd6d0388ff771ca1"
+        },
+        "result": {
+          "bytes": 5831,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/018-train-fasttext/train-fasttext__EaecQYv/result.json",
+          "sha256": "b21fd390761d6b5c82e1aa8073662696ab0171a045035d893059b16f9aaf46c9"
+        }
+      },
+      "split": "test",
+      "split_bucket": 9,
+      "task_identity_sha256": "4268c994a501823bcdc93132dc50de350394c0ffe993cebfa35f8e3ee126bcdf"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 85,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "tune-mjcf",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1313,
+          "path": "runs/terminal-bench-2/full89-terra-final-tune-mjcf-20260927/tune-mjcf__XFL9tQX/config.json",
+          "sha256": "8591a9efdcb732ea9ab47bcefca4a19d55426b675766a7d3aadc6d677405a0c9"
+        },
+        "journal": {
+          "bytes": 153232,
+          "path": "runs/terminal-bench-2/full89-terra-final-tune-mjcf-20260927/tune-mjcf__XFL9tQX/agent/evidence-harness/events.jsonl",
+          "sha256": "64559277830b37008e0a81c37954e7e1ae647ea78245bb12df55727452ea74f5"
+        },
+        "result": {
+          "bytes": 5859,
+          "path": "runs/terminal-bench-2/full89-terra-final-tune-mjcf-20260927/tune-mjcf__XFL9tQX/result.json",
+          "sha256": "24c234f9daff86f0954fc567b7fc5eb5b5d201002eeb76093b308f1d778f5e72"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "759ac2e391e886c078b83b90d02889ba4bc306e066f58a866d6ae39e46aa9789"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 86,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "video-processing",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1379,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/020-video-processing/video-processing__ZyB3N8P/config.json",
+          "sha256": "7ef6552fb68d5c805cade48fefd885d740691ca34f1f5ef4f82d84e0a64d37d8"
+        },
+        "journal": {
+          "bytes": 218846,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/020-video-processing/video-processing__ZyB3N8P/agent/evidence-harness/events.jsonl",
+          "sha256": "b73753c7315e0ee5be302993be4d6d9e3ae74b9951941e6a83e9658e6f002033"
+        },
+        "result": {
+          "bytes": 5989,
+          "path": "runs/terminal-bench-2/full89-terra-error-retry-20260926/020-video-processing/video-processing__ZyB3N8P/result.json",
+          "sha256": "f5d7c70a589f0f01dfe8e2cf0b68439b1311bbf0108e7ef0c9192cd876926b9b"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "a80e476f194e7a895ed667e69f906566397616c03e5775d1a135a8210d3d8108"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 87,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "vulnerable-secret",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1344,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/087-vulnerable-secret/vulnerable-secret__MZ3ey7J/config.json",
+          "sha256": "b9b1e09340138a86522f208b04baba4631ed6daf31369bbf73f1eb9931d91b32"
+        },
+        "journal": {
+          "bytes": 24932,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/087-vulnerable-secret/vulnerable-secret__MZ3ey7J/agent/evidence-harness/events.jsonl",
+          "sha256": "80101e6a169702871214fdc8392fbaa4904f212cb988cbd496b848a917bf6598"
+        },
+        "result": {
+          "bytes": 5766,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/087-vulnerable-secret/vulnerable-secret__MZ3ey7J/result.json",
+          "sha256": "d5a576074f925302dcabeefc3825d65b43cc9402d9148566fde8a59f11e87953"
+        }
+      },
+      "split": "test",
+      "split_bucket": 6,
+      "task_identity_sha256": "a74cbc26326bc41877191dab2a9bc25a917574737e9b25f8b93c947704fc7899"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 88,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "winning-avg-corewars",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 1011,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/088-winning-avg-corewars/winning-avg-corewars__xbNVnj4/config.json",
+          "sha256": "5a6dcbead1458620f32fb6dd07eb7a333594c950630f01b56e915de0dc74bda2"
+        },
+        "journal": {
+          "bytes": 206578,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/088-winning-avg-corewars/winning-avg-corewars__xbNVnj4/agent/evidence-harness/events.jsonl",
+          "sha256": "2006ccb3134a0a323370f61a9150d99d7ddfa36616d63aa7633f7a30e598c41e"
+        },
+        "result": {
+          "bytes": 5654,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/088-winning-avg-corewars/winning-avg-corewars__xbNVnj4/result.json",
+          "sha256": "e41f90686ca9d5e296a1d7d7a23dc41c306b9c49b404c2c42378ecc9444a52cf"
+        }
+      },
+      "split": "test",
+      "split_bucket": 5,
+      "task_identity_sha256": "2c9a39287c496d3bc11126d996bd0c1e30c722f7a00125de10df8cb12f18bdd7"
+    },
+    {
+      "admitted": false,
+      "exclusion_reasons": [
+        "journal_not_bound_by_canonical",
+        "unsupported_journal_schema",
+        "producer_commit_unattested",
+        "prefixbench_profile_missing",
+        "phase_evidence_incomplete"
+      ],
+      "execution_mode": "live",
+      "index": 89,
+      "journal_schema_version": 1,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 2
+      },
+      "name": "write-compressor",
+      "phase_events": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      },
+      "sources": {
+        "config": {
+          "bytes": 999,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/089-write-compressor/write-compressor__UMyNgqA/config.json",
+          "sha256": "68cee52e698c202e2675dd672b9ba94c53662768f6458e9182bbe6f8cbf18c78"
+        },
+        "journal": {
+          "bytes": 292248,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/089-write-compressor/write-compressor__UMyNgqA/agent/evidence-harness/events.jsonl",
+          "sha256": "8feb2e6dd024590e8cc8ab0bedef29684804d30cb84b25485c7c76f4c00ad45a"
+        },
+        "result": {
+          "bytes": 5479,
+          "path": "runs/terminal-bench-2/full89-terra-resume56-20260926/089-write-compressor/write-compressor__UMyNgqA/result.json",
+          "sha256": "08cec4d2f345d2843d22fd341c218409462a28497bc32f51cf7c9b1fe3de449e"
+        }
+      },
+      "split": "test",
+      "split_bucket": 7,
+      "task_identity_sha256": "de37899d1e08dc2b444b44738dde1f6f265427100726682f91641f7bbc5189e6"
+    }
+  ]
+}

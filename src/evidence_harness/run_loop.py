@@ -28,12 +28,17 @@ from evidence_harness.prompting import build_executor_prompt, build_review_promp
 from evidence_harness.protocol import (
     ActionKind,
     AgentDecision,
+    CollectionAttestation,
     CommandMode,
     CommandReceipt,
+    CompletionReviewStarted,
+    ExecutorTurnStarted,
     FailureKind,
+    FinalizationStarted,
     FinalizationTrigger,
     LoopOptions,
     ModelGateway,
+    RecoveryRequired,
     ReviewDecision,
     RunPhase,
     RunReport,
@@ -43,6 +48,7 @@ from evidence_harness.protocol import (
     ShellEnvironment,
     StopReason,
     VerificationCheck,
+    WorkBatchStarted,
 )
 from evidence_harness.shell import CommandRunner
 
@@ -89,6 +95,7 @@ class EvidenceLoop:
         journal: RunJournal,
         options: LoopOptions,
         completion_isolation: CompletionIsolation,
+        collection: CollectionAttestation | None = None,
         clock: Callable[[], float] = time.monotonic,
         on_progress: ProgressCallback | None = None,
     ) -> None:
@@ -96,6 +103,7 @@ class EvidenceLoop:
         self._journal = journal
         self._options = options
         self._completion_isolation = completion_isolation
+        self._collection = collection
         self._clock = clock
         self._on_progress = on_progress
         self._gate = EvidenceGate(options)
@@ -109,14 +117,21 @@ class EvidenceLoop:
             deadline_monotonic=started + self._options.max_wall_time_sec,
         )
         runner = CommandRunner(environment, self._journal, self._options, self._clock)
-        self._journal.append(
-            "run_started",
-            {
-                "journal_schema_version": 2,
-                "instruction": instruction,
-                "options": asdict(self._options),
-            },
-        )
+        started_payload = {
+            "journal_schema_version": 2,
+            "instruction": instruction,
+            "options": (
+                self._collection.options if self._collection is not None else asdict(self._options)
+            ),
+        }
+        if self._collection is not None:
+            started_payload.update(
+                {
+                    "prefixbench_profile": self._collection.prefixbench_profile,
+                    "producer": self._collection.producer.model_dump(mode="json"),
+                }
+            )
+        self._journal.append("run_started", started_payload)
 
         bootstrap = await self._run_command(state, runner, _BOOTSTRAP)
         if bootstrap.failure in {FailureKind.TIMEOUT, FailureKind.TRANSPORT}:
@@ -138,6 +153,18 @@ class EvidenceLoop:
 
             self._enter_finalization_if_needed(state)
             state.phase = RunPhase.FINALIZING if state.finalization_started else RunPhase.THINKING
+            if state.phase is RunPhase.THINKING:
+                attempt_id = state.next_executor_attempt
+                state.next_executor_attempt += 1
+                self._journal.append(
+                    "executor_turn_started",
+                    ExecutorTurnStarted(
+                        attempt_id=attempt_id,
+                        turns_completed=state.turn_count,
+                        work_epoch=state.work_epoch,
+                        recovery_required=state.must_replan,
+                    ),
+                )
             self._notify(state)
             allowed_actions = self._allowed_actions(state)
             prompt = build_executor_prompt(
@@ -292,6 +319,14 @@ class EvidenceLoop:
         state.current_goal = decision.commands[0].purpose
         state.work_epoch += 1
         state.latest_evidence = None
+        self._journal.append(
+            "work_batch_started",
+            WorkBatchStarted(
+                work_epoch=state.work_epoch,
+                command_ids=tuple(command.id for command in decision.commands),
+                started_in_finalization=state.finalization_started,
+            ),
+        )
         receipts_before = {item.observation_fingerprint for item in state.observations}
         batch_progressed = False
         started_in_finalization = state.finalization_started
@@ -448,6 +483,15 @@ class EvidenceLoop:
 
         if self._options.enable_completion_review:
             state.phase = RunPhase.REVIEWING
+            state.completion_review_count += 1
+            self._journal.append(
+                "completion_review_started",
+                CompletionReviewStarted(
+                    attempt_id=attempt_id,
+                    review_ordinal=state.completion_review_count,
+                    work_epoch=state.work_epoch,
+                ),
+            )
             review_prompt = build_review_prompt(
                 instruction=state.instruction,
                 checks=decision.checks,
@@ -457,7 +501,6 @@ class EvidenceLoop:
                 supporting_observations=supporting_observations,
                 prior_findings=state.completion_findings,
             )
-            state.completion_review_count += 1
             model_timeout_sec = self._model_call_timeout_sec(state)
             try:
                 async with asyncio.timeout(model_timeout_sec):
@@ -593,6 +636,8 @@ class EvidenceLoop:
         repeated_cycle = find_repeated_cycle(state.observations)
         if repeated_cycle is None and state.stagnant_batches < 3:
             return
+        if state.must_replan:
+            return
         if state.recovery_count >= self._options.max_recoveries:
             self._finish(
                 state,
@@ -607,10 +652,12 @@ class EvidenceLoop:
         )
         self._journal.append(
             "recovery_required",
-            {
-                "cycle": repeated_cycle,
-                "stagnant_batches": state.stagnant_batches,
-            },
+            RecoveryRequired(
+                recovery_ordinal=state.recovery_count + 1,
+                cycle=repeated_cycle,
+                stagnant_batches=state.stagnant_batches,
+                work_epoch=state.work_epoch,
+            ),
         )
 
     def _model_call_timeout_sec(
@@ -691,14 +738,14 @@ class EvidenceLoop:
         state.recovery_directive = None
         self._journal.append(
             "finalization_started",
-            {
-                "triggers": state.finalization_triggers,
-                "turns_remaining": turns_remaining,
-                "turn_reserve": turn_reserve,
-                "wall_time_remaining_sec": wall_time_remaining_sec,
-                "wall_time_reserve_sec": wall_time_reserve_sec,
-                "completion_findings": state.completion_findings,
-            },
+            FinalizationStarted(
+                triggers=state.finalization_triggers,
+                turns_remaining=turns_remaining,
+                turn_reserve=turn_reserve,
+                wall_time_remaining_sec=wall_time_remaining_sec,
+                wall_time_reserve_sec=wall_time_reserve_sec,
+                completion_findings=state.completion_findings,
+            ),
         )
 
     def _allowed_actions(self, state: RunState) -> tuple[ActionKind, ...]:

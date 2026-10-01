@@ -1,0 +1,993 @@
+{
+  "archives": [
+    {
+      "archive_commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "archive_sha256": "f75769a660fb70b1b61aaf153ea20e93eea781da20b286f353ceb9fcaee0a871",
+      "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "source_set": {
+        "algorithm": "sha256-length-framed-path-content-v1",
+        "files": [
+          {
+            "path": "pyproject.toml",
+            "sha256": "1fd33327fccabdc522357c0477306a5990ef5bf550ccc568231ab0c40219ef7c"
+          },
+          {
+            "path": "uv.lock",
+            "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+          },
+          {
+            "path": "src/evidence_harness/__init__.py",
+            "sha256": "e6f800ec62e909801c872b610f1a1e81afe919d1befa7bf3f8b9adb8935d2981"
+          },
+          {
+            "path": "src/evidence_harness/evaluation.py",
+            "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+          },
+          {
+            "path": "src/evidence_harness/evidence.py",
+            "sha256": "bf101005ae37f2e464a025512ed21e8797b87006f6d5bbfefbe19e36dacfec50"
+          },
+          {
+            "path": "src/evidence_harness/harbor_agent.py",
+            "sha256": "c31b7ae3ddec9ace257cd5f43fea37ba087bb3ae7c7cb5e07e44b07a9cbf6f92"
+          },
+          {
+            "path": "src/evidence_harness/journal.py",
+            "sha256": "1fc6d883cbe0f0f5b385d2c8564f206d62fc8c66f57829b31a777b02f565aed6"
+          },
+          {
+            "path": "src/evidence_harness/model_client.py",
+            "sha256": "d3c1e00169d941896e58588de45df22a832b479c34aaaf9de5d151418669349e"
+          },
+          {
+            "path": "src/evidence_harness/policy.py",
+            "sha256": "cbf9feda4050f171a19979104b5e7543260ef09667292ea163cc4a425fc33475"
+          },
+          {
+            "path": "src/evidence_harness/process_containment.py",
+            "sha256": "6eb17b9aa1cfe07c12634792e7f81a982cc02f0e8b7a93990a7eb735e9a09359"
+          },
+          {
+            "path": "src/evidence_harness/prompting.py",
+            "sha256": "b351c7b7e452af21776fd939706e4e1a9ce2ae5eecca4cf3ef2b41b97aa81f2d"
+          },
+          {
+            "path": "src/evidence_harness/protocol.py",
+            "sha256": "3e5e1479d790dde6d17b978b6422d2002ef5674c81bf46512cde927f73f07917"
+          },
+          {
+            "path": "src/evidence_harness/replay_agent.py",
+            "sha256": "bccf23d2e7d63f65e2d3cc073cdf0c1ff718edcef6dc7150edd539acbb3388fd"
+          },
+          {
+            "path": "src/evidence_harness/run_loop.py",
+            "sha256": "bb9c7d0a57705a44bb18f2dd3b718d427c7d46f074935c77b867487306d779cd"
+          },
+          {
+            "path": "src/evidence_harness/shell.py",
+            "sha256": "b108d510b842baabc82e41545cc56882a0a141dbe6fd3e0f6716473aa38520af"
+          }
+        ],
+        "sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a"
+      },
+      "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c"
+    },
+    {
+      "archive_commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "archive_sha256": "94f39a306a2971a36aaaee00800bcbed6201cdea672f31cda5db0aba7c0e1219",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "source_set": {
+        "algorithm": "sha256-length-framed-path-content-v1",
+        "files": [
+          {
+            "path": "pyproject.toml",
+            "sha256": "1fd33327fccabdc522357c0477306a5990ef5bf550ccc568231ab0c40219ef7c"
+          },
+          {
+            "path": "uv.lock",
+            "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+          },
+          {
+            "path": "src/evidence_harness/__init__.py",
+            "sha256": "e6f800ec62e909801c872b610f1a1e81afe919d1befa7bf3f8b9adb8935d2981"
+          },
+          {
+            "path": "src/evidence_harness/evaluation.py",
+            "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+          },
+          {
+            "path": "src/evidence_harness/evidence.py",
+            "sha256": "e1f42d0fe275a7d467b1eea5f5836d52c27f5590ce9070d85b354bbc245fb1f7"
+          },
+          {
+            "path": "src/evidence_harness/harbor_agent.py",
+            "sha256": "c31b7ae3ddec9ace257cd5f43fea37ba087bb3ae7c7cb5e07e44b07a9cbf6f92"
+          },
+          {
+            "path": "src/evidence_harness/journal.py",
+            "sha256": "1fc6d883cbe0f0f5b385d2c8564f206d62fc8c66f57829b31a777b02f565aed6"
+          },
+          {
+            "path": "src/evidence_harness/model_client.py",
+            "sha256": "d3c1e00169d941896e58588de45df22a832b479c34aaaf9de5d151418669349e"
+          },
+          {
+            "path": "src/evidence_harness/policy.py",
+            "sha256": "cbf9feda4050f171a19979104b5e7543260ef09667292ea163cc4a425fc33475"
+          },
+          {
+            "path": "src/evidence_harness/process_containment.py",
+            "sha256": "6eb17b9aa1cfe07c12634792e7f81a982cc02f0e8b7a93990a7eb735e9a09359"
+          },
+          {
+            "path": "src/evidence_harness/prompting.py",
+            "sha256": "cf2227059c991e5f978526921ca23a7d8351c0ba706ef809a6bf843488efbbda"
+          },
+          {
+            "path": "src/evidence_harness/protocol.py",
+            "sha256": "97a23b90228c1899fe8a9db2506316d50cf34806eccb94ff2be96e33b024db37"
+          },
+          {
+            "path": "src/evidence_harness/replay_agent.py",
+            "sha256": "bccf23d2e7d63f65e2d3cc073cdf0c1ff718edcef6dc7150edd539acbb3388fd"
+          },
+          {
+            "path": "src/evidence_harness/run_loop.py",
+            "sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+          },
+          {
+            "path": "src/evidence_harness/shell.py",
+            "sha256": "b108d510b842baabc82e41545cc56882a0a141dbe6fd3e0f6716473aa38520af"
+          }
+        ],
+        "sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69"
+      },
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_commit": "6f74c19f74b68dd7d79d64c4c205274ae2cd1788",
+      "archive_sha256": "43b797ac25f58dd053b42e5f04b783e712a03b4b77dd8acf3fbe8510742f265e",
+      "commit": "6f74c19f74b68dd7d79d64c4c205274ae2cd1788",
+      "source_set": {
+        "algorithm": "sha256-length-framed-path-content-v1",
+        "files": [
+          {
+            "path": "pyproject.toml",
+            "sha256": "1fd33327fccabdc522357c0477306a5990ef5bf550ccc568231ab0c40219ef7c"
+          },
+          {
+            "path": "uv.lock",
+            "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+          },
+          {
+            "path": "src/evidence_harness/__init__.py",
+            "sha256": "e6f800ec62e909801c872b610f1a1e81afe919d1befa7bf3f8b9adb8935d2981"
+          },
+          {
+            "path": "src/evidence_harness/budget.py",
+            "sha256": "3350c8797e47a26f55a40dff2dd042931773e6ec3c9a91b3c9333e8ab980c2d2"
+          },
+          {
+            "path": "src/evidence_harness/evaluation.py",
+            "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+          },
+          {
+            "path": "src/evidence_harness/evidence.py",
+            "sha256": "e1f42d0fe275a7d467b1eea5f5836d52c27f5590ce9070d85b354bbc245fb1f7"
+          },
+          {
+            "path": "src/evidence_harness/harbor_agent.py",
+            "sha256": "c31b7ae3ddec9ace257cd5f43fea37ba087bb3ae7c7cb5e07e44b07a9cbf6f92"
+          },
+          {
+            "path": "src/evidence_harness/journal.py",
+            "sha256": "a59e8df63548b92c629717c01523d414dde64fb25b5d96d3c7ce6dead8e20c6d"
+          },
+          {
+            "path": "src/evidence_harness/model_client.py",
+            "sha256": "d3c1e00169d941896e58588de45df22a832b479c34aaaf9de5d151418669349e"
+          },
+          {
+            "path": "src/evidence_harness/policy.py",
+            "sha256": "4d158891c224ca904b936d4b27a85912fb1439495acf7d70b8d6e2ab587a187b"
+          },
+          {
+            "path": "src/evidence_harness/process_containment.py",
+            "sha256": "6eb17b9aa1cfe07c12634792e7f81a982cc02f0e8b7a93990a7eb735e9a09359"
+          },
+          {
+            "path": "src/evidence_harness/prompting.py",
+            "sha256": "c7ee9e67bde4ce97bc0416109c6ddb8cc152abb6bff0d8272e498f623916ed30"
+          },
+          {
+            "path": "src/evidence_harness/protocol.py",
+            "sha256": "8e799023f02f2c141b8034c0b7164e42826f3e1766d366bb1999c993502917f3"
+          },
+          {
+            "path": "src/evidence_harness/replay_agent.py",
+            "sha256": "bccf23d2e7d63f65e2d3cc073cdf0c1ff718edcef6dc7150edd539acbb3388fd"
+          },
+          {
+            "path": "src/evidence_harness/run_loop.py",
+            "sha256": "8b93517bf2f2ccdec3de62997f8ea274c16d29e354fb2e227b300d1a7f49603f"
+          },
+          {
+            "path": "src/evidence_harness/shell.py",
+            "sha256": "b108d510b842baabc82e41545cc56882a0a141dbe6fd3e0f6716473aa38520af"
+          }
+        ],
+        "sha256": "11e68d00667f775a0da3873884985d4fbf5fad6fad390c5568796f519fcdffe0"
+      },
+      "tree": "283427564a6972ca2c3019e811e3a75541e214f5"
+    },
+    {
+      "archive_commit": "289bea40d10e0e94b98b1247617d06a12fc46f52",
+      "archive_sha256": "71d33f42b6bfa53b3ad280c10576246d4e6929a24e405113cd6df012643034ed",
+      "commit": "289bea40d10e0e94b98b1247617d06a12fc46f52",
+      "source_set": {
+        "algorithm": "sha256-length-framed-path-content-v1",
+        "files": [
+          {
+            "path": "pyproject.toml",
+            "sha256": "1fd33327fccabdc522357c0477306a5990ef5bf550ccc568231ab0c40219ef7c"
+          },
+          {
+            "path": "uv.lock",
+            "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+          },
+          {
+            "path": "src/evidence_harness/__init__.py",
+            "sha256": "e6f800ec62e909801c872b610f1a1e81afe919d1befa7bf3f8b9adb8935d2981"
+          },
+          {
+            "path": "src/evidence_harness/budget.py",
+            "sha256": "3350c8797e47a26f55a40dff2dd042931773e6ec3c9a91b3c9333e8ab980c2d2"
+          },
+          {
+            "path": "src/evidence_harness/completion_isolation.py",
+            "sha256": "8837eff2afc87a33a1b6463d8f85038bb2f68773c59132a37f1f232fac336d84"
+          },
+          {
+            "path": "src/evidence_harness/docker_completion_isolation.py",
+            "sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040"
+          },
+          {
+            "path": "src/evidence_harness/evaluation.py",
+            "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+          },
+          {
+            "path": "src/evidence_harness/evidence.py",
+            "sha256": "c787c37c78e0ffb0fceb7da6dfe68b4b56e1909ae8294acf51a00fdb3d3d08dd"
+          },
+          {
+            "path": "src/evidence_harness/harbor_agent.py",
+            "sha256": "c0cd2098032b95bb5dce0f122dc42e3d4633c9adff9271806d9f1e879185d3bb"
+          },
+          {
+            "path": "src/evidence_harness/isolation_experiment_agent.py",
+            "sha256": "0fff8d46dfca221e8f46cbb59b7faac36c724cba11072e66139834fbc80595e7"
+          },
+          {
+            "path": "src/evidence_harness/journal.py",
+            "sha256": "a59e8df63548b92c629717c01523d414dde64fb25b5d96d3c7ce6dead8e20c6d"
+          },
+          {
+            "path": "src/evidence_harness/model_client.py",
+            "sha256": "d3c1e00169d941896e58588de45df22a832b479c34aaaf9de5d151418669349e"
+          },
+          {
+            "path": "src/evidence_harness/policy.py",
+            "sha256": "14744d9cb85a745d38d2e68ea9a404343d182d612a0c41e5bc973a2251a5e3ec"
+          },
+          {
+            "path": "src/evidence_harness/process_containment.py",
+            "sha256": "6eb17b9aa1cfe07c12634792e7f81a982cc02f0e8b7a93990a7eb735e9a09359"
+          },
+          {
+            "path": "src/evidence_harness/prompting.py",
+            "sha256": "5ce1171e2e4313cfca113dbe650e0ed93617193277264eab30930c381815c6df"
+          },
+          {
+            "path": "src/evidence_harness/protocol.py",
+            "sha256": "35fd9f378c692105fedfc2c8f570014c8645337640306911b2370355306d94d3"
+          },
+          {
+            "path": "src/evidence_harness/replay_agent.py",
+            "sha256": "ab3f7f967cc152eee6c037cea01073ffcf12fc75a7d805279bd78996cdbabc81"
+          },
+          {
+            "path": "src/evidence_harness/run_loop.py",
+            "sha256": "a107aa5c1152a271bb21ab49e086e421ae3ecac581bc69953a10340a58e49f10"
+          },
+          {
+            "path": "src/evidence_harness/shell.py",
+            "sha256": "b108d510b842baabc82e41545cc56882a0a141dbe6fd3e0f6716473aa38520af"
+          },
+          {
+            "path": "src/evidence_harness/source_binding.py",
+            "sha256": "d4647c0397fde5dd9819c3ffc86423dfef8b5291bf46c42a332c5ebd330b83d3"
+          }
+        ],
+        "sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac"
+      },
+      "tree": "a87bee24f82ca14f4cf49c2582b5d71553b1eb99"
+    },
+    {
+      "archive_commit": "3a3b83f8315304d2fd39130c524fa2d41e4807d5",
+      "archive_sha256": "a8576c76ca295c573894b8b8e8067540210cf0ba19b094684c696cf471d25519",
+      "commit": "3a3b83f8315304d2fd39130c524fa2d41e4807d5",
+      "source_set": {
+        "algorithm": "sha256-length-framed-path-content-v1",
+        "files": [
+          {
+            "path": "pyproject.toml",
+            "sha256": "1fd33327fccabdc522357c0477306a5990ef5bf550ccc568231ab0c40219ef7c"
+          },
+          {
+            "path": "uv.lock",
+            "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+          },
+          {
+            "path": "src/evidence_harness/__init__.py",
+            "sha256": "e6f800ec62e909801c872b610f1a1e81afe919d1befa7bf3f8b9adb8935d2981"
+          },
+          {
+            "path": "src/evidence_harness/budget.py",
+            "sha256": "3350c8797e47a26f55a40dff2dd042931773e6ec3c9a91b3c9333e8ab980c2d2"
+          },
+          {
+            "path": "src/evidence_harness/evaluation.py",
+            "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+          },
+          {
+            "path": "src/evidence_harness/evidence.py",
+            "sha256": "e1f42d0fe275a7d467b1eea5f5836d52c27f5590ce9070d85b354bbc245fb1f7"
+          },
+          {
+            "path": "src/evidence_harness/harbor_agent.py",
+            "sha256": "c31b7ae3ddec9ace257cd5f43fea37ba087bb3ae7c7cb5e07e44b07a9cbf6f92"
+          },
+          {
+            "path": "src/evidence_harness/journal.py",
+            "sha256": "1fc6d883cbe0f0f5b385d2c8564f206d62fc8c66f57829b31a777b02f565aed6"
+          },
+          {
+            "path": "src/evidence_harness/model_client.py",
+            "sha256": "d3c1e00169d941896e58588de45df22a832b479c34aaaf9de5d151418669349e"
+          },
+          {
+            "path": "src/evidence_harness/policy.py",
+            "sha256": "cbf9feda4050f171a19979104b5e7543260ef09667292ea163cc4a425fc33475"
+          },
+          {
+            "path": "src/evidence_harness/process_containment.py",
+            "sha256": "6eb17b9aa1cfe07c12634792e7f81a982cc02f0e8b7a93990a7eb735e9a09359"
+          },
+          {
+            "path": "src/evidence_harness/prompting.py",
+            "sha256": "c7ee9e67bde4ce97bc0416109c6ddb8cc152abb6bff0d8272e498f623916ed30"
+          },
+          {
+            "path": "src/evidence_harness/protocol.py",
+            "sha256": "8e799023f02f2c141b8034c0b7164e42826f3e1766d366bb1999c993502917f3"
+          },
+          {
+            "path": "src/evidence_harness/replay_agent.py",
+            "sha256": "bccf23d2e7d63f65e2d3cc073cdf0c1ff718edcef6dc7150edd539acbb3388fd"
+          },
+          {
+            "path": "src/evidence_harness/run_loop.py",
+            "sha256": "8b93517bf2f2ccdec3de62997f8ea274c16d29e354fb2e227b300d1a7f49603f"
+          },
+          {
+            "path": "src/evidence_harness/shell.py",
+            "sha256": "b108d510b842baabc82e41545cc56882a0a141dbe6fd3e0f6716473aa38520af"
+          }
+        ],
+        "sha256": "64dee0672d7f17545079430ee1185cbc7cb556d29c3c62ed3179b76b5c1bd877"
+      },
+      "tree": "98ef1b63b7d368ffed6d0391178c4a8a2134d373"
+    }
+  ],
+  "control": {
+    "coordinator": {
+      "path": "src/evidence_harness_mutation/historical.py",
+      "sha256": "a4b1db3d9696746380c8f63aeee706322f61b5d7deeb3f04694a6f60a2493609"
+    },
+    "manifest": {
+      "path": "experiments/historical-7/manifest.json",
+      "sha256": "498959a371dca885792d2b8807c24808c88035c46534f55284b5ac1baf1bf20e"
+    },
+    "schema_module": {
+      "path": "src/evidence_harness_mutation/historical_cases.py",
+      "sha256": "b1e2330bcf65cedb8114b942c1e88678c273b545022c31b31571d2b0ee575a20"
+    },
+    "worker": {
+      "path": "scripts/historical_mutation_probe.py",
+      "sha256": "eebf6ffa8a3da59dcb91af8f952a3736c2bd734ea45a8669e3901d9f429680ac"
+    }
+  },
+  "results": [
+    {
+      "archive_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+      "case_id": "review_timeout_fallback",
+      "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "bb9c7d0a57705a44bb18f2dd3b718d427c7d46f074935c77b867487306d779cd"
+        },
+        "kind": "review_timeout",
+        "run": {
+          "accepted_verification_count": 1,
+          "completion_rejection_count": 0,
+          "decision_calls": 1,
+          "environment_calls": 2,
+          "evidence_accepted": true,
+          "failure_category": null,
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 0,
+          "review_calls": 1,
+          "review_error_count": 1,
+          "stop_reason": "verified",
+          "turns_used": 1,
+          "verification_attempts": 1
+        }
+      },
+      "observed_outcome": "survived",
+      "property_id": "review_timeout_fails_closed",
+      "revision_role": "vulnerable",
+      "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c"
+    },
+    {
+      "archive_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+      "case_id": "review_timeout_fallback",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+        },
+        "kind": "review_timeout",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 0,
+          "decision_calls": 1,
+          "environment_calls": 2,
+          "evidence_accepted": false,
+          "failure_category": "completion_review_service",
+          "recoveries_used": 0,
+          "rejection_reasons": [
+            "completion semantic review was not accepted"
+          ],
+          "repairs_used": 0,
+          "review_calls": 1,
+          "review_error_count": 1,
+          "stop_reason": "model_failure",
+          "turns_used": 1,
+          "verification_attempts": 1
+        }
+      },
+      "observed_outcome": "killed",
+      "property_id": "review_timeout_fails_closed",
+      "revision_role": "fixed",
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_source_sha256": "11e68d00667f775a0da3873884985d4fbf5fad6fad390c5568796f519fcdffe0",
+      "case_id": "reorder_check_receipts",
+      "commit": "6f74c19f74b68dd7d79d64c4c205274ae2cd1788",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "accepted": true,
+        "binding": {
+          "entrypoint": "EvidenceGate.decide",
+          "module_member": "evidence_harness.evidence:EvidenceGate.decide",
+          "production_source_sha256": "11e68d00667f775a0da3873884985d4fbf5fad6fad390c5568796f519fcdffe0",
+          "source_path": "src/evidence_harness/evidence.py",
+          "source_sha256": "e1f42d0fe275a7d467b1eea5f5836d52c27f5590ce9070d85b354bbc245fb1f7"
+        },
+        "kind": "reorder_receipts",
+        "proposal_rejections": [],
+        "proposed_check_ids": [
+          "behavior",
+          "content"
+        ],
+        "rejection_reasons": [],
+        "supplied_receipt_ids": [
+          "content",
+          "behavior"
+        ]
+      },
+      "observed_outcome": "survived",
+      "property_id": "receipts_match_proposal_order",
+      "revision_role": "vulnerable",
+      "tree": "283427564a6972ca2c3019e811e3a75541e214f5"
+    },
+    {
+      "archive_source_sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac",
+      "case_id": "reorder_check_receipts",
+      "commit": "289bea40d10e0e94b98b1247617d06a12fc46f52",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "accepted": false,
+        "binding": {
+          "entrypoint": "EvidenceGate.decide",
+          "module_member": "evidence_harness.evidence:EvidenceGate.decide",
+          "production_source_sha256": "dca26829d7124daae2795015c6dabd8e861759d4a2535df0e4cc8342d05149ac",
+          "source_path": "src/evidence_harness/evidence.py",
+          "source_sha256": "c787c37c78e0ffb0fceb7da6dfe68b4b56e1909ae8294acf51a00fdb3d3d08dd"
+        },
+        "kind": "reorder_receipts",
+        "proposal_rejections": [],
+        "proposed_check_ids": [
+          "behavior",
+          "content"
+        ],
+        "rejection_reasons": [
+          "not all proposed verification commands were executed in order"
+        ],
+        "supplied_receipt_ids": [
+          "content",
+          "behavior"
+        ]
+      },
+      "observed_outcome": "killed",
+      "property_id": "receipts_match_proposal_order",
+      "revision_role": "fixed",
+      "tree": "a87bee24f82ca14f4cf49c2582b5d71553b1eb99"
+    },
+    {
+      "archive_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+      "case_id": "review_receipt_order",
+      "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "bb9c7d0a57705a44bb18f2dd3b718d427c7d46f074935c77b867487306d779cd"
+        },
+        "call_order": [
+          "review",
+          "check"
+        ],
+        "kind": "review_receipt_order",
+        "review_saw_receipt_marker": [
+          false
+        ],
+        "run": {
+          "accepted_verification_count": 1,
+          "completion_rejection_count": 0,
+          "decision_calls": 1,
+          "environment_calls": 2,
+          "evidence_accepted": true,
+          "failure_category": null,
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 0,
+          "review_calls": 1,
+          "review_error_count": 0,
+          "stop_reason": "verified",
+          "turns_used": 1,
+          "verification_attempts": 1
+        }
+      },
+      "observed_outcome": "survived",
+      "property_id": "review_sees_executed_receipts",
+      "revision_role": "vulnerable",
+      "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c"
+    },
+    {
+      "archive_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+      "case_id": "review_receipt_order",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+        },
+        "call_order": [
+          "check",
+          "review"
+        ],
+        "kind": "review_receipt_order",
+        "review_saw_receipt_marker": [
+          true
+        ],
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 1,
+          "decision_calls": 1,
+          "environment_calls": 2,
+          "evidence_accepted": false,
+          "failure_category": "completion_repair_budget",
+          "recoveries_used": 0,
+          "rejection_reasons": [
+            "the executed receipt reports the wrong value",
+            "answer.txt must contain good"
+          ],
+          "repairs_used": 0,
+          "review_calls": 1,
+          "review_error_count": 0,
+          "stop_reason": "budget_exhausted",
+          "turns_used": 1,
+          "verification_attempts": 1
+        }
+      },
+      "observed_outcome": "killed",
+      "property_id": "review_sees_executed_receipts",
+      "revision_role": "fixed",
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+      "case_id": "review_quota_no_bypass",
+      "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "bb9c7d0a57705a44bb18f2dd3b718d427c7d46f074935c77b867487306d779cd"
+        },
+        "check_calls": 1,
+        "kind": "review_quota_no_bypass",
+        "run": {
+          "accepted_verification_count": 1,
+          "completion_rejection_count": 2,
+          "decision_calls": 3,
+          "environment_calls": 2,
+          "evidence_accepted": true,
+          "failure_category": null,
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 2,
+          "review_calls": 2,
+          "review_error_count": 0,
+          "stop_reason": "verified",
+          "turns_used": 3,
+          "verification_attempts": 1
+        }
+      },
+      "observed_outcome": "survived",
+      "property_id": "review_quota_fails_closed",
+      "revision_role": "vulnerable",
+      "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c"
+    },
+    {
+      "archive_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+      "case_id": "review_quota_no_bypass",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+        },
+        "check_calls": 2,
+        "kind": "review_quota_no_bypass",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 2,
+          "decision_calls": 2,
+          "environment_calls": 3,
+          "evidence_accepted": false,
+          "failure_category": "completion_review_budget",
+          "recoveries_used": 0,
+          "rejection_reasons": [
+            "second evidence gap"
+          ],
+          "repairs_used": 1,
+          "review_calls": 2,
+          "review_error_count": 0,
+          "stop_reason": "budget_exhausted",
+          "turns_used": 2,
+          "verification_attempts": 2
+        }
+      },
+      "observed_outcome": "killed",
+      "property_id": "review_quota_fails_closed",
+      "revision_role": "fixed",
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+      "case_id": "failed_change_progress",
+      "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "bb9c7d0a57705a44bb18f2dd3b718d427c7d46f074935c77b867487306d779cd"
+        },
+        "failed_change_ids": [
+          "change-0",
+          "change-1",
+          "change-2"
+        ],
+        "kind": "failed_change_progress",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 0,
+          "decision_calls": 4,
+          "environment_calls": 4,
+          "evidence_accepted": null,
+          "failure_category": "model_blocked",
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 0,
+          "review_calls": 0,
+          "review_error_count": 0,
+          "stop_reason": "model_stopped",
+          "turns_used": 4,
+          "verification_attempts": 0
+        },
+        "stop_decision_consumed": true
+      },
+      "observed_outcome": "survived",
+      "property_id": "failed_changes_do_not_count_as_progress",
+      "revision_role": "vulnerable",
+      "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c"
+    },
+    {
+      "archive_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+      "case_id": "failed_change_progress",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+        },
+        "failed_change_ids": [
+          "change-0",
+          "change-1",
+          "change-2"
+        ],
+        "kind": "failed_change_progress",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 0,
+          "decision_calls": 3,
+          "environment_calls": 4,
+          "evidence_accepted": null,
+          "failure_category": "model_reasoning",
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 0,
+          "review_calls": 0,
+          "review_error_count": 0,
+          "stop_reason": "doom_loop",
+          "turns_used": 3,
+          "verification_attempts": 0
+        },
+        "stop_decision_consumed": false
+      },
+      "observed_outcome": "killed",
+      "property_id": "failed_changes_do_not_count_as_progress",
+      "revision_role": "fixed",
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+      "case_id": "max_repairs_exact",
+      "commit": "ba2cbaebb1ceb97b024c549ee3e00790bd7e5f78",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "e2170e33ebf88209d68de58e6791d5c2ae974655b6193f746c92528bba7cc88a",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "bb9c7d0a57705a44bb18f2dd3b718d427c7d46f074935c77b867487306d779cd"
+        },
+        "failed_check_calls": 2,
+        "kind": "max_repairs_exact",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 2,
+          "decision_calls": 2,
+          "environment_calls": 3,
+          "evidence_accepted": false,
+          "failure_category": "model_protocol",
+          "recoveries_used": 0,
+          "rejection_reasons": [
+            "verification commands failed: ['check-answer']"
+          ],
+          "repairs_used": 2,
+          "review_calls": 0,
+          "review_error_count": 0,
+          "stop_reason": "budget_exhausted",
+          "turns_used": 2,
+          "verification_attempts": 2
+        }
+      },
+      "observed_outcome": "survived",
+      "property_id": "repair_budget_counts_granted_repairs",
+      "revision_role": "vulnerable",
+      "tree": "5f30ae8405443ab41774b770491c5a37bd7c0f7c"
+    },
+    {
+      "archive_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+      "case_id": "max_repairs_exact",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+        },
+        "failed_check_calls": 2,
+        "kind": "max_repairs_exact",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 2,
+          "decision_calls": 2,
+          "environment_calls": 3,
+          "evidence_accepted": false,
+          "failure_category": "completion_repair_budget",
+          "recoveries_used": 0,
+          "rejection_reasons": [
+            "verification commands failed: ['check-answer']"
+          ],
+          "repairs_used": 1,
+          "review_calls": 0,
+          "review_error_count": 0,
+          "stop_reason": "budget_exhausted",
+          "turns_used": 2,
+          "verification_attempts": 2
+        }
+      },
+      "observed_outcome": "killed",
+      "property_id": "repair_budget_counts_granted_repairs",
+      "revision_role": "fixed",
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+      "case_id": "wall_time_command_deadline",
+      "commit": "5f64d669a3bd8078dba075717d044fbc29694cd5",
+      "expected_outcome": "survived",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "b93bf74230605489be2226e7fd5bf8883e5cf6254631cfea20a1092c285dfd69",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "abaadd40e66a79851aba31d16501aec943de2899c3e0b5022cfe2e6de463aadc"
+        },
+        "final_clock_sec": 930.0,
+        "finalization_triggers": [],
+        "kind": "wall_time_command_deadline",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 0,
+          "decision_calls": 2,
+          "environment_calls": 2,
+          "evidence_accepted": null,
+          "failure_category": "model_blocked",
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 0,
+          "review_calls": 0,
+          "review_error_count": 0,
+          "stop_reason": "model_stopped",
+          "turns_used": 2,
+          "verification_attempts": 0
+        },
+        "work_command_failure": null,
+        "work_command_return_code": 0,
+        "work_command_timeout_sec": 150
+      },
+      "observed_outcome": "survived",
+      "property_id": "work_preserves_finalization_time",
+      "revision_role": "vulnerable",
+      "tree": "ab3ab8e3856eace4b273278fcc6d3ae5ad7dcc03"
+    },
+    {
+      "archive_source_sha256": "64dee0672d7f17545079430ee1185cbc7cb556d29c3c62ed3179b76b5c1bd877",
+      "case_id": "wall_time_command_deadline",
+      "commit": "3a3b83f8315304d2fd39130c524fa2d41e4807d5",
+      "expected_outcome": "killed",
+      "kind": "completed",
+      "matches_expected": true,
+      "observation": {
+        "binding": {
+          "entrypoint": "EvidenceLoop.run",
+          "module_member": "evidence_harness.run_loop:EvidenceLoop.run",
+          "production_source_sha256": "64dee0672d7f17545079430ee1185cbc7cb556d29c3c62ed3179b76b5c1bd877",
+          "source_path": "src/evidence_harness/run_loop.py",
+          "source_sha256": "8b93517bf2f2ccdec3de62997f8ea274c16d29e354fb2e227b300d1a7f49603f"
+        },
+        "final_clock_sec": 900.0,
+        "finalization_triggers": [
+          "wall_clock"
+        ],
+        "kind": "wall_time_command_deadline",
+        "run": {
+          "accepted_verification_count": 0,
+          "completion_rejection_count": 0,
+          "decision_calls": 2,
+          "environment_calls": 2,
+          "evidence_accepted": null,
+          "failure_category": "model_blocked",
+          "recoveries_used": 0,
+          "rejection_reasons": [],
+          "repairs_used": 0,
+          "review_calls": 0,
+          "review_error_count": 0,
+          "stop_reason": "model_stopped",
+          "turns_used": 2,
+          "verification_attempts": 0
+        },
+        "work_command_failure": "timeout",
+        "work_command_return_code": null,
+        "work_command_timeout_sec": 50
+      },
+      "observed_outcome": "killed",
+      "property_id": "work_preserves_finalization_time",
+      "revision_role": "fixed",
+      "tree": "98ef1b63b7d368ffed6d0391178c4a8a2134d373"
+    }
+  ],
+  "schema_version": 2,
+  "suite_id": "historical-7",
+  "uv_lock_sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8",
+  "verdict": "passed"
+}

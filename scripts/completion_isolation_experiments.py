@@ -113,7 +113,7 @@ def build_experiment_report(
             project_root=project_root,
             factory_source_path=factory_source_path,
             agent_source_path=agent_source_path,
-            runtime_source_sha256=_required_string(runtime_binding, "sha256"),
+            runtime_source_sha256=runtime_binding["sha256"],
         )
         for task_name in expected
     ]

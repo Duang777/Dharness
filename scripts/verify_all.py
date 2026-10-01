@@ -16,7 +16,16 @@ STATIC_GATES = (
     ("Ruff lint", ("uv", "run", "ruff", "check", ".")),
     ("Ruff format", ("uv", "run", "ruff", "format", "--check", ".")),
     ("mypy", ("uv", "run", "mypy", "src", "scripts", "tests")),
-    ("pytest", ("uv", "run", "pytest", "--cov=evidence_harness")),
+    (
+        "pytest",
+        (
+            "uv",
+            "run",
+            "pytest",
+            "--cov=evidence_harness",
+            "--cov=evidence_harness_mutation",
+        ),
+    ),
     ("build", ("uv", "build")),
     (
         "EvidenceHarness schema",
@@ -112,6 +121,16 @@ STATIC_GATES = (
             "run",
             "python",
             "scripts/completion_calibration.py",
+            "check",
+        ),
+    ),
+    (
+        "PrefixBench readiness",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/prefixbench.py",
             "check",
         ),
     ),

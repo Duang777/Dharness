@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from evidence_harness.protocol import ProducerAttestation
 from scripts import run_full_evaluation
 
 
@@ -113,6 +114,52 @@ def test_build_task_command_is_serial_and_scopes_https_mount() -> None:
     assert "--debian-bullseye-main-sources" in bullseye_command
     assert "--debian-https-sources" not in bullseye_command
     assert "--debian-trixie-https-sources" not in bullseye_command
+
+
+def test_profiled_task_command_and_run_config_bind_the_producer(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    matrix = tmp_path / "matrix.json"
+    env_file = tmp_path / "provider.env"
+    _write_matrix(matrix, ["task-a"])
+    env_file.write_text("OPENAI_API_KEY=test\n", encoding="utf-8")
+    producer = ProducerAttestation(
+        commit="a" * 40,
+        tree="b" * 40,
+        source_sha256="c" * 64,
+    )
+    monkeypatch.setattr(run_full_evaluation, "attest_git_runtime_source", lambda _: producer)
+    args = argparse.Namespace(
+        model="openai/test-model",
+        env_file=env_file,
+        matrix=matrix,
+        jobs_dir=tmp_path / "jobs",
+        run_name="profiled",
+        agent_kwarg=[],
+        collection_profile="prefixbench-v1",
+        start_at=None,
+        dry_run=True,
+    )
+
+    configuration = run_full_evaluation.run_configuration(args)
+    command = run_full_evaluation.build_task_command(
+        model=args.model,
+        env_file=env_file,
+        matrix=matrix,
+        run_root=tmp_path / "jobs" / "profiled",
+        job_name="001-task-a",
+        task_name="task-a",
+        agent_kwargs=[],
+        collection_profile_name=args.collection_profile,
+    )
+
+    assert configuration["schema_version"] == 2
+    assert configuration["collection"] == {
+        "profile": "prefixbench-v1",
+        "producer": producer.model_dump(mode="json"),
+    }
+    assert command[-2:] == ["--collection-profile", "prefixbench-v1"]
 
 
 def test_completed_task_results_reads_trials_and_ignores_job_summary(tmp_path: Path) -> None:
@@ -327,6 +374,55 @@ def test_full_run_rechecks_configuration_before_each_task(
     with pytest.raises(ValueError, match="configuration changed after"):
         run_full_evaluation.run_full_evaluation(args)
     assert set(run_full_evaluation.completed_task_results(jobs_dir / "full-run")) == {"task-a"}
+
+
+def test_profiled_full_run_reattests_before_each_task(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    matrix = tmp_path / "matrix.json"
+    env_file = tmp_path / "provider.env"
+    jobs_dir = tmp_path / "jobs"
+    _write_matrix(matrix, ["task-a", "task-b"])
+    env_file.write_text("OPENAI_API_KEY=secret\n", encoding="utf-8")
+    producer = ProducerAttestation(
+        commit="a" * 40,
+        tree="b" * 40,
+        source_sha256="c" * 64,
+    )
+    attestations = 0
+
+    def attest(_root: Path) -> ProducerAttestation:
+        nonlocal attestations
+        attestations += 1
+        return producer
+
+    def fake_run(
+        command: list[str],
+        run_root: Path,
+        task_name: str,
+        job_name: str,
+    ) -> int:
+        assert command[-2:] == ["--collection-profile", "prefixbench-v1"]
+        _write_trial_result(run_root / job_name, task_name)
+        return 0
+
+    monkeypatch.setattr(run_full_evaluation, "attest_git_runtime_source", attest)
+    monkeypatch.setattr(run_full_evaluation, "_run_child", fake_run)
+    args = argparse.Namespace(
+        model="openai/test-model",
+        env_file=env_file,
+        matrix=matrix,
+        jobs_dir=jobs_dir,
+        run_name="profiled",
+        agent_kwarg=[],
+        collection_profile="prefixbench-v1",
+        start_at=None,
+        dry_run=False,
+    )
+
+    assert run_full_evaluation.run_full_evaluation(args) == 0
+    assert attestations == 3
 
 
 def test_full_run_records_child_launch_failure(

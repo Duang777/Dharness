@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from evidence_harness.protocol import ProducerAttestation
 from scripts import run_evaluation
 
 
@@ -154,6 +155,57 @@ def test_build_command_rejects_duplicate_task_selection(
     )
 
     with pytest.raises(ValueError, match="must be unique"):
+        run_evaluation.build_command(args)
+
+
+def test_prefixbench_profile_attests_source_and_owns_reserved_kwargs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    producer = ProducerAttestation(
+        commit="a" * 40,
+        tree="b" * 40,
+        source_sha256="c" * 64,
+    )
+    monkeypatch.setattr(run_evaluation.shutil, "which", lambda _: "/usr/local/bin/harbor")
+    monkeypatch.setattr(run_evaluation, "attest_git_runtime_source", lambda _: producer)
+    args = _parse_args(
+        monkeypatch,
+        "--model",
+        "openai/test-model",
+        "--include-task-name",
+        "fix-git",
+        "--collection-profile",
+        "prefixbench-v1",
+        "--agent-kwarg",
+        "api_base=https://example.test/v1",
+    )
+
+    command = run_evaluation.build_command(args)
+    kwargs = [command[index + 1] for index, value in enumerate(command) if value == "--agent-kwarg"]
+
+    assert "max_repairs=4" in kwargs
+    assert "enable_completion_review=true" in kwargs
+    assert "prefixbench_profile=prefixbench-v1" in kwargs
+    assert f"producer_commit={producer.commit}" in kwargs
+    assert kwargs[-1] == "api_base=https://example.test/v1"
+
+    args.agent_kwarg = ["max_turns=41"]
+    with pytest.raises(ValueError, match="cannot be overridden: max_turns"):
+        run_evaluation.build_command(args)
+
+
+def test_standard_run_rejects_spoofed_collection_provenance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    args = _parse_args(
+        monkeypatch,
+        "--model",
+        "openai/test-model",
+        "--agent-kwarg",
+        f"producer_commit={'a' * 40}",
+    )
+
+    with pytest.raises(ValueError, match="provenance options are reserved"):
         run_evaluation.build_command(args)
 
 

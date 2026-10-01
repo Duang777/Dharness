@@ -24,7 +24,7 @@ dev = [
 ]
 
 [tool.uv.build-backend]
-module-name = "evidence_harness"
+module-name = ["evidence_harness", "evidence_harness_mutation"]
 module-root = "src"
 
 [tool.pytest.ini_options]
@@ -35,7 +35,7 @@ testpaths = ["tests"]
 
 [tool.coverage.run]
 branch = true
-source = ["evidence_harness"]
+source = ["evidence_harness", "evidence_harness_mutation"]
 
 [tool.coverage.report]
 show_missing = true

@@ -4,16 +4,28 @@ import argparse
 import hashlib
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal
 
+from pydantic import ValidationError
+
+from evidence_harness.collection_profile import FrozenCollectionProfile, collection_profile
 from evidence_harness.evaluation import EvaluationMatrix, load_matrix
+from evidence_harness.protocol import ProducerAttestation
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix-89.json"
 Status = Literal["passed", "failed", "error"]
+
+
+@dataclass(frozen=True)
+class CollectionEvidence:
+    journal_path: Path
+    journal_sha256: str
+    prefixbench_profile: str
+    producer: ProducerAttestation
 
 
 @dataclass(frozen=True)
@@ -29,6 +41,7 @@ class CompletedResult:
     task_checksum: str | None
     task_git_url: str | None
     task_git_commit_id: str | None
+    collection: CollectionEvidence | None = None
 
 
 def parse_args() -> argparse.Namespace:
@@ -46,12 +59,19 @@ def parse_args() -> argparse.Namespace:
         default=[],
         help="Include this canonical status in the retry matrix; repeat as needed.",
     )
+    parser.add_argument(
+        "--collection-profile",
+        choices=("prefixbench-v1",),
+        help="Require profiled live journals and emit canonical schema 2.",
+    )
     return parser.parse_args()
 
 
 def collect_latest_results(
     run_dirs: list[Path],
     matrix: EvaluationMatrix,
+    *,
+    collection_profile_name: str | None = None,
 ) -> dict[str, CompletedResult]:
     expected = {task.name for task in matrix.tasks}
     latest: dict[str, CompletedResult] = {}
@@ -89,6 +109,15 @@ def collect_latest_results(
     missing = sorted(expected - latest.keys())
     if missing:
         raise ValueError("matrix tasks have no completed result: " + ", ".join(missing))
+    if collection_profile_name is not None:
+        profile = collection_profile(collection_profile_name)
+        latest = {
+            task_name: replace(
+                completed,
+                collection=_read_collection_evidence(completed, profile),
+            )
+            for task_name, completed in latest.items()
+        }
     return latest
 
 
@@ -148,36 +177,168 @@ def build_manifest(
     matrix: EvaluationMatrix,
     matrix_path: Path,
     latest: dict[str, CompletedResult],
+    *,
+    collection_profile_name: str | None = None,
 ) -> dict[str, Any]:
-    task_rows = [
-        {
+    task_rows = []
+    for index, task in enumerate(matrix.tasks, start=1):
+        completed = latest[task.name]
+        row: dict[str, Any] = {
             "index": index,
             "name": task.name,
-            "status": latest[task.name].status,
-            "reward": latest[task.name].reward,
-            "exception_type": latest[task.name].exception_type,
-            "completed_at": latest[task.name].completed_at.isoformat(),
-            "run_dir": _display_path(latest[task.name].run_dir),
-            "result_path": _display_path(latest[task.name].result_path),
-            "result_sha256": hashlib.sha256(latest[task.name].result_path.read_bytes()).hexdigest(),
-            "config_sha256": latest[task.name].config_sha256,
-            "task_checksum": latest[task.name].task_checksum,
-            "task_git_url": latest[task.name].task_git_url,
-            "task_git_commit_id": latest[task.name].task_git_commit_id,
+            "status": completed.status,
+            "reward": completed.reward,
+            "exception_type": completed.exception_type,
+            "completed_at": completed.completed_at.isoformat(),
+            "run_dir": _display_path(completed.run_dir),
+            "result_path": _display_path(completed.result_path),
+            "result_sha256": hashlib.sha256(completed.result_path.read_bytes()).hexdigest(),
+            "config_sha256": completed.config_sha256,
+            "task_checksum": completed.task_checksum,
+            "task_git_url": completed.task_git_url,
+            "task_git_commit_id": completed.task_git_commit_id,
         }
-        for index, task in enumerate(matrix.tasks, start=1)
-    ]
+        if collection_profile_name is not None:
+            evidence = completed.collection
+            if evidence is None:
+                raise ValueError(f"profiled result has no collection evidence: {task.name}")
+            row.update(
+                {
+                    "journal_path": _display_path(evidence.journal_path),
+                    "journal_sha256": evidence.journal_sha256,
+                    "prefixbench_profile": evidence.prefixbench_profile,
+                    "producer_commit": evidence.producer.commit,
+                    "producer_tree": evidence.producer.tree,
+                    "producer_source_sha256": evidence.producer.source_sha256,
+                }
+            )
+        task_rows.append(row)
+
+    if collection_profile_name is not None:
+        producers = {
+            (
+                completed.collection.producer.commit,
+                completed.collection.producer.tree,
+                completed.collection.producer.source_sha256,
+            )
+            for completed in latest.values()
+            if completed.collection is not None
+        }
+        if len(producers) != 1:
+            raise ValueError("profiled canonical cohort must have one producer attestation")
     counts = {
         status: sum(row["status"] == status for row in task_rows)
         for status in ("passed", "failed", "error")
     }
-    return {
-        "schema_version": 1,
+    manifest = {
+        "schema_version": 2 if collection_profile_name is not None else 1,
         "dataset": matrix.dataset,
         "matrix_sha256": hashlib.sha256(matrix_path.read_bytes()).hexdigest(),
         "counts": {"completed": len(task_rows), **counts},
         "tasks": task_rows,
     }
+    if collection_profile_name is not None:
+        manifest["collection_profile"] = collection_profile_name
+    return manifest
+
+
+def _read_collection_evidence(
+    completed: CompletedResult,
+    profile: FrozenCollectionProfile,
+) -> CollectionEvidence:
+    result = _read_json_object(completed.result_path, "trial result")
+    metadata = _mapping(_mapping(result.get("agent_result")).get("metadata"))
+    harness = _mapping(metadata.get("evidence_harness"))
+    if not isinstance(harness.get("stop_reason"), str) or not harness["stop_reason"]:
+        raise ValueError(
+            f"profiled result is not a live Evidence Harness run: {completed.task_name}"
+        )
+
+    trial_dir = completed.result_path.parent.resolve()
+    journal_path = (trial_dir / "agent" / "evidence-harness" / "events.jsonl").resolve()
+    run_store = (PROJECT_ROOT / "runs" / "terminal-bench-2").resolve()
+    if not journal_path.is_relative_to(trial_dir) or not journal_path.is_relative_to(run_store):
+        raise ValueError(f"profiled journal is outside the run store: {journal_path}")
+    try:
+        journal_bytes = journal_path.read_bytes()
+    except OSError as exc:
+        raise ValueError(f"profiled result has no readable journal: {completed.task_name}") from exc
+    started = _leading_run_started(journal_bytes, journal_path)
+    if started.get("journal_schema_version") != profile.journal_schema_version:
+        raise ValueError(f"profiled journal must use schema 2: {completed.task_name}")
+    if started.get("prefixbench_profile") != profile.name:
+        raise ValueError(f"profiled journal profile does not match: {completed.task_name}")
+    options = started.get("options")
+    if not isinstance(options, dict):
+        raise ValueError(f"profiled journal options are invalid: {completed.task_name}")
+    if options != dict(profile.controlled_agent_options):
+        raise ValueError(f"profiled journal options do not match: {completed.task_name}")
+
+    try:
+        producer = ProducerAttestation.model_validate(started.get("producer"))
+    except ValidationError as exc:
+        raise ValueError(f"profiled journal producer is invalid: {completed.task_name}") from exc
+
+    config_path = trial_dir / "config.json"
+    config = _read_json_object(config_path, "trial config")
+    config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
+    if completed.config_sha256 != config_sha256:
+        raise ValueError(f"profiled config changed during collection: {completed.task_name}")
+    if result.get("config") != config:
+        raise ValueError(
+            f"profiled result config does not match config.json: {completed.task_name}"
+        )
+    agent = _mapping(config.get("agent"))
+    if agent.get("name") != "evidence_harness.harbor_agent:EvidenceHarnessAgent":
+        raise ValueError(f"profiled config has the wrong agent: {completed.task_name}")
+    kwargs = _mapping(agent.get("kwargs"))
+    profile.validate_effective_options(kwargs)
+    expected_provenance = {
+        "prefixbench_profile": profile.name,
+        "producer_commit": producer.commit,
+        "producer_tree": producer.tree,
+        "producer_source_sha256": producer.source_sha256,
+    }
+    if any(kwargs.get(key) != value for key, value in expected_provenance.items()):
+        raise ValueError(f"profiled config provenance does not match: {completed.task_name}")
+
+    return CollectionEvidence(
+        journal_path=journal_path,
+        journal_sha256=hashlib.sha256(journal_bytes).hexdigest(),
+        prefixbench_profile=profile.name,
+        producer=producer,
+    )
+
+
+def _leading_run_started(data: bytes, path: Path) -> dict[str, Any]:
+    events: list[dict[str, Any]] = []
+    for line_number, raw_line in enumerate(data.splitlines(keepends=True), start=1):
+        if not raw_line.strip():
+            raise ValueError(f"blank journal line: {path}:{line_number}")
+        try:
+            value = json.loads(raw_line)
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"invalid journal event: {path}:{line_number}") from exc
+        if not isinstance(value, dict):
+            raise ValueError(f"journal event is not an object: {path}:{line_number}")
+        events.append(value)
+    starts = [event for event in events if event.get("type") == "run_started"]
+    if not events or len(starts) != 1 or events[0] is not starts[0]:
+        raise ValueError(f"journal must contain one leading run_started event: {path}")
+    payload = starts[0].get("payload")
+    if not isinstance(payload, dict):
+        raise ValueError(f"run_started payload is not an object: {path}")
+    return payload
+
+
+def _read_json_object(path: Path, label: str) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read {label}: {path}") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} is not an object: {path}")
+    return value
 
 
 def build_retry_matrix(
@@ -344,8 +505,17 @@ def main() -> int:
     args = parse_args()
     try:
         matrix = load_matrix(args.matrix)
-        latest = collect_latest_results(args.run_dir, matrix)
-        manifest = build_manifest(matrix, args.matrix, latest)
+        latest = collect_latest_results(
+            args.run_dir,
+            matrix,
+            collection_profile_name=args.collection_profile,
+        )
+        manifest = build_manifest(
+            matrix,
+            args.matrix,
+            latest,
+            collection_profile_name=args.collection_profile,
+        )
         _write_json(args.manifest_out, manifest)
         if args.retry_matrix_out is not None:
             statuses = set(args.retry_status or ["error"])

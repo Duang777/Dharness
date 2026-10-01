@@ -10,14 +10,26 @@ from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext, ModelUsage
 from pydantic import Field, model_validator
 
+from evidence_harness.collection_profile import collection_profile
 from evidence_harness.docker_completion_isolation import (
     completion_isolation_for_harbor,
 )
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import LiteLLMModelGateway
 from evidence_harness.process_containment import contain_harbor_environment
-from evidence_harness.protocol import LoopOptions, RunState
+from evidence_harness.protocol import (
+    CollectionAttestation,
+    GitObjectId,
+    LoopOptions,
+    ProducerAttestation,
+    RunState,
+    Sha256,
+)
 from evidence_harness.run_loop import EvidenceLoop
+from evidence_harness.source_binding import (
+    runtime_project_root,
+    verify_git_runtime_source,
+)
 
 
 class EvidenceHarnessOptions(AgentOptions):
@@ -41,6 +53,10 @@ class EvidenceHarnessOptions(AgentOptions):
     reasoning_effort: (
         Literal["none", "minimal", "low", "medium", "high", "xhigh", "max", "default"] | None
     ) = None
+    prefixbench_profile: Literal["prefixbench-v1"] | None = None
+    producer_commit: GitObjectId | None = None
+    producer_tree: GitObjectId | None = None
+    producer_source_sha256: Sha256 | None = None
 
     @model_validator(mode="after")
     def validate_reserve(self) -> EvidenceHarnessOptions:
@@ -48,7 +64,34 @@ class EvidenceHarnessOptions(AgentOptions):
             raise ValueError(
                 "verification_environment_reserve must be smaller than max_environment_calls"
             )
+        self.collection_attestation()
         return self
+
+    def collection_attestation(self) -> CollectionAttestation | None:
+        values = (
+            self.prefixbench_profile,
+            self.producer_commit,
+            self.producer_tree,
+            self.producer_source_sha256,
+        )
+        if not any(value is not None for value in values):
+            return None
+        if not all(value is not None for value in values):
+            raise ValueError("collection profile and producer fields must be provided together")
+        assert self.prefixbench_profile is not None
+        assert self.producer_commit is not None
+        assert self.producer_tree is not None
+        assert self.producer_source_sha256 is not None
+        profile = collection_profile(self.prefixbench_profile)
+        producer = ProducerAttestation(
+            commit=self.producer_commit,
+            tree=self.producer_tree,
+            source_sha256=self.producer_source_sha256,
+        )
+        return profile.attestation(
+            producer,
+            self.model_dump(mode="json"),
+        )
 
     def loop_options(self) -> LoopOptions:
         return LoopOptions(
@@ -93,6 +136,15 @@ class EvidenceHarnessAgent(BaseAgent):
     ) -> None:
         if not self.model_name:
             raise ValueError("EvidenceHarnessAgent requires Harbor --model/-m")
+
+        expected_collection = self.options.collection_attestation()
+        collection = None
+        if expected_collection is not None:
+            producer = verify_git_runtime_source(
+                runtime_project_root(),
+                expected_collection.producer,
+            )
+            collection = expected_collection.model_copy(update={"producer": producer})
 
         root = self.logs_dir / "evidence-harness"
         journal = RunJournal(root, inline_bytes=self.options.output_inline_bytes)
@@ -145,6 +197,7 @@ class EvidenceHarnessAgent(BaseAgent):
             journal=journal,
             options=self.options.loop_options(),
             completion_isolation=completion_isolation,
+            collection=collection,
             on_progress=update_context,
         )
         report = await loop.run(instruction, contain_harbor_environment(environment))

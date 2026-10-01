@@ -10,6 +10,15 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
+from evidence_harness.collection_profile import (
+    collection_profile,
+    reject_provenance_overrides,
+)
+from evidence_harness.source_binding import (
+    attest_git_runtime_source,
+    runtime_project_root,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix.json"
 DEBIAN_HTTPS_SOURCES = PROJECT_ROOT / "evaluation" / "debian-https.sources"
@@ -68,6 +77,11 @@ def parse_args() -> argparse.Namespace:
         metavar="KEY=VALUE",
         help="Additional Harbor --agent-kwarg value; repeat as needed.",
     )
+    parser.add_argument(
+        "--collection-profile",
+        choices=("prefixbench-v1",),
+        help="Use a frozen, source-attested collection profile.",
+    )
     return parser.parse_args()
 
 
@@ -112,6 +126,7 @@ def build_command(args: argparse.Namespace) -> list[str]:
     )
     if source_mount_count > 1:
         raise ValueError("Debian source mounts are mutually exclusive")
+    reject_provenance_overrides(args.agent_kwarg)
 
     dataset, matrix_task_names = load_matrix(args.matrix)
     task_names = args.include_task_name or matrix_task_names
@@ -150,13 +165,21 @@ def build_command(args: argparse.Namespace) -> list[str]:
     for task_name in task_names:
         command.extend(("--include-task-name", task_name))
 
-    default_agent_kwargs = (
-        "max_turns=40",
-        "max_environment_calls=80",
-        "max_wall_time_sec=1800",
-        "verification_environment_reserve=3",
-    )
-    for item in (*default_agent_kwargs, *args.agent_kwarg):
+    profile_name = getattr(args, "collection_profile", None)
+    if profile_name is None:
+        agent_kwargs = (
+            "max_turns=40",
+            "max_environment_calls=80",
+            "max_wall_time_sec=1800",
+            "verification_environment_reserve=3",
+            *args.agent_kwarg,
+        )
+    else:
+        profile = collection_profile(profile_name)
+        profile.reject_reserved_overrides(args.agent_kwarg)
+        producer = attest_git_runtime_source(runtime_project_root())
+        agent_kwargs = (*profile.harbor_agent_kwargs(producer), *args.agent_kwarg)
+    for item in agent_kwargs:
         command.extend(("--agent-kwarg", item))
 
     if args.env_file is not None:
