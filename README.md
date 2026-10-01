@@ -243,25 +243,47 @@ Trixie HTTPS 软件源。相同 `--run-name` 只能使用相同模型、矩阵�
 ### PrefixBench 采集
 
 PrefixBench 使用独立的冻结 profile。它要求当前 runtime source 与 `git archive HEAD`
-完全一致，并把 commit、tree 和 source SHA-256 写入每个 live journal：
+完全一致，并把 commit、tree 和 source SHA-256 写入每个 live journal。先从已绑定的
+89 题 readiness 产物生成固定的 28 题 development matrix：
 
 ```bash
-uv run python scripts/run_full_evaluation.py \
-  --matrix evaluation/matrix-89.json \
-  --run-name prefixbench-v1-development \
-  --model provider/model \
-  --env-file /tmp/evidence-harness.env \
+uv run python scripts/prefixbench.py matrix \
+  --split development \
+  --out evaluation/matrix-prefixbench-development.json
+```
+
+用单次 launcher dry-run 检查 development matrix、来源证明和 Harbor 参数，不读取
+provider env，也不启动任务：
+
+```bash
+uv run python scripts/run_evaluation.py \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --model openai/modelhub/gpt-5.6-terra \
   --collection-profile prefixbench-v1 \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
   --dry-run
 ```
 
 先保留 `--dry-run` 检查来源与参数。工作树包含未提交的 Harness runtime 修改时，preflight
-会拒绝启动。采集完成后，用同一 profile 生成绑定 journal 的 canonical schema 2：
+会拒绝启动。检查通过后，使用可恢复的串行编排器运行 development split：
+
+```bash
+uv run python scripts/run_full_evaluation.py \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --run-name prefixbench-v1-development-20261002 \
+  --model openai/modelhub/gpt-5.6-terra \
+  --env-file /absolute/path/to/provider.env \
+  --collection-profile prefixbench-v1 \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+```
+
+该 matrix 只含固定的 28 题 development cohort，不包含 61 题 test cohort。采集完成后，
+用同一 profile 生成绑定 journal 的 canonical schema 2：
 
 ```bash
 uv run python scripts/collect_evaluation_results.py \
-  runs/terminal-bench-2/prefixbench-v1-development \
-  --matrix evaluation/matrix-89.json \
+  runs/terminal-bench-2/prefixbench-v1-development-20261002 \
+  --matrix evaluation/matrix-prefixbench-development.json \
   --collection-profile prefixbench-v1 \
   --manifest-out evaluation/prefixbench-v1-canonical.json
 ```

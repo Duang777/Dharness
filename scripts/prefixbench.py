@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
 import tempfile
 from pathlib import Path
 
 from evidence_harness_mutation import (
     PrefixBenchReadiness,
+    PrefixBenchSplit,
+    build_prefixbench_split_matrix,
     check_prefixbench_readiness,
     inspect_prefixbench,
 )
@@ -29,6 +32,19 @@ def parse_args() -> argparse.Namespace:
     build.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     build.add_argument("--project-root", type=Path, default=PROJECT_ROOT)
     build.add_argument("--out", type=Path, default=DEFAULT_REPORT)
+
+    matrix = subparsers.add_parser(
+        "matrix",
+        help="Build a frozen PrefixBench split matrix.",
+    )
+    matrix.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
+    matrix.add_argument("--readiness", type=Path, default=DEFAULT_REPORT)
+    matrix.add_argument(
+        "--split",
+        choices=tuple(split.value for split in PrefixBenchSplit),
+        required=True,
+    )
+    matrix.add_argument("--out", type=Path, required=True)
 
     check = subparsers.add_parser("check", help="Verify the committed readiness report.")
     check.add_argument("--canonical", type=Path, default=DEFAULT_CANONICAL)
@@ -54,6 +70,25 @@ def _write_atomic(path: Path, data: bytes) -> None:
 def main() -> int:
     args = parse_args()
     try:
+        if args.command == "matrix":
+            matrix = build_prefixbench_split_matrix(
+                args.matrix,
+                args.readiness,
+                PrefixBenchSplit(args.split),
+            )
+            data = (
+                json.dumps(
+                    matrix.model_dump(mode="json"),
+                    ensure_ascii=True,
+                    indent=2,
+                )
+                + "\n"
+            ).encode()
+            _write_atomic(args.out, data)
+            print(f"split={args.split} tasks={len(matrix.tasks)} source={args.matrix}")
+            print(f"sha256={hashlib.sha256(data).hexdigest()}")
+            return 0
+
         if args.command == "build":
             report = inspect_prefixbench(
                 args.canonical,

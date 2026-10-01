@@ -20,14 +20,27 @@ their current option schemas.
 
 ## Usage
 
-Run the preflight and print the Harbor command without starting a task:
+Generate the frozen 28-task development matrix from the source matrix and readiness artifact:
+
+```bash
+uv run python scripts/prefixbench.py matrix \
+  --split development \
+  --out evaluation/matrix-prefixbench-development.json
+```
+
+The builder requires the canonical readiness bytes and verifies the source matrix against the
+readiness file binding. It preserves task metadata and source order. The 61-task test split is not
+included.
+
+Run the preflight and print the Harbor command without reading provider credentials or starting a
+task:
 
 ```bash
 uv run python scripts/run_evaluation.py \
-  --model "$EVIDENCE_HARNESS_MODEL" \
-  --matrix evaluation/matrix-89.json \
-  --include-task-name adaptive-rejection-sampler \
+  --model openai/modelhub/gpt-5.6-terra \
+  --matrix evaluation/matrix-prefixbench-development.json \
   --collection-profile prefixbench-v1 \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
   --dry-run
 ```
 
@@ -35,19 +48,20 @@ Run a resumable collection only after reviewing the dry-run output:
 
 ```bash
 uv run python scripts/run_full_evaluation.py \
-  --model "$EVIDENCE_HARNESS_MODEL" \
-  --env-file provider.env \
-  --matrix evaluation/matrix-89.json \
-  --run-name prefixbench-v1-development \
-  --collection-profile prefixbench-v1
+  --model openai/modelhub/gpt-5.6-terra \
+  --env-file /absolute/path/to/provider.env \
+  --matrix evaluation/matrix-prefixbench-development.json \
+  --run-name prefixbench-v1-development-20261002 \
+  --collection-profile prefixbench-v1 \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
 ```
 
 Build a schema-2 canonical manifest:
 
 ```bash
 uv run python scripts/collect_evaluation_results.py \
-  runs/terminal-bench-2/prefixbench-v1-development \
-  --matrix evaluation/matrix-89.json \
+  runs/terminal-bench-2/prefixbench-v1-development-20261002 \
+  --matrix evaluation/matrix-prefixbench-development.json \
   --collection-profile prefixbench-v1 \
   --manifest-out evaluation/prefixbench-v1-canonical.json
 ```

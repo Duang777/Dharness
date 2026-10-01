@@ -13,6 +13,7 @@ from evidence_harness_mutation import (
     PrefixBenchReadiness,
     PrefixBenchReadinessV2,
     PrefixBenchSplit,
+    build_prefixbench_split_matrix,
     check_prefixbench_readiness,
     inspect_prefixbench,
     prefixbench_task_split,
@@ -475,6 +476,72 @@ def test_task_split_is_stable_and_outcome_blind() -> None:
     assert first == second
     assert first[0] is (PrefixBenchSplit.DEVELOPMENT if first[1] < 3 else PrefixBenchSplit.TEST)
     assert len(first[2]) == 64
+
+
+def test_real_development_matrix_preserves_frozen_identity_order_and_metadata() -> None:
+    matrix = build_prefixbench_split_matrix(
+        PROJECT_ROOT / "evaluation" / "matrix-89.json",
+        PROJECT_ROOT / "evaluation" / "prefixbench-readiness.json",
+        PrefixBenchSplit.DEVELOPMENT,
+    )
+
+    expected_names = (
+        "adaptive-rejection-sampler",
+        "chess-best-move",
+        "compile-compcert",
+        "configure-git-webserver",
+        "custom-memory-heap-crash",
+        "feal-linear-cryptanalysis",
+        "fix-code-vulnerability",
+        "git-leak-recovery",
+        "install-windows-3.11",
+        "kv-store-grpc",
+        "largest-eigenval",
+        "mteb-retrieve",
+        "multi-source-data-merger",
+        "nginx-request-logging",
+        "path-tracing",
+        "polyglot-c-py",
+        "polyglot-rust-c",
+        "portfolio-optimization",
+        "protein-assembly",
+        "prove-plus-comm",
+        "qemu-alpine-ssh",
+        "regex-chess",
+        "reshard-c4-data",
+        "schemelike-metacircular-eval",
+        "sqlite-db-truncate",
+        "torch-tensor-parallelism",
+        "tune-mjcf",
+        "video-processing",
+    )
+    source = json.loads((PROJECT_ROOT / "evaluation" / "matrix-89.json").read_bytes())
+    source_tasks = {task["name"]: task for task in source["tasks"]}
+
+    assert tuple(task.name for task in matrix.tasks) == expected_names
+    assert [task.model_dump(mode="json") for task in matrix.tasks] == [
+        source_tasks[name] for name in expected_names
+    ]
+    assert matrix.selection_method == (
+        "PrefixBench development split from prefixbench-task-split-v1 buckets 0,1,2; "
+        "28/89 source tasks in source order; source matrix SHA-256 "
+        "51a6e58f5591d3d247543b53dc4f7008d663a085ca0928b2d4d2852f813f9939."
+    )
+
+
+def test_split_matrix_rejects_source_matrix_drift(tmp_path: Path) -> None:
+    source_path = PROJECT_ROOT / "evaluation" / "matrix-89.json"
+    changed = json.loads(source_path.read_bytes())
+    changed["tasks"][0]["difficulty"] = "hard"
+    changed_path = tmp_path / "matrix-89.json"
+    changed_path.write_bytes(_dump(changed))
+
+    with pytest.raises(ValueError, match="does not match the PrefixBench readiness binding"):
+        build_prefixbench_split_matrix(
+            changed_path,
+            PROJECT_ROOT / "evaluation" / "prefixbench-readiness.json",
+            PrefixBenchSplit.DEVELOPMENT,
+        )
 
 
 def test_checker_rebuilds_all_sources_allows_none_and_rejects_partial(

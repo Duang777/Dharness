@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "dataset": "terminal-bench@2.0",
+  "selection_method": "PrefixBench development split from prefixbench-task-split-v1 buckets 0,1,2; 28/89 source tasks in source order; source matrix SHA-256 51a6e58f5591d3d247543b53dc4f7008d663a085ca0928b2d4d2852f813f9939.",
+  "tasks": [
+    {
+      "name": "adaptive-rejection-sampler",
+      "difficulty": "medium",
+      "category": "scientific-computing",
+      "tags": [
+        "applied-statistics",
+        "adaptive-rejection-sampling",
+        "Bayesian-inference",
+        "simulation"
+      ]
+    },
+    {
+      "name": "chess-best-move",
+      "difficulty": "medium",
+      "category": "games",
+      "tags": []
+    },
+    {
+      "name": "compile-compcert",
+      "difficulty": "medium",
+      "category": "system-administration",
+      "tags": [
+        "compilation",
+        "compilers"
+      ]
+    },
+    {
+      "name": "configure-git-webserver",
+      "difficulty": "hard",
+      "category": "system-administration",
+      "tags": [
+        "system",
+        "version-control",
+        "web"
+      ]
+    },
+    {
+      "name": "custom-memory-heap-crash",
+      "difficulty": "medium",
+      "category": "debugging",
+      "tags": [
+        "cpp",
+        "memory-management",
+        "debugging"
+      ]
+    },
+    {
+      "name": "feal-linear-cryptanalysis",
+      "difficulty": "hard",
+      "category": "mathematics",
+      "tags": [
+        "software-engineering"
+      ]
+    },
+    {
+      "name": "fix-code-vulnerability",
+      "difficulty": "hard",
+      "category": "security",
+      "tags": [
+        "security",
+        "code-vulnerability",
+        "common-weakness-enumeration"
+      ]
+    },
+    {
+      "name": "git-leak-recovery",
+      "difficulty": "medium",
+      "category": "software-engineering",
+      "tags": [
+        "git",
+        "security"
+      ]
+    },
+    {
+      "name": "install-windows-3.11",
+      "difficulty": "hard",
+      "category": "system-administration",
+      "tags": [
+        "virtualization",
+        "qemu",
+        "windows-3.11",
+        "vnc",
+        "sys-admin",
+        "retro-computing"
+      ]
+    },
+    {
+      "name": "kv-store-grpc",
+      "difficulty": "medium",
+      "category": "software-engineering",
+      "tags": [
+        "coding",
+        "file-operations",
+        "system"
+      ]
+    },
+    {
+      "name": "largest-eigenval",
+      "difficulty": "medium",
+      "category": "mathematics",
+      "tags": [
+        "coding",
+        "optimization",
+        "constraint",
+        "numerical-approximation"
+      ]
+    },
+    {
+      "name": "mteb-retrieve",
+      "difficulty": "medium",
+      "category": "data-science",
+      "tags": [
+        "data-processing",
+        "data-science",
+        "mteb"
+      ]
+    },
+    {
+      "name": "multi-source-data-merger",
+      "difficulty": "medium",
+      "category": "data-processing",
+      "tags": [
+        "data-processing",
+        "etl",
+        "schema-mapping",
+        "conflict-resolution",
+        "pandas",
+        "parquet"
+      ]
+    },
+    {
+      "name": "nginx-request-logging",
+      "difficulty": "medium",
+      "category": "system-administration",
+      "tags": [
+        "web-server"
+      ]
+    },
+    {
+      "name": "path-tracing",
+      "difficulty": "hard",
+      "category": "software-engineering",
+      "tags": [
+        "images"
+      ]
+    },
+    {
+      "name": "polyglot-c-py",
+      "difficulty": "medium",
+      "category": "software-engineering",
+      "tags": [
+        "coding"
+      ]
+    },
+    {
+      "name": "polyglot-rust-c",
+      "difficulty": "hard",
+      "category": "software-engineering",
+      "tags": [
+        "coding",
+        "no-verified-solution"
+      ]
+    },
+    {
+      "name": "portfolio-optimization",
+      "difficulty": "medium",
+      "category": "optimization",
+      "tags": [
+        "c-programming",
+        "python-extension",
+        "optimization"
+      ]
+    },
+    {
+      "name": "protein-assembly",
+      "difficulty": "hard",
+      "category": "scientific-computing",
+      "tags": [
+        "biology",
+        "cloning",
+        "proteins"
+      ]
+    },
+    {
+      "name": "prove-plus-comm",
+      "difficulty": "easy",
+      "category": "software-engineering",
+      "tags": [
+        "coding"
+      ]
+    },
+    {
+      "name": "qemu-alpine-ssh",
+      "difficulty": "medium",
+      "category": "system-administration",
+      "tags": [
+        "sys-admin"
+      ]
+    },
+    {
+      "name": "regex-chess",
+      "difficulty": "hard",
+      "category": "software-engineering",
+      "tags": [
+        "software-engineering"
+      ]
+    },
+    {
+      "name": "reshard-c4-data",
+      "difficulty": "medium",
+      "category": "data-science",
+      "tags": [
+        "coding",
+        "data-processing",
+        "file-operations"
+      ]
+    },
+    {
+      "name": "schemelike-metacircular-eval",
+      "difficulty": "medium",
+      "category": "software-engineering",
+      "tags": [
+        "software-engineering"
+      ]
+    },
+    {
+      "name": "sqlite-db-truncate",
+      "difficulty": "medium",
+      "category": "debugging",
+      "tags": [
+        "file-operations"
+      ]
+    },
+    {
+      "name": "torch-tensor-parallelism",
+      "difficulty": "hard",
+      "category": "software-engineering",
+      "tags": [
+        "system"
+      ]
+    },
+    {
+      "name": "tune-mjcf",
+      "difficulty": "medium",
+      "category": "scientific-computing",
+      "tags": [
+        "mujoco",
+        "physics",
+        "simulation",
+        "numerical-optimization"
+      ]
+    },
+    {
+      "name": "video-processing",
+      "difficulty": "hard",
+      "category": "video-processing",
+      "tags": [
+        "video-processing"
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ from typing import Annotated, Any, Literal, Self
 from pydantic import Field, ValidationError, model_validator
 
 from evidence_harness.collection_profile import PREFIXBENCH_V1
+from evidence_harness.evaluation import EvaluationMatrix
 from evidence_harness.protocol import (
     CompletionReviewStarted,
     ExecutorTurnStarted,
@@ -526,6 +527,73 @@ def prefixbench_task_split(
     return split, bucket, digest.hex()
 
 
+def build_prefixbench_split_matrix(
+    matrix_path: Path,
+    readiness_path: Path,
+    split: PrefixBenchSplit,
+    *,
+    expected_task_count: int = EXPECTED_CANONICAL_TASKS,
+) -> EvaluationMatrix:
+    matrix_bytes = matrix_path.read_bytes()
+    try:
+        matrix = EvaluationMatrix.model_validate_json(matrix_bytes)
+    except ValidationError as exc:
+        raise ValueError(f"invalid source matrix: {matrix_path}") from exc
+    if matrix.schema_version != 1:
+        raise ValueError("unsupported source matrix schema")
+
+    readiness_bytes = readiness_path.read_bytes()
+    report = _parse_readiness_report(readiness_bytes, readiness_path)
+    if readiness_bytes != report.canonical_bytes():
+        raise ValueError("PrefixBench readiness artifact is not canonical JSON")
+
+    matrix_binding = report.sources["matrix"]
+    matrix_sha256 = hashlib.sha256(matrix_bytes).hexdigest()
+    if matrix_binding.bytes != len(matrix_bytes) or matrix_binding.sha256 != matrix_sha256:
+        raise ValueError("source matrix does not match the PrefixBench readiness binding")
+    if matrix.dataset != report.dataset:
+        raise ValueError("source matrix dataset does not match PrefixBench readiness")
+    if len(matrix.tasks) != expected_task_count or len(report.tasks) != expected_task_count:
+        raise ValueError(
+            "PrefixBench split source must contain "
+            f"{expected_task_count} tasks, got matrix={len(matrix.tasks)} "
+            f"readiness={len(report.tasks)}"
+        )
+
+    matrix_names = tuple(task.name for task in matrix.tasks)
+    readiness_names = tuple(task.name for task in report.tasks)
+    if matrix_names != readiness_names:
+        raise ValueError("source matrix task order does not match PrefixBench readiness")
+
+    if isinstance(report, PrefixBenchReadiness):
+        selected_names = {
+            assessment.name for assessment in report.tasks if assessment.split is split
+        }
+    else:
+        selected_names = {
+            assessment.name for assessment in report.tasks if assessment.split is split
+        }
+    selected_tasks = tuple(task for task in matrix.tasks if task.name in selected_names)
+    if not selected_tasks:
+        raise ValueError(f"PrefixBench {split.value} split is empty")
+    buckets = (
+        report.split_policy.development_buckets
+        if split is PrefixBenchSplit.DEVELOPMENT
+        else report.split_policy.test_buckets
+    )
+    bucket_text = ",".join(str(bucket) for bucket in buckets)
+    return EvaluationMatrix(
+        schema_version=1,
+        dataset=matrix.dataset,
+        selection_method=(
+            f"PrefixBench {split.value} split from {report.split_policy.namespace} "
+            f"buckets {bucket_text}; {len(selected_tasks)}/{len(matrix.tasks)} source tasks "
+            f"in source order; source matrix SHA-256 {matrix_sha256}."
+        ),
+        tasks=selected_tasks,
+    )
+
+
 def inspect_prefixbench(
     canonical_path: Path,
     matrix_path: Path,
@@ -655,13 +723,7 @@ def check_prefixbench_readiness(
 ) -> tuple[str, ...]:
     try:
         report_bytes = readiness_path.read_bytes()
-        raw_report = _object(json.loads(report_bytes), str(readiness_path))
-        if raw_report.get("schema_version") == 1:
-            report: PrefixBenchReadinessReport = PrefixBenchReadiness.model_validate(raw_report)
-        elif raw_report.get("schema_version") == 2:
-            report = PrefixBenchReadinessV2.model_validate(raw_report)
-        else:
-            raise ValueError("unsupported PrefixBench readiness schema")
+        report = _parse_readiness_report(report_bytes, readiness_path)
     except (OSError, ValueError) as exc:
         return (f"invalid PrefixBench readiness artifact: {exc}",)
 
@@ -1406,6 +1468,18 @@ def _validate_hash(data: bytes, expected: str, label: str) -> None:
 def _read_json_object(path: Path) -> tuple[bytes, dict[str, Any]]:
     data = path.read_bytes()
     return data, _object(json.loads(data), str(path))
+
+
+def _parse_readiness_report(
+    data: bytes,
+    path: Path,
+) -> PrefixBenchReadinessReport:
+    raw_report = _object(json.loads(data), str(path))
+    if raw_report.get("schema_version") == 1:
+        return PrefixBenchReadiness.model_validate(raw_report)
+    if raw_report.get("schema_version") == 2:
+        return PrefixBenchReadinessV2.model_validate(raw_report)
+    raise ValueError("unsupported PrefixBench readiness schema")
 
 
 def _task_name(result: dict[str, Any]) -> str | None:
