@@ -32,6 +32,7 @@ def parse_args() -> argparse.Namespace:
     build.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     build.add_argument("--project-root", type=Path, default=PROJECT_ROOT)
     build.add_argument("--out", type=Path, default=DEFAULT_REPORT)
+    build.add_argument("--expected-task-count", type=int, default=89)
 
     matrix = subparsers.add_parser(
         "matrix",
@@ -51,6 +52,7 @@ def parse_args() -> argparse.Namespace:
     check.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     check.add_argument("--project-root", type=Path, default=PROJECT_ROOT)
     check.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    check.add_argument("--expected-task-count", type=int, default=89)
     return parser.parse_args()
 
 
@@ -94,6 +96,7 @@ def main() -> int:
                 args.canonical,
                 args.matrix,
                 args.project_root,
+                expected_task_count=args.expected_task_count,
             )
             data = report.canonical_bytes()
             _write_atomic(args.out, data)
@@ -117,6 +120,7 @@ def main() -> int:
             canonical_path=args.canonical,
             matrix_path=args.matrix,
             project_root=args.project_root,
+            expected_task_count=args.expected_task_count,
         )
         if errors:
             for error in errors:
