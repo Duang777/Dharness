@@ -331,6 +331,33 @@ uv run python scripts/prefixbench_analysis.py check
 分母，并把基线比较、test split 推断、生产 killed/survived、耗时和调用成本标为
 `not_evaluated`。
 
+development 协议冻结后，从同一 readiness 生成固定的 61 题 test matrix：
+
+```bash
+uv run python scripts/prefixbench.py matrix \
+  --split test \
+  --out evaluation/matrix-prefixbench-test.json
+```
+
+先用单次 launcher dry-run 核对矩阵和来源证明，再用可恢复的串行编排器启动采集：
+
+```bash
+uv run python scripts/run_evaluation.py \
+  --matrix evaluation/matrix-prefixbench-test.json \
+  --model openai/modelhub/gpt-5.6-terra \
+  --collection-profile prefixbench-v1 \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
+  --dry-run
+
+uv run python scripts/run_full_evaluation.py \
+  --matrix evaluation/matrix-prefixbench-test.json \
+  --run-name prefixbench-v1-test-20261002 \
+  --model openai/modelhub/gpt-5.6-terra \
+  --env-file /absolute/path/to/provider.env \
+  --collection-profile prefixbench-v1 \
+  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+```
+
 完整来源链、phase event 和 readiness v2 契约见
 [PrefixBench live collection design](docs/prefixbench-collection-design.md)，离线 campaign
 契约见 [PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)，
@@ -444,6 +471,7 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [89 题隔离支持 census](docs/completion-isolation-support.md)
 - [隔离完成验证实验](docs/completion-isolation-experiments.md)
 - [PrefixBench live collection 设计](docs/prefixbench-collection-design.md)
+- [PrefixBench test matrix](evaluation/matrix-prefixbench-test.json)
 - [PrefixBench development 离线 campaign 设计](docs/prefixbench-mutation-campaign-design.md)
 - [PrefixBench development 离线 campaign](evaluation/prefixbench-v1-development-offline-campaign.json)
 - [PrefixBench development 分析设计](docs/prefixbench-analysis-design.md)

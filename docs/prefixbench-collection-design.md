@@ -32,6 +32,20 @@ The builder requires the canonical readiness bytes and verifies the source matri
 readiness file binding. It preserves task metadata and source order. The 61-task test split is not
 included.
 
+After freezing the development protocol, generate the complementary test matrix from the same
+source:
+
+```bash
+uv run python scripts/prefixbench.py matrix \
+  --split test \
+  --out evaluation/matrix-prefixbench-test.json
+```
+
+The committed test matrix contains 61 tasks and has SHA-256
+`a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb`. Its task names
+have no overlap with the 28-task development matrix, and both matrices partition the 89-task
+source matrix.
+
 Run the preflight and print the Harbor command without reading provider credentials or starting a
 task:
 
@@ -54,6 +68,13 @@ uv run python scripts/run_full_evaluation.py \
   --run-name prefixbench-v1-development-20261002 \
   --collection-profile prefixbench-v1 \
   --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+```
+
+The frozen test run uses the same model, profile, and connection options with:
+
+```text
+--matrix evaluation/matrix-prefixbench-test.json
+--run-name prefixbench-v1-test-20261002
 ```
 
 Build a schema-2 canonical manifest:

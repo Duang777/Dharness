@@ -40,6 +40,7 @@ REQUIRED_FILES = (
     RESULTS_89_JSON,
     RESULTS_89_MARKDOWN,
     Path("evaluation/matrix-prefixbench-development.json"),
+    Path("evaluation/matrix-prefixbench-test.json"),
     Path("evaluation/prefixbench-readiness.json"),
     Path("evaluation/prefixbench-v1-development-canonical.json"),
     Path("evaluation/prefixbench-v1-development-offline-analysis.json"),
