@@ -509,11 +509,20 @@ task split 已按任务身份冻结，不使用 reward、stop reason 或 journal
 分桶得到 28 个 development task 和 61 个 test task，其中 live task 为 27/58。新采集必须
 沿用该 task-level split，不能按新运行结果重新分配。
 
-live collection 工具链现已实现，但尚未执行真实采集。`prefixbench-v1` 会冻结运行参数，
-在启动前和 Agent 内部两次核对 Git archive 与实际 runtime source，并把 producer
-attestation 写入 schema-2 journal。五个 phase entry 使用显式事件记录；canonical
+development live collection 已完成。固定的 28 题 cohort 全部通过 source admission，
+readiness v2 状态为 `ready`，并覆盖五类显式 phase-entry event；61 题 test cohort 未
+运行。`prefixbench-v1` 冻结运行参数，在启动前和 Agent 内部两次核对 Git archive 与
+实际 runtime source，并把 producer attestation 写入 schema-2 journal。canonical
 schema 2 绑定 journal bytes；readiness v2 分开 source admission 与 development phase
 coverage。实现契约见 `docs/prefixbench-collection-design.md`。
+
+development cohort 的确定性离线 mutation campaign 也已完成。每题使用一个完整 journal
+prefix，按默认顺序运行四个算子，共保留 168 个 case：77 个
+`mutation_not_applicable`、63 个 `oracle_equivalent`、28 个 `offline_violation`，没有
+`offline_invalid` 或 `other_oracle_change`。28 个违规都内联 source-anchored 缩减反例。
+协议 manifest 绑定算子、oracle、reducer、runner 和依赖源码；重复运行产生完全相同的
+canonical bytes。该结果只用于冻结 development 协议，不是 test split 结论。契约见
+`docs/prefixbench-mutation-campaign-design.md`。
 
 ### 对照方法
 
@@ -728,9 +737,12 @@ truth，不是方法本身。
 2. 已完成 Historical-7 全部 `7/7` 的修复前后双版本实验。
 3. 已完成 source-anchored 反例缩减和确定性 offline campaign。
 4. 已完成 PrefixBench readiness census，并冻结 development/test task split。
-5. 增加 producer source attestation 和五个显式 phase-entry event，再采集 schema-2 cohort。
-6. 冻结算子和 oracle 后运行 PrefixBench test split。
-7. 主实验稳定后做 mini-swe-agent 适配。
+5. 已完成 producer source attestation、五个显式 phase-entry event 和 28 题 schema-2
+   development cohort 采集。
+6. 已完成 development cohort 离线 campaign，并冻结算子、oracle、reducer 与 runner
+   协议。
+7. 按冻结协议运行 PrefixBench test split。
+8. 主实验稳定后做 mini-swe-agent 适配。
 
 ## 优先精读
 
@@ -760,3 +772,6 @@ truth，不是方法本身。
 - PrefixBench readiness 与采集契约：`docs/prefixbench-design.md`
 - PrefixBench live collection 实现契约：`docs/prefixbench-collection-design.md`
 - PrefixBench readiness 报告：`evaluation/prefixbench-readiness.json`
+- PrefixBench development campaign 契约：`docs/prefixbench-mutation-campaign-design.md`
+- PrefixBench development campaign 报告：
+  `evaluation/prefixbench-v1-development-offline-campaign.json`

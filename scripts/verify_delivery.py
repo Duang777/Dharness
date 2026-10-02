@@ -39,6 +39,11 @@ REQUIRED_FILES = (
     CANONICAL_89_PATH,
     RESULTS_89_JSON,
     RESULTS_89_MARKDOWN,
+    Path("evaluation/matrix-prefixbench-development.json"),
+    Path("evaluation/prefixbench-readiness.json"),
+    Path("evaluation/prefixbench-v1-development-canonical.json"),
+    Path("evaluation/prefixbench-v1-development-offline-campaign.json"),
+    Path("evaluation/prefixbench-v1-development-readiness.json"),
     Path("evaluation/completion-calibration.json"),
     Path("evaluation/completion-disagreements.json"),
     Path("evaluation/completion-isolation-experiments.json"),
@@ -53,6 +58,9 @@ REQUIRED_FILES = (
     Path("docs/isolated-verification-design.md"),
     Path("docs/isolated-verification-runtime-research.md"),
     Path("docs/next-10-hours.md"),
+    Path("docs/prefixbench-collection-design.md"),
+    Path("docs/prefixbench-design.md"),
+    Path("docs/prefixbench-mutation-campaign-design.md"),
     Path("docs/terminal-agent-isolation-research.md"),
     Path("docs/ten-task-analysis.md"),
     Path("docs/expanded-ten-analysis.md"),
@@ -60,6 +68,9 @@ REQUIRED_FILES = (
     Path("scripts/completion_calibration.py"),
     Path("scripts/completion_isolation_census.py"),
     Path("scripts/completion_isolation_experiments.py"),
+    Path("scripts/prefixbench.py"),
+    Path("scripts/prefixbench_campaign.py"),
+    Path("experiments/prefixbench-v1/mutation-protocol-v1.json"),
     *(
         Path("evaluation/completion-isolation-trials") / task / relative
         for task in ("crack-7z-hash", "fix-ocaml-gc", "write-compressor")

@@ -135,6 +135,34 @@ STATIC_GATES = (
         ),
     ),
     (
+        "PrefixBench development readiness",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/prefixbench.py",
+            "check",
+            "--canonical",
+            "evaluation/prefixbench-v1-development-canonical.json",
+            "--matrix",
+            "evaluation/matrix-prefixbench-development.json",
+            "--expected-task-count",
+            "28",
+            "--report",
+            "evaluation/prefixbench-v1-development-readiness.json",
+        ),
+    ),
+    (
+        "PrefixBench development offline campaign",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/prefixbench_campaign.py",
+            "check",
+        ),
+    ),
+    (
         "completion isolation support census",
         (
             "uv",

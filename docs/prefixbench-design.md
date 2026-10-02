@@ -147,10 +147,11 @@ The collection path is now implemented:
    development coverage policy.
 
 The implementation contract and commands are in
-[`prefixbench-collection-design.md`](prefixbench-collection-design.md). No live PrefixBench
-collection has been run yet. The next operational step is to commit a clean producer revision,
-run the development split, and review its phase coverage before freezing mutation quotas or
-touching the test split.
+[`prefixbench-collection-design.md`](prefixbench-collection-design.md). The fixed 28-task
+development collection now has schema-2 journals, complete source admission, and aggregate
+five-phase coverage. Its deterministic completion-level offline mutation campaign is documented
+in [`prefixbench-mutation-campaign-design.md`](prefixbench-mutation-campaign-design.md). The
+61-task test split remains unexecuted and must use the frozen protocol.
 
 Schema-1 conversion is not allowed because it would assign phase semantics and source provenance
 that the original records did not contain.

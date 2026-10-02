@@ -304,8 +304,24 @@ uv run python scripts/prefixbench.py check \
   --report evaluation/prefixbench-v1-development-readiness.json
 ```
 
+readiness 通过后，对 28 题 development cohort 的完整 journal 运行固定离线 mutation
+campaign：
+
+```bash
+uv run python scripts/prefixbench_campaign.py build
+uv run python scripts/prefixbench_campaign.py check
+```
+
+该命令没有 split、model、provider 或 Docker 参数，不会读取或运行 61 题 test cohort。
+当前 artifact 保留全部 168 个 case 和 28 个内联缩减反例；结果为 77 个不适用、63 个
+oracle 等价、28 个离线违规，且没有 offline-invalid 或其他 oracle 变化。没有本地
+`runs/` 的普通 clone 仍可校验 artifact、输入和协议绑定；28 份 journal 全部存在时，
+`check` 会重新运行 campaign 并要求字节完全一致。
+
 完整来源链、phase event 和 readiness v2 契约见
-[PrefixBench live collection design](docs/prefixbench-collection-design.md)。
+[PrefixBench live collection design](docs/prefixbench-collection-design.md)，离线 campaign
+契约见
+[PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)。
 
 ## 完整验收
 
@@ -414,6 +430,9 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [隔离运行时研究](docs/isolated-verification-runtime-research.md)
 - [89 题隔离支持 census](docs/completion-isolation-support.md)
 - [隔离完成验证实验](docs/completion-isolation-experiments.md)
+- [PrefixBench live collection 设计](docs/prefixbench-collection-design.md)
+- [PrefixBench development 离线 campaign 设计](docs/prefixbench-mutation-campaign-design.md)
+- [PrefixBench development 离线 campaign](evaluation/prefixbench-v1-development-offline-campaign.json)
 - [终端 Agent 隔离与结项机制调研](docs/terminal-agent-isolation-research.md)
 - [如果再给 10 小时](docs/next-10-hours.md)
 - [AI Coding 工程日志](docs/vibe-coding-log.md)

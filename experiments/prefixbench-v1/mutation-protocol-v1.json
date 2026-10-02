@@ -1,0 +1,221 @@
+{
+  "baseline_rule": "credit-only-new-expected-violation-at-attempt-terminal",
+  "campaign_audit_runs": 3,
+  "canonical_json": {
+    "ensure_ascii": true,
+    "indent": 2,
+    "sort_keys": true,
+    "trailing_newline": true
+  },
+  "cohort": "prefixbench-v1-development",
+  "components": [
+    {
+      "entrypoint": "evidence_harness_mutation.prefixbench:check_prefixbench_readiness",
+      "name": "source_admission",
+      "source_paths": [
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/evaluation.py",
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/prefixbench.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.journal_loader:load_state_prefix",
+      "name": "journal_loading",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/journal_loader.py",
+        "src/evidence_harness_mutation/model.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.attempts:project_completion_attempts",
+      "name": "attempt_projection",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/model.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.operators:apply_mutation",
+      "name": "operators",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.invariants:audit_completion_trace",
+      "name": "oracle",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/model.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.reducer:reduce_counterexample",
+      "name": "reducer",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py",
+        "src/evidence_harness_mutation/reducer.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.campaign:run_offline_campaign",
+      "name": "single_prefix_campaign",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/campaign.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py",
+        "src/evidence_harness_mutation/reducer.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.prefixbench_campaign:build_prefixbench_development_campaign",
+      "name": "cohort_campaign",
+      "source_paths": [
+        "pyproject.toml",
+        "uv.lock",
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/evaluation.py",
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/campaign.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/journal_loader.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py",
+        "src/evidence_harness_mutation/prefixbench.py",
+        "src/evidence_harness_mutation/prefixbench_campaign.py",
+        "src/evidence_harness_mutation/reducer.py"
+      ]
+    }
+  ],
+  "counterexamples": "inline-for-every-offline-violation",
+  "execution": "sequential",
+  "operators": [
+    {
+      "expected_invariant": "I1",
+      "operator": "stale_evidence_epoch"
+    },
+    {
+      "expected_invariant": "I2",
+      "operator": "reorder_check_receipts"
+    },
+    {
+      "expected_invariant": "I3",
+      "operator": "review_timeout_fallback"
+    },
+    {
+      "expected_invariant": "I4",
+      "operator": "cross_candidate_evidence"
+    }
+  ],
+  "outcomes": [
+    "mutation_not_applicable",
+    "offline_invalid",
+    "oracle_equivalent",
+    "offline_violation",
+    "other_oracle_change"
+  ],
+  "phase_witness_policy": "readiness-metadata-only-not-campaign-cutoffs",
+  "prefix_policy": "one-full-journal-state-prefix-per-admitted-task",
+  "protocol_id": "prefixbench-v1-development-offline-mutation-v1",
+  "reducer_algorithm": "source-anchored-ddmin-v1",
+  "reducer_audit_runs": 3,
+  "reducer_minimality": "1-minimal-under-declared-removals",
+  "schedule": "run-offline-campaign-default",
+  "schema_version": 1,
+  "source_set": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 492231,
+    "files": [
+      {
+        "bytes": 1168,
+        "path": "pyproject.toml",
+        "sha256": "16b90004e6861dcf11ff525c1eb3276b86735a5c9c5149e752a69e7c6970b8c5"
+      },
+      {
+        "bytes": 301116,
+        "path": "uv.lock",
+        "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+      },
+      {
+        "bytes": 4108,
+        "path": "src/evidence_harness/collection_profile.py",
+        "sha256": "c285c48cb63e2751f58acbf94fd12ec65d7c1f50167cdd701b4ace1a58f3cbd6"
+      },
+      {
+        "bytes": 12366,
+        "path": "src/evidence_harness/evaluation.py",
+        "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+      },
+      {
+        "bytes": 12865,
+        "path": "src/evidence_harness/protocol.py",
+        "sha256": "be0d80be68e6a9d86dd9668297f0bd4d816bbaf75be5ab8799957f8fe10b662f"
+      },
+      {
+        "bytes": 2317,
+        "path": "src/evidence_harness_mutation/attempts.py",
+        "sha256": "5c67ff40ff43fcff5b7ac876b568a8da17402f294e66a61f29bd3b15111a1d32"
+      },
+      {
+        "bytes": 14235,
+        "path": "src/evidence_harness_mutation/campaign.py",
+        "sha256": "9c506b594e374cb8cb1629f72c2e7c759534919db4e55cf55a47fe9ebeefb1d6"
+      },
+      {
+        "bytes": 14339,
+        "path": "src/evidence_harness_mutation/invariants.py",
+        "sha256": "952d7edb8891f3ec6b36f4b6a161ec5c6ae1201b425617d024b74eaafb5d962f"
+      },
+      {
+        "bytes": 4363,
+        "path": "src/evidence_harness_mutation/journal_loader.py",
+        "sha256": "18da93a9939ccbee82afaa907f8efd7f9000f12fd1df4f83b6c1b9bff1f1a098"
+      },
+      {
+        "bytes": 4055,
+        "path": "src/evidence_harness_mutation/model.py",
+        "sha256": "9f058bd057fb902fe0bfa45207163da39f4a43892c420ccb71a1aa700dbcf6f3"
+      },
+      {
+        "bytes": 7452,
+        "path": "src/evidence_harness_mutation/operators.py",
+        "sha256": "014cd1df65f0834fcd0cad8b785ce75c01f8568a24e6ff86885769c234f9b3e4"
+      },
+      {
+        "bytes": 60536,
+        "path": "src/evidence_harness_mutation/prefixbench.py",
+        "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
+      },
+      {
+        "bytes": 33771,
+        "path": "src/evidence_harness_mutation/prefixbench_campaign.py",
+        "sha256": "8d3a6f0ee500655f2b093a0820c1739fc6e45c4c5c8f6c43d90b88e483b7f233"
+      },
+      {
+        "bytes": 19540,
+        "path": "src/evidence_harness_mutation/reducer.py",
+        "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
+      }
+    ],
+    "sha256": "b7a2fccd54e6b291ecf3a54637223f33a13555157f377af3682dd09d85176dc8"
+  },
+  "task_count": 28,
+  "task_order": "readiness-task-order"
+}
