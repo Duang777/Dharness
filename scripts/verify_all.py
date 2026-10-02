@@ -163,6 +163,16 @@ STATIC_GATES = (
         ),
     ),
     (
+        "PrefixBench development offline analysis",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/prefixbench_analysis.py",
+            "check",
+        ),
+    ),
+    (
         "completion isolation support census",
         (
             "uv",

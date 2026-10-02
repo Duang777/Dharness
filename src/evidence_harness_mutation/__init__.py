@@ -65,6 +65,11 @@ from evidence_harness_mutation.prefixbench import (
     prefixbench_task_split,
     validate_phase_trace,
 )
+from evidence_harness_mutation.prefixbench_analysis import (
+    PrefixBenchDevelopmentAnalysisReport,
+    build_prefixbench_development_analysis,
+    check_prefixbench_development_analysis,
+)
 from evidence_harness_mutation.prefixbench_campaign import (
     PrefixBenchDevelopmentCampaignReport,
     build_prefixbench_development_campaign,
@@ -111,6 +116,7 @@ __all__ = [
     "OracleEquivalentCase",
     "OtherOracleChangeCase",
     "PrefixBenchCoveragePolicy",
+    "PrefixBenchDevelopmentAnalysisReport",
     "PrefixBenchDevelopmentCampaignReport",
     "PrefixBenchExclusion",
     "PrefixBenchFileBinding",
@@ -140,8 +146,10 @@ __all__ = [
     "ViolationWitness",
     "apply_mutation",
     "audit_completion_trace",
+    "build_prefixbench_development_analysis",
     "build_prefixbench_development_campaign",
     "build_prefixbench_split_matrix",
+    "check_prefixbench_development_analysis",
     "check_prefixbench_development_campaign",
     "check_prefixbench_readiness",
     "inspect_prefixbench",

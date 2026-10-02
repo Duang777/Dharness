@@ -1,0 +1,283 @@
+{
+  "benchmark": "PrefixBench",
+  "cases": {
+    "applicable_cases": {
+      "count": 91,
+      "fraction": {
+        "denominator": 24,
+        "numerator": 13
+      },
+      "population": 168
+    },
+    "mutation_not_applicable_cases": {
+      "count": 77,
+      "fraction": {
+        "denominator": 24,
+        "numerator": 11
+      },
+      "population": 168
+    },
+    "offline_invalid_cases": {
+      "count": 0,
+      "fraction": {
+        "denominator": 1,
+        "numerator": 0
+      },
+      "population": 168
+    },
+    "offline_violations": {
+      "count": 28,
+      "fraction": {
+        "denominator": 13,
+        "numerator": 4
+      },
+      "population": 91
+    },
+    "oracle_equivalent_cases": {
+      "count": 63,
+      "fraction": {
+        "denominator": 13,
+        "numerator": 9
+      },
+      "population": 91
+    },
+    "other_oracle_changes": {
+      "count": 0,
+      "fraction": {
+        "denominator": 1,
+        "numerator": 0
+      },
+      "population": 91
+    },
+    "scheduled_cases": 168
+  },
+  "claims": {
+    "container_call_telemetry": "not_evaluated",
+    "inferential_statistics": "not_evaluated",
+    "model_call_telemetry": "not_evaluated",
+    "offline_invalid_definition": "offline-pipeline-stage-failure-not-general-schema-validity",
+    "offline_violation_definition": "new-target-invariant-failure-not-production-mutation-score",
+    "oracle_equivalent_definition": "identical-offline-audit-output-not-semantic-equivalence",
+    "phase_target_reachability": "not_evaluated",
+    "phase_witness_definition": "readiness-metadata-not-campaign-cutoffs",
+    "rq2_baseline_comparison": "not_evaluated",
+    "rq3_production_mutation_score": "not_evaluated",
+    "rq4_live_cost_savings": "not_evaluated",
+    "scope": "committed-development-campaign-artifact-only",
+    "test_split_generalization": "not_evaluated"
+  },
+  "dataset": "terminal-bench@2.0",
+  "operators": [
+    {
+      "applicable_cases_of_scheduled": {
+        "count": 26,
+        "fraction": {
+          "denominator": 21,
+          "numerator": 13
+        },
+        "population": 42
+      },
+      "expected_invariant": "I1",
+      "offline_violations_of_applicable": {
+        "count": 7,
+        "fraction": {
+          "denominator": 26,
+          "numerator": 7
+        },
+        "population": 26
+      },
+      "operator": "stale_evidence_epoch",
+      "outcomes": {
+        "mutation_not_applicable": 16,
+        "offline_invalid": 0,
+        "offline_violation": 7,
+        "oracle_equivalent": 19,
+        "other_oracle_change": 0,
+        "scheduled": 42
+      }
+    },
+    {
+      "applicable_cases_of_scheduled": {
+        "count": 23,
+        "fraction": {
+          "denominator": 42,
+          "numerator": 23
+        },
+        "population": 42
+      },
+      "expected_invariant": "I2",
+      "offline_violations_of_applicable": {
+        "count": 7,
+        "fraction": {
+          "denominator": 23,
+          "numerator": 7
+        },
+        "population": 23
+      },
+      "operator": "reorder_check_receipts",
+      "outcomes": {
+        "mutation_not_applicable": 19,
+        "offline_invalid": 0,
+        "offline_violation": 7,
+        "oracle_equivalent": 16,
+        "other_oracle_change": 0,
+        "scheduled": 42
+      }
+    },
+    {
+      "applicable_cases_of_scheduled": {
+        "count": 16,
+        "fraction": {
+          "denominator": 21,
+          "numerator": 8
+        },
+        "population": 42
+      },
+      "expected_invariant": "I3",
+      "offline_violations_of_applicable": {
+        "count": 7,
+        "fraction": {
+          "denominator": 16,
+          "numerator": 7
+        },
+        "population": 16
+      },
+      "operator": "review_timeout_fallback",
+      "outcomes": {
+        "mutation_not_applicable": 26,
+        "offline_invalid": 0,
+        "offline_violation": 7,
+        "oracle_equivalent": 9,
+        "other_oracle_change": 0,
+        "scheduled": 42
+      }
+    },
+    {
+      "applicable_cases_of_scheduled": {
+        "count": 26,
+        "fraction": {
+          "denominator": 21,
+          "numerator": 13
+        },
+        "population": 42
+      },
+      "expected_invariant": "I4",
+      "offline_violations_of_applicable": {
+        "count": 7,
+        "fraction": {
+          "denominator": 26,
+          "numerator": 7
+        },
+        "population": 26
+      },
+      "operator": "cross_candidate_evidence",
+      "outcomes": {
+        "mutation_not_applicable": 16,
+        "offline_invalid": 0,
+        "offline_violation": 7,
+        "oracle_equivalent": 19,
+        "other_oracle_change": 0,
+        "scheduled": 42
+      }
+    }
+  ],
+  "protocol": {
+    "applicable_definition": "typed-applicable-campaign-case",
+    "applicable_outcome_partition": "applicable=oracle_equivalent+offline_violation+other_oracle_change",
+    "case_partition": "scheduled=mutation_not_applicable+offline_invalid+applicable",
+    "operator_aggregation": "operator-and-expected-invariant-in-protocol-order",
+    "protocol_id": "prefixbench-v1-development-offline-analysis-v1",
+    "rate_encoding": "count-population-and-reduced-fraction",
+    "reduction_aggregation": "pooled-sums-over-offline-violation-counterexamples",
+    "source_policy": "fixed-canonical-development-campaign-sha256",
+    "statistics": "descriptive-only-no-inferential-statistics"
+  },
+  "reduction": {
+    "accepted_reductions": 568,
+    "audits_executed": 7938,
+    "candidates_evaluated": 15587,
+    "compact_canonical_json_bytes": {
+      "after": 716196,
+      "before": 4044814,
+      "retained_fraction": {
+        "denominator": 2022407,
+        "numerator": 358098
+      }
+    },
+    "counterexamples": 28,
+    "events": {
+      "after": 230,
+      "before": 1996,
+      "retained_fraction": {
+        "denominator": 998,
+        "numerator": 115
+      }
+    },
+    "recursive_payload_members": {
+      "after": 6465,
+      "before": 35582,
+      "retained_fraction": {
+        "denominator": 35582,
+        "numerator": 6465
+      }
+    },
+    "rejections": {
+      "cause_changed": 2022,
+      "malformed": 12997,
+      "no_violation": 0,
+      "nondeterministic": 0,
+      "not_applicable": 0
+    }
+  },
+  "schema_version": 1,
+  "source_campaign": {
+    "bytes": 1510691,
+    "path": "evaluation/prefixbench-v1-development-offline-campaign.json",
+    "sha256": "659dba67f203183be64a200e85198596d7fbb929849a308df7b681cb7f42794d"
+  },
+  "split": "development",
+  "tasks": {
+    "projected_attempts": 39,
+    "tasks": 28,
+    "tasks_with_applicable_case": {
+      "count": 12,
+      "fraction": {
+        "denominator": 7,
+        "numerator": 3
+      },
+      "population": 28
+    },
+    "tasks_with_offline_violation": {
+      "count": 7,
+      "fraction": {
+        "denominator": 4,
+        "numerator": 1
+      },
+      "population": 28
+    },
+    "tasks_with_projected_attempts": {
+      "count": 25,
+      "fraction": {
+        "denominator": 28,
+        "numerator": 25
+      },
+      "population": 28
+    },
+    "tasks_with_verified_attempts": {
+      "count": 7,
+      "fraction": {
+        "denominator": 4,
+        "numerator": 1
+      },
+      "population": 28
+    },
+    "verified_attempts_of_projected": {
+      "count": 7,
+      "fraction": {
+        "denominator": 39,
+        "numerator": 7
+      },
+      "population": 39
+    }
+  }
+}

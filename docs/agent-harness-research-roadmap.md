@@ -524,6 +524,14 @@ prefix，按默认顺序运行四个算子，共保留 168 个 case：77 个
 canonical bytes。该结果只用于冻结 development 协议，不是 test split 结论。契约见
 `docs/prefixbench-mutation-campaign-design.md`。
 
+development 描述性分析也已冻结。168 个调度 case 中，91 个属于 typed applicable
+case，其中 28 个产生新的目标不变量违规；四个算子分别产生 7 个违规。28 个内联反例的
+事件总数从 1,996 缩减到 230，递归 payload member 从 35,582 缩减到 6,465。分析使用
+精确计数和分数保存原始分母，并把基线比较、phase-specific reachability、生产
+mutation score、成本节省、推断统计和 test split 结论标记为 `not_evaluated`。该产物
+只是 development 协议和口径的冻结，不回答 RQ2 至 RQ4 的主实验问题。契约见
+`docs/prefixbench-analysis-design.md`。
+
 ### 对照方法
 
 | 基线 | 作用 |
@@ -741,8 +749,10 @@ truth，不是方法本身。
    development cohort 采集。
 6. 已完成 development cohort 离线 campaign，并冻结算子、oracle、reducer 与 runner
    协议。
-7. 按冻结协议运行 PrefixBench test split。
-8. 主实验稳定后做 mini-swe-agent 适配。
+7. 已完成 development campaign 的 artifact-only 描述性分析，并冻结指标分母与主张
+   边界。
+8. 按冻结协议运行 PrefixBench test split。
+9. 主实验稳定后做 mini-swe-agent 适配。
 
 ## 优先精读
 
@@ -775,3 +785,6 @@ truth，不是方法本身。
 - PrefixBench development campaign 契约：`docs/prefixbench-mutation-campaign-design.md`
 - PrefixBench development campaign 报告：
   `evaluation/prefixbench-v1-development-offline-campaign.json`
+- PrefixBench development 分析契约：`docs/prefixbench-analysis-design.md`
+- PrefixBench development 分析报告：
+  `evaluation/prefixbench-v1-development-offline-analysis.json`

@@ -42,6 +42,7 @@ REQUIRED_FILES = (
     Path("evaluation/matrix-prefixbench-development.json"),
     Path("evaluation/prefixbench-readiness.json"),
     Path("evaluation/prefixbench-v1-development-canonical.json"),
+    Path("evaluation/prefixbench-v1-development-offline-analysis.json"),
     Path("evaluation/prefixbench-v1-development-offline-campaign.json"),
     Path("evaluation/prefixbench-v1-development-readiness.json"),
     Path("evaluation/completion-calibration.json"),
@@ -60,6 +61,7 @@ REQUIRED_FILES = (
     Path("docs/next-10-hours.md"),
     Path("docs/prefixbench-collection-design.md"),
     Path("docs/prefixbench-design.md"),
+    Path("docs/prefixbench-analysis-design.md"),
     Path("docs/prefixbench-mutation-campaign-design.md"),
     Path("docs/terminal-agent-isolation-research.md"),
     Path("docs/ten-task-analysis.md"),
@@ -69,6 +71,7 @@ REQUIRED_FILES = (
     Path("scripts/completion_isolation_census.py"),
     Path("scripts/completion_isolation_experiments.py"),
     Path("scripts/prefixbench.py"),
+    Path("scripts/prefixbench_analysis.py"),
     Path("scripts/prefixbench_campaign.py"),
     Path("experiments/prefixbench-v1/mutation-protocol-v1.json"),
     *(

@@ -318,10 +318,23 @@ oracle 等价、28 个离线违规，且没有 offline-invalid 或其他 oracle 
 `runs/` 的普通 clone 仍可校验 artifact、输入和协议绑定；28 份 journal 全部存在时，
 `check` 会重新运行 campaign 并要求字节完全一致。
 
+从该 canonical campaign 生成固定的 development 描述性分析：
+
+```bash
+uv run python scripts/prefixbench_analysis.py build
+uv run python scripts/prefixbench_analysis.py check
+```
+
+分析只读取已提交的 campaign JSON。91/168 个 case 属于可判定的 applicable 类型，其中
+28/91 产生新的目标不变量违规；这不是生产测试套件的 mutation score。28 个反例的事件总数
+从 1,996 降到 230，递归 payload member 从 35,582 降到 6,465。报告以精确计数和分数保存
+分母，并把基线比较、test split 推断、生产 killed/survived、耗时和调用成本标为
+`not_evaluated`。
+
 完整来源链、phase event 和 readiness v2 契约见
 [PrefixBench live collection design](docs/prefixbench-collection-design.md)，离线 campaign
-契约见
-[PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)。
+契约见 [PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)，
+分析口径见 [PrefixBench development analysis](docs/prefixbench-analysis-design.md)。
 
 ## 完整验收
 
@@ -433,6 +446,8 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [PrefixBench live collection 设计](docs/prefixbench-collection-design.md)
 - [PrefixBench development 离线 campaign 设计](docs/prefixbench-mutation-campaign-design.md)
 - [PrefixBench development 离线 campaign](evaluation/prefixbench-v1-development-offline-campaign.json)
+- [PrefixBench development 分析设计](docs/prefixbench-analysis-design.md)
+- [PrefixBench development 分析](evaluation/prefixbench-v1-development-offline-analysis.json)
 - [终端 Agent 隔离与结项机制调研](docs/terminal-agent-isolation-research.md)
 - [如果再给 10 小时](docs/next-10-hours.md)
 - [AI Coding 工程日志](docs/vibe-coding-log.md)
