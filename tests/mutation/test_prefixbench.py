@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from harbor.models.trial.config import TrialConfig
 
 from evidence_harness.collection_profile import PREFIXBENCH_V1
 from evidence_harness_mutation import (
@@ -292,6 +293,7 @@ def _create_v2_source_project(
     include_recovery: bool = True,
     review_has_outcome: bool = True,
     options_match: bool = True,
+    result_error: bool = False,
 ) -> tuple[Path, Path, Path]:
     name = _development_task_name()
     matrix = {
@@ -333,7 +335,7 @@ def _create_v2_source_project(
             "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
             "kwargs": agent_kwargs,
         },
-        "job_id": "test-job",
+        "job_id": "00000000-0000-0000-0000-000000000001",
         "trial_name": f"{name}__trial",
     }
     result: dict[str, Any] = {
@@ -344,9 +346,9 @@ def _create_v2_source_project(
             "git_url": config["task"]["git_url"],
             "git_commit_id": config["task"]["git_commit_id"],
         },
-        "config": config,
-        "verifier_result": {"rewards": {"reward": 1.0}},
-        "exception_info": None,
+        "config": TrialConfig.model_validate(config).model_dump(mode="json"),
+        "verifier_result": None if result_error else {"rewards": {"reward": 1.0}},
+        "exception_info": ({"exception_type": "VerifierTimeoutError"} if result_error else None),
         "agent_result": {"metadata": {"evidence_harness": {"stop_reason": "verified"}}},
     }
     config_bytes = _dump(config)
@@ -372,7 +374,12 @@ def _create_v2_source_project(
         "collection_profile": "prefixbench-v1",
         "dataset": matrix["dataset"],
         "matrix_sha256": hashlib.sha256(matrix_bytes).hexdigest(),
-        "counts": {"completed": 1, "passed": 1, "failed": 0, "error": 0},
+        "counts": {
+            "completed": 1,
+            "passed": 0 if result_error else 1,
+            "failed": 0,
+            "error": 1 if result_error else 0,
+        },
         "tasks": [
             {
                 "index": 1,
@@ -384,9 +391,9 @@ def _create_v2_source_project(
                 "task_checksum": result["task_checksum"],
                 "task_git_url": config["task"]["git_url"],
                 "task_git_commit_id": config["task"]["git_commit_id"],
-                "reward": 1.0,
-                "status": "passed",
-                "exception_type": None,
+                "reward": None if result_error else 1.0,
+                "status": "error" if result_error else "passed",
+                "exception_type": "VerifierTimeoutError" if result_error else None,
                 "journal_path": str(journal_path),
                 "journal_sha256": hashlib.sha256(journal_bytes).hexdigest(),
                 "prefixbench_profile": "prefixbench-v1",
@@ -633,6 +640,27 @@ def test_schema2_readiness_uses_aggregate_development_phase_coverage(
         "recovering": 1,
     }
     assert report.summary.phase_coverage.test == report.coverage_policy.test
+
+
+def test_schema2_readiness_admits_live_result_with_verifier_error(
+    tmp_path: Path,
+) -> None:
+    canonical, matrix, _journal = _create_v2_source_project(
+        tmp_path,
+        result_error=True,
+    )
+
+    report = inspect_prefixbench(
+        canonical,
+        matrix,
+        tmp_path,
+        expected_task_count=1,
+    )
+
+    assert isinstance(report, PrefixBenchReadinessV2)
+    assert report.status == "ready"
+    assert report.summary.source_admitted == 1
+    assert report.tasks[0].source_admission.admitted
 
 
 def test_schema2_readiness_distinguishes_missing_phase_from_source_exclusion(

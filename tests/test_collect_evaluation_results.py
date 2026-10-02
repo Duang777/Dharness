@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import pytest
+from harbor.models.trial.config import TrialConfig
 
 from evidence_harness.collection_profile import PREFIXBENCH_V1
 from evidence_harness.evaluation import load_matrix
@@ -109,7 +110,9 @@ def _write_profiled_completion(
         "producer_source_sha256": producer.source_sha256,
     }
     config = {
+        "task": {"path": task_name},
         "trial_name": f"{task_name}__trial",
+        "trials_dir": str(run_dir / task_name),
         "agent": {
             "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
             "kwargs": kwargs,
@@ -132,7 +135,7 @@ def _write_profiled_completion(
                     "git_commit_id": "b" * 40,
                     "path": task_name,
                 },
-                "config": config,
+                "config": TrialConfig.model_validate(config).model_dump(mode="json"),
                 "verifier_result": {"rewards": {"reward": 1.0}},
                 "exception_info": None,
                 "agent_result": {"metadata": metadata},
@@ -389,6 +392,41 @@ def test_profile_collection_binds_the_selected_journal_and_producer(
         manifest["tasks"][0]["journal_sha256"]
         == hashlib.sha256(journal_path.journal_path.read_bytes()).hexdigest()
     )
+
+
+def test_profile_collection_rejects_effective_config_mismatch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(collector, "PROJECT_ROOT", tmp_path)
+    matrix_path = tmp_path / "evaluation" / "matrix.json"
+    matrix_path.parent.mkdir(parents=True)
+    _write_matrix(matrix_path)
+    run_dir = tmp_path / "runs" / "terminal-bench-2" / "profiled"
+    producer = ProducerAttestation(
+        commit="c" * 40,
+        tree="d" * 40,
+        source_sha256="e" * 64,
+    )
+    for index, task_name in enumerate(("task-a", "task-b"), start=1):
+        _write_profiled_completion(
+            run_dir,
+            task_name=task_name,
+            timestamp=f"2026-09-25T10:0{index}:00Z",
+            producer=producer,
+        )
+
+    result_path = next((run_dir / "task-a").rglob("result.json"))
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["config"]["agent"]["model_name"] = "different-model"
+    result_path.write_text(json.dumps(result), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="result config does not match"):
+        collect_latest_results(
+            [run_dir],
+            load_matrix(matrix_path),
+            collection_profile_name="prefixbench-v1",
+        )
 
 
 def test_profile_collection_rejects_replay_and_mixed_producers(

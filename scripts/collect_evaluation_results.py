@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal
 
+from harbor.models.trial.config import TrialConfig
 from pydantic import ValidationError
 
 from evidence_harness.collection_profile import FrozenCollectionProfile, collection_profile
@@ -284,7 +285,12 @@ def _read_collection_evidence(
     config_sha256 = hashlib.sha256(config_path.read_bytes()).hexdigest()
     if completed.config_sha256 != config_sha256:
         raise ValueError(f"profiled config changed during collection: {completed.task_name}")
-    if result.get("config") != config:
+    try:
+        saved_config = TrialConfig.model_validate(config).model_dump(mode="json")
+        result_config = TrialConfig.model_validate(result.get("config")).model_dump(mode="json")
+    except ValidationError as exc:
+        raise ValueError(f"profiled trial config is invalid: {completed.task_name}") from exc
+    if result_config != saved_config:
         raise ValueError(
             f"profiled result config does not match config.json: {completed.task_name}"
         )

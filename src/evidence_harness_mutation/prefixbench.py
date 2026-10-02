@@ -7,6 +7,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Any, Literal, Self
 
+from harbor.models.trial.config import TrialConfig
 from pydantic import Field, ValidationError, model_validator
 
 from evidence_harness.collection_profile import PREFIXBENCH_V1
@@ -1015,7 +1016,7 @@ def _inspect_task_v2(
     agent_options = _optional_object(agent.get("kwargs"))
     profile_options_match = (
         started_options == expected_options
-        and _optional_object(result.get("config")) == config
+        and _trial_configs_match(result.get("config"), config)
         and agent.get("name") == "evidence_harness.harbor_agent:EvidenceHarnessAgent"
     )
     try:
@@ -1492,12 +1493,12 @@ def _task_name(result: dict[str, Any]) -> str | None:
     return Path(path).name if isinstance(path, str) and path else None
 
 
-def _reward(result: dict[str, Any]) -> float:
-    verifier = _object(result.get("verifier_result"), "verifier_result")
-    rewards = _object(verifier.get("rewards"), "verifier rewards")
+def _reward(result: dict[str, Any]) -> float | None:
+    verifier = _optional_object(result.get("verifier_result"))
+    rewards = _optional_object(verifier.get("rewards"))
     reward = rewards.get("reward")
     if not isinstance(reward, int | float) or isinstance(reward, bool):
-        raise ValueError("verifier reward is missing or non-numeric")
+        return None
     return float(reward)
 
 
@@ -1509,10 +1510,19 @@ def _exception_type(result: dict[str, Any]) -> str | None:
     return value
 
 
-def _result_status(result: dict[str, Any], reward: float) -> str:
-    if _exception_type(result):
+def _result_status(result: dict[str, Any], reward: float | None) -> str:
+    if _exception_type(result) or reward is None:
         return "error"
     return "passed" if reward == 1.0 else "failed"
+
+
+def _trial_configs_match(first: object, second: object) -> bool:
+    try:
+        first_config = TrialConfig.model_validate(first).model_dump(mode="json")
+        second_config = TrialConfig.model_validate(second).model_dump(mode="json")
+    except ValidationError:
+        return False
+    return first_config == second_config
 
 
 def _object(value: object, label: str) -> dict[str, Any]:
