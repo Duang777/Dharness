@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -27,6 +28,7 @@ from evidence_harness.protocol import (
 from evidence_harness.source_binding import runtime_source_binding
 from scripts.completion_isolation_experiments import (
     _dump_json,
+    _tracked_file_revision,
     build_experiment_report,
     check_artifacts,
     freeze_experiment_inputs,
@@ -34,6 +36,16 @@ from scripts.completion_isolation_experiments import (
 )
 
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
+
+
+def _git(root: Path, *args: str) -> str:
+    completed = subprocess.run(
+        ["git", "-C", str(root), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout.strip()
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -469,6 +481,50 @@ def test_check_artifacts_rebuilds_available_results(tmp_path: Path) -> None:
         "invalid completion isolation experiment artifacts: "
         "docker_isolation source binding does not match"
     ]
+
+
+def test_check_artifacts_uses_report_revision_for_frozen_runtime(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='fixture'\n", encoding="utf-8")
+    (tmp_path / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+    corpus, calibration, factory, agent, result = _write_fixture(tmp_path)
+    report_path = tmp_path / "evaluation" / "experiments.json"
+    markdown_path = tmp_path / "docs" / "experiments.md"
+    report = build_experiment_report(
+        corpus_path=corpus,
+        calibration_path=calibration,
+        result_paths=[result],
+        project_root=tmp_path,
+        factory_source_path=factory,
+        agent_source_path=agent,
+    )
+    report_path.write_bytes(_dump_json(report))
+    markdown_path.parent.mkdir(parents=True)
+    markdown_path.write_text(render_markdown(report), encoding="utf-8")
+    _git(tmp_path, "init")
+    _git(tmp_path, "config", "user.name", "Test")
+    _git(tmp_path, "config", "user.email", "test@example.com")
+    _git(tmp_path, "add", ".")
+    _git(tmp_path, "commit", "-m", "freeze experiment")
+    producer_revision = _git(tmp_path, "rev-parse", "HEAD")
+
+    (factory.parent / "new_runtime.py").write_text("VALUE = 1\n", encoding="utf-8")
+    _git(tmp_path, "add", ".")
+    _git(tmp_path, "commit", "-m", "advance runtime")
+
+    assert _tracked_file_revision(report_path, tmp_path) == producer_revision
+    assert (
+        check_artifacts(
+            corpus_path=corpus,
+            calibration_path=calibration,
+            report_path=report_path,
+            markdown_path=markdown_path,
+            project_root=tmp_path,
+            factory_source_path=factory,
+            agent_source_path=agent,
+            source_revision=producer_revision,
+        )
+        == []
+    )
 
 
 def test_freeze_experiment_inputs_copies_rebuildable_evidence(tmp_path: Path) -> None:

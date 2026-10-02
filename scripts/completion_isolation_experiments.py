@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -21,7 +22,10 @@ from evidence_harness.protocol import (
     VerificationReceipt,
 )
 from evidence_harness.replay_agent import RecordedCommand, load_recorded_replay_batches
-from evidence_harness.source_binding import runtime_source_binding
+from evidence_harness.source_binding import (
+    archived_runtime_source_binding,
+    runtime_source_binding,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CORPUS = PROJECT_ROOT / "evaluation" / "completion-disagreements.json"
@@ -62,10 +66,25 @@ def build_experiment_report(
     project_root: Path = PROJECT_ROOT,
     factory_source_path: Path = FACTORY_SOURCE,
     agent_source_path: Path = AGENT_SOURCE,
+    source_revision: str | None = None,
 ) -> dict[str, Any]:
     corpus_bytes, corpus = _read_json_object(corpus_path)
     calibration_bytes, calibration = _read_json_object(calibration_path)
-    runtime_binding = runtime_source_binding(project_root)
+    runtime_binding = (
+        archived_runtime_source_binding(project_root, source_revision)
+        if source_revision is not None
+        else runtime_source_binding(project_root)
+    )
+    factory_binding = _source_file_binding(
+        factory_source_path,
+        project_root,
+        revision=source_revision,
+    )
+    agent_binding = _source_file_binding(
+        agent_source_path,
+        project_root,
+        revision=source_revision,
+    )
     candidates = calibration.get("isolation_experiment_candidates")
     if not isinstance(candidates, list) or not candidates:
         raise ValueError("calibration has no isolation experiment candidates")
@@ -111,8 +130,8 @@ def build_experiment_report(
             result_path=results[task_name][0],
             result=results[task_name][1],
             project_root=project_root,
-            factory_source_path=factory_source_path,
-            agent_source_path=agent_source_path,
+            factory_source_sha256=_required_string(factory_binding, "sha256"),
+            agent_source_sha256=_required_string(agent_binding, "sha256"),
             runtime_source_sha256=runtime_binding["sha256"],
         )
         for task_name in expected
@@ -134,14 +153,8 @@ def build_experiment_report(
                 project_root,
                 calibration_bytes,
             ),
-            "docker_isolation": _file_binding(
-                factory_source_path,
-                project_root,
-            ),
-            "experiment_agent": _file_binding(
-                agent_source_path,
-                project_root,
-            ),
+            "docker_isolation": factory_binding,
+            "experiment_agent": agent_binding,
             "runtime": runtime_binding,
         },
         "summary": {
@@ -240,8 +253,8 @@ def _build_experiment_row(
     result_path: Path,
     result: dict[str, Any],
     project_root: Path,
-    factory_source_path: Path,
-    agent_source_path: Path,
+    factory_source_sha256: str,
+    agent_source_sha256: str,
     runtime_source_sha256: str,
 ) -> dict[str, Any]:
     case_id = _required_string(candidate, "case_id")
@@ -287,14 +300,8 @@ def _build_experiment_row(
         "attempt_ordinal": expected_ordinal,
         "source_journal_sha256": expected_journal_sha256,
         "proposal_event_line_sha256": expected_proposal_sha256,
-        "experiment_agent_source_sha256": _file_binding(
-            agent_source_path,
-            project_root,
-        )["sha256"],
-        "docker_isolation_source_sha256": _file_binding(
-            factory_source_path,
-            project_root,
-        )["sha256"],
+        "experiment_agent_source_sha256": agent_source_sha256,
+        "docker_isolation_source_sha256": factory_source_sha256,
         "runtime_source_sha256": runtime_source_sha256,
     }
     for key, expected_value in expected_metadata.items():
@@ -839,6 +846,7 @@ def check_artifacts(
     project_root: Path = PROJECT_ROOT,
     factory_source_path: Path = FACTORY_SOURCE,
     agent_source_path: Path = AGENT_SOURCE,
+    source_revision: str | None = None,
 ) -> list[str]:
     errors: list[str] = []
     try:
@@ -850,6 +858,7 @@ def check_artifacts(
             project_root=project_root,
             factory_source_path=factory_source_path,
             agent_source_path=agent_source_path,
+            source_revision=source_revision,
         )
         expected_markdown = render_markdown(report)
         if markdown_path.read_text(encoding="utf-8") != expected_markdown:
@@ -883,6 +892,7 @@ def check_artifacts(
                 project_root=project_root,
                 factory_source_path=factory_source_path,
                 agent_source_path=agent_source_path,
+                source_revision=source_revision,
             )
             if _dump_json(rebuilt) != _dump_json(report):
                 errors.append("completion isolation experiment report is stale")
@@ -899,6 +909,7 @@ def _validate_source_bindings(
     project_root: Path,
     factory_source_path: Path,
     agent_source_path: Path,
+    source_revision: str | None,
 ) -> None:
     if report.get("schema_version") != 1:
         raise ValueError("unsupported completion isolation experiment schema")
@@ -912,11 +923,17 @@ def _validate_source_bindings(
     }
     for key, path in expected.items():
         binding = _object(sources.get(key), f"{key} binding")
-        actual = (
-            runtime_source_binding(project_root)
-            if path is None
-            else _file_binding(path, project_root)
-        )
+        actual: object
+        if path is None:
+            actual = (
+                archived_runtime_source_binding(project_root, source_revision)
+                if source_revision is not None
+                else runtime_source_binding(project_root)
+            )
+        elif key in {"docker_isolation", "experiment_agent"}:
+            actual = _source_file_binding(path, project_root, revision=source_revision)
+        else:
+            actual = _file_binding(path, project_root)
         if binding != actual:
             raise ValueError(f"{key} source binding does not match")
 
@@ -990,6 +1007,58 @@ def _file_binding(
         "bytes": len(payload),
         "sha256": hashlib.sha256(payload).hexdigest(),
     }
+
+
+def _source_file_binding(
+    path: Path,
+    project_root: Path,
+    *,
+    revision: str | None,
+) -> dict[str, Any]:
+    if revision is None:
+        return _file_binding(path, project_root)
+    relative = _relative_project_path(path, project_root)
+    payload = _run_git(project_root, "show", f"{revision}:{relative}")
+    return _file_binding(path, project_root, payload)
+
+
+def _tracked_file_revision(path: Path, project_root: Path) -> str:
+    relative = _relative_project_path(path, project_root)
+    revision = (
+        _run_git(
+            project_root,
+            "log",
+            "-1",
+            "--format=%H",
+            "--",
+            relative,
+        )
+        .decode()
+        .strip()
+    )
+    if not revision:
+        raise ValueError(f"source artifact is not tracked by Git: {relative}")
+    return revision
+
+
+def _relative_project_path(path: Path, project_root: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(project_root.resolve()).as_posix()
+    except ValueError as exc:
+        raise ValueError(f"source path is outside the project: {path}") from exc
+
+
+def _run_git(project_root: Path, *args: str) -> bytes:
+    completed = subprocess.run(
+        ["git", "-C", str(project_root), *args],
+        check=False,
+        capture_output=True,
+    )
+    if completed.returncode:
+        detail = completed.stderr.decode(errors="replace").strip()
+        raise ValueError(f"Git {' '.join(args)} failed: {detail}")
+    return completed.stdout
 
 
 def _read_json_lines(path: Path) -> list[dict[str, Any]]:
@@ -1083,6 +1152,7 @@ def main() -> int:
             calibration_path=args.calibration,
             report_path=args.report,
             markdown_path=args.markdown,
+            source_revision=_tracked_file_revision(args.report, PROJECT_ROOT),
         )
         if errors:
             for error in errors:
