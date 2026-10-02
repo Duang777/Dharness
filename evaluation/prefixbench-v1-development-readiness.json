@@ -1,0 +1,2267 @@
+{
+  "benchmark": "PrefixBench",
+  "claim_boundary": "readiness_only_no_five_phase_benchmark_results",
+  "collection_profile": "prefixbench-v1",
+  "coverage_policy": {
+    "development": {
+      "executing": 1,
+      "finalizing": 1,
+      "recovering": 1,
+      "reviewing": 1,
+      "thinking": 1
+    },
+    "name": "prefixbench-development-coverage-v1",
+    "test": {
+      "executing": 0,
+      "finalizing": 0,
+      "recovering": 0,
+      "reviewing": 0,
+      "thinking": 0
+    }
+  },
+  "dataset": "terminal-bench@2.0",
+  "phase_contract": [
+    {
+      "event_type": "executor_turn_started",
+      "phase": "thinking"
+    },
+    {
+      "event_type": "work_batch_started",
+      "phase": "executing"
+    },
+    {
+      "event_type": "finalization_started",
+      "phase": "finalizing"
+    },
+    {
+      "event_type": "completion_review_started",
+      "phase": "reviewing"
+    },
+    {
+      "event_type": "recovery_required",
+      "phase": "recovering"
+    }
+  ],
+  "schema_version": 2,
+  "sources": {
+    "canonical": {
+      "bytes": 39415,
+      "path": "evaluation/prefixbench-v1-development-canonical.json",
+      "sha256": "a970b5223a8792f86b69c994d5e0d4cb47f1828e7e6c6195bded6bf7db46ab98"
+    },
+    "matrix": {
+      "bytes": 5736,
+      "path": "evaluation/matrix-prefixbench-development.json",
+      "sha256": "f95bfc0ac1836b49dcab8323e6ff702586edc97c1f71f2986ae3c1e6645a6067"
+    }
+  },
+  "split_policy": {
+    "algorithm": "sha256_first_8_bytes_mod_10",
+    "development_buckets": [
+      0,
+      1,
+      2
+    ],
+    "namespace": "prefixbench-task-split-v1",
+    "test_buckets": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "status": "ready",
+  "summary": {
+    "development": 28,
+    "legacy_events": {
+      "completion_rejections": 19,
+      "completion_reviews": 16,
+      "finish_proposals": 39,
+      "replans": 14
+    },
+    "phase_coverage": {
+      "development": {
+        "executing": 314,
+        "finalizing": 2,
+        "recovering": 4,
+        "reviewing": 16,
+        "thinking": 370
+      },
+      "test": {
+        "executing": 0,
+        "finalizing": 0,
+        "recovering": 0,
+        "reviewing": 0,
+        "thinking": 0
+      }
+    },
+    "source_admitted": 28,
+    "source_excluded": 0,
+    "source_exclusions": {
+      "journal_not_bound_by_canonical": 0,
+      "non_live_result": 0,
+      "prefixbench_profile_missing": 0,
+      "producer_commit_unattested": 0,
+      "profile_options_mismatch": 0,
+      "unsupported_journal_schema": 0
+    },
+    "tasks": 28,
+    "test": 0
+  },
+  "tasks": [
+    {
+      "execution_mode": "live",
+      "index": 1,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "adaptive-rejection-sampler",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          44
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          69
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          25,
+          41,
+          47
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1691,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/001-adaptive-rejection-sampler/adaptive-rejection-sampler__WqP9DWU/config.json",
+          "sha256": "de8f98c398e7943b8d932d7cbe273df3afe2240be54b089d76b66db63ed8bf1e"
+        },
+        "journal": {
+          "bytes": 144702,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/001-adaptive-rejection-sampler/adaptive-rejection-sampler__WqP9DWU/agent/evidence-harness/events.jsonl",
+          "sha256": "db15f92c1e9b8686c2149bcff85251c417c1386de9b0eaebfd0e767799c6e585"
+        },
+        "result": {
+          "bytes": 6556,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/001-adaptive-rejection-sampler/adaptive-rejection-sampler__WqP9DWU/result.json",
+          "sha256": "a202d564f8374c25f272eb39d0bb0f1bc30c4d9e3e669efd3d2cdfd2cf78c09e"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "9bb84d746e13f13bb4912a89fbdbc298c86bc51511852c525d6f99dcd9c37b8f"
+    },
+    {
+      "execution_mode": "live",
+      "index": 2,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "chess-best-move",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          22,
+          49,
+          54,
+          59
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          41,
+          77
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          19,
+          25,
+          46,
+          51,
+          56,
+          61
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1658,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/002-chess-best-move/chess-best-move__e7ZZ72r/config.json",
+          "sha256": "cfeef1de1c93128c529b7e2ed0dd08f43fd47e2d65c66a2126064f651684eab1"
+        },
+        "journal": {
+          "bytes": 161842,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/002-chess-best-move/chess-best-move__e7ZZ72r/agent/evidence-harness/events.jsonl",
+          "sha256": "ef61c9c44c62641688e628eefc2bdab195c030d862fa984aacef8ff179b92e96"
+        },
+        "result": {
+          "bytes": 6333,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/002-chess-best-move/chess-best-move__e7ZZ72r/result.json",
+          "sha256": "4289f4656ed55b86fac011e9fccb4b141451249355329a2cac3eba67b148e86b"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "3b795773ef1d4c72b057bd0b0f63f1349d91a5fb04c05e7c99a19d5f75003313"
+    },
+    {
+      "execution_mode": "live",
+      "index": 3,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 1
+      },
+      "name": "compile-compcert",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          27,
+          32,
+          37,
+          42,
+          47,
+          52,
+          59,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100,
+          105,
+          110,
+          119,
+          124,
+          129
+        ],
+        "finalizing": [
+          131
+        ],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          24,
+          29,
+          34,
+          39,
+          44,
+          49,
+          56,
+          62,
+          67,
+          72,
+          77,
+          82,
+          87,
+          92,
+          97,
+          102,
+          107,
+          112,
+          116,
+          121,
+          126
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1661,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/003-compile-compcert/compile-compcert__cRMPYJA/config.json",
+          "sha256": "8ad714d01da856d1e6bd6eda6d54c986ddadadec3f17b58d3364855ed771618f"
+        },
+        "journal": {
+          "bytes": 197664,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/003-compile-compcert/compile-compcert__cRMPYJA/agent/evidence-harness/events.jsonl",
+          "sha256": "a4a4dd70f9491769744a408a4e64717875f3907c5512e6dde7f0581e342437d3"
+        },
+        "result": {
+          "bytes": 6310,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/003-compile-compcert/compile-compcert__cRMPYJA/result.json",
+          "sha256": "0f6817e2afac63232d152761b8e91ef6e66c6dbbd052c6436795f6594a0f0035"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "0a3b99b61a384c82ae747ebf6e83bc694d5c070ea33c03e1bdab03f213f6359b"
+    },
+    {
+      "execution_mode": "live",
+      "index": 4,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "configure-git-webserver",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26,
+          31,
+          37,
+          42,
+          47
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          28,
+          34,
+          39,
+          44,
+          49
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1682,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/004-configure-git-webserver/configure-git-webserver__VgkaGzC/config.json",
+          "sha256": "38f72fd8c779b3b394993b0dd236023648cd6c2c75ec207efa6eab6a39383d8f"
+        },
+        "journal": {
+          "bytes": 92806,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/004-configure-git-webserver/configure-git-webserver__VgkaGzC/agent/evidence-harness/events.jsonl",
+          "sha256": "3c6794c9172dc06c87da0343e9463bbecf37ccc4cadc5d5ffbef9b4a9758aeab"
+        },
+        "result": {
+          "bytes": 6322,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/004-configure-git-webserver/configure-git-webserver__VgkaGzC/result.json",
+          "sha256": "828fd0d79ff1cf685b4ed7d1536ee1137d41ccb922883043deb488d1c2ddbe16"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "6da22167c2c73067b6c5abc19f5f937d663c1bd12988f239a222d812259bb432"
+    },
+    {
+      "execution_mode": "live",
+      "index": 5,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "custom-memory-heap-crash",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          12,
+          17,
+          22,
+          28,
+          34,
+          39,
+          44,
+          50,
+          55,
+          81,
+          86,
+          91,
+          96,
+          101
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          73,
+          119
+        ],
+        "thinking": [
+          3,
+          9,
+          14,
+          19,
+          25,
+          31,
+          36,
+          41,
+          47,
+          52,
+          57,
+          78,
+          83,
+          88,
+          93,
+          98,
+          103
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1685,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/005-custom-memory-heap-crash/custom-memory-heap-crash__qF5zMSa/config.json",
+          "sha256": "6b1617e242d892421630a1e3c1be10cf38ef2fe883b8dbeaf6cc967b989fa5fc"
+        },
+        "journal": {
+          "bytes": 207403,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/005-custom-memory-heap-crash/custom-memory-heap-crash__qF5zMSa/agent/evidence-harness/events.jsonl",
+          "sha256": "d1e7da5a0333330cafedbf6c3f6b9368237a2c59ef3b2e5fe96adcd385e86895"
+        },
+        "result": {
+          "bytes": 6323,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/005-custom-memory-heap-crash/custom-memory-heap-crash__qF5zMSa/result.json",
+          "sha256": "3a2fd08db95f571a371d41c586d742430830a5607a92bbb9c8d80fbd2c933ac8"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "4b4533d15394ad217ae42bddddd8b0e4c6dfdee470bfc35bf78a90241dcef590"
+    },
+    {
+      "execution_mode": "live",
+      "index": 6,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 4
+      },
+      "name": "feal-linear-cryptanalysis",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          27,
+          32,
+          41,
+          54,
+          59,
+          64
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          24,
+          29,
+          34,
+          38,
+          43,
+          47,
+          51,
+          56,
+          61,
+          66,
+          70
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2040,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/006-feal-linear-cryptanalysis-attempt-2/feal-linear-cryptanalysis__hLYZ4TX/config.json",
+          "sha256": "f034dba702c52af371baae96c6569d7ffe9766c90b157ac1d8e5fa9d07da0736"
+        },
+        "journal": {
+          "bytes": 108206,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/006-feal-linear-cryptanalysis-attempt-2/feal-linear-cryptanalysis__hLYZ4TX/agent/evidence-harness/events.jsonl",
+          "sha256": "43129edd88a3bb589552fe88a7ec4362cb737924d05b5d981844fcda78691048"
+        },
+        "result": {
+          "bytes": 6642,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/006-feal-linear-cryptanalysis-attempt-2/feal-linear-cryptanalysis__hLYZ4TX/result.json",
+          "sha256": "7efb49245afdad0ec4c28f89fa27778f1f2071095a19ac42f0ba2b2712f024ba"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "4d1789cde50d5a76ad52032e9a2ce7d765ef067edbce20bf7865c97e452a0119"
+    },
+    {
+      "execution_mode": "live",
+      "index": 7,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "fix-code-vulnerability",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          13,
+          18
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          65
+        ],
+        "thinking": [
+          3,
+          10,
+          15,
+          21,
+          45
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1679,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/007-fix-code-vulnerability/fix-code-vulnerability__iseZ8pG/config.json",
+          "sha256": "6ffebd440d4e3a7686efbed83d20224d0afbdc61ea34c828e25b40c23d22df4c"
+        },
+        "journal": {
+          "bytes": 158268,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/007-fix-code-vulnerability/fix-code-vulnerability__iseZ8pG/agent/evidence-harness/events.jsonl",
+          "sha256": "d708eb9035b7043cdcd00bb9c57ddcf6dfb58e8fac3c4c7ee4fd43d7278fcccf"
+        },
+        "result": {
+          "bytes": 6405,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/007-fix-code-vulnerability/fix-code-vulnerability__iseZ8pG/result.json",
+          "sha256": "7b4a966c5834d110aa7d4ac00ff62b139b3b425ee1c8210805739596e067ee1a"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "6c6dda8bafc7ffca45d8077ff3bfbb06dc6327f41de1d707d3666dba9f93062d"
+    },
+    {
+      "execution_mode": "live",
+      "index": 8,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 3,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 1
+      },
+      "name": "git-leak-recovery",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          38,
+          43,
+          48,
+          53,
+          63,
+          68,
+          99
+        ],
+        "finalizing": [],
+        "recovering": [
+          55
+        ],
+        "reviewing": [
+          91,
+          122
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          35,
+          40,
+          45,
+          50,
+          56,
+          60,
+          65,
+          71,
+          96,
+          102
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1664,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/008-git-leak-recovery/git-leak-recovery__8tiB82e/config.json",
+          "sha256": "13bb618e3f205e6761e1e3078bed7400aa07f6ef50175ce4b94b0d639e1fe1ff"
+        },
+        "journal": {
+          "bytes": 149007,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/008-git-leak-recovery/git-leak-recovery__8tiB82e/agent/evidence-harness/events.jsonl",
+          "sha256": "b9807c1f67a2a76e8a8534288694fc0163bb80585bce7c91061109ace4657e8e"
+        },
+        "result": {
+          "bytes": 6250,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/008-git-leak-recovery/git-leak-recovery__8tiB82e/result.json",
+          "sha256": "4cf402995e6bf31cab1775ff0cac585797b922ac60fddb2f576a251abfcc67f9"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "ca079dbb880dc205dbc3acf1e8abf2b50fcd9f4352c9d768f1b3881a8192f1ce"
+    },
+    {
+      "execution_mode": "live",
+      "index": 9,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "install-windows-3.11",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          27,
+          32,
+          38,
+          43,
+          48,
+          53,
+          58,
+          63
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          24,
+          29,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1673,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/009-install-windows-3.11/install-windows-3.11__GRbWcdu/config.json",
+          "sha256": "3aed80534530d6e454502aba00fe0516d6ec12a2d0783a2374a70bea23b47a23"
+        },
+        "journal": {
+          "bytes": 143980,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/009-install-windows-3.11/install-windows-3.11__GRbWcdu/agent/evidence-harness/events.jsonl",
+          "sha256": "02ecded015e5aedcea16c56297575008e2382a4e7047860f86267c86a786feee"
+        },
+        "result": {
+          "bytes": 6297,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/009-install-windows-3.11/install-windows-3.11__GRbWcdu/result.json",
+          "sha256": "8a1a15c7d57d0ceede14544c4b6d88319c722e3037b240f406c7163e3cfa853f"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "3507e6d59c2e5168749b40aab998627591dc5856c00ec4111b7cf6374e9dab9b"
+    },
+    {
+      "execution_mode": "live",
+      "index": 10,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "kv-store-grpc",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          16
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1652,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/010-kv-store-grpc/kv-store-grpc__rHjtVYx/config.json",
+          "sha256": "4efb0129c608c96e25f743ed0167b72b911e819340ed4caa94ccea8d22f52d42"
+        },
+        "journal": {
+          "bytes": 36245,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/010-kv-store-grpc/kv-store-grpc__rHjtVYx/agent/evidence-harness/events.jsonl",
+          "sha256": "7b08ef08b61a328b039cb71335d911e9bfbe6b0b608ef6d7c964647cc41221ec"
+        },
+        "result": {
+          "bytes": 6220,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/010-kv-store-grpc/kv-store-grpc__rHjtVYx/result.json",
+          "sha256": "571266c33c4ba8934a4861c173ef7d807f56afbfae960097a6fc49fd140204ff"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "7add103655be18dcc9e56b2ee361a1533d19cc6db48fce2b7055ef2d63b75336"
+    },
+    {
+      "execution_mode": "live",
+      "index": 11,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "largest-eigenval",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26,
+          31
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          50
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          28,
+          34
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1661,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/011-largest-eigenval/largest-eigenval__Np3KNq4/config.json",
+          "sha256": "d5272f1e7a35cc3f9906d5290a364345b6465e55e32d5b5fc92fb39c69d25d53"
+        },
+        "journal": {
+          "bytes": 72087,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/011-largest-eigenval/largest-eigenval__Np3KNq4/agent/evidence-harness/events.jsonl",
+          "sha256": "f1556a41ed289f7398c32533f2f47f9922979ce9fd7d4803ef63da073f67db42"
+        },
+        "result": {
+          "bytes": 6371,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/011-largest-eigenval/largest-eigenval__Np3KNq4/result.json",
+          "sha256": "b0c86bd42315ea4a50613234d8aae089eeb3a4b5e87e8f27110b28df518182fd"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "393e67506aca46fa4b68ada6bbcf1a7346fd2ea45ef838998a1da95818e9cf3b"
+    },
+    {
+      "execution_mode": "live",
+      "index": 12,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "mteb-retrieve",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          28
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1994,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/012-mteb-retrieve/mteb-retrieve__SVejXXp/config.json",
+          "sha256": "57be64ac7fd6246204848ea6edca844b51444fb353d04258bbf98e5c10cf93ff"
+        },
+        "journal": {
+          "bytes": 44293,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/012-mteb-retrieve/mteb-retrieve__SVejXXp/agent/evidence-harness/events.jsonl",
+          "sha256": "fc886c1240002e9cb92950ed3f8a48922979ae14710c2ed2389b166c1ecf1f63"
+        },
+        "result": {
+          "bytes": 6513,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/012-mteb-retrieve/mteb-retrieve__SVejXXp/result.json",
+          "sha256": "c4c371b2f02b938882ed350abe3ca6b5ca9bce82c8f9ddff595884fe6aed2b2f"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "8556e1bb5facb19850a2dc2c2ef6ebac6725604a4a8ec4cd054c9b6dc8318b02"
+    },
+    {
+      "execution_mode": "live",
+      "index": 13,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 2,
+        "replans": 0
+      },
+      "name": "multi-source-data-merger",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          39
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          57
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          36,
+          41
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1685,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/013-multi-source-data-merger/multi-source-data-merger__87bkdL9/config.json",
+          "sha256": "ecc8f54b2bd4f76196e71e66dc286d41aac68e241d51895b1a7c032f99cced79"
+        },
+        "journal": {
+          "bytes": 103196,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/013-multi-source-data-merger/multi-source-data-merger__87bkdL9/agent/evidence-harness/events.jsonl",
+          "sha256": "82bec6aa89bef0e1c32609c497fb8c8e17b567a2cd442632047371fa781bb98c"
+        },
+        "result": {
+          "bytes": 6439,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/013-multi-source-data-merger/multi-source-data-merger__87bkdL9/result.json",
+          "sha256": "2d6347ed04105ec6d3d8f0634692e2beb9bc786b4fba09b71c60e1138472b00c"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "5ac5f952391bb110118480fd2e38ebbaf13e367e77e216281ce93e73fde21f41"
+    },
+    {
+      "execution_mode": "live",
+      "index": 14,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "nginx-request-logging",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2018,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/014-nginx-request-logging/nginx-request-logging__kvWEyZ5/config.json",
+          "sha256": "4138972438cd9e25fc4e3f1ff032e0883cb69bfb47a28c7450140705583e6055"
+        },
+        "journal": {
+          "bytes": 45757,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/014-nginx-request-logging/nginx-request-logging__kvWEyZ5/agent/evidence-harness/events.jsonl",
+          "sha256": "5d70836bab3ca63ec314c0a6dfe6a956b46cb4c36ce3ae4f255e3eca8f6af36d"
+        },
+        "result": {
+          "bytes": 6593,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/014-nginx-request-logging/nginx-request-logging__kvWEyZ5/result.json",
+          "sha256": "fa79b7554fc3cd5575399482447566add637016673d72bc9e56e8cadd5cdd8c6"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "f75f45062d7af60b514550a70a68eb23cd5c4b25a24569ca00c8260d69dacc62"
+    },
+    {
+      "execution_mode": "live",
+      "index": 15,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 0,
+        "replans": 0
+      },
+      "name": "path-tracing",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          18,
+          24,
+          32,
+          40,
+          48,
+          55,
+          60,
+          65,
+          70,
+          75,
+          81,
+          86,
+          92,
+          98,
+          104,
+          111,
+          116,
+          121,
+          126,
+          131,
+          137,
+          142,
+          147,
+          152,
+          157,
+          162,
+          167,
+          174,
+          180,
+          185,
+          190,
+          195,
+          200,
+          205,
+          211
+        ],
+        "finalizing": [
+          213
+        ],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          15,
+          21,
+          29,
+          37,
+          45,
+          52,
+          57,
+          62,
+          67,
+          72,
+          78,
+          83,
+          89,
+          95,
+          101,
+          108,
+          113,
+          118,
+          123,
+          128,
+          134,
+          139,
+          144,
+          149,
+          154,
+          159,
+          164,
+          171,
+          177,
+          182,
+          187,
+          192,
+          197,
+          202,
+          208
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1649,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/015-path-tracing/path-tracing__8jZMQHj/config.json",
+          "sha256": "8118454c8f3cf883fce00eafdd435bb977c4df72707ba1477eeefc85238a3c5c"
+        },
+        "journal": {
+          "bytes": 707612,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/015-path-tracing/path-tracing__8jZMQHj/agent/evidence-harness/events.jsonl",
+          "sha256": "ff52bd19ac4ff913941cc66ce5fe01ff42786fb08ee7cfa31d171d1208678bba"
+        },
+        "result": {
+          "bytes": 6286,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/015-path-tracing/path-tracing__8jZMQHj/result.json",
+          "sha256": "c1b60f62d4519ab0d47cbcb0d0d9cdaf34b4c36ac1aee2d4987c3d4362fa0b0c"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "ba687c2a2d0aa5b8fe61f8f7b9f34fb9bc048f54c376b1b03c359f1fa6f8ce48"
+    },
+    {
+      "execution_mode": "live",
+      "index": 16,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 1,
+        "finish_proposals": 2,
+        "replans": 1
+      },
+      "name": "polyglot-c-py",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          15,
+          20,
+          25,
+          48,
+          53
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          71
+        ],
+        "thinking": [
+          3,
+          8,
+          12,
+          17,
+          22,
+          27,
+          45,
+          50,
+          55,
+          76
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1652,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/016-polyglot-c-py/polyglot-c-py__yKYbC7g/config.json",
+          "sha256": "562a7ab572942adf107eca16a0a6829925aee286274d44e63920ab065da08a57"
+        },
+        "journal": {
+          "bytes": 95225,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/016-polyglot-c-py/polyglot-c-py__yKYbC7g/agent/evidence-harness/events.jsonl",
+          "sha256": "490f50ba7da4c10230295c78fcbf3e1731101b570e5cbdf65e85bd830fa133d3"
+        },
+        "result": {
+          "bytes": 6346,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/016-polyglot-c-py/polyglot-c-py__yKYbC7g/result.json",
+          "sha256": "61cd822d2b3c172255ef7cd9687dc63ce9871ebadad0d33cbc35654abe34a220"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "76bc1528605a9744291f52e4c97a6779eb7869db59eadd404fe8f3c16f30e807"
+    },
+    {
+      "execution_mode": "live",
+      "index": 17,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 5,
+        "completion_reviews": 1,
+        "finish_proposals": 5,
+        "replans": 2
+      },
+      "name": "polyglot-rust-c",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          26,
+          31,
+          36,
+          46,
+          51,
+          56,
+          61,
+          103,
+          108,
+          113,
+          118,
+          144,
+          149,
+          175
+        ],
+        "finalizing": [],
+        "recovering": [
+          18,
+          38
+        ],
+        "reviewing": [
+          79
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          19,
+          23,
+          28,
+          33,
+          39,
+          43,
+          48,
+          53,
+          58,
+          63,
+          84,
+          100,
+          105,
+          110,
+          115,
+          121,
+          141,
+          146,
+          152,
+          172,
+          177
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1658,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/017-polyglot-rust-c/polyglot-rust-c__yxdZaGo/config.json",
+          "sha256": "a3d37d412dc1d52aa0bb05d581018428f23e55b73caf5dea49408b93cadb7bf0"
+        },
+        "journal": {
+          "bytes": 242823,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/017-polyglot-rust-c/polyglot-rust-c__yxdZaGo/agent/evidence-harness/events.jsonl",
+          "sha256": "a6f13e586ab1abc02c5ab1199a7d1a6d1fa891845b74898be330caf400391f64"
+        },
+        "result": {
+          "bytes": 6233,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/017-polyglot-rust-c/polyglot-rust-c__yxdZaGo/result.json",
+          "sha256": "1316fb80bffbbf2ff235575fd34473c928ec39ced52767aad21cfba4472f7937"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "668f57c1abd308019d55ae72657d98b66ad111e344631d78264255ec00defc31"
+    },
+    {
+      "execution_mode": "live",
+      "index": 18,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "portfolio-optimization",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          27
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          24,
+          29
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2021,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/018-portfolio-optimization/portfolio-optimization__635kUnb/config.json",
+          "sha256": "a489dd34c6cbb8119d1f663171ddb728aa6baddbb5ac68d0d313be5886602386"
+        },
+        "journal": {
+          "bytes": 69390,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/018-portfolio-optimization/portfolio-optimization__635kUnb/agent/evidence-harness/events.jsonl",
+          "sha256": "49e305d23dbf00c7822b525c16c692271033bbfcc370ad5179c088a50026ee03"
+        },
+        "result": {
+          "bytes": 6603,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/018-portfolio-optimization/portfolio-optimization__635kUnb/result.json",
+          "sha256": "508686c2f00f518c32d79c192ebf53ab1ad9d9a4b31328c717dbfe98c1c552dd"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "7e6433b02eb01a684990773bd29d42edb923f1512acb890c4aa90eeb3929d059"
+    },
+    {
+      "execution_mode": "live",
+      "index": 19,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "protein-assembly",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          17,
+          24,
+          29,
+          34,
+          39,
+          44,
+          49,
+          54,
+          60,
+          65
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          14,
+          21,
+          26,
+          31,
+          36,
+          41,
+          46,
+          51,
+          57,
+          62,
+          67
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2003,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/019-protein-assembly/protein-assembly__r8eTKjk/config.json",
+          "sha256": "bfc49fda7f62704c43aface5461ce7199f28b8f956d74eb0f6b159a10a8c5b62"
+        },
+        "journal": {
+          "bytes": 150458,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/019-protein-assembly/protein-assembly__r8eTKjk/agent/evidence-harness/events.jsonl",
+          "sha256": "2bb2323ce7c767822c64255e0f79b65032c3be988027edbc93af6e0cfd6837f3"
+        },
+        "result": {
+          "bytes": 6550,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/019-protein-assembly/protein-assembly__r8eTKjk/result.json",
+          "sha256": "5d9afa2e0abd36d2ed6f00b00929a1fc7b90d068ec8f445f51c55bf1307c4075"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "353c3452215b91b9e563038dfcbeabb2805082adf4f5e71b00c574b63cb77d7a"
+    },
+    {
+      "execution_mode": "live",
+      "index": 20,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "prove-plus-comm",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          33
+        ],
+        "thinking": [
+          3,
+          8,
+          13
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1658,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/020-prove-plus-comm/prove-plus-comm__5j2jt3D/config.json",
+          "sha256": "956ae23160bded4df3114e8ec3ca205d39df66283b5483c6d525a5bc150a1856"
+        },
+        "journal": {
+          "bytes": 57866,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/020-prove-plus-comm/prove-plus-comm__5j2jt3D/agent/evidence-harness/events.jsonl",
+          "sha256": "8797b28081a6fef784499af41d56f2e5c5be513a948c84f9b93cdc780d74bb7d"
+        },
+        "result": {
+          "bytes": 6376,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/020-prove-plus-comm/prove-plus-comm__5j2jt3D/result.json",
+          "sha256": "45af475c92b70ead7fc28b05872540df7d992328c7c046351ab97321719e74d4"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "cf709616611d4f4028a4e3b02ea5b62d801dd45d176c2b7baea968483b502526"
+    },
+    {
+      "execution_mode": "live",
+      "index": 21,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 3
+      },
+      "name": "qemu-alpine-ssh",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          20,
+          25,
+          30,
+          39,
+          44,
+          49,
+          54,
+          60,
+          65,
+          70,
+          75,
+          80,
+          89,
+          94,
+          99,
+          104,
+          109,
+          114,
+          119,
+          124,
+          129,
+          134,
+          139,
+          144,
+          149,
+          154,
+          159,
+          165,
+          171
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          17,
+          22,
+          27,
+          32,
+          36,
+          41,
+          46,
+          51,
+          57,
+          62,
+          67,
+          72,
+          77,
+          82,
+          86,
+          91,
+          96,
+          101,
+          106,
+          111,
+          116,
+          121,
+          126,
+          131,
+          136,
+          141,
+          146,
+          151,
+          156,
+          162,
+          168,
+          174
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1988,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/021-qemu-alpine-ssh/qemu-alpine-ssh__eqQuC4E/config.json",
+          "sha256": "aef35b046eda645a35a8d77a0ea8531b1e328a95c3c516a088e39256ef3617e1"
+        },
+        "journal": {
+          "bytes": 274739,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/021-qemu-alpine-ssh/qemu-alpine-ssh__eqQuC4E/agent/evidence-harness/events.jsonl",
+          "sha256": "c91d51ba8b25fd3151d36066e89c0b44a92219dbca4f2eba614eb1d2d49bcbc0"
+        },
+        "result": {
+          "bytes": 6528,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/021-qemu-alpine-ssh/qemu-alpine-ssh__eqQuC4E/result.json",
+          "sha256": "82a7bd2f3f40955c2fa9a9cde8fc013601b967584f2c727d8c753648d3ad51b9"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "d6b6633b07127d1b128733b9e29c9fbce9cabe1c1c9861a8f00b5ab4f0790ace"
+    },
+    {
+      "execution_mode": "live",
+      "index": 22,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 1
+      },
+      "name": "regex-chess",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26,
+          31,
+          37,
+          42,
+          48,
+          53,
+          58,
+          64,
+          69,
+          74,
+          79,
+          84,
+          89,
+          94,
+          99,
+          104,
+          109,
+          114,
+          119,
+          124,
+          129,
+          139
+        ],
+        "finalizing": [],
+        "recovering": [
+          131
+        ],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          28,
+          34,
+          39,
+          45,
+          50,
+          55,
+          61,
+          66,
+          71,
+          76,
+          81,
+          86,
+          91,
+          96,
+          101,
+          106,
+          111,
+          116,
+          121,
+          126,
+          132,
+          136,
+          141
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1988,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/022-regex-chess/regex-chess__x9zPf8D/config.json",
+          "sha256": "7846be22946a589f3b9dd4f0ceb269152911d2e135a410f970dc47051588eead"
+        },
+        "journal": {
+          "bytes": 288658,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/022-regex-chess/regex-chess__x9zPf8D/agent/evidence-harness/events.jsonl",
+          "sha256": "5fd7be358a85540d3343c403e35788399bff59e6b5cd04eb4082d231b43dc548"
+        },
+        "result": {
+          "bytes": 6500,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/022-regex-chess/regex-chess__x9zPf8D/result.json",
+          "sha256": "fc989d1d582e838a70d80af2f9162bbb07644ef380d78819c47568ad7b99e6c6"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "fb8838ad1847889620d3ced8f607aba9a20568bbae0f7a2e9a4d36122b3fc3be"
+    },
+    {
+      "execution_mode": "live",
+      "index": 23,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 2,
+        "completion_reviews": 2,
+        "finish_proposals": 3,
+        "replans": 0
+      },
+      "name": "reshard-c4-data",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          22,
+          27,
+          32,
+          37,
+          66,
+          96
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          88,
+          120
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          19,
+          24,
+          29,
+          34,
+          39,
+          63,
+          68,
+          93,
+          98
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1658,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/023-reshard-c4-data/reshard-c4-data__TUHvxEi/config.json",
+          "sha256": "556740ecbb9b8e4d45dbec920af0a4552d133406f5608da75f1aea227e9e2eaa"
+        },
+        "journal": {
+          "bytes": 270160,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/023-reshard-c4-data/reshard-c4-data__TUHvxEi/agent/evidence-harness/events.jsonl",
+          "sha256": "7b04271e21b05e2818dd44549b7832f314159ad8b5042a638564a62e058ec619"
+        },
+        "result": {
+          "bytes": 6526,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/023-reshard-c4-data/reshard-c4-data__TUHvxEi/result.json",
+          "sha256": "06f6973fbbe893350912cbb119c25f074ab8d5398cbe60692b14e60cecdd8b51"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "01edde029abbe0dc5b4caeb60815ae66ebd88da5ddf81a3e37f68dc6ca3ff865"
+    },
+    {
+      "execution_mode": "live",
+      "index": 24,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "schemelike-metacircular-eval",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          12,
+          19,
+          24,
+          30,
+          35,
+          40,
+          45,
+          52,
+          57,
+          62,
+          68,
+          73,
+          78,
+          83,
+          88,
+          93,
+          98,
+          103,
+          108,
+          113
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          9,
+          16,
+          21,
+          27,
+          32,
+          37,
+          42,
+          49,
+          54,
+          59,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100,
+          105,
+          110,
+          116
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2039,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/024-schemelike-metacircular-eval/schemelike-metacircular-eval__VeGTd5C/config.json",
+          "sha256": "ad6fa20f2cbe7726fce0e3bd6cadd5cd085e7c8ccc0671f88f9c0ad407d75049"
+        },
+        "journal": {
+          "bytes": 248144,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/024-schemelike-metacircular-eval/schemelike-metacircular-eval__VeGTd5C/agent/evidence-harness/events.jsonl",
+          "sha256": "daf7000d7f0ae48bca6dc9944b78dd8b1b7f78bb5ebeb1b2c501f9a4811f762a"
+        },
+        "result": {
+          "bytes": 6670,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/024-schemelike-metacircular-eval/schemelike-metacircular-eval__VeGTd5C/result.json",
+          "sha256": "313fed2d5d2c059f972689806940d5a12f666bb29390c50b220b8ee88336d005"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "b2a0e79a2056dcd69dbc949923f3b282b6219a048bd44e50fffb522faf285644"
+    },
+    {
+      "execution_mode": "live",
+      "index": 25,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "sqlite-db-truncate",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2009,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/025-sqlite-db-truncate/sqlite-db-truncate__zFxQ2xw/config.json",
+          "sha256": "c2dbb5d5f01e0753dcbb7fd54d911bcbdf15fa2feeaa57eaefdb62081fc02d52"
+        },
+        "journal": {
+          "bytes": 32396,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/025-sqlite-db-truncate/sqlite-db-truncate__zFxQ2xw/agent/evidence-harness/events.jsonl",
+          "sha256": "4394b220868c1136887198966b4f93dd79c6f14f6177c24bc8fdb1f9b7368b86"
+        },
+        "result": {
+          "bytes": 6563,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/025-sqlite-db-truncate/sqlite-db-truncate__zFxQ2xw/result.json",
+          "sha256": "8da7ee7c46a0b883c8b8598a28406cef79331f85369e124756d595c1a75d5020"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "22802798fd27037c807296dcf705800f1612c6293e785154676696b7c53a3d2f"
+    },
+    {
+      "execution_mode": "live",
+      "index": 26,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 1,
+        "completion_reviews": 1,
+        "finish_proposals": 1,
+        "replans": 1
+      },
+      "name": "torch-tensor-parallelism",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26,
+          31,
+          40,
+          45,
+          51,
+          56,
+          82
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [
+          74
+        ],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          28,
+          33,
+          37,
+          42,
+          48,
+          53,
+          58,
+          79,
+          84
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1685,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/026-torch-tensor-parallelism/torch-tensor-parallelism__jWKoJKx/config.json",
+          "sha256": "4c06856540b6258f7052b9ae23eeaa207c2b9155ad58d7600e5f884138b0362c"
+        },
+        "journal": {
+          "bytes": 158250,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/026-torch-tensor-parallelism/torch-tensor-parallelism__jWKoJKx/agent/evidence-harness/events.jsonl",
+          "sha256": "179b629278163d33ca100e5b7d1f2088a398375c345fb7693e0123c61f72ad88"
+        },
+        "result": {
+          "bytes": 10889,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/026-torch-tensor-parallelism/torch-tensor-parallelism__jWKoJKx/result.json",
+          "sha256": "5a8a3a1cc4fab29ac8c48d6245ea56ab23af0e81913759fddaaca8ca6f110127"
+        }
+      },
+      "split": "development",
+      "split_bucket": 2,
+      "task_identity_sha256": "1091a2f2f75561d027f83786bc034449b6b58babc9a73475475290cc84b747b7"
+    },
+    {
+      "execution_mode": "live",
+      "index": 27,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "tune-mjcf",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26,
+          32,
+          37,
+          42
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          29,
+          34,
+          39,
+          45
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 1982,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/027-tune-mjcf/tune-mjcf__TpQbipH/config.json",
+          "sha256": "44d381c30b55aefc78ba21626011df8bd8fcb742cdae59335dbd6fcb9a2218d5"
+        },
+        "journal": {
+          "bytes": 91432,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/027-tune-mjcf/tune-mjcf__TpQbipH/agent/evidence-harness/events.jsonl",
+          "sha256": "b04e1652d70acbbd9ab73c38b2f9e3688ea8dfeb1afb9d6f87d9fa88418580d4"
+        },
+        "result": {
+          "bytes": 6476,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/027-tune-mjcf/tune-mjcf__TpQbipH/result.json",
+          "sha256": "d716e975edf5b94c0958010438c40f5a5c8f3a83b74842de33a56747a91d4f0e"
+        }
+      },
+      "split": "development",
+      "split_bucket": 0,
+      "task_identity_sha256": "759ac2e391e886c078b83b90d02889ba4bc306e066f58a866d6ae39e46aa9789"
+    },
+    {
+      "execution_mode": "live",
+      "index": 28,
+      "journal_schema_version": 2,
+      "legacy_events": {
+        "completion_rejections": 0,
+        "completion_reviews": 0,
+        "finish_proposals": 1,
+        "replans": 0
+      },
+      "name": "video-processing",
+      "phase_eligibility": {
+        "executing": [
+          6,
+          11,
+          16,
+          21,
+          26,
+          31,
+          36,
+          41,
+          46,
+          51,
+          56,
+          61
+        ],
+        "finalizing": [],
+        "recovering": [],
+        "reviewing": [],
+        "thinking": [
+          3,
+          8,
+          13,
+          18,
+          23,
+          28,
+          33,
+          38,
+          43,
+          48,
+          53,
+          58,
+          63
+        ]
+      },
+      "phase_errors": [],
+      "producer": {
+        "commit": "ac600977b820bc7d8d991f7a687c4c13e2cd0168",
+        "source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b",
+        "tree": "d53803070651aae8ba49fcf4366ef3735f78d58b"
+      },
+      "source_admission": {
+        "admitted": true,
+        "exclusion_reasons": []
+      },
+      "sources": {
+        "config": {
+          "bytes": 2003,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/028-video-processing/video-processing__fzqyFp6/config.json",
+          "sha256": "ddb217efe2468a4f83adcde576c56a83675b71a3fb8b2e23417c4a934c20e277"
+        },
+        "journal": {
+          "bytes": 147737,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/028-video-processing/video-processing__fzqyFp6/agent/evidence-harness/events.jsonl",
+          "sha256": "26599761ecfbeb5292892ffb5bdf890e14183900ec159d416d6f61b676bd1d6e"
+        },
+        "result": {
+          "bytes": 6550,
+          "path": "runs/terminal-bench-2/prefixbench-v1-development-20261002/028-video-processing/video-processing__fzqyFp6/result.json",
+          "sha256": "8b671ee3667c0cb787ae6608762f3cf1a38160035d5c0d508b3f966b172f98b9"
+        }
+      },
+      "split": "development",
+      "split_bucket": 1,
+      "task_identity_sha256": "a80e476f194e7a895ed667e69f906566397616c03e5775d1a135a8210d3d8108"
+    }
+  ]
+}
