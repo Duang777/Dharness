@@ -163,6 +163,16 @@ STATIC_GATES = (
         ),
     ),
     (
+        "PrefixBench test preregistration",
+        (
+            "uv",
+            "run",
+            "python",
+            "scripts/prefixbench_test_campaign.py",
+            "preflight",
+        ),
+    ),
+    (
         "PrefixBench development offline analysis",
         (
             "uv",

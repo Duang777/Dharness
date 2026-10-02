@@ -1,0 +1,528 @@
+{
+  "baseline_rule": "credit-only-new-expected-violation-at-attempt-terminal",
+  "campaign_audit_runs": 3,
+  "campaign_execution": "sequential",
+  "canonical_json": {
+    "ensure_ascii": true,
+    "indent": 2,
+    "sort_keys": true,
+    "trailing_newline": true
+  },
+  "claims": {
+    "held_out_non_interference": "outcomes-did-not-influence-task-selection-order-retry-policy-operators-oracle-reducer-formulas-or-claim-scope",
+    "inferential_statistics": "not_evaluated",
+    "offline_violation_definition": "new-target-invariant-failure-not-production-mutation-score",
+    "oracle_equivalent_definition": "identical-offline-audit-output-not-semantic-equivalence",
+    "rq2_baseline_superiority": "not_evaluated",
+    "rq3_production_mutation_score": "not_evaluated",
+    "rq4_live_cost_savings": "not_evaluated",
+    "scope": "held-out-test-descriptive-offline-campaign-only"
+  },
+  "cohort": "prefixbench-v1-test",
+  "collection": {
+    "agent_kwargs_sha256": "d1f7d9d0eb7d262893939a6f52b7373a8b337b47066d7951eb69fd36334218b5",
+    "api_base": "https://xpa-relay.bytedance.net/v1",
+    "collector_inputs": "one-fixed-run-root",
+    "collector_retry_matrix": "forbidden",
+    "completed_results_per_task": 1,
+    "controlled_agent_options": [
+      {
+        "name": "max_turns",
+        "value": 40
+      },
+      {
+        "name": "max_environment_calls",
+        "value": 80
+      },
+      {
+        "name": "max_repairs",
+        "value": 4
+      },
+      {
+        "name": "max_recoveries",
+        "value": 2
+      },
+      {
+        "name": "max_completion_reviews",
+        "value": 2
+      },
+      {
+        "name": "max_wall_time_sec",
+        "value": 1800
+      },
+      {
+        "name": "max_model_call_timeout_sec",
+        "value": 360
+      },
+      {
+        "name": "max_command_timeout_sec",
+        "value": 300
+      },
+      {
+        "name": "verification_environment_reserve",
+        "value": 3
+      },
+      {
+        "name": "recent_observation_count",
+        "value": 8
+      },
+      {
+        "name": "output_inline_bytes",
+        "value": 12000
+      },
+      {
+        "name": "context_max_chars",
+        "value": 80000
+      },
+      {
+        "name": "enable_completion_review",
+        "value": true
+      },
+      {
+        "name": "max_output_tokens",
+        "value": 8192
+      },
+      {
+        "name": "transport_attempts",
+        "value": 3
+      },
+      {
+        "name": "temperature",
+        "value": null
+      },
+      {
+        "name": "reasoning_effort",
+        "value": null
+      }
+    ],
+    "execution": "sequential-matrix-order-one-task-jobs",
+    "journal_schema_version": 2,
+    "model": "openai/modelhub/gpt-5.6-terra",
+    "orchestration_source_sha256": "868d63fb26011ddd692f8b04f7b3bea0072ad5ddbd3086200e442280c55f1e0c",
+    "profile": "prefixbench-v1",
+    "provider_credentials": "external-file-run-config-hash-only",
+    "result_policy": "accept-every-live-completed-result",
+    "retry_policy": "resume-interrupted-only-no-retry-by-reward-status-or-exception",
+    "start_at": null
+  },
+  "components": [
+    {
+      "entrypoint": "evidence_harness_mutation.prefixbench:build_prefixbench_split_matrix",
+      "name": "split_selection",
+      "source_paths": [
+        "src/evidence_harness/evaluation.py",
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/prefixbench.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness.source_binding:attest_git_runtime_source",
+      "name": "runtime_attestation",
+      "source_paths": [
+        "pyproject.toml",
+        "uv.lock",
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness/source_binding.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness.collection_profile:PREFIXBENCH_V1",
+      "name": "collection_profile",
+      "source_paths": [
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/protocol.py"
+      ]
+    },
+    {
+      "entrypoint": "scripts.run_full_evaluation:run_full_evaluation",
+      "name": "serial_collection",
+      "source_paths": [
+        "pyproject.toml",
+        "uv.lock",
+        "evaluation/debian-https.sources",
+        "evaluation/debian-bullseye-main.list",
+        "evaluation/debian-trixie-https.sources",
+        "scripts/run_evaluation.py",
+        "scripts/run_full_evaluation.py",
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/source_binding.py"
+      ]
+    },
+    {
+      "entrypoint": "scripts.collect_evaluation_results:build_manifest",
+      "name": "canonical_collection",
+      "source_paths": [
+        "scripts/collect_evaluation_results.py",
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/evaluation.py",
+        "src/evidence_harness/protocol.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.prefixbench:check_prefixbench_readiness",
+      "name": "source_admission",
+      "source_paths": [
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/evaluation.py",
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/prefixbench.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.journal_loader:load_state_prefix",
+      "name": "journal_loading",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/journal_loader.py",
+        "src/evidence_harness_mutation/model.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.attempts:project_completion_attempts",
+      "name": "attempt_projection",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/model.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.operators:apply_mutation",
+      "name": "operators",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.invariants:audit_completion_trace",
+      "name": "oracle",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/model.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.reducer:reduce_counterexample",
+      "name": "reducer",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py",
+        "src/evidence_harness_mutation/reducer.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.campaign:run_offline_campaign",
+      "name": "single_prefix_campaign",
+      "source_paths": [
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/campaign.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py",
+        "src/evidence_harness_mutation/reducer.py"
+      ]
+    },
+    {
+      "entrypoint": "evidence_harness_mutation.prefixbench_test_campaign:build_prefixbench_test_campaign",
+      "name": "held_out_campaign",
+      "source_paths": [
+        "pyproject.toml",
+        "uv.lock",
+        "evaluation/debian-https.sources",
+        "evaluation/debian-bullseye-main.list",
+        "evaluation/debian-trixie-https.sources",
+        "scripts/collect_evaluation_results.py",
+        "scripts/run_evaluation.py",
+        "scripts/run_full_evaluation.py",
+        "src/evidence_harness/collection_profile.py",
+        "src/evidence_harness/evaluation.py",
+        "src/evidence_harness/protocol.py",
+        "src/evidence_harness/source_binding.py",
+        "src/evidence_harness_mutation/attempts.py",
+        "src/evidence_harness_mutation/campaign.py",
+        "src/evidence_harness_mutation/invariants.py",
+        "src/evidence_harness_mutation/journal_loader.py",
+        "src/evidence_harness_mutation/model.py",
+        "src/evidence_harness_mutation/operators.py",
+        "src/evidence_harness_mutation/prefixbench.py",
+        "src/evidence_harness_mutation/prefixbench_test_campaign.py",
+        "src/evidence_harness_mutation/reducer.py"
+      ]
+    }
+  ],
+  "counterexamples": "inline-for-every-offline-violation",
+  "development_lineage": {
+    "file": {
+      "bytes": 7747,
+      "path": "experiments/prefixbench-v1/mutation-protocol-v1.json",
+      "sha256": "b394fe0f4529d7bd476d5113411230151c0fa3077414cd23f0df34ea287e8c8d"
+    },
+    "protocol_id": "prefixbench-v1-development-offline-mutation-v1",
+    "source_set_sha256": "b7a2fccd54e6b291ecf3a54637223f33a13555157f377af3682dd09d85176dc8"
+  },
+  "frozen_matrix_commit": "2e3e65868213238d9bbcdbf3e09ce4356c8edfd9",
+  "matrix": {
+    "bytes": 12130,
+    "path": "evaluation/matrix-prefixbench-test.json",
+    "sha256": "a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb"
+  },
+  "operators": [
+    {
+      "expected_invariant": "I1",
+      "operator": "stale_evidence_epoch"
+    },
+    {
+      "expected_invariant": "I2",
+      "operator": "reorder_check_receipts"
+    },
+    {
+      "expected_invariant": "I3",
+      "operator": "review_timeout_fallback"
+    },
+    {
+      "expected_invariant": "I4",
+      "operator": "cross_candidate_evidence"
+    }
+  ],
+  "outcomes": [
+    "mutation_not_applicable",
+    "offline_invalid",
+    "oracle_equivalent",
+    "offline_violation",
+    "other_oracle_change"
+  ],
+  "paths": {
+    "campaign": "evaluation/prefixbench-v1-test-offline-campaign.json",
+    "canonical": "evaluation/prefixbench-v1-test-canonical.json",
+    "collection_run_root": "runs/terminal-bench-2/prefixbench-v1-test-20261002",
+    "development_matrix": "evaluation/matrix-prefixbench-development.json",
+    "development_protocol": "experiments/prefixbench-v1/mutation-protocol-v1.json",
+    "matrix": "evaluation/matrix-prefixbench-test.json",
+    "progress": "runs/terminal-bench-2/prefixbench-v1-test-20261002/progress.jsonl",
+    "protocol": "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
+    "readiness": "evaluation/prefixbench-v1-test-readiness.json",
+    "run_config": "runs/terminal-bench-2/prefixbench-v1-test-20261002/run-config.json",
+    "source_matrix": "evaluation/matrix-89.json",
+    "split_readiness": "evaluation/prefixbench-readiness.json"
+  },
+  "phase_witness_policy": "reporting-only-test-admission-ignores-development-coverage-gate",
+  "prefix_policy": "one-full-journal-state-prefix-per-admitted-task",
+  "producer": {
+    "producer_commit_policy": "not-frozen-protocol-must-exist-in-producer-commit",
+    "producer_tree_policy": "not-frozen-all-tasks-must-share-one-tree",
+    "runtime_source_algorithm": "sha256-length-framed-runtime-source-binding-v1",
+    "runtime_source_description": "pyproject.toml, uv.lock, and src/evidence_harness/**/*.py",
+    "runtime_source_sha256": "74dc91c82da08d58fddcd73d6ba102d8f8009920a1be9f1d72ed0a377fde336b"
+  },
+  "protocol_id": "prefixbench-v1-test-offline-mutation-v1",
+  "reducer_algorithm": "source-anchored-ddmin-v1",
+  "reducer_audit_runs": 3,
+  "reducer_minimality": "1-minimal-under-declared-removals",
+  "schedule": "run-offline-campaign-default",
+  "schema_version": 1,
+  "source_set": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 588909,
+    "files": [
+      {
+        "bytes": 1168,
+        "path": "pyproject.toml",
+        "sha256": "16b90004e6861dcf11ff525c1eb3276b86735a5c9c5149e752a69e7c6970b8c5"
+      },
+      {
+        "bytes": 301116,
+        "path": "uv.lock",
+        "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+      },
+      {
+        "bytes": 314,
+        "path": "evaluation/debian-https.sources",
+        "sha256": "cdfbaa247442dae546c43aeb25d9f0c6fdaaebd83e75f91ac7145a21a733a8a3"
+      },
+      {
+        "bytes": 104,
+        "path": "evaluation/debian-bullseye-main.list",
+        "sha256": "bcb99092aafb4abe26789e97f08247e25335b96c913a704d47cd932306a34c4f"
+      },
+      {
+        "bytes": 308,
+        "path": "evaluation/debian-trixie-https.sources",
+        "sha256": "8abf8cc4e1dae5c6bde55fd1b15691d48c80073c263707b13d3528a3b5b542dc"
+      },
+      {
+        "bytes": 21122,
+        "path": "scripts/collect_evaluation_results.py",
+        "sha256": "de9305113d85beac0668098cda5ac79e96b0404f135e3fb71dd369453952e954"
+      },
+      {
+        "bytes": 7800,
+        "path": "scripts/run_evaluation.py",
+        "sha256": "e9389719d62db4b6b087e8b948ae380faab2362f2f84be983e499820f820b1f8"
+      },
+      {
+        "bytes": 22694,
+        "path": "scripts/run_full_evaluation.py",
+        "sha256": "9df1f5b207cf905eebbfa3748fbe13e285eaed2ba981aa698dba522eb6f7e77a"
+      },
+      {
+        "bytes": 4108,
+        "path": "src/evidence_harness/collection_profile.py",
+        "sha256": "c285c48cb63e2751f58acbf94fd12ec65d7c1f50167cdd701b4ace1a58f3cbd6"
+      },
+      {
+        "bytes": 12366,
+        "path": "src/evidence_harness/evaluation.py",
+        "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+      },
+      {
+        "bytes": 12865,
+        "path": "src/evidence_harness/protocol.py",
+        "sha256": "be0d80be68e6a9d86dd9668297f0bd4d816bbaf75be5ab8799957f8fe10b662f"
+      },
+      {
+        "bytes": 6231,
+        "path": "src/evidence_harness/source_binding.py",
+        "sha256": "c56a461c3f83eb70d64b4f87796696975ad8099104e6e556547372517ff0a9bb"
+      },
+      {
+        "bytes": 2317,
+        "path": "src/evidence_harness_mutation/attempts.py",
+        "sha256": "5c67ff40ff43fcff5b7ac876b568a8da17402f294e66a61f29bd3b15111a1d32"
+      },
+      {
+        "bytes": 14235,
+        "path": "src/evidence_harness_mutation/campaign.py",
+        "sha256": "9c506b594e374cb8cb1629f72c2e7c759534919db4e55cf55a47fe9ebeefb1d6"
+      },
+      {
+        "bytes": 14339,
+        "path": "src/evidence_harness_mutation/invariants.py",
+        "sha256": "952d7edb8891f3ec6b36f4b6a161ec5c6ae1201b425617d024b74eaafb5d962f"
+      },
+      {
+        "bytes": 4363,
+        "path": "src/evidence_harness_mutation/journal_loader.py",
+        "sha256": "18da93a9939ccbee82afaa907f8efd7f9000f12fd1df4f83b6c1b9bff1f1a098"
+      },
+      {
+        "bytes": 4055,
+        "path": "src/evidence_harness_mutation/model.py",
+        "sha256": "9f058bd057fb902fe0bfa45207163da39f4a43892c420ccb71a1aa700dbcf6f3"
+      },
+      {
+        "bytes": 7452,
+        "path": "src/evidence_harness_mutation/operators.py",
+        "sha256": "014cd1df65f0834fcd0cad8b785ce75c01f8568a24e6ff86885769c234f9b3e4"
+      },
+      {
+        "bytes": 60536,
+        "path": "src/evidence_harness_mutation/prefixbench.py",
+        "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
+      },
+      {
+        "bytes": 71876,
+        "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
+        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+      },
+      {
+        "bytes": 19540,
+        "path": "src/evidence_harness_mutation/reducer.py",
+        "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
+      }
+    ],
+    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+  },
+  "split_lineage": {
+    "development_matrix": {
+      "bytes": 5736,
+      "path": "evaluation/matrix-prefixbench-development.json",
+      "sha256": "f95bfc0ac1836b49dcab8323e6ff702586edc97c1f71f2986ae3c1e6645a6067"
+    },
+    "readiness": {
+      "bytes": 154595,
+      "path": "evaluation/prefixbench-readiness.json",
+      "sha256": "b38d9dead64d42141817b324368babb44759ed59a89e3aaa8af213bc6691ea7c"
+    },
+    "source_matrix": {
+      "bytes": 17531,
+      "path": "evaluation/matrix-89.json",
+      "sha256": "51a6e58f5591d3d247543b53dc4f7008d663a085ca0928b2d4d2852f813f9939"
+    }
+  },
+  "summary_formulas": "counts-derived-only-from-nested-campaign-cases",
+  "task_count": 61,
+  "task_order": [
+    "bn-fit-modify",
+    "break-filter-js-from-html",
+    "build-cython-ext",
+    "build-pmars",
+    "build-pov-ray",
+    "caffe-cifar-10",
+    "cancel-async-tasks",
+    "circuit-fibsqrt",
+    "cobol-modernization",
+    "code-from-image",
+    "constraints-scheduling",
+    "count-dataset-tokens",
+    "crack-7z-hash",
+    "db-wal-recovery",
+    "distribution-search",
+    "dna-assembly",
+    "dna-insert",
+    "extract-elf",
+    "extract-moves-from-video",
+    "feal-differential-cryptanalysis",
+    "filter-js-from-html",
+    "financial-document-processor",
+    "fix-git",
+    "fix-ocaml-gc",
+    "gcode-to-text",
+    "git-multibranch",
+    "gpt2-codegolf",
+    "headless-terminal",
+    "hf-model-inference",
+    "large-scale-text-editing",
+    "llm-inference-batching-scheduler",
+    "log-summary-date-ranges",
+    "mailman",
+    "make-doom-for-mips",
+    "make-mips-interpreter",
+    "mcmc-sampling-stan",
+    "merge-diff-arc-agi-task",
+    "model-extraction-relu-logits",
+    "modernize-scientific-stack",
+    "mteb-leaderboard",
+    "openssl-selfsigned-cert",
+    "overfull-hbox",
+    "password-recovery",
+    "path-tracing-reverse",
+    "pypi-server",
+    "pytorch-model-cli",
+    "pytorch-model-recovery",
+    "qemu-startup",
+    "query-optimize",
+    "raman-fitting",
+    "regex-log",
+    "rstan-to-pystan",
+    "sam-cell-seg",
+    "sanitize-git-repo",
+    "sparql-university",
+    "sqlite-with-gcov",
+    "torch-pipeline-parallelism",
+    "train-fasttext",
+    "vulnerable-secret",
+    "winning-avg-corewars",
+    "write-compressor"
+  ]
+}

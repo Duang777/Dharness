@@ -339,7 +339,24 @@ uv run python scripts/prefixbench.py matrix \
   --out evaluation/matrix-prefixbench-test.json
 ```
 
-先用单次 launcher dry-run 核对矩阵和来源证明，再用可恢复的串行编排器启动采集：
+在读取任何 test 结果前生成并提交 held-out 协议。提交后运行只读 preflight，确认协议、
+矩阵、采集策略、runtime source 和 mutation 实现均与 Git 一致：
+
+```bash
+uv run python scripts/prefixbench_test_campaign.py freeze
+git add \
+  src/evidence_harness_mutation/prefixbench_test_campaign.py \
+  scripts/prefixbench_test_campaign.py \
+  experiments/prefixbench-v1/test-mutation-protocol-v1.json \
+  tests/mutation/test_prefixbench_test_campaign.py \
+  tests/test_prefixbench_test_campaign_script.py \
+  docs/prefixbench-test-mutation-campaign-design.md \
+  README.md
+git commit -m "Preregister PrefixBench held-out campaign"
+uv run python scripts/prefixbench_test_campaign.py preflight
+```
+
+再用单次 launcher dry-run 核对 Harbor 参数，并用可恢复的串行编排器启动采集：
 
 ```bash
 uv run python scripts/run_evaluation.py \
@@ -358,9 +375,35 @@ uv run python scripts/run_full_evaluation.py \
   --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
 ```
 
+中断后只允许用完全相同的命令恢复。已完成任务不会因 reward、status 或 exception
+被重跑。61 题完成后，先生成 canonical 和 readiness，再构建描述性离线 campaign：
+
+```bash
+uv run python scripts/collect_evaluation_results.py \
+  runs/terminal-bench-2/prefixbench-v1-test-20261002 \
+  --matrix evaluation/matrix-prefixbench-test.json \
+  --collection-profile prefixbench-v1 \
+  --manifest-out evaluation/prefixbench-v1-test-canonical.json
+
+uv run python scripts/prefixbench.py build \
+  --canonical evaluation/prefixbench-v1-test-canonical.json \
+  --matrix evaluation/matrix-prefixbench-test.json \
+  --expected-task-count 61 \
+  --out evaluation/prefixbench-v1-test-readiness.json
+
+uv run python scripts/prefixbench_test_campaign.py build
+uv run python scripts/prefixbench_test_campaign.py check
+```
+
+test campaign 会检查 `run-config.json`、`progress.jsonl`、producer revision 和完整的
+61/61 source admission，但不要求 development-only phase coverage gate 为 `ready`。
+首份 test 报告只描述观测结果，不声明 RQ2 baseline superiority、RQ3 production
+mutation score 或 RQ4 live cost savings。
+
 完整来源链、phase event 和 readiness v2 契约见
 [PrefixBench live collection design](docs/prefixbench-collection-design.md)，离线 campaign
-契约见 [PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)，
+契约见 [PrefixBench held-out test campaign](docs/prefixbench-test-mutation-campaign-design.md)
+和 [PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)，
 分析口径见 [PrefixBench development analysis](docs/prefixbench-analysis-design.md)。
 
 ## 完整验收
@@ -472,6 +515,8 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [隔离完成验证实验](docs/completion-isolation-experiments.md)
 - [PrefixBench live collection 设计](docs/prefixbench-collection-design.md)
 - [PrefixBench test matrix](evaluation/matrix-prefixbench-test.json)
+- [PrefixBench held-out test campaign 设计](docs/prefixbench-test-mutation-campaign-design.md)
+- [PrefixBench held-out test protocol](experiments/prefixbench-v1/test-mutation-protocol-v1.json)
 - [PrefixBench development 离线 campaign 设计](docs/prefixbench-mutation-campaign-design.md)
 - [PrefixBench development 离线 campaign](evaluation/prefixbench-v1-development-offline-campaign.json)
 - [PrefixBench development 分析设计](docs/prefixbench-analysis-design.md)

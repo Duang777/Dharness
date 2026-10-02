@@ -64,6 +64,7 @@ REQUIRED_FILES = (
     Path("docs/prefixbench-design.md"),
     Path("docs/prefixbench-analysis-design.md"),
     Path("docs/prefixbench-mutation-campaign-design.md"),
+    Path("docs/prefixbench-test-mutation-campaign-design.md"),
     Path("docs/terminal-agent-isolation-research.md"),
     Path("docs/ten-task-analysis.md"),
     Path("docs/expanded-ten-analysis.md"),
@@ -74,7 +75,9 @@ REQUIRED_FILES = (
     Path("scripts/prefixbench.py"),
     Path("scripts/prefixbench_analysis.py"),
     Path("scripts/prefixbench_campaign.py"),
+    Path("scripts/prefixbench_test_campaign.py"),
     Path("experiments/prefixbench-v1/mutation-protocol-v1.json"),
+    Path("experiments/prefixbench-v1/test-mutation-protocol-v1.json"),
     *(
         Path("evaluation/completion-isolation-trials") / task / relative
         for task in ("crack-7z-hash", "fix-ocaml-gc", "write-compressor")
