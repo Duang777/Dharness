@@ -1,0 +1,426 @@
+{
+  "canonical_json": {
+    "ensure_ascii": true,
+    "indent": 2,
+    "sort_keys": true,
+    "trailing_newline": true
+  },
+  "chronology": {
+    "claim": "repository-enforced-protocol-and-implementation-precede-bound-outcomes",
+    "design_base_commit": "f5c463b399201911ce9042db559f90f8a6d91337",
+    "executable_policy": "executable-manifest-commit-ancestor-of-every-confirmatory-outcome-producer",
+    "external_non_observation_claim": "not_provable",
+    "freeze_gate": "filesystem-absence-then-all-refs-path-history",
+    "protected_source_policy": "test-source-set-byte-identical-to-design-base",
+    "protocol_policy": "protocol-commit-ancestor-of-every-outcome-producer",
+    "test_matrix_commit": "2e3e65868213238d9bbcdbf3e09ce4356c8edfd9",
+    "test_protocol_commit": "f5c463b399201911ce9042db559f90f8a6d91337"
+  },
+  "development": {
+    "claim_status": "descriptive_not_evaluated",
+    "pooled_into_main_analysis": false,
+    "post_protocol_model_selection": "forbidden",
+    "required_not_evaluated_claims": [
+      "container_call_telemetry",
+      "inferential_statistics",
+      "model_call_telemetry",
+      "phase_target_reachability",
+      "rq2_baseline_comparison",
+      "rq3_production_mutation_score",
+      "rq4_live_cost_savings",
+      "test_split_generalization"
+    ],
+    "role": "calibration-only-descriptive"
+  },
+  "executable_freeze": "required-before-held-out-or-cross-harness-outcome",
+  "known_inputs": [
+    {
+      "bytes": 12498,
+      "path": "experiments/historical-7/manifest.json",
+      "sha256": "498959a371dca885792d2b8807c24808c88035c46534f55284b5ac1baf1bf20e"
+    },
+    {
+      "bytes": 39396,
+      "path": "evaluation/historical-7.json",
+      "sha256": "bac8ac96373332473a5cc5011a43cd7a5d0aad3fca730617b062e60cb0077c97"
+    },
+    {
+      "bytes": 5736,
+      "path": "evaluation/matrix-prefixbench-development.json",
+      "sha256": "f95bfc0ac1836b49dcab8323e6ff702586edc97c1f71f2986ae3c1e6645a6067"
+    },
+    {
+      "bytes": 7747,
+      "path": "experiments/prefixbench-v1/mutation-protocol-v1.json",
+      "sha256": "b394fe0f4529d7bd476d5113411230151c0fa3077414cd23f0df34ea287e8c8d"
+    },
+    {
+      "bytes": 1510691,
+      "path": "evaluation/prefixbench-v1-development-offline-campaign.json",
+      "sha256": "659dba67f203183be64a200e85198596d7fbb929849a308df7b681cb7f42794d"
+    },
+    {
+      "bytes": 7318,
+      "path": "evaluation/prefixbench-v1-development-offline-analysis.json",
+      "sha256": "7194e267d69944ef608f495c42a81085c224634d1478ca99c03ecc7b42d3356f"
+    },
+    {
+      "bytes": 12130,
+      "path": "evaluation/matrix-prefixbench-test.json",
+      "sha256": "a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb"
+    },
+    {
+      "bytes": 18041,
+      "path": "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
+      "sha256": "6cd943d1194d08d25d4674ad5dc92a7e820fd218c0506c691ad288b699ac2e2d"
+    }
+  ],
+  "optional_evidence": {
+    "affects_main_conclusions": false,
+    "affects_multiplicity_families": false,
+    "live_cost": "optional-auxiliary-separate-protocol-or-not_evaluated",
+    "production_mutation_score": "optional-auxiliary-separate-protocol-or-not_evaluated",
+    "terminal_bench_2_1": "sensitivity-only-separate-protocol-not-pooled"
+  },
+  "paths": {
+    "auxiliary_report": "evaluation/thesis-auxiliary-v1.json",
+    "executable_protocol": "experiments/prefixbench-v1/main-analysis-executable-v1.json",
+    "main_report": "evaluation/thesis-main-analysis-v1.json",
+    "miniswe_cohort": "experiments/prefixbench-v1/miniswe-cohort-v1.json",
+    "protocol": "experiments/prefixbench-v1/main-analysis-protocol-v1.json",
+    "rq2_report": "evaluation/prefixbench-v1-test-method-comparison.json",
+    "rq3_report": "evaluation/prefixbench-v1-test-reducer-comparison.json",
+    "rq4_report": "evaluation/miniswe-agent-transfer-v1.json",
+    "tb21_report": "evaluation/thesis-tb21-sensitivity-v1.json",
+    "test_campaign": "evaluation/prefixbench-v1-test-offline-campaign.json",
+    "test_canonical": "evaluation/prefixbench-v1-test-canonical.json",
+    "test_readiness": "evaluation/prefixbench-v1-test-readiness.json",
+    "test_run_root": "runs/terminal-bench-2/prefixbench-v1-test-20261002"
+  },
+  "planned_outcomes": [
+    "runs/terminal-bench-2/prefixbench-v1-test-20261002",
+    "evaluation/prefixbench-v1-test-canonical.json",
+    "evaluation/prefixbench-v1-test-readiness.json",
+    "evaluation/prefixbench-v1-test-offline-campaign.json",
+    "evaluation/prefixbench-v1-test-method-comparison.json",
+    "evaluation/prefixbench-v1-test-reducer-comparison.json",
+    "evaluation/miniswe-agent-transfer-v1.json",
+    "evaluation/thesis-main-analysis-v1.json",
+    "evaluation/thesis-tb21-sensitivity-v1.json",
+    "evaluation/thesis-auxiliary-v1.json"
+  ],
+  "protected_sources": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 588909,
+    "files": [
+      {
+        "bytes": 1168,
+        "path": "pyproject.toml",
+        "sha256": "16b90004e6861dcf11ff525c1eb3276b86735a5c9c5149e752a69e7c6970b8c5"
+      },
+      {
+        "bytes": 301116,
+        "path": "uv.lock",
+        "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+      },
+      {
+        "bytes": 314,
+        "path": "evaluation/debian-https.sources",
+        "sha256": "cdfbaa247442dae546c43aeb25d9f0c6fdaaebd83e75f91ac7145a21a733a8a3"
+      },
+      {
+        "bytes": 104,
+        "path": "evaluation/debian-bullseye-main.list",
+        "sha256": "bcb99092aafb4abe26789e97f08247e25335b96c913a704d47cd932306a34c4f"
+      },
+      {
+        "bytes": 308,
+        "path": "evaluation/debian-trixie-https.sources",
+        "sha256": "8abf8cc4e1dae5c6bde55fd1b15691d48c80073c263707b13d3528a3b5b542dc"
+      },
+      {
+        "bytes": 21122,
+        "path": "scripts/collect_evaluation_results.py",
+        "sha256": "de9305113d85beac0668098cda5ac79e96b0404f135e3fb71dd369453952e954"
+      },
+      {
+        "bytes": 7800,
+        "path": "scripts/run_evaluation.py",
+        "sha256": "e9389719d62db4b6b087e8b948ae380faab2362f2f84be983e499820f820b1f8"
+      },
+      {
+        "bytes": 22694,
+        "path": "scripts/run_full_evaluation.py",
+        "sha256": "9df1f5b207cf905eebbfa3748fbe13e285eaed2ba981aa698dba522eb6f7e77a"
+      },
+      {
+        "bytes": 4108,
+        "path": "src/evidence_harness/collection_profile.py",
+        "sha256": "c285c48cb63e2751f58acbf94fd12ec65d7c1f50167cdd701b4ace1a58f3cbd6"
+      },
+      {
+        "bytes": 12366,
+        "path": "src/evidence_harness/evaluation.py",
+        "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+      },
+      {
+        "bytes": 12865,
+        "path": "src/evidence_harness/protocol.py",
+        "sha256": "be0d80be68e6a9d86dd9668297f0bd4d816bbaf75be5ab8799957f8fe10b662f"
+      },
+      {
+        "bytes": 6231,
+        "path": "src/evidence_harness/source_binding.py",
+        "sha256": "c56a461c3f83eb70d64b4f87796696975ad8099104e6e556547372517ff0a9bb"
+      },
+      {
+        "bytes": 2317,
+        "path": "src/evidence_harness_mutation/attempts.py",
+        "sha256": "5c67ff40ff43fcff5b7ac876b568a8da17402f294e66a61f29bd3b15111a1d32"
+      },
+      {
+        "bytes": 14235,
+        "path": "src/evidence_harness_mutation/campaign.py",
+        "sha256": "9c506b594e374cb8cb1629f72c2e7c759534919db4e55cf55a47fe9ebeefb1d6"
+      },
+      {
+        "bytes": 14339,
+        "path": "src/evidence_harness_mutation/invariants.py",
+        "sha256": "952d7edb8891f3ec6b36f4b6a161ec5c6ae1201b425617d024b74eaafb5d962f"
+      },
+      {
+        "bytes": 4363,
+        "path": "src/evidence_harness_mutation/journal_loader.py",
+        "sha256": "18da93a9939ccbee82afaa907f8efd7f9000f12fd1df4f83b6c1b9bff1f1a098"
+      },
+      {
+        "bytes": 4055,
+        "path": "src/evidence_harness_mutation/model.py",
+        "sha256": "9f058bd057fb902fe0bfa45207163da39f4a43892c420ccb71a1aa700dbcf6f3"
+      },
+      {
+        "bytes": 7452,
+        "path": "src/evidence_harness_mutation/operators.py",
+        "sha256": "014cd1df65f0834fcd0cad8b785ce75c01f8568a24e6ff86885769c234f9b3e4"
+      },
+      {
+        "bytes": 60536,
+        "path": "src/evidence_harness_mutation/prefixbench.py",
+        "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
+      },
+      {
+        "bytes": 71876,
+        "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
+        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+      },
+      {
+        "bytes": 19540,
+        "path": "src/evidence_harness_mutation/reducer.py",
+        "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
+      }
+    ],
+    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+  },
+  "protected_test_source_set_sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a",
+  "protocol_id": "thesis-main-analysis-v1",
+  "protocol_sources": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 91290,
+    "files": [
+      {
+        "bytes": 18479,
+        "path": "docs/thesis-execution-plan.md",
+        "sha256": "677da56c80e7a4212e52b5726d6f1d9420698b502fe22c27f5a9674bb99284ee"
+      },
+      {
+        "bytes": 24605,
+        "path": "docs/thesis-main-experiment-spec.md",
+        "sha256": "3dceb49c4a83c4067fc41fca54de4cd27492bba3d205a1d58e11c768bc77eb76"
+      },
+      {
+        "bytes": 3301,
+        "path": "scripts/main_analysis_protocol.py",
+        "sha256": "27f74bf48c72dcbd65e845842fa43e14c300e1e36690e2eb51d8237998c92008"
+      },
+      {
+        "bytes": 33655,
+        "path": "src/evidence_harness_mutation/main_analysis_protocol.py",
+        "sha256": "988505f51e6f1e49094a33a1e0468f33cc9716b42bc0f6ea174fc24908cd2966"
+      },
+      {
+        "bytes": 7609,
+        "path": "tests/mutation/test_main_analysis_protocol.py",
+        "sha256": "158ebb41eb4b77c39c494260f6cd4cc8ebaa416802c415dcda648b9df74689b6"
+      },
+      {
+        "bytes": 3641,
+        "path": "tests/test_main_analysis_protocol_script.py",
+        "sha256": "58a8c965748a42d800b3447c9e32f44e9b5357916f0ec08a36373fd987f15ead"
+      }
+    ],
+    "sha256": "529231c28bf045eef39fd70d9a6a77d4270ace7e2497c5dcfc5f0f9eb49bdb58"
+  },
+  "rq1": {
+    "engineering_threshold": "at-least-6-of-7-pairs",
+    "evidence_role": "locked_retrospective",
+    "inferential_test": "none",
+    "pair_success": "vulnerable-survived-and-fixed-killed",
+    "population": 7,
+    "question": "historical_7",
+    "unit": "historical_case_pair"
+  },
+  "rq2": {
+    "bootstrap_resamples": 10000,
+    "choices": {
+      "algorithm": "sha256-first-8-bytes-mod-n",
+      "namespace": "thesis-main-analysis-v1",
+      "redraw_after_failure": false,
+      "replicate_count": 1,
+      "seed": 20261003
+    },
+    "comparison_order": [
+      "random_json",
+      "schema_valid_random",
+      "agentchaos_style",
+      "stateless_semantic"
+    ],
+    "complete_cohort_required": true,
+    "correction": "holm-four-contrasts-alpha-0.05",
+    "dataset": "terminal-bench@2.0",
+    "effect": "paired-absolute-risk-difference",
+    "interval": "task-bootstrap-percentile-95",
+    "methods": [
+      "state_aware",
+      "random_json",
+      "schema_valid_random",
+      "agentchaos_style",
+      "stateless_semantic"
+    ],
+    "no_attempt_rule": "four-synthetic-ordinal-target-not-reached-slots",
+    "operators": [
+      {
+        "operator": "stale_evidence_epoch",
+        "target_invariant": "I1"
+      },
+      {
+        "operator": "reorder_check_receipts",
+        "target_invariant": "I2"
+      },
+      {
+        "operator": "review_timeout_fallback",
+        "target_invariant": "I3"
+      },
+      {
+        "operator": "cross_candidate_evidence",
+        "target_invariant": "I4"
+      }
+    ],
+    "outcomes": [
+      "input_rejected",
+      "target_not_reached",
+      "oracle_invalid",
+      "oracle_equivalent",
+      "target_violation",
+      "other_oracle_change"
+    ],
+    "primary_endpoint": "task-has-any-target-violation",
+    "question": "state_aware_vs_four_baselines",
+    "slot_grid": "task-attempt-major-operator-minor",
+    "split": "test",
+    "task_budget": "4-times-max-1-projected-completion-attempts",
+    "tasks": 61,
+    "test": "two-sided-exact-mcnemar",
+    "unit": "task"
+  },
+  "rq3": {
+    "audit_calls_role": "secondary",
+    "bootstrap_resamples": 10000,
+    "common_input": "same-unreduced-applied-mutation",
+    "comparison_order": [
+      "no_reduction",
+      "flat_ddmin",
+      "hdd"
+    ],
+    "correction": "holm-three-contrasts-alpha-0.05",
+    "effect": "paired-rank-biserial",
+    "failed_reduction_rule": "retain-full-input-size-and-record-failure",
+    "insufficient_rule": "descriptive-only-no-p-values",
+    "interval": "task-cluster-bootstrap-percentile-95",
+    "minimum_counterexamples": 10,
+    "minimum_tasks": 5,
+    "population": "all-rq2-state-aware-target-violations",
+    "primary_metric": "task-pooled-retained-byte-fraction",
+    "question": "reducer_comparison",
+    "reducers": [
+      "no_reduction",
+      "flat_ddmin",
+      "hdd",
+      "source_anchored"
+    ],
+    "size_order": [
+      "event_count",
+      "payload_member_count",
+      "compact_canonical_json_bytes"
+    ],
+    "test": "two-sided-exact-wilcoxon-signed-rank",
+    "witness": {
+      "deterministic_audits": 3,
+      "protected_anchors": [
+        "run_started",
+        "proposal",
+        "verified_terminal",
+        "mutation_target"
+      ],
+      "same_attempt": true,
+      "same_invariant": true,
+      "same_ordered_details": true,
+      "same_terminal": true
+    }
+  },
+  "rq4": {
+    "benchmark": "ProgramBench",
+    "commit": "04d809ceab9df28f9adaed044884180159172930",
+    "deterministic_audits": 3,
+    "families": [
+      {
+        "source_invariant": "I1",
+        "status": "mapped",
+        "target": "workspace-change-invalidates-prior-observation-or-candidate-evidence"
+      },
+      {
+        "source_invariant": "I2",
+        "status": "mapped",
+        "target": "action-observation-association-preserves-order-and-identity"
+      },
+      {
+        "source_invariant": "I3",
+        "status": "unsupported_by_design",
+        "target": null
+      },
+      {
+        "source_invariant": "I4",
+        "status": "mapped",
+        "target": "submission-terminal-binds-current-workspace-tree"
+      }
+    ],
+    "field_name_reuse": "forbidden",
+    "inferential_test": "none",
+    "mapped_family_denominator": 3,
+    "minimum_applicable_tasks_per_mapped_family": 5,
+    "minimum_violation_tasks_per_mapped_family": 2,
+    "original_family_denominator": 4,
+    "question": "mini_swe_agent_transfer",
+    "repository": "https://github.com/SWE-agent/mini-swe-agent",
+    "retry_policy": "resume-interrupted-only-no-outcome-retry",
+    "selection": "sha256-ranked-instance-id-first-20",
+    "tasks": 20,
+    "trajectory_format": "mini-swe-agent-1.1"
+  },
+  "rq_order": [
+    "RQ1",
+    "RQ2",
+    "RQ3",
+    "RQ4"
+  ],
+  "schema_version": 1
+}
