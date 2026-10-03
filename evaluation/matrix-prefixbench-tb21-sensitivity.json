@@ -1,0 +1,1445 @@
+{
+  "cohort_source": {
+    "bytes": 12130,
+    "path": "evaluation/matrix-prefixbench-test.json",
+    "sha256": "a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb"
+  },
+  "matrix_id": "prefixbench-v1-tb21-sensitivity-v1",
+  "schema_version": 1,
+  "selection": {
+    "aliases": false,
+    "fuzzy_matching": false,
+    "name_role": "cohort-correspondence-only-not-task-identity",
+    "rule": "frozen-tb20-test-order-exact-utf8-short-name-intersection-no-normalization",
+    "selected_tasks": 61,
+    "tb20_population": 89,
+    "tb21_population": 89
+  },
+  "tasks": [
+    {
+      "correspondence_sha256": "62f6c7a9139554b0b86770c67e8c5ce5ac59b12717a795f18786a75a85821b98",
+      "match_name": "bn-fit-modify",
+      "ordinal": 1,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "a88b962a36f3e788ffa88561ee798f354e4cd36caa0279e8ac5c51d9371525a0",
+        "task_path": "bn-fit-modify",
+        "task_tree": "a5ed868827cf86880a9a3e25e85f65196a14ec63",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:b5f9644970c17ad9ddb46b7266f7bcd87c761d77d7e6f55d7cfe7284d5ff66e9",
+        "registry_name": "terminal-bench/bn-fit-modify",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "1f9b9a2af81d38a6c577c6fbd0fd2532529393e634aaec0005f49293c9496d81",
+        "task_path": "tasks/bn-fit-modify",
+        "task_tree": "8545a30a1ea56f0bbcd293ea4a3540f5773593f2",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "60b81d7461835219e2adbdfe694627e513c7cd63a1fe582bd6de7d9fd4918333",
+      "match_name": "break-filter-js-from-html",
+      "ordinal": 2,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f42bbe11fb2f4bfc3d27aef348abd19a0d620ceaf829170a7747dfaba1da3fc4",
+        "task_path": "break-filter-js-from-html",
+        "task_tree": "fc2de8289eb85c473df86147c301a6d9cbeebdec",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:678008d1a4fd1e6e1b9b3cc9a327219fe4b410a31eafc52e9099bbf947eea600",
+        "registry_name": "terminal-bench/break-filter-js-from-html",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "7c60f5745529f069fa4caf25c4df92388e2c43cdc2603c5b5bd3b521dcd4b2bd",
+        "task_path": "tasks/break-filter-js-from-html",
+        "task_tree": "d18a5a82b3e92ae2b723d76a67ef25a757dbe3f7",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "dccf150d83b7865ab1d21e9afc3309f2fba629cf4a0352795a7efbf7eef1bd9f",
+      "match_name": "build-cython-ext",
+      "ordinal": 3,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "053f409aa3c29349f391fea8a145cbabafe5f1d3a112fae520a628f04973eb70",
+        "task_path": "build-cython-ext",
+        "task_tree": "2cfbaa1b5966f4d7ccca609671ed23518eeb9168",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:35dc561790e73f13e59837828ac0863c0893edc6b71d42cf7d58656c843adf12",
+        "registry_name": "terminal-bench/build-cython-ext",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "42171ece749049fee628217db51d9114f177f647493df0c9c0cbdc921f60e74e",
+        "task_path": "tasks/build-cython-ext",
+        "task_tree": "6c7b65b6a83a26e59352065333b04a320cb6a5ad",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "ac3e52f6e40e96ce7d0cbd052d9dee1809e02f5b6d1f8215df41c36bbab71f9b",
+      "match_name": "build-pmars",
+      "ordinal": 4,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "13a149973b584063e1e34ae088b8b02d813dc388518e168f9a2da1aa9c8873b1",
+        "task_path": "build-pmars",
+        "task_tree": "ecdfdf1948d8b417789188c3f309000ca3f28b6a",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:63f0449b276f081986740c941ea9372068b310a02b062c1e5e3400f575241893",
+        "registry_name": "terminal-bench/build-pmars",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "c79f7bb2be7047f313d8c23cc917527e56037b357959bffaf56759806aaca41d",
+        "task_path": "tasks/build-pmars",
+        "task_tree": "a453c55c8ad94ff02c3d95c8028b81f11c34d069",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "c689e01be04133c9d6ae0bd8e533869a6d82282dc370b23c2be434a1a63425d4",
+      "match_name": "build-pov-ray",
+      "ordinal": 5,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "d31f588e49f5c5d9bb2aa092f9f112d2aca590bc03c07433ff6d863e91ad4a6d",
+        "task_path": "build-pov-ray",
+        "task_tree": "6cc217d34989b23e8205853df12b94fa52df991e",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:4f08dab602fe2e9e2f42051cc6aef684a88cf2822e8b499b3ca19e670759fddb",
+        "registry_name": "terminal-bench/build-pov-ray",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "a0df83c39a1ad98a723b3d7f8f5023be36e80b0b1132675ebd4ac101b209c1b3",
+        "task_path": "tasks/build-pov-ray",
+        "task_tree": "f6a6a0f6cbbea2ed4809ba3ff687e7afa7aab6bb",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "4a00084b9fc53e4e69916342a6af01631ffca83ceaa683dad5abdfc53404a952",
+      "match_name": "caffe-cifar-10",
+      "ordinal": 6,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "763251c3697d1652d99c2af36460ffc0cdc018b0e458dfc6a9ee4552f3ead7ec",
+        "task_path": "caffe-cifar-10",
+        "task_tree": "b6ca7a9f077072ac1ee14410141071b12d7a43ab",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:7b0045106d7d5af724efe96b610ba64f7893f5c88528401c573c4d47e384e2bf",
+        "registry_name": "terminal-bench/caffe-cifar-10",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "bfbaa89302efcc78d7ce79e95d3ebedc1b93555f5f557e7451f20cb40c6ec3a8",
+        "task_path": "tasks/caffe-cifar-10",
+        "task_tree": "89d331dde5215ea49742d9824bf691671093d6d6",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "bd6045f147c925ba21b571daa85d4b6269b69e0e0ac90626ba278ca7ec0a0500",
+      "match_name": "cancel-async-tasks",
+      "ordinal": 7,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "be9d9ca8c918562dcf688235de17c4106642989646ce3d1c09e2bc1a2839d856",
+        "task_path": "cancel-async-tasks",
+        "task_tree": "39f23a8066d3864db9aa44427dc4e7e58ecdc46f",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:a3d048d351136e48070696cda8bb79660dfd74db1fea3b6da88559f0332699c1",
+        "registry_name": "terminal-bench/cancel-async-tasks",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "b88ff3d5d73238791a58a682346f84d7d0dc50d7a0b177a5707b600f05cf1e5d",
+        "task_path": "tasks/cancel-async-tasks",
+        "task_tree": "bef6464536e5cd0c22105e5e8d377ad0fbcb38d5",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "499bd651623da8e667e32d3115d11d897787fd094795e2c1f677a3520e528ae3",
+      "match_name": "circuit-fibsqrt",
+      "ordinal": 8,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "fad0b11cb512ae4f70fd02e20c95e2c9edb45bde4f0aea13e03d70e6124d89de",
+        "task_path": "circuit-fibsqrt",
+        "task_tree": "2e2e0c257a460e30b58edb99987a4bc1ad9306c9",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:9bcffe1054bb33249aa578a9a2a74f3c8cca66b0cb7aa1328233f1d31822aae3",
+        "registry_name": "terminal-bench/circuit-fibsqrt",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "7730df861be3800fc6129ec53d1d5a064589f31f28caf1b11d962b79bc9c4582",
+        "task_path": "tasks/circuit-fibsqrt",
+        "task_tree": "cca01f48b71b5daf6e866c3588077a937ceac2aa",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "613eef7f542778c8ca3059a4ec8c5df6426ca29232f88123f82b6de54d1128c8",
+      "match_name": "cobol-modernization",
+      "ordinal": 9,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "ef22aefe341c31b33e3b4520977a21143adc2bdb505f0fa8f3360e663e758c65",
+        "task_path": "cobol-modernization",
+        "task_tree": "a0d633fdd56cbdfcc80f2826dcee2a7b3eab78be",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:e03aa03965eee48c9f772d566ff9bcd741fceeac9693123f82a13fdd46be0d88",
+        "registry_name": "terminal-bench/cobol-modernization",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "6104e30caa1c7769e840f36423d8eee7e107737ea18a7414c7b6ee9d126687a2",
+        "task_path": "tasks/cobol-modernization",
+        "task_tree": "01470166d7d757379f3158ba7c3011e8df5ca96a",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "f3ddd4967ed1755af8c03ab169d0d31a2dffec43f574c52345054b7c62e6e288",
+      "match_name": "code-from-image",
+      "ordinal": 10,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "c6dfde9e45b5f0435de7b198dd3f57c7ccb1d09fe80ca1b824c8e08da2c06b6f",
+        "task_path": "code-from-image",
+        "task_tree": "6cce67ba6ed89759dcace4cfe1571b8c6b62f7b3",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:ef2907bb300d9b3352410c2a75dbf831278c187c073298371870ea9c83526f78",
+        "registry_name": "terminal-bench/code-from-image",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "ccb76d3703e6df97672f2cb0f6346f4d6f65dee6b716dda066fca6e2c09a7d0b",
+        "task_path": "tasks/code-from-image",
+        "task_tree": "89f2d50f843b1e0f9a06836c48a816f6fdb47cd6",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "45c2422448da160b3dc840949bfbdcb38fffaadee9197470e463d8aa9994c1e0",
+      "match_name": "constraints-scheduling",
+      "ordinal": 11,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "538a621e7810567a0f6529516f281a4febf5ea21142800fe94942851cece6a6d",
+        "task_path": "constraints-scheduling",
+        "task_tree": "c2a6655aa8e2a5068cf02d556b081209cc220db3",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:91dd6f87e1ee508328d5aafbd99a6bd1ccc47bc22671b4aaa4060bda492deb53",
+        "registry_name": "terminal-bench/constraints-scheduling",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "4a2cfa83e3c0f3d059b299d94cdd92826d43665d23673176b8d3d895250d072a",
+        "task_path": "tasks/constraints-scheduling",
+        "task_tree": "286941bbbff26726f725d012bb81d957f802932d",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "fe22daca89a23c9a4d48497cb640810401b0b05bde2060ec8b8491179503cb0d",
+      "match_name": "count-dataset-tokens",
+      "ordinal": 12,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "5a6d1b2eaf137096ccce582374433681e8c7c51a302ba0834c8dcf02cf7dfa26",
+        "task_path": "count-dataset-tokens",
+        "task_tree": "c93494aaaa842ba04e020d3f72d8f60cf827b9f5",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:cd0574ec8281f53854256acc93702ed1441407c0428849e1dd4f27e863c6b08a",
+        "registry_name": "terminal-bench/count-dataset-tokens",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "be7767195f342569acf2073e5b489d4c0ba6c23aa5f94994e5e997e186dc2ab3",
+        "task_path": "tasks/count-dataset-tokens",
+        "task_tree": "558f504914d2f87098e4d0015d63f2ab9ff80e48",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "767c7ea96222a6266adb2ade23d515aaec4dc4e15e73b6bc37ec140634867636",
+      "match_name": "crack-7z-hash",
+      "ordinal": 13,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "0ac9d593f006f756da25f3ae7d65a5327b78cd088ce30cb13d205e5cfe0776a4",
+        "task_path": "crack-7z-hash",
+        "task_tree": "43bab707b204938eee612852cd93f8b078f469c4",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:99cbb2269f6bd112d3387fd01cb6900118fe4aded3f75a8d656580a8296a1ae5",
+        "registry_name": "terminal-bench/crack-7z-hash",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "ca8c52a820eaeab5c2f979d18ddc08aafa8d8b6dfe2a04d345adafe51ca3f7af",
+        "task_path": "tasks/crack-7z-hash",
+        "task_tree": "103ee113a33d0faec2427ee4268efff9acd35b83",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "3a91b9ddd48163b1257660f362fb4ef0c2c4c279289ffb4c72f57e80e5f939f6",
+      "match_name": "db-wal-recovery",
+      "ordinal": 14,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "8bd884b6049d6e342bc71d3c487d8f7d5983f77a93b66615c2e928641503c358",
+        "task_path": "db-wal-recovery",
+        "task_tree": "a6710bbe2a2364741ee277d0a1f61d73ec1946a2",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:07e9193513bfce038b9f9d84962ecc85683eee0a642d14ee6fb7104b086ddab4",
+        "registry_name": "terminal-bench/db-wal-recovery",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "b007b754d385d8badedd5f3f23326dfa62c3d427d2a33e619b1d93ca5f5dac82",
+        "task_path": "tasks/db-wal-recovery",
+        "task_tree": "2072a10f19356e3cbb522ec00eba9a15f1a2a1e3",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "1de771f3fb12395dc6505517f94c2e7bbd7e513ce23d1d8d97d164d21552c152",
+      "match_name": "distribution-search",
+      "ordinal": 15,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "d0cf43691424f43286aa43059c9782b2045ac14d11ea6980857dc460ed6593f0",
+        "task_path": "distribution-search",
+        "task_tree": "488b2dbd3cf1afc16ab2a450e99c01c2a0442082",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:8787d3004ac4dd9d78f0c14f5b5ef94a4ad3e69d8828d7d35b9fbd7828a69ed1",
+        "registry_name": "terminal-bench/distribution-search",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "87f2760cc509397c84e7c2d88520805dcda8051ee7c157e97c45b23984a674c6",
+        "task_path": "tasks/distribution-search",
+        "task_tree": "7798c23d3a24b3945caa6cc37d34769f25daf01c",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "aa73ea45aed1fb648e6e32e55e2a6cad73abe034a8065c7fba4c12456f7c4c5c",
+      "match_name": "dna-assembly",
+      "ordinal": 16,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "a51099efe5be563acf49138fd8bb9fc8476239c396e9ee29bf4deb2d05dcdb2c",
+        "task_path": "dna-assembly",
+        "task_tree": "a067e4b0bd4c90b3e83156b538064ec86eaa32ee",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:e41a8e94d86019949b08d3b5f88a85f6d943ba0fd85d5e1d5ebb95cb8f66223f",
+        "registry_name": "terminal-bench/dna-assembly",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "a6f5183bee322a2665ba623988d7554094b0ff6c5169ad9bfe7ef20912563d09",
+        "task_path": "tasks/dna-assembly",
+        "task_tree": "a6397a25168ff3b94a78a728b10d1402aee435b2",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "5c60f7020a61ddb41a1e8f5e5185b79a6161999d303bbcf27f3dcf342e5a8fe3",
+      "match_name": "dna-insert",
+      "ordinal": 17,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "39e67fad4a43331f45246531c086459b832467a33be8d23caaa6c0fcb1c268a6",
+        "task_path": "dna-insert",
+        "task_tree": "22c66c8a00f8edac80fc151e0418acf70b511d7c",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:37fc023970e3464c1acc31f43e04a0b4b94758130d340788f261f00764d9e530",
+        "registry_name": "terminal-bench/dna-insert",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "a2417e00b6dc92f9e45c94897c675b60d5d1ada5928e6b21e6b3e7d69dd4200e",
+        "task_path": "tasks/dna-insert",
+        "task_tree": "a88b1748a1857e70022d95dcbb39ca0c5bd813ae",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "ffce74ca42d9272e350e47d09ba7ff497e676367796bbe71a5480c77108f13aa",
+      "match_name": "extract-elf",
+      "ordinal": 18,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f4fcf6d12da1045c32f1534d00960e447fa8799ac7766c39f5157a917ed66d5b",
+        "task_path": "extract-elf",
+        "task_tree": "073a0625a09b1ae748884fae19fe6821fb8f968f",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:1ef31d566be4fe3459d5368621ae7ef7a31b23ef675737e473bbc43c8c7b3fce",
+        "registry_name": "terminal-bench/extract-elf",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "c5f0b87ae66486656523a22d88967a64949545a753f9e412fe20adac2a3184d5",
+        "task_path": "tasks/extract-elf",
+        "task_tree": "5005c9867da9cb9a346ef48b5cafe5b0b2082197",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "4c04943e073d8abcbe001defbf0c2851dccc522782f332a07dd0d764e8f68b83",
+      "match_name": "extract-moves-from-video",
+      "ordinal": 19,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "2ae25ce136e1551c33389906179dffe9a5d838eee789958e3bf27eee2c3a9863",
+        "task_path": "extract-moves-from-video",
+        "task_tree": "90e025fac7967a31e9cd927e18924f8dfc0c8d2b",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:168e2b9168511b8f8d32b1697f4703b08626203e7949ad396658f4bef7dee66e",
+        "registry_name": "terminal-bench/extract-moves-from-video",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "b50679835b417e0a7a32980d33dc63b667d3b98f33413a6e285cf2ebfa5e8bf3",
+        "task_path": "tasks/extract-moves-from-video",
+        "task_tree": "c415bb6b41b2b2aa544907a5c482134ac1086fc5",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "1b3e4818753dd6c551f24a2aa1bc74eccc53688530b585695e74271026d6a2dd",
+      "match_name": "feal-differential-cryptanalysis",
+      "ordinal": 20,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "eb962df288185d9cd94cf028e9df40f23243ba9c0047596a4dc1a4bc576249c1",
+        "task_path": "feal-differential-cryptanalysis",
+        "task_tree": "08bd9574b4a95696080a00b6e4ae35adc781c431",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:8ea56995fcc43fb94f0e4e15adb12dd28836bf3e9c766b2cc7ae78a7ce90341f",
+        "registry_name": "terminal-bench/feal-differential-cryptanalysis",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "196b2321372ccc4fff87784d5c0939da2646c7de94b4f7d10a33f0e5d0ed1898",
+        "task_path": "tasks/feal-differential-cryptanalysis",
+        "task_tree": "595263f1617cccfc8548ac7528734caf399b35a6",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "71d527c269c35d6c3361ae92384e73ea03bdab22225551dfe1606e18899f1e9d",
+      "match_name": "filter-js-from-html",
+      "ordinal": 21,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "1e1e21a82a54c002ff205c171ca6495f33a9fb9f9e9c919f92b979cee396b90b",
+        "task_path": "filter-js-from-html",
+        "task_tree": "e548e172115b2d0e8fc1580eac06e1d345effc2f",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:2d1496b6fc62adeccdba7a56f4bc24e5ef265840434d2011234ed20b6c240759",
+        "registry_name": "terminal-bench/filter-js-from-html",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "cc2ade6b7de34ab531938768bce6a86221ef7088b9e5c8c0bf1b1d0f53e41ebb",
+        "task_path": "tasks/filter-js-from-html",
+        "task_tree": "7939565b055a4b4fa4d87ddc76b4250f03810362",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "942dae131c45b6891d510d4f1bab7b64dbf04a5d2896218cfac86af520bb4d2f",
+      "match_name": "financial-document-processor",
+      "ordinal": 22,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "dbfdc591fc4bf013c9df12c3e42626f3e14f112d1b6ad1a5d659a2d9afe03148",
+        "task_path": "financial-document-processor",
+        "task_tree": "29567824a42dd81f9a87d01ffeec2f39cba061e1",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:63dc43a15d9ec401613016e9114d1a93ec860eea63b2db02abfe8060deea30fb",
+        "registry_name": "terminal-bench/financial-document-processor",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "0e08d99f3683071ecbb79749a9569f96140736dde236def148a0ca40c5d87bf7",
+        "task_path": "tasks/financial-document-processor",
+        "task_tree": "f461579cc917b5e02fb466d90ad8a63b208c4b01",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "395c259553fe1af1f65819311b43390d6c3d23ef887196b13d9b240ce9cd3be1",
+      "match_name": "fix-git",
+      "ordinal": 23,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "4119253d2dae24816790cf6e5704697dcca72e5f18b91934fb6f871da1ebe544",
+        "task_path": "fix-git",
+        "task_tree": "3f631ddfdc2b8fd13a29bf779abfb89850a32334",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:16948b980df9d96de616a205f5acca1c5d395de83ff4f8ffabcafacb93226f2e",
+        "registry_name": "terminal-bench/fix-git",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "f4647bcd5a9d09769f9f0360c66f2819f67f8f9a4400a41fefb12b289845e262",
+        "task_path": "tasks/fix-git",
+        "task_tree": "d46ee4917dc83bb69df73db134a8626c3251cf33",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "241dc384dc1306833a725b142bc3c7e5e3f2c2096ee37532554126fd7f52fa9b",
+      "match_name": "fix-ocaml-gc",
+      "ordinal": 24,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "046da570c43b442aa4e9f7e71d0a2d2f5ae492576468ca3b1a18eb0ae5ac44c8",
+        "task_path": "fix-ocaml-gc",
+        "task_tree": "9523a4aebdfa13fdea66d9dda4c9a366995cd47a",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:2031f3d5224b891fe443a31526b569eb756be2f88b663cb025448af9c4f97e2c",
+        "registry_name": "terminal-bench/fix-ocaml-gc",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "22dc79c49b999dbce625dcf7d2ab346b16844240a6844cabace743c7ac5d49e2",
+        "task_path": "tasks/fix-ocaml-gc",
+        "task_tree": "7f731963bf2e7b582aca1ead5f664b5bd5c45cd2",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "9831a3e5552e023282284d8dbcb6cf997e080dbe7131afa2dc234277bbe71fd6",
+      "match_name": "gcode-to-text",
+      "ordinal": 25,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "937aa869a6baad79ce059efa521974cd410e2b09fb9945b9f9e752d299484a97",
+        "task_path": "gcode-to-text",
+        "task_tree": "4d66be664100607ccd65be06068fe385b88613f6",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:7dd2af04820e71ecaba96bc493cbffa16317e96816c6c8003385c034adf6c23b",
+        "registry_name": "terminal-bench/gcode-to-text",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "78de63eafc896317cfc3e3dd697501710e563e90be27b4df89c32741fbd0607a",
+        "task_path": "tasks/gcode-to-text",
+        "task_tree": "2715e32f44c99a413a991d792caeada753d66538",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "0bd741dd80978793b65e555b4c93da8c51ce941f7dc7084356f49e4c89d62405",
+      "match_name": "git-multibranch",
+      "ordinal": 26,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "c96743eb1cf80029649eaef30964612010c7d74eb9e0a380369f840a27a6403d",
+        "task_path": "git-multibranch",
+        "task_tree": "df6c26bcf07314c302ecc843ca5e2aebad57be41",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:7759a92a373c967dd31535975bad8659410644025673fe62385444fd2605c5fa",
+        "registry_name": "terminal-bench/git-multibranch",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "64d0cb970d18d75c05ec840d0aa00863071e163a53057b02e16b5f01da892b56",
+        "task_path": "tasks/git-multibranch",
+        "task_tree": "066eb7e2dcf712b70a0738b0ae429f43caf3ae1a",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "8d13652a0a98150d996117a00136d842b232f0284bd1967260970ae4affd10e6",
+      "match_name": "gpt2-codegolf",
+      "ordinal": 27,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "c9dc725f10f2f697d5700c007bf571a20ba74fd702dbe89f65a224aaf336eaa7",
+        "task_path": "gpt2-codegolf",
+        "task_tree": "ad0b573f04c02e54a0e1652dac7faf26ad6eb12a",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:fe42af8e9c5aa927c3b680acd08e43032c84088fa9d770b03ce63dbc66fea4e7",
+        "registry_name": "terminal-bench/gpt2-codegolf",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "0fd89cd07bf7558f7df22f00d4571109bb0cb4b50c1978b611ac2a5a37d47a7c",
+        "task_path": "tasks/gpt2-codegolf",
+        "task_tree": "fb6764934ecc890e27fe942d0b15ecba6656f9cc",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "abb5afa3a90d02ed25cb58b155cf0e4fcfd2ad76a5fb90d9913f9c772de58ecc",
+      "match_name": "headless-terminal",
+      "ordinal": 28,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "507720acbe3db83db89d6dce6d854cd4a18ed481afbae559289a0baa9fd19812",
+        "task_path": "headless-terminal",
+        "task_tree": "2aa16a0e2a0830bd2f4ced5156b7e18cf990e7f9",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:203953871ebdae4efbf163af9499849368dab5e219b70d447e5ee9701ad382d9",
+        "registry_name": "terminal-bench/headless-terminal",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "bd7a3bd3795fd6bd4e6a4a9aa9da7a6fa467b3b5855441725c75999d5a641298",
+        "task_path": "tasks/headless-terminal",
+        "task_tree": "6976f78b85397d716e5e27a003adb5df659a0dbc",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "c3c31d40ecaccd96816e23ca5d1ceaa6a48ea4d7c333ea5b04c6fbde77e44635",
+      "match_name": "hf-model-inference",
+      "ordinal": 29,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "6ed3bb4ed015d0b62e86742eab434fbeb7409ef46f53d0b5d1da61aaf3b388f9",
+        "task_path": "hf-model-inference",
+        "task_tree": "97812129848f17a5f5f6760af35f7221d3f051ad",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:01370f37e61286f920dfca1e471496640ebcc8d06e1cc48d874c790715dbd4ad",
+        "registry_name": "terminal-bench/hf-model-inference",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "df6c30a8e803f778b4479958da94590143f7edec456d5cc1e859ce19c770ad06",
+        "task_path": "tasks/hf-model-inference",
+        "task_tree": "efd1a72d430e69a318e3cbf02b46c47c1e8610df",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "50f3a75b8a5309d94f1656eb5ec827d3decde5ba0d92703ca88e5e3f60c3f620",
+      "match_name": "large-scale-text-editing",
+      "ordinal": 30,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "125a772da6a2dc035c7fb2127ad8dac5c626af5d1c23223a43713cec92d6e6be",
+        "task_path": "large-scale-text-editing",
+        "task_tree": "5d4634920de5c717be0d8ec311dcfc07b33baffb",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:1f1cddc3df15e452fe2d3c6928f6b1e5b5330a7ae67cab373a0d089ea7d334a2",
+        "registry_name": "terminal-bench/large-scale-text-editing",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "7185b4b40bb4e017e0d56e2af6c89815a29dcb5e9ed42f48525a095b3096568d",
+        "task_path": "tasks/large-scale-text-editing",
+        "task_tree": "c2f519a7011d73ba8a775265081405a4d1cdb98b",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "f11554860d86e6ce7c9cfa9cea6a27be4653d77052be21df8c771fd72215196c",
+      "match_name": "llm-inference-batching-scheduler",
+      "ordinal": 31,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "5fc07dcffd55e1b3668b65bb9a54d6c509124b30dc88420d14797da2c9f5c077",
+        "task_path": "llm-inference-batching-scheduler",
+        "task_tree": "eb2edc36db2b6496181c3e6731044afe636fd201",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:a3bf47589118daec5124fe3689b4439802c805b2f4ed9d402a48ae73ca2fea67",
+        "registry_name": "terminal-bench/llm-inference-batching-scheduler",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "e2ebe4a500333bd4dd733da3bebb9f1c322acaa40aac481758733dd3f87c425d",
+        "task_path": "tasks/llm-inference-batching-scheduler",
+        "task_tree": "ce785157dffd58efd621a02030190768fcb57a53",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "f3b4bddfc29b06fee77a52922eca34f2ba684b7ff572ae25b3825a108ea35e0c",
+      "match_name": "log-summary-date-ranges",
+      "ordinal": 32,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "fcb33b004ec851c3c6d1fb6993c67447659893b87322d345319f96e6eb5f7120",
+        "task_path": "log-summary-date-ranges",
+        "task_tree": "97908d0bb7f3b0583483863662c734e56c80e517",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:27b074a2f10fff7606e096f3abd8dced418ad8fda0f53d88acbe477f2d9ceaf6",
+        "registry_name": "terminal-bench/log-summary-date-ranges",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "13385ca75f649c9f2b27b1bb6909ff87f22da8913b4afc3dae152a486bdbe94c",
+        "task_path": "tasks/log-summary-date-ranges",
+        "task_tree": "5ede3a7233c599672ed632f4ecd1f7cc9ea28139",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "23648f8a6062fc4e381717b86358690984ee96080d501a44581d187663f57e6e",
+      "match_name": "mailman",
+      "ordinal": 33,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "3e5a9d2b20ff16c9387658ef0fccec6fbde2211dbb80cb6873a57c9c26fabe53",
+        "task_path": "mailman",
+        "task_tree": "76d1d2455be168d583e95020f84f1fc284bc5134",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:831b3ed00807153963c05f91599443e4839099521d1d56db811c5547ab280dbe",
+        "registry_name": "terminal-bench/mailman",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "c4c495c2b3703cfacd3687e8ff748549d14540be45a974ac22158790ddecbb3d",
+        "task_path": "tasks/mailman",
+        "task_tree": "ff3739b8581d012ca40833a92ab0a78b61cfb90c",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "f377f594b87d22d27feb5ddcbe2c004b975ba466a31f06465e9778b46f465f68",
+      "match_name": "make-doom-for-mips",
+      "ordinal": 34,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "8f5eae95ffce564f0c0e43830d091fe8a91592307fd2b13baa916fc10f2c137a",
+        "task_path": "make-doom-for-mips",
+        "task_tree": "01ec9d1d32b2606280ae79e760c77719a8865abb",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:2d83dd3dee8e0f055e09973934cf0d7e3169a9cd90704cba5c8940b170be9498",
+        "registry_name": "terminal-bench/make-doom-for-mips",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "15cab9ff634c3711d05347b403cda3693f1a1aa7ced8df48754b3d6cf34ea5b9",
+        "task_path": "tasks/make-doom-for-mips",
+        "task_tree": "48879b977ba8d8146333d43cafb02578e7eb8eb3",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "2b1da2dd577834dc446052adf698224df138c5f78f1adbe63a65078abdeae243",
+      "match_name": "make-mips-interpreter",
+      "ordinal": 35,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "4fb078d56078de243a89e6fed559457e4b4fb5d6c29d40a14547248f07b5ab04",
+        "task_path": "make-mips-interpreter",
+        "task_tree": "08bb8253c93134f00054e421916ba3f09550ab58",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:41a55da0abec5d7b32a0c2321f8b18e84000ca8074ae62c6874d6ed4a3a1cd3c",
+        "registry_name": "terminal-bench/make-mips-interpreter",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "4f06d4f26c6a40d463e33ff320f6c3a58d3797a0d0f5497562a226a47517c726",
+        "task_path": "tasks/make-mips-interpreter",
+        "task_tree": "b2343a958171cdc292ab2016497a386033dd7b68",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "91ac457ceb1c85c1d6b563c93e55b89a6edf3ded46503e3cb4963b32b0e3cc56",
+      "match_name": "mcmc-sampling-stan",
+      "ordinal": 36,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "e5bff0cb2407acc363b7590a96665bc36a65a1094e39b2e53f2a443c240c4978",
+        "task_path": "mcmc-sampling-stan",
+        "task_tree": "b8a24ef8cbdc2b7e058e3b54cbeb93c912057fad",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:443cd2b94ed797944793e97a56527a5dc0f8ad40f78ed418fe1b2e367cf22546",
+        "registry_name": "terminal-bench/mcmc-sampling-stan",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "41e4c3eca7cd5c70fd2ec326a57099ce166fed6d28e1760aec7575a92d2dafd3",
+        "task_path": "tasks/mcmc-sampling-stan",
+        "task_tree": "af1d2e3b571ff9f3e8601c7c674601597870297a",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "8aaabd8ecd0b8758b646eeb6ddf9287025c130d7fb0b211aa53abd3a23487906",
+      "match_name": "merge-diff-arc-agi-task",
+      "ordinal": 37,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "12def72cd9569f2e8fc9b61e7199971d173ca28930b337d1047240c3b360b4ac",
+        "task_path": "merge-diff-arc-agi-task",
+        "task_tree": "0adcc78cf424056cb80cba3611b420987bb31f0c",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:6aab6511a5344ce87698293bb1ce4cc51d9a45f1ad9f0c075d2a83197b36727d",
+        "registry_name": "terminal-bench/merge-diff-arc-agi-task",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "cc4f93280f417bb6316689fecab6c3da532f73b209fd6d9982ca0758e94de332",
+        "task_path": "tasks/merge-diff-arc-agi-task",
+        "task_tree": "ac678c4abf5d521f929df873355a7542866f9b51",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "d6ea84bb87919209022d1039396097f5cbcefc72bd6e7511e27bf765e9eda955",
+      "match_name": "model-extraction-relu-logits",
+      "ordinal": 38,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "33c2bd5dbed6f9a58842f75ecde879f47bb66b19f454823abafa39e6e2369a30",
+        "task_path": "model-extraction-relu-logits",
+        "task_tree": "e2417b1bb0659b4b3f7b5a7cddacf84068fcb6d3",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:1ae5045ad68b5d34c3398b612066a07c4a08b6dc330d28868ec4021e17c94b17",
+        "registry_name": "terminal-bench/model-extraction-relu-logits",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "e2cf60adfc9c230d8ac084816de6ac227ed35658cb3711636be6cbedb3df3d0a",
+        "task_path": "tasks/model-extraction-relu-logits",
+        "task_tree": "cffa72606789260f6c16c681d44a37c01814641c",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "913c3f16c9d5f55862aabfa2b6e632d41edde0d350d1aed44b71bf5c05a7005a",
+      "match_name": "modernize-scientific-stack",
+      "ordinal": 39,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "ba551af10dbdaf4146ebd51fb76d5663aee359ee81d11c745973bc982e3ff90c",
+        "task_path": "modernize-scientific-stack",
+        "task_tree": "5d886a66722196d35f8b81e5b89f1a04ad0c0cab",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:67a9952aca67df9c70510acf62faea336644a0e9d379f3aaf9df79f14c8fcb12",
+        "registry_name": "terminal-bench/modernize-scientific-stack",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "8de20d72ac1549808003251bba1abbb4d9c89243756145ebae9c798344147457",
+        "task_path": "tasks/modernize-scientific-stack",
+        "task_tree": "7b223fb8cc8899f1fd545e48210d8a14418fa511",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "32dd58c0a25894fa388269db2655e0e1c5c2512fb8acc90fea3dc309c65269b8",
+      "match_name": "mteb-leaderboard",
+      "ordinal": 40,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "49a10178689d7c0f4c263b0ce1bf6d36078a5c2bc8e9129c049b59a027fb5799",
+        "task_path": "mteb-leaderboard",
+        "task_tree": "54d233c082a41c210c3dd573800682ce2f4930be",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:484f6d7008a05b5b8640fc6618a384b8c9447cd76f85416c8a595028d29bff9c",
+        "registry_name": "terminal-bench/mteb-leaderboard",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "5b45660bc48d96f0607c60c44b050145118f1c68b04a89a289b940ed24e1517b",
+        "task_path": "tasks/mteb-leaderboard",
+        "task_tree": "b717645248aaa7ab175e50bd86417737ae1b7d73",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "4ee52c38976bb9fead298732413eda22e615c02487560f938c49a7e57213edb6",
+      "match_name": "openssl-selfsigned-cert",
+      "ordinal": 41,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "2d7d6a54aa9c35a042da5d1b11d448b710a9003f888b7974836d0a5666423119",
+        "task_path": "openssl-selfsigned-cert",
+        "task_tree": "7a7847e0801ace69b614f0fbafe3e7ee512e2d2e",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:d4afa2bd2a9ba1420db8d6cfde42ffdb4873ae2d955c35014e8da94444c83302",
+        "registry_name": "terminal-bench/openssl-selfsigned-cert",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "fdbfa50a0a1d8e21d300429cd2e4aa93d33f69848575dcac3414d07ec83fa76a",
+        "task_path": "tasks/openssl-selfsigned-cert",
+        "task_tree": "4c5b1214db4b807f2bc4c1bff8803402e36b648b",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "d9b1018be7640a4f4b9309582ca0165b336194965806c1becb993165889852b3",
+      "match_name": "overfull-hbox",
+      "ordinal": 42,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "8bee01d2625f6c066f653bd780fd2d02daa4d5197cdf0f5b662bbd1c1571f62a",
+        "task_path": "overfull-hbox",
+        "task_tree": "f2880db6b9ebbe17986122e0474ce8bf6d52aeed",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:3c3b16e4b2de5fea90ca98db242b155a6843f9cc4dfd00be3479985a34bab4f7",
+        "registry_name": "terminal-bench/overfull-hbox",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "09bd43eb8dc2fe1d129b24d737c84a5254781970d30fdbed07e6d0eabda057fa",
+        "task_path": "tasks/overfull-hbox",
+        "task_tree": "ae927ef2b4f2ab21fafe406ff65259950c870c69",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "06f72fb1400c4d22ebd6fec240659a75d09622dbea43e78d76bba407ec5a6956",
+      "match_name": "password-recovery",
+      "ordinal": 43,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "799f6b04be13db1a17b0ca547b5638a0770c9d0c24dd15cad247dedd57d9724c",
+        "task_path": "password-recovery",
+        "task_tree": "8b6adb8f7797bbad146b0feecf790bd3685f9bc7",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:9b5c6bdce0cf03f075b21f6a7af5030b825ce07d7b16b37610f3964217ab84a4",
+        "registry_name": "terminal-bench/password-recovery",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "3a2fbcaead285ec22d1b55cd4cae896c94718773b84e0ae0fd10829924ab436d",
+        "task_path": "tasks/password-recovery",
+        "task_tree": "1c9b07ed999d3839f6cd9eb33ccf1c2167738607",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "a1d07ae17f06211ada7d066dee8a58f9ed15db5f9a4f8f51d0eea97115b48d1a",
+      "match_name": "path-tracing-reverse",
+      "ordinal": 44,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "3b43605055defe258fea0bce697d55f818d0f246f3dcd341a213e9525f28e635",
+        "task_path": "path-tracing-reverse",
+        "task_tree": "d7719c7dbda88ddc89feca942480077319191d0c",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:035880d7ef5554b217e53a75ce5e87e43193b7a44c30ad17226a6ab10fc11a6c",
+        "registry_name": "terminal-bench/path-tracing-reverse",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "6eaa8cd7a185ebb57bcf172d587906caf245c3e85a65897001004d491f145d4f",
+        "task_path": "tasks/path-tracing-reverse",
+        "task_tree": "fc5fa9074d0974399ecb1206a858028c5260fabc",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "62564fbc68caae521272855cb685acc6a7c21d5355068523768460635c7841df",
+      "match_name": "pypi-server",
+      "ordinal": 45,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "24226cd73d0e8437e5d1353b3555d1d620bc93514f6b2c1cb48870d613907121",
+        "task_path": "pypi-server",
+        "task_tree": "89e92186e373de303c7cf1068a05b557f4fa2fda",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:1a1e0542f58e2d3362fec17a9bbb98667717d9a4a3e9a4c8413d3150a4fa0ff1",
+        "registry_name": "terminal-bench/pypi-server",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "c71f616fc7d6ec1710e51a70cfa755ada8f1756abb2411bd73eaeeb2e58c8691",
+        "task_path": "tasks/pypi-server",
+        "task_tree": "5f7f6449d6945aa675ace3755ee4e9eea8243f58",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "a64a6655d582f8427796b223fd7a82330b4e5239ed5b9598813bf38fff5445db",
+      "match_name": "pytorch-model-cli",
+      "ordinal": 46,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "3ac44919e54fbd18f6c3d542c8ebca8462cd0d337549b33b899cfdb1305944ca",
+        "task_path": "pytorch-model-cli",
+        "task_tree": "bd9854924102d248649cc4ebe1a3ecd7edc63028",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:6f11544dcc81a380dc4611902961f5520259c462d9fceb413419d66ab9a96c79",
+        "registry_name": "terminal-bench/pytorch-model-cli",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "90a56d0d5c0cfd999c98152a268d8c60cfaeb3722fbb60de4dccca998d50e2a8",
+        "task_path": "tasks/pytorch-model-cli",
+        "task_tree": "4cd9f2c9247794e1e260c8752bd24aa6a7a77fcd",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "09eeffde47e6ce37624d9475805b5ecaa1cfc1347384da85c066340da4ce76e3",
+      "match_name": "pytorch-model-recovery",
+      "ordinal": 47,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "d557e4f21fa2a33612fbcf2528da083cc1a2313b7a003766202623f6206f85a6",
+        "task_path": "pytorch-model-recovery",
+        "task_tree": "38d95c73164b003bab5d219b7704b995e02720d2",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:2e628841cff93290919172398e573e794f34c95d9382b7425adde4364022decc",
+        "registry_name": "terminal-bench/pytorch-model-recovery",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "a825116d00afc2f49e21ccf91a4c25039297789793bf91074c7eef15305574de",
+        "task_path": "tasks/pytorch-model-recovery",
+        "task_tree": "e9cacc61e4ec539777458ae72bb1c1ad3450a0b8",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "2a70a340284820470bebfcdb875a113fb7d9cb3550a4efa9f0841e1dcd2790dd",
+      "match_name": "qemu-startup",
+      "ordinal": 48,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f7748fb03acb47120135b0a81cad63c7857dadfaa94cff3f0eb42d43db6ddf3e",
+        "task_path": "qemu-startup",
+        "task_tree": "fc49eaa26135c7b26bbfa513f054891b1ce4c373",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:8e58263747da7dc688ad470688fb72825c4ba2c1c40443fa0f52963645bbd999",
+        "registry_name": "terminal-bench/qemu-startup",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "27f1e3493ba00876601c03381a4537989044aa75efb3eab131a3523b92f31644",
+        "task_path": "tasks/qemu-startup",
+        "task_tree": "1711c2110f62c7eb58d96ef488bd5aaa47649420",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "76829a4495de45086920e34d75a0d0feb1a288d1452888cbe5999890a14b5c0c",
+      "match_name": "query-optimize",
+      "ordinal": 49,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "3e96fdfb7449e1d4a2dee8f6d6f3171ff9244940cf46366ca614ee74bb46c1ba",
+        "task_path": "query-optimize",
+        "task_tree": "f92de6ad5fd2d055abb188001d12b6c971f06652",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:169496ea6843cb403b0860132675baf7aa0df0ac8b86221068e27d86395260f4",
+        "registry_name": "terminal-bench/query-optimize",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "428492c84b8112e1174c3136aa4d1c1885b062dc7729253c574a5d6fb7c304cb",
+        "task_path": "tasks/query-optimize",
+        "task_tree": "c04a867b98a03f27199ebd6c40d54a2f97d807ae",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "08040893ad75f1e70eb9b913bcd9ab1e4e71cfc7504d22f3bda3c0efaf27cc0b",
+      "match_name": "raman-fitting",
+      "ordinal": 50,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "76f17e9ff61b2dcf23428414c6e2c767e54ab980b512c2ca5038a8e951b0e64c",
+        "task_path": "raman-fitting",
+        "task_tree": "a35bd03fbcb5e956450dca276cd7815f1d9db054",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:97ca4025332b20739da553cab0658f2ead925d1b5b3b9b7664dc9eb5e7fbeab7",
+        "registry_name": "terminal-bench/raman-fitting",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "2c8f2f8c5c5d6198b6f9cdaf5ee903d972b99cb3958ac0eeae10413a3b408aa7",
+        "task_path": "tasks/raman-fitting",
+        "task_tree": "13925eceab38977b960d6c061791166570fd5297",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "8369d3ef45d3b77601a6b96121baf904ed0383fde4e83f78bdf239f9c6f3df3a",
+      "match_name": "regex-log",
+      "ordinal": 51,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "de0cb9e3bf1ffbe8800195e3ff49ca918180b8059b8c168fd50e4e6921780f78",
+        "task_path": "regex-log",
+        "task_tree": "319bf5ac0f73d875ec7d710036f217713d4b0ce6",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:802c16cfd132e6c457529cb864be5a757c1b23b6cadc57f2d01983cb0110292a",
+        "registry_name": "terminal-bench/regex-log",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "c416824a7f9f249e92ac3b45b78ca00d759823c19ac4cf502b38e94016e08a1f",
+        "task_path": "tasks/regex-log",
+        "task_tree": "1b49a7126da8cff9dcb5bd550632c368514db5f6",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "d857868de365c6296e3495521b7ceb19af118b03d108aa1c45dd532cf3045fc7",
+      "match_name": "rstan-to-pystan",
+      "ordinal": 52,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "01c81ccde0423535945210b0d6cdad889ab9520846a49510e5f5adfa56bf8ee5",
+        "task_path": "rstan-to-pystan",
+        "task_tree": "8ccb780319f6e6c5f06a7f38fd7603599488ef24",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:592f15f75751f3c4999c3d05087f2f8b2a4dbaaedbfad5a30ae54058b80b925f",
+        "registry_name": "terminal-bench/rstan-to-pystan",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "948feeeb7309529f80ed4315568944dbb94e3fe4dcbec28b206f4cc1f0f7af3f",
+        "task_path": "tasks/rstan-to-pystan",
+        "task_tree": "c0f640ad3dffd723bedb0298bce4c5503f89160f",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "772a2848f25abaedc40c1b195858e4bc44b90c56dd2a2df4309873bf869e606f",
+      "match_name": "sam-cell-seg",
+      "ordinal": 53,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f9099831619cdd90eb4de9d93aaa9028e298c71531d0b135e622ce3c2ebd5e0d",
+        "task_path": "sam-cell-seg",
+        "task_tree": "bd0b3590ca6ac017bad29c0beaa3e43006b733dc",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:37c182b91df18b9c2ea2dceda47430bbd585e7880c56fca2f1975907ce0df8ce",
+        "registry_name": "terminal-bench/sam-cell-seg",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "a4510a3e17eae19cd7e53fa14fd07f8b55497b22ee508e624ea2fbf26ae37a07",
+        "task_path": "tasks/sam-cell-seg",
+        "task_tree": "78d68cb5d49eedf02df3dc0b5106257f52cc8a75",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "3431a0a8f1308d8749f40002bf8174bd984660c3b44f94e78aa6646fd48ced9b",
+      "match_name": "sanitize-git-repo",
+      "ordinal": 54,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f956648d6698336d8ce427d0975ca95fa3a6202306720da1dbe30d630b83eda0",
+        "task_path": "sanitize-git-repo",
+        "task_tree": "31d1185b3cc1bd48ee1316e6bd8abce4b14e7e3c",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:73c94a21ebe370bae843adbeeaaa9e991374867b18483aaf56c7cd470dcddea7",
+        "registry_name": "terminal-bench/sanitize-git-repo",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "a40aadbc4a09f2f0cb757d0c259c5936e28db10005c0ba845be6ddac1e5c6608",
+        "task_path": "tasks/sanitize-git-repo",
+        "task_tree": "023c1ca23c89c85153d13a4170e5ce995ce9204f",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "595fa2c0cbb9d03441ce686e7aaee2bee2621d64ad98af7d28b05cfcffa11dd5",
+      "match_name": "sparql-university",
+      "ordinal": 55,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "59b64dada719ee612f4b945e7b14a9758f791cff0b9bc73a53a056c398e1be03",
+        "task_path": "sparql-university",
+        "task_tree": "3c0215d468ba50a6b245a26919df2980d39b963e",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:02aeca67b6c5b0d2d72c91ab471beb51ded6f42f0dc3dec580e20d489f09a867",
+        "registry_name": "terminal-bench/sparql-university",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "5df5a7cae2be246d34958eba78603adbc6aa118c1d85b8d509164f23ad7df955",
+        "task_path": "tasks/sparql-university",
+        "task_tree": "4a7112f4deb341f11d977f5abcd36509dd774067",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "16936adbc6b28218a4da09fcfe3c43c600cc8902959e4d086f101748c2d23bc5",
+      "match_name": "sqlite-with-gcov",
+      "ordinal": 56,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "d79f53a1fe118f2d4290c855e18155cafa9ddc75f98a7f2df4251061d30c01f1",
+        "task_path": "sqlite-with-gcov",
+        "task_tree": "5077a910d49908958ff65ed0094fd20d26ac16e5",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:9f9bd57fbf9f4831e9031755e83aea6b9d60d2b2d54e8a12d48cff4dca3c231d",
+        "registry_name": "terminal-bench/sqlite-with-gcov",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "46b1e44b6ce301e5bb5b486aa641b74819abcf921052b73d7a975f755fbf5bda",
+        "task_path": "tasks/sqlite-with-gcov",
+        "task_tree": "444713ae2f03788ea2f04d8f6ef8a1f8e2106c21",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "9905a143ffbee0860842d6c804de15b16d6ecdf2fc334ea704044bbe3ad912cd",
+      "match_name": "torch-pipeline-parallelism",
+      "ordinal": 57,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "5a1236692ff4121113ce91e0923a0968ef915ee28ba12f8f81dd1f3c854f58c7",
+        "task_path": "torch-pipeline-parallelism",
+        "task_tree": "bbe99b2300ce0d249a4e92013717849086b33810",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:db605337c749a872cea7b5b413429b3915bb4c3efe0f7875f0c46ce81bd8c4fb",
+        "registry_name": "terminal-bench/torch-pipeline-parallelism",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "dac8db03dfb302fca273f2665008ac516cd5b7cc1d7581628c5bc0136cc85489",
+        "task_path": "tasks/torch-pipeline-parallelism",
+        "task_tree": "bec6e436ccfab9f1201d720efc2d7525046bb2c5",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "313b3500c7a495ecdeb5393dee1c2a32a9e989da2cab03c7b4176946770c821e",
+      "match_name": "train-fasttext",
+      "ordinal": 58,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f312c251aedd98e7f7441bf55592a032470b81a6368f45d9d8646a0f2cce34e8",
+        "task_path": "train-fasttext",
+        "task_tree": "9446cefd31c23b6faf7eb66b27ca45fa46c94739",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:460fc0818971ec83545a76805267b65459128fad52e68c26a199a0d74022badb",
+        "registry_name": "terminal-bench/train-fasttext",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "854bc18aaa03bd41ebae4f553a4cc7d621e2bd63282037da75f54afa28754a13",
+        "task_path": "tasks/train-fasttext",
+        "task_tree": "ba086c51eaa4832dc3fe9daf01512ac27b5f320d",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "3b16beb7e54922be97346705b2c3396a2d2a82b2cea7f98dbd4557f4d622077e",
+      "match_name": "vulnerable-secret",
+      "ordinal": 59,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "bc6a01e55fa91919cb979a3831c2a8b20e17ed0f6a1b17af96d55fec0331b5e0",
+        "task_path": "vulnerable-secret",
+        "task_tree": "a080974bd10a8a1f8f519ef7ec66bf19574ab198",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:d76dfa9e256487c5542905b892156f694137aeef784e1abf3f41e15a8c946eac",
+        "registry_name": "terminal-bench/vulnerable-secret",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "ea74ed3a336c57cd1a5b0ea160e417f2d6c04230951b0915cd6c0980a934ccce",
+        "task_path": "tasks/vulnerable-secret",
+        "task_tree": "4448de3675dafb947ca472cd3bd3be0d564ede20",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "82ea04db33d13b374d4e51419ad2abf3a511e67cf4eda6a9588c8926803caab4",
+      "match_name": "winning-avg-corewars",
+      "ordinal": 60,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "f5711c8d68fb347697d80aaf6c578f27a155e027151763850e9873001913f6a9",
+        "task_path": "winning-avg-corewars",
+        "task_tree": "c6e456d979013854e31f87a3933e8d83e1f304b3",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:a9f2c630fb7d656e96f3a42ade600a8abcb500631d153d62d5ceb2df073bc256",
+        "registry_name": "terminal-bench/winning-avg-corewars",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "b4e2b0b860a62f78a5162d8f7649becc25109c6fa4e3f57aa5a2c966cd45fde4",
+        "task_path": "tasks/winning-avg-corewars",
+        "task_tree": "46d1a5d4babda7e4bac71a87ed65c1b3fcbb642f",
+        "version": "terminal-bench-2-1"
+      }
+    },
+    {
+      "correspondence_sha256": "d9efd213dde9ab2fef884b4d0e8f2ca4d94474c6a579aff663ca921b1727880e",
+      "match_name": "write-compressor",
+      "ordinal": 61,
+      "tb20": {
+        "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+        "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+        "source_identity_sha256": "9a33282b71b56f848b18373976228186cefb068a64cf246c7b62ff5bc495195f",
+        "task_path": "write-compressor",
+        "task_tree": "6302d1ddb23ececa71d629e52aaf3604cce119b9",
+        "version": "terminal-bench@2.0"
+      },
+      "tb21": {
+        "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+        "package_digest": "sha256:d9ddd9a8e925e2c566b37b2492cbf995afecefe58874e4043ef78d7f3c892c7e",
+        "registry_name": "terminal-bench/write-compressor",
+        "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+        "source_identity_sha256": "7e6ff74b2670ab93b8b3b44ab068a6da65131132155b192122df31c54283ab45",
+        "task_path": "tasks/write-compressor",
+        "task_tree": "cfe203b9d5b2e10b747f18a7b0e979a35cba8c6d",
+        "version": "terminal-bench-2-1"
+      }
+    }
+  ],
+  "tb20": {
+    "commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
+    "repository": "https://github.com/laude-institute/terminal-bench-2.git",
+    "root_tree": "03e5d294753cbd4a6b9b25b6ae8479a8692a1675",
+    "task_count": 89,
+    "task_root": "."
+  },
+  "tb21": {
+    "commit": "5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+    "manifest": {
+      "bytes": 12570,
+      "git_blob": "6e7e030fd37a7cefdbd597badcf8560c8748d995",
+      "path": "tasks/dataset.toml",
+      "sha256": "d90b4389992d07ed6f4ab8de963a70241eaa4b60072eeaec4c3b261b6c4a6dd8"
+    },
+    "manifest_dataset": "terminal-bench/terminal-bench-2-1",
+    "repository": "https://github.com/harbor-framework/terminal-bench-2-1.git",
+    "root_tree": "45e2c88a5f4a8a4864ee58284b4dc17ef97ee73c",
+    "task_count": 89,
+    "task_root": "tasks",
+    "tasks_tree": "46241f6de73251d4d9e7a284876e188c026a5a7d"
+  }
+}
