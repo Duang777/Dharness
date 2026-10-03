@@ -17,6 +17,14 @@ def _frozen(root: Path) -> Any:
     cohort = tuple(
         SimpleNamespace(index=index, instance_id=f"task-{index}") for index in range(1, 21)
     )
+    tb21_paths = (
+        "runs/tb21",
+        "evaluation/tb21-canonical.json",
+        "evaluation/tb21-readiness.json",
+        "evaluation/tb21-campaign.json",
+        "evaluation/tb21-method.json",
+        "evaluation/tb21-final.json",
+    )
     return SimpleNamespace(
         root=root,
         protocol=SimpleNamespace(preregistration_commit="a" * 40),
@@ -24,7 +32,22 @@ def _frozen(root: Path) -> Any:
             executable_commit="b" * 40,
             spec=SimpleNamespace(cohort=SimpleNamespace(tasks=cohort)),
         ),
+        tb21=SimpleNamespace(
+            protocol=SimpleNamespace(preregistration_commit="c" * 40),
+            executable_commit="d" * 40,
+            spec=SimpleNamespace(artifacts=SimpleNamespace(paths=tb21_paths)),
+        ),
     )
+
+
+def _write_tb21_outcome_prefix(root: Path, entries: int) -> None:
+    paths = tuple(Path(path) for path in _frozen(root).tb21.spec.artifacts.paths)
+    if entries:
+        (root / paths[0]).mkdir(parents=True)
+    for path in paths[1:entries]:
+        target = root / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("{}\n", encoding="utf-8")
 
 
 def _write_required_artifacts(root: Path) -> None:
@@ -102,10 +125,22 @@ def test_precollection_has_four_artifact_only_declarations(
 ) -> None:
     monkeypatch.setattr(reproduction, "_pass_freeze_gate", lambda _root: _frozen(tmp_path))
     monkeypatch.setattr(reproduction, "_check_precollection", lambda _frozen: ())
+    monkeypatch.setattr(
+        reproduction,
+        "check_tb21_sensitivity",
+        lambda _root: pytest.fail("absent TB2.1 outcomes were read"),
+    )
 
     result = reproduction.check_thesis_reproduction(tmp_path)
 
     assert result.state is reproduction.ReproductionState.PRE_COLLECTION
+    assert result.schema_version == 2
+    assert result.tb21_sensitivity == reproduction.Tb21SensitivityStatus(
+        state=reproduction.Tb21SensitivityState.NOT_STARTED,
+        protocol_commit="c" * 40,
+        executable_commit="d" * 40,
+        present_entries=0,
+    )
     assert tuple(item.group for item in result.raw_inputs) == tuple(reproduction.RawInputGroup)
     assert (
         tuple(item.mode for item in result.raw_inputs)
@@ -113,6 +148,100 @@ def test_precollection_has_four_artifact_only_declarations(
     )
     assert tuple(item.expected_files for item in result.raw_inputs) == (185, 61, 61, 20)
     assert all(item.present_files == 0 for item in result.raw_inputs)
+
+
+def test_partial_tb21_prefix_is_reported_without_reading_outcomes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _write_tb21_outcome_prefix(tmp_path, 3)
+    monkeypatch.setattr(reproduction, "_pass_freeze_gate", lambda _root: _frozen(tmp_path))
+    monkeypatch.setattr(reproduction, "_check_precollection", lambda _frozen: ())
+    monkeypatch.setattr(
+        reproduction,
+        "check_tb21_sensitivity",
+        lambda _root: pytest.fail("partial TB2.1 outcomes were read"),
+    )
+
+    result = reproduction.check_thesis_reproduction(tmp_path)
+
+    assert result.state is reproduction.ReproductionState.PRE_COLLECTION
+    assert result.tb21_sensitivity is not None
+    assert result.tb21_sensitivity.state is reproduction.Tb21SensitivityState.PARTIAL
+    assert result.tb21_sensitivity.present_entries == 3
+
+
+def test_tb21_outcomes_must_form_the_fixed_dependency_prefix(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    canonical = tmp_path / "evaluation/tb21-canonical.json"
+    canonical.parent.mkdir(parents=True)
+    canonical.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(reproduction, "_pass_freeze_gate", lambda _root: _frozen(tmp_path))
+    monkeypatch.setattr(
+        reproduction,
+        "_artifact_topology",
+        lambda _root: pytest.fail("main outcomes were inspected after a TB2.1 topology error"),
+    )
+
+    result = reproduction.check_thesis_reproduction(tmp_path)
+
+    assert result.state is reproduction.ReproductionState.PARTIAL_INVALID
+    assert result.tb21_sensitivity is not None
+    assert result.tb21_sensitivity.state is reproduction.Tb21SensitivityState.PARTIAL
+    assert "do not form the fixed dependency prefix" in result.errors[0]
+
+
+def test_complete_tb21_prefix_runs_the_existing_content_checker(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _write_tb21_outcome_prefix(tmp_path, 6)
+    calls: list[Path] = []
+
+    def check_tb21(root: Path) -> tuple[str, ...]:
+        calls.append(root)
+        return ()
+
+    monkeypatch.setattr(reproduction, "_pass_freeze_gate", lambda _root: _frozen(tmp_path))
+    monkeypatch.setattr(reproduction, "_check_precollection", lambda _frozen: ())
+    monkeypatch.setattr(
+        reproduction,
+        "check_tb21_sensitivity",
+        check_tb21,
+    )
+
+    result = reproduction.check_thesis_reproduction(tmp_path)
+
+    assert result.state is reproduction.ReproductionState.PRE_COLLECTION
+    assert result.tb21_sensitivity is not None
+    assert result.tb21_sensitivity.state is reproduction.Tb21SensitivityState.COMPLETE
+    assert result.tb21_sensitivity.present_entries == 6
+    assert calls == [tmp_path]
+
+
+def test_invalid_complete_tb21_stops_before_main_outcome_probe(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _write_tb21_outcome_prefix(tmp_path, 6)
+    monkeypatch.setattr(reproduction, "_pass_freeze_gate", lambda _root: _frozen(tmp_path))
+    monkeypatch.setattr(
+        reproduction,
+        "check_tb21_sensitivity",
+        lambda _root: ("stale final report",),
+    )
+    monkeypatch.setattr(
+        reproduction,
+        "_artifact_topology",
+        lambda _root: pytest.fail("main outcomes were inspected after a TB2.1 content error"),
+    )
+
+    result = reproduction.check_thesis_reproduction(tmp_path)
+
+    assert result.state is reproduction.ReproductionState.PARTIAL_INVALID
+    assert result.errors == ("TB2.1 sensitivity: stale final report",)
 
 
 def test_raw_root_without_artifacts_is_partial_invalid(

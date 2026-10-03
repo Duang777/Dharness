@@ -11,6 +11,7 @@ from typing import Any, Literal, Self
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from evidence_harness.evaluation import load_matrix
+from evidence_harness_mutation._tb21_manifest import BoundExecutable
 from evidence_harness_mutation.main_analysis_executable import (
     BoundMainAnalysisExecutable,
     load_main_analysis_executable,
@@ -21,7 +22,6 @@ from evidence_harness_mutation.main_analysis_protocol import (
     RQ2_REPORT,
     RQ3_REPORT,
     RQ4_REPORT,
-    TB21_REPORT,
     BoundMainAnalysisProtocol,
     MainAnalysisMethod,
     MainAnalysisOutcome,
@@ -50,6 +50,12 @@ from evidence_harness_mutation.prefixbench_test_campaign import (
     check_prefixbench_test_campaign,
     preflight_prefixbench_test_campaign,
 )
+from evidence_harness_mutation.tb21_sensitivity import (
+    check as check_tb21_sensitivity,
+)
+from evidence_harness_mutation.tb21_sensitivity import (
+    load as load_tb21_sensitivity,
+)
 from evidence_harness_mutation.thesis_tables import (
     TABLE_BUNDLE,
     TABLE_MARKDOWN,
@@ -75,6 +81,12 @@ class RawInputMode(StrEnum):
     FULL_REBUILD = "full_rebuild"
 
 
+class Tb21SensitivityState(StrEnum):
+    NOT_STARTED = "not_started"
+    PARTIAL = "partial"
+    COMPLETE = "complete"
+
+
 class RawInputDeclaration(FrozenModel):
     group: RawInputGroup
     mode: RawInputMode | None
@@ -92,11 +104,30 @@ class RawInputDeclaration(FrozenModel):
         return self
 
 
+class Tb21SensitivityStatus(FrozenModel):
+    state: Tb21SensitivityState
+    protocol_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
+    executable_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
+    expected_entries: Literal[6] = 6
+    present_entries: int = Field(ge=0, le=6)
+
+    @model_validator(mode="after")
+    def validate_state(self) -> Self:
+        if self.state is Tb21SensitivityState.NOT_STARTED and self.present_entries != 0:
+            raise ValueError("not-started TB2.1 sensitivity must have no outcome entries")
+        if self.state is Tb21SensitivityState.PARTIAL and not 1 <= self.present_entries <= 5:
+            raise ValueError("partial TB2.1 sensitivity must have one to five outcome entries")
+        if self.state is Tb21SensitivityState.COMPLETE and self.present_entries != 6:
+            raise ValueError("complete TB2.1 sensitivity must have all six outcome entries")
+        return self
+
+
 class ThesisReproductionResult(FrozenModel):
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     state: ReproductionState
     protocol_commit: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
     executable_commit: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
+    tb21_sensitivity: Tb21SensitivityStatus | None = None
     raw_inputs: tuple[RawInputDeclaration, ...] = Field(max_length=4)
     errors: tuple[str, ...]
 
@@ -128,6 +159,8 @@ class ThesisReproductionResult(FrozenModel):
             self.protocol_commit is None or self.executable_commit is None
         ):
             raise ValueError("valid result must identify both frozen commits")
+        if self.state is not ReproductionState.PARTIAL_INVALID and self.tb21_sensitivity is None:
+            raise ValueError("valid result must identify the TB2.1 sensitivity state")
         return self
 
     def canonical_bytes(self) -> bytes:
@@ -139,6 +172,7 @@ class _FrozenContext:
     root: Path
     protocol: BoundMainAnalysisProtocol
     executable: BoundMainAnalysisExecutable
+    tb21: BoundExecutable
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,7 +225,6 @@ _START_MARKERS = (
     *_REQUIRED_ARTIFACTS,
     TEST_RUN_ROOT,
     TRANSFER_RUN_ROOT,
-    TB21_REPORT,
     AUXILIARY_REPORT,
 )
 _EXTRA_PRECOLLECTION_HISTORY_PATHS = (
@@ -216,6 +249,13 @@ def check_thesis_reproduction(project_root: Path) -> ThesisReproductionResult:
 
     protocol_commit = frozen.protocol.preregistration_commit
     executable_commit = frozen.executable.executable_commit
+    tb21_sensitivity, tb21_errors = _check_tb21_status(frozen)
+    if tb21_errors:
+        return _invalid_result(
+            tb21_errors,
+            frozen=frozen,
+            tb21_sensitivity=tb21_sensitivity,
+        )
     topology = _artifact_topology(root)
 
     if topology.all_absent:
@@ -227,45 +267,71 @@ def check_thesis_reproduction(project_root: Path) -> ThesisReproductionResult:
                     + ", ".join(path.as_posix() for path in started),
                 ),
                 frozen=frozen,
+                tb21_sensitivity=tb21_sensitivity,
             )
         errors = _check_precollection(frozen)
         if errors:
-            return _invalid_result(errors, frozen=frozen)
+            return _invalid_result(
+                errors,
+                frozen=frozen,
+                tb21_sensitivity=tb21_sensitivity,
+            )
         return ThesisReproductionResult(
             state=ReproductionState.PRE_COLLECTION,
             protocol_commit=protocol_commit,
             executable_commit=executable_commit,
+            tb21_sensitivity=tb21_sensitivity,
             raw_inputs=_precollection_raw_inputs(),
             errors=(),
         )
 
     if not topology.complete:
         errors = _topology_errors(topology)
-        return _invalid_result(errors, frozen=frozen)
+        return _invalid_result(
+            errors,
+            frozen=frozen,
+            tb21_sensitivity=tb21_sensitivity,
+        )
 
     try:
         snapshot = _load_outcome_snapshot(frozen)
         structure_errors = _validate_outcome_structure(frozen, snapshot)
         if structure_errors:
-            return _invalid_result(structure_errors, frozen=frozen)
+            return _invalid_result(
+                structure_errors,
+                frozen=frozen,
+                tb21_sensitivity=tb21_sensitivity,
+            )
         manifests = _raw_manifests(frozen, snapshot)
         raw_inputs, raw_errors = _classify_raw_inputs(frozen, manifests)
     except (OSError, TypeError, ValueError) as exc:
         return _invalid_result(
             (f"cannot load the complete artifact set: {exc}",),
             frozen=frozen,
+            tb21_sensitivity=tb21_sensitivity,
         )
 
     if raw_errors:
-        return _invalid_result(raw_errors, frozen=frozen, raw_inputs=raw_inputs)
+        return _invalid_result(
+            raw_errors,
+            frozen=frozen,
+            tb21_sensitivity=tb21_sensitivity,
+            raw_inputs=raw_inputs,
+        )
 
     errors = _check_complete_artifacts(frozen, snapshot, raw_inputs)
     if errors:
-        return _invalid_result(errors, frozen=frozen, raw_inputs=raw_inputs)
+        return _invalid_result(
+            errors,
+            frozen=frozen,
+            tb21_sensitivity=tb21_sensitivity,
+            raw_inputs=raw_inputs,
+        )
     return ThesisReproductionResult(
         state=ReproductionState.COMPLETE,
         protocol_commit=protocol_commit,
         executable_commit=executable_commit,
+        tb21_sensitivity=tb21_sensitivity,
         raw_inputs=raw_inputs,
         errors=(),
     )
@@ -280,7 +346,57 @@ def _pass_freeze_gate(root: Path) -> _FrozenContext:
         raise ValueError("executable protocol commit differs from the main protocol")
     if executable.spec.protected_sources != protocol.spec.protected_sources:
         raise ValueError("executable protected sources differ from the main protocol")
-    return _FrozenContext(root=root, protocol=protocol, executable=executable)
+    tb21 = load_tb21_sensitivity(root)
+    return _FrozenContext(
+        root=root,
+        protocol=protocol,
+        executable=executable,
+        tb21=tb21,
+    )
+
+
+def _check_tb21_status(
+    frozen: _FrozenContext,
+) -> tuple[Tb21SensitivityStatus, tuple[str, ...]]:
+    paths = tuple(Path(path) for path in frozen.tb21.spec.artifacts.paths)
+    states = (
+        _directory_state(frozen.root / paths[0], frozen.root),
+        *(_regular_file_state(frozen.root / path, frozen.root) for path in paths[1:]),
+    )
+    present_paths = tuple(
+        path for path, state in zip(paths, states, strict=True) if state != "missing"
+    )
+    present_entries = len(present_paths)
+    if present_entries == 0:
+        state = Tb21SensitivityState.NOT_STARTED
+    elif present_entries == len(paths):
+        state = Tb21SensitivityState.COMPLETE
+    else:
+        state = Tb21SensitivityState.PARTIAL
+    status = Tb21SensitivityStatus(
+        state=state,
+        protocol_commit=frozen.tb21.protocol.preregistration_commit,
+        executable_commit=frozen.tb21.executable_commit,
+        present_entries=present_entries,
+    )
+
+    errors: list[str] = []
+    invalid = tuple(
+        path for path, path_state in zip(paths, states, strict=True) if path_state == "invalid"
+    )
+    if invalid:
+        errors.append(
+            "TB2.1 sensitivity outcome entries have invalid types: "
+            + ", ".join(path.as_posix() for path in invalid)
+        )
+    if present_paths != paths[:present_entries]:
+        errors.append(
+            "TB2.1 sensitivity outcome entries do not form the fixed dependency prefix: "
+            + ", ".join(path.as_posix() for path in present_paths)
+        )
+    if not errors and state is Tb21SensitivityState.COMPLETE:
+        errors.extend(_prefixed("TB2.1 sensitivity", check_tb21_sensitivity(frozen.root)))
+    return status, tuple(errors)
 
 
 def _check_precollection(frozen: _FrozenContext) -> tuple[str, ...]:
@@ -717,12 +833,14 @@ def _invalid_result(
     errors: tuple[str, ...],
     *,
     frozen: _FrozenContext | None = None,
+    tb21_sensitivity: Tb21SensitivityStatus | None = None,
     raw_inputs: tuple[RawInputDeclaration, ...] = (),
 ) -> ThesisReproductionResult:
     return ThesisReproductionResult(
         state=ReproductionState.PARTIAL_INVALID,
         protocol_commit=(frozen.protocol.preregistration_commit if frozen is not None else None),
         executable_commit=(frozen.executable.executable_commit if frozen is not None else None),
+        tb21_sensitivity=tb21_sensitivity,
         raw_inputs=raw_inputs,
         errors=errors,
     )

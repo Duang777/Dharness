@@ -10,6 +10,8 @@ from evidence_harness_mutation.thesis_reproduction import (
     RawInputGroup,
     RawInputMode,
     ReproductionState,
+    Tb21SensitivityState,
+    Tb21SensitivityStatus,
     ThesisReproductionResult,
 )
 from scripts import check_thesis_reproduction
@@ -38,6 +40,16 @@ def _result(state: ReproductionState) -> ThesisReproductionResult:
         state=state,
         protocol_commit="a" * 40 if state is not ReproductionState.PARTIAL_INVALID else None,
         executable_commit="b" * 40 if state is not ReproductionState.PARTIAL_INVALID else None,
+        tb21_sensitivity=(
+            Tb21SensitivityStatus(
+                state=Tb21SensitivityState.NOT_STARTED,
+                protocol_commit="c" * 40,
+                executable_commit="d" * 40,
+                present_entries=0,
+            )
+            if state is not ReproductionState.PARTIAL_INVALID
+            else None
+        ),
         raw_inputs=raw_inputs,
         errors=("invalid package",) if state is ReproductionState.PARTIAL_INVALID else (),
     )
@@ -69,6 +81,7 @@ def test_cli_prints_canonical_result_and_maps_state_to_exit_code(
     output = capsys.readouterr().out.encode()
     assert output == result.canonical_bytes()
     assert json.loads(output)["state"] == state.value
+    assert json.loads(output)["schema_version"] == 2
 
 
 @pytest.mark.parametrize(

@@ -6,6 +6,9 @@
 复现包。现有 checker 分别验证单个阶段，但没有统一状态机。RQ2、RQ3 和 RQ4 的 checker
 也只检查单个 raw anchor，不能证明协议规定的 raw input group 是全有或全无。
 
+TB2.1 sensitivity 后续增加了独立协议和 executable。统一入口还需要验证这条冻结链，并在
+不改变主复现包状态定义的前提下报告其 outcome 尚未开始、部分存在或完整。
+
 检查器不得运行 Provider、Docker、模型或采集命令，不得写入或修复产物，也不得修改主协议、
 executable manifest 绑定的源码。
 
@@ -19,6 +22,9 @@ uv run python scripts/check_thesis_reproduction.py
 
 它不接受项目路径、模式、输出路径或科学参数。脚本从自身位置确定项目根目录，并向 stdout
 写一个 canonical JSON 结果。
+
+当前输出 schema 为 v2。v2 增加 `tb21_sensitivity`，保留原有 `state`、主协议提交、
+主 executable 提交和四组 raw input 的含义。
 
 Python 调用者只需一个操作：
 
@@ -62,6 +68,8 @@ docs/thesis-tables-v1.md
 ```
 
 Terminal-Bench 2.1 与 auxiliary 报告仍是可选证据，不属于 v1 完整包的必要集合。
+TB2.1 的完成状态单独出现在 `tb21_sensitivity`，不会把主复现包从 `pre_collection`
+改成 `complete`。
 
 ## 冻结 gate
 
@@ -69,12 +77,34 @@ Terminal-Bench 2.1 与 auxiliary 报告仍是可选证据，不属于 v1 完整�
 `load_main_analysis_executable()`。两者验证 canonical bytes、固定 source binding、当前
 Git 内容以及 `protocol commit -> executable commit -> HEAD` 的祖先关系。
 
-这些 loader 会读取已冻结的 Historical-7 和 development 输入，但不会读取 held-out 或
-CrossHarness outcome。只有它们都成功后，检查器才探测九个下游 artifact 或两个 raw root。
+随后检查器调用 `tb21_sensitivity.load()`。该 loader 验证 TB2.1 matrix、协议、
+executable、绑定源码以及它自己的 `protocol commit -> executable commit -> HEAD`
+祖先关系。
+
+这些 loader 会读取已冻结的 Historical-7、development 和 TB2.1 设计输入，但不会读取
+held-out、RQ、CrossHarness 或 TB2.1 outcome。全部 loader 成功后，检查器才探测下游路径。
 私有 `_FrozenContext` 是后续 outcome helper 的必需参数，使调用顺序在函数签名中可见。
 
 若 gate 失败，检查器立即返回，不探测或读取下游路径。测试通过替换 topology reader 证明
 该顺序。
+
+## TB2.1 sensitivity 状态
+
+`tb21_sensitivity` 固定包含 protocol commit、executable commit、六个预期 outcome entry
+的数量和当前状态：
+
+- `not_started`：六个 outcome entry 全部缺失。
+- `partial`：存在一至五个 entry。
+- `complete`：六个 entry 全部存在。
+
+六个 entry 是 raw root、canonical、readiness、campaign、method comparison 和 final
+report。它们必须按 executable 声明的依赖顺序形成前缀。raw root 必须是普通目录，其余
+entry 必须是普通文件；symlink、类型错误或跳过依赖都会使顶层状态变成
+`partial_invalid`。
+
+`not_started` 和 `partial` 只检查路径拓扑，不读取 outcome 内容。`complete` 复用
+`tb21_sensitivity.check()`，逐字节重建并检查五个派生产物，同时验证 outcome 提交位于
+executable commit 之后。该路径不会运行 Harbor preflight、Provider、Docker 或采集命令。
 
 ## 四组 raw input
 
@@ -160,3 +190,5 @@ docs/thesis-reproduction-checker-design.md
 - 接受 Git 作为运行前提，因为主协议和 executable 本身依赖提交内容与祖先关系。
 - artifact-only 只能证明 canonical graph 自洽，不能重新证明已省略的 raw payload；结果
   用 mode 明确记录这一限制。
+- 接受 TB2.1 partial 状态只证明依赖拓扑。内容校验需要 61 个 terminal task 齐全，因此只在
+  complete 状态调用现有 checker。
