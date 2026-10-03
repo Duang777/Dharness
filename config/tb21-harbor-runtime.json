@@ -1,0 +1,42 @@
+{
+  "acceptance": {
+    "executable_artifact": "experiments/prefixbench-v1/tb21-sensitivity-executable-v1.json",
+    "executable_artifact_sha256": "f1eba2fad05cbdbfb0d6c2aa785137270545217c16eb835e0183d31d7a003b8b",
+    "executable_commit": "96b4af2dfb14e07be6f424d243cc391ce8aeaf86",
+    "expected_member_count": 61,
+    "preflight_script": "scripts/tb21_sensitivity.py",
+    "preflight_script_sha256": "625317179605e92208c7451af735a8d667ebf3dcbabc19eeba028108e399fc6e",
+    "provider_calls": 0,
+    "selector_path": "tasks/dataset.toml"
+  },
+  "build": {
+    "source_date_epoch": 1789188913,
+    "uv_build_version": "0.8.17"
+  },
+  "patch": {
+    "changed_paths": [
+      "pyproject.toml",
+      "src/harbor/models/job/config.py",
+      "src/harbor/registry/client/git_repo.py",
+      "tests/unit/test_git_repo_registry.py"
+    ],
+    "path": "patches/harbor-v0.23.0-tb21-dataset-toml.patch",
+    "sha256": "1fc9f9099dcf6066136099860afa2a57320366e415e659f91f8616982016f9d5"
+  },
+  "project": {
+    "distribution_name": "evidence-harness",
+    "distribution_version": "0.1.0",
+    "pyproject_sha256": "16b90004e6861dcf11ff525c1eb3276b86735a5c9c5149e752a69e7c6970b8c5",
+    "uv_lock_sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+  },
+  "schema_version": 1,
+  "upstream": {
+    "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+    "distribution_name": "harbor",
+    "distribution_version": "0.23.0+tb21.1",
+    "repository": "https://github.com/laude-institute/harbor.git",
+    "source_tree": "b399c3e614a6180d194359d8fd8df7fded1dad89",
+    "tag": "v0.23.0",
+    "tag_object": "3c305dc5611e3600afc3c818735a82322f0264f8"
+  }
+}

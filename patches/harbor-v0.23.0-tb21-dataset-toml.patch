@@ -1,0 +1,389 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index f37c92e1..b5b72a54 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [project]
+ name = "harbor"
+-version = "0.23.0"
++version = "0.23.0+tb21.1"
+ description = "A framework for evaluating and optimizing agents and models using sandboxed environments."
+ readme = "README.md"
+ license = "Apache-2.0"
+diff --git a/src/harbor/models/job/config.py b/src/harbor/models/job/config.py
+index b8551a34..c7545f23 100644
+--- a/src/harbor/models/job/config.py
++++ b/src/harbor/models/job/config.py
+@@ -10,7 +10,6 @@ from pydantic import BaseModel, Field, model_validator
+ from harbor.models.metric.config import MetricConfig
+ from harbor.models.task.id import GitTaskId, LocalTaskId, PackageTaskId
+ from harbor.models.task.task import Task as TaskModel
+-from harbor.registry.client.base import EmptyDatasetError
+ from harbor.models.trial.config import (
+     AgentConfig,
+     ArtifactConfig,
+@@ -19,6 +18,7 @@ from harbor.models.trial.config import (
+     UserAgentConfig,
+     VerifierConfig,
+ )
++from harbor.registry.client.base import EmptyDatasetError
+ 
+ 
+ class DatasetConfig(BaseModel):
+@@ -211,17 +211,32 @@ class DatasetConfig(BaseModel):
+ 
+         result: list[TaskConfig] = []
+         for task_id in self._filter_task_ids(metadata.task_ids):
+-            if isinstance(task_id, GitTaskId):
+-                result.append(
+-                    TaskConfig(
+-                        path=task_id.path,
+-                        git_url=task_id.git_url,
+-                        git_commit_id=task_id.git_commit_id,
+-                        overwrite=self.overwrite,
+-                        download_dir=self.download_dir,
+-                        source=metadata.name,
++            match task_id:
++                case GitTaskId():
++                    result.append(
++                        TaskConfig(
++                            path=task_id.path,
++                            git_url=task_id.git_url,
++                            git_commit_id=task_id.git_commit_id,
++                            overwrite=self.overwrite,
++                            download_dir=self.download_dir,
++                            source=metadata.name,
++                        )
++                    )
++                case PackageTaskId():
++                    result.append(
++                        TaskConfig(
++                            name=f"{task_id.org}/{task_id.name}",
++                            ref=task_id.ref,
++                            overwrite=self.overwrite,
++                            download_dir=self.download_dir,
++                            source=metadata.name,
++                        )
++                    )
++                case _:
++                    raise TypeError(
++                        f"Unsupported repository task identity: {type(task_id).__name__}"
+                     )
+-                )
+         return result
+ 
+     async def _get_registry_task_configs(self) -> list[TaskConfig]:
+diff --git a/src/harbor/registry/client/git_repo.py b/src/harbor/registry/client/git_repo.py
+index 628a9aa7..1310a01d 100644
+--- a/src/harbor/registry/client/git_repo.py
++++ b/src/harbor/registry/client/git_repo.py
+@@ -1,20 +1,21 @@
+-from typing import override
+ import json
+ from contextlib import asynccontextmanager
+ from pathlib import Path
++from typing import override
+ from urllib.parse import urlsplit
+ 
+ from pydantic import BaseModel
+ 
++from harbor.models.dataset.manifest import DatasetManifest
+ from harbor.models.registry import (
+     DatasetMetadata,
+     DatasetSpec,
+     DatasetSummary,
+ )
+-from harbor.models.task.id import GitTaskId
++from harbor.models.task.id import GitTaskId, PackageTaskId
+ from harbor.registry.client.base import BaseRegistryClient, resolve_version
+-from harbor.utils.git import select_ls_remote_sha
+ from harbor.tasks.client import _is_resolved_git_commit_id
++from harbor.utils.git import select_ls_remote_sha
+ from harbor.utils.logger import logger
+ 
+ _GIT_URL_SCHEMES = ("https://", "http://", "ssh://", "git://")
+@@ -264,7 +265,7 @@ class GitRepoRegistryClient(BaseRegistryClient):
+ 
+     def _registry_rel_path(self) -> str:
+         if self._registry_path is not None:
+-            if self._registry_path.suffix == ".json":
++            if self._registry_path.suffix in {".json", ".toml"}:
+                 return self._registry_path.as_posix()
+             return (self._registry_path / _REGISTRY_FILENAME).as_posix()
+         return _REGISTRY_FILENAME
+@@ -299,6 +300,45 @@ class GitRepoRegistryClient(BaseRegistryClient):
+             metrics=spec.metrics,
+         )
+ 
++    def _manifest_to_metadata(
++        self,
++        manifest: DatasetManifest,
++        name: str,
++        version: str | None,
++    ) -> DatasetMetadata:
++        available_names = {
++            manifest.dataset.name,
++            manifest.dataset.short_name,
++        }
++        if name not in available_names:
++            raise ValueError(
++                f"Dataset '{name}' not found in {self._registry_rel_path()}. "
++                f"Available datasets: {sorted(available_names)}"
++            )
++        if version is not None and version != manifest.dataset.version:
++            raise ValueError(
++                f"Version '{version}' of dataset '{name}' not found in "
++                f"{self._registry_rel_path()}."
++            )
++        if manifest.files:
++            raise ValueError(
++                "Git repository dataset.toml manifests with dataset files "
++                "are not supported."
++            )
++        return DatasetMetadata(
++            name=manifest.dataset.name,
++            version=manifest.dataset.version,
++            description=manifest.dataset.description,
++            task_ids=[
++                PackageTaskId(
++                    org=task.org,
++                    name=task.short_name,
++                    ref=task.digest,
++                )
++                for task in manifest.tasks
++            ],
++        )
++
+     async def _get_registry_metadata(
+         self, name: str, version: str | None
+     ) -> DatasetMetadata:
+@@ -311,6 +351,9 @@ class GitRepoRegistryClient(BaseRegistryClient):
+                 raise ValueError(
+                     f"{registry_rel} not found in {self._repo.git_url} at {sha}."
+                 )
++            if registry_file.suffix == ".toml":
++                manifest = DatasetManifest.from_toml_file(registry_file)
++                return self._manifest_to_metadata(manifest, name, version)
+             specs = self._load_registry_specs(registry_file)
+ 
+         matching = [spec for spec in specs if spec.name == name]
+@@ -434,6 +477,21 @@ class GitRepoRegistryClient(BaseRegistryClient):
+         async with self._sparse_checkout([registry_rel], sha) as repo_dir:
+             registry_file = repo_dir / registry_rel
+             if registry_file.exists():
++                if registry_file.suffix == ".toml":
++                    manifest = DatasetManifest.from_toml_file(registry_file)
++                    metadata = self._manifest_to_metadata(
++                        manifest,
++                        name=manifest.dataset.short_name,
++                        version=None,
++                    )
++                    return [
++                        DatasetSummary(
++                            name=metadata.name,
++                            version=metadata.version,
++                            description=metadata.description,
++                            task_count=len(metadata.task_ids),
++                        )
++                    ]
+                 specs = self._load_registry_specs(registry_file)
+                 return [
+                     DatasetSummary(
+diff --git a/tests/unit/test_git_repo_registry.py b/tests/unit/test_git_repo_registry.py
+index 71633d34..02851a81 100644
+--- a/tests/unit/test_git_repo_registry.py
++++ b/tests/unit/test_git_repo_registry.py
+@@ -1,10 +1,14 @@
+ import json
++from contextlib import asynccontextmanager
+ from pathlib import Path
++from unittest.mock import AsyncMock
+ 
+ import pytest
+ 
+ from harbor.models.job.config import DatasetConfig
+-from harbor.models.registry import DatasetSpec, RegistryTaskId
++from harbor.models.registry import DatasetMetadata, DatasetSpec, RegistryTaskId
++from harbor.models.task.id import PackageTaskId
++from harbor.registry.client.factory import RegistryClientFactory
+ from harbor.registry.client.git_repo import (
+     GitRepoRegistryClient,
+     ResolvedRepo,
+@@ -106,6 +110,177 @@ class TestGitRepoRegistryClient:
+         )
+         assert client._registry_rel_path() == "some/path/my-registry.json"
+ 
++    def test_registry_rel_path_explicit_toml_file(self):
++        repo = ResolvedRepo(
++            host="github.com",
++            org="o",
++            name="n",
++            git_url="https://github.com/o/n.git",
++        )
++        client = GitRepoRegistryClient(
++            repo=repo, registry_path=Path("tasks/dataset.toml")
++        )
++        assert client._registry_rel_path() == "tasks/dataset.toml"
++
++    def _make_toml_client(
++        self,
++        tmp_path: Path,
++        *,
++        files: bool = False,
++    ) -> GitRepoRegistryClient:
++        first_digest = "a" * 64
++        second_digest = "b" * 64
++        lines = [
++            'schema_version = "1.0"',
++            "",
++            "[dataset]",
++            'name = "terminal-bench/terminal-bench-2-1"',
++            'version = "2.1"',
++            'description = "Terminal-Bench 2.1"',
++            "",
++            "[[tasks]]",
++            'name = "terminal-bench/first"',
++            f'digest = "sha256:{first_digest}"',
++            "",
++            "[[tasks]]",
++            'name = "terminal-bench/second"',
++            f'digest = "sha256:{second_digest}"',
++            "",
++            "[[tasks]]",
++            'name = "terminal-bench/first"',
++            f'digest = "sha256:{first_digest}"',
++        ]
++        if files:
++            lines.extend(
++                [
++                    "",
++                    "[[files]]",
++                    'path = "metric.py"',
++                    f'digest = "sha256:{first_digest}"',
++                ]
++            )
++
++        manifest = tmp_path / "tasks" / "dataset.toml"
++        manifest.parent.mkdir()
++        manifest.write_text("\n".join(lines))
++        repo = ResolvedRepo(
++            host="github.com",
++            org="o",
++            name="n",
++            git_url="https://github.com/o/n.git",
++            resolved_sha="c" * 40,
++        )
++        client = GitRepoRegistryClient(
++            repo=repo, registry_path=Path("tasks/dataset.toml")
++        )
++
++        @asynccontextmanager
++        async def fake_sparse_checkout(paths, sha):
++            assert paths == ["tasks/dataset.toml"]
++            assert sha == "c" * 40
++            yield tmp_path
++
++        client._sparse_checkout = fake_sparse_checkout
++        return client
++
++    @pytest.mark.parametrize(
++        "requested_name",
++        [
++            "terminal-bench-2-1",
++            "terminal-bench/terminal-bench-2-1",
++        ],
++    )
++    async def test_toml_manifest_preserves_package_task_order_and_digests(
++        self,
++        tmp_path,
++        requested_name,
++    ):
++        client = self._make_toml_client(tmp_path)
++
++        metadata = await client.get_dataset_metadata(f"{requested_name}@2.1")
++
++        assert metadata.name == "terminal-bench/terminal-bench-2-1"
++        assert metadata.version == "2.1"
++        assert metadata.description == "Terminal-Bench 2.1"
++        assert metadata.task_ids == [
++            PackageTaskId(
++                org="terminal-bench",
++                name="first",
++                ref=f"sha256:{'a' * 64}",
++            ),
++            PackageTaskId(
++                org="terminal-bench",
++                name="second",
++                ref=f"sha256:{'b' * 64}",
++            ),
++            PackageTaskId(
++                org="terminal-bench",
++                name="first",
++                ref=f"sha256:{'a' * 64}",
++            ),
++        ]
++
++    async def test_toml_manifest_rejects_wrong_dataset_name(self, tmp_path):
++        client = self._make_toml_client(tmp_path)
++
++        with pytest.raises(ValueError, match="Dataset 'other' not found"):
++            await client.get_dataset_metadata("other")
++
++    async def test_toml_manifest_rejects_wrong_dataset_version(self, tmp_path):
++        client = self._make_toml_client(tmp_path)
++
++        with pytest.raises(ValueError, match="Version '9.9'.*not found"):
++            await client.get_dataset_metadata("terminal-bench-2-1@9.9")
++
++    async def test_toml_manifest_rejects_dataset_files(self, tmp_path):
++        client = self._make_toml_client(tmp_path, files=True)
++
++        with pytest.raises(ValueError, match="dataset files are not supported"):
++            await client.get_dataset_metadata("terminal-bench-2-1")
++
++    async def test_toml_manifest_list_preserves_duplicate_task_count(self, tmp_path):
++        client = self._make_toml_client(tmp_path)
++
++        summaries = await client.list_datasets()
++
++        assert len(summaries) == 1
++        assert summaries[0].name == "terminal-bench/terminal-bench-2-1"
++        assert summaries[0].version == "2.1"
++        assert summaries[0].task_count == 3
++
++    async def test_repo_dataset_preserves_package_task_ids(self, monkeypatch):
++        metadata = DatasetMetadata(
++            name="terminal-bench/terminal-bench-2-1",
++            task_ids=[
++                PackageTaskId(
++                    org="terminal-bench",
++                    name="first",
++                    ref=f"sha256:{'a' * 64}",
++                ),
++                PackageTaskId(
++                    org="terminal-bench",
++                    name="second",
++                    ref=f"sha256:{'b' * 64}",
++                ),
++            ],
++        )
++        client = self._make_client()
++        client.get_dataset_metadata = AsyncMock(return_value=metadata)
++        monkeypatch.setattr(
++            RegistryClientFactory,
++            "create",
++            lambda **_kwargs: client,
++        )
++        config = DatasetConfig(
++            repo="harbor-framework/terminal-bench-2-1",
++            registry_path=Path("tasks/dataset.toml"),
++            name="terminal-bench-2-1",
++        )
++
++        task_configs = await config.get_task_configs()
++
++        assert [task.get_task_id() for task in task_configs] == metadata.task_ids
++
+     def test_effective_subdir_defaults_to_tasks(self):
+         client = self._make_client()
+         assert client._effective_subdir() == "tasks"

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+project_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+python="$project_root/.venv/bin/python"
+if [ ! -x "$python" ]; then
+    echo "TB2.1 Harbor runtime failed: $python is unavailable" >&2
+    exit 2
+fi
+
+unset PYTHONHOME PYTHONSTARTUP PYTHONUSERBASE VIRTUAL_ENV UV_PROJECT_ENVIRONMENT
+PYTHONNOUSERSITE=1 PYTHONPATH="$project_root/src" exec "$python" \
+    -m evidence_harness_mutation.tb21_harbor_runtime "$@"
