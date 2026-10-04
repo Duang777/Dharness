@@ -894,6 +894,8 @@ def check_artifacts(
                 agent_source_path=agent_source_path,
                 source_revision=source_revision,
             )
+            if "source_revision" in report:
+                rebuilt["source_revision"] = source_revision
             if _dump_json(rebuilt) != _dump_json(report):
                 errors.append("completion isolation experiment report is stale")
         except (OSError, ValueError, json.JSONDecodeError) as exc:
@@ -1041,6 +1043,16 @@ def _tracked_file_revision(path: Path, project_root: Path) -> str:
     return revision
 
 
+def _artifact_source_revision(path: Path, project_root: Path) -> str:
+    _, report = _read_json_object(path)
+    revision = report.get("source_revision")
+    if revision is None:
+        return _tracked_file_revision(path, project_root)
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("completion isolation source revision is invalid")
+    return revision
+
+
 def _relative_project_path(path: Path, project_root: Path) -> str:
     resolved = path.resolve()
     try:
@@ -1152,7 +1164,7 @@ def main() -> int:
             calibration_path=args.calibration,
             report_path=args.report,
             markdown_path=args.markdown,
-            source_revision=_tracked_file_revision(args.report, PROJECT_ROOT),
+            source_revision=_artifact_source_revision(args.report, PROJECT_ROOT),
         )
         if errors:
             for error in errors:

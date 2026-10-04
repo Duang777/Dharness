@@ -68,7 +68,11 @@ def sanitize_tracked_json(root: Path = PROJECT_ROOT) -> tuple[Path, ...]:
     report_path = root / ISOLATION_REPORT
     if report_path.is_file():
         report = json.loads(report_path.read_text(encoding="utf-8"))
-        if _refresh_isolation_result_bindings(report, root):
+        report_changed = _refresh_isolation_result_bindings(report, root)
+        if "source_revision" not in report:
+            report["source_revision"] = _find_report_source_revision(report, root)
+            report_changed = True
+        if report_changed:
             report_path.write_text(_canonical_json(report), encoding="utf-8")
             relative_report = report_path.relative_to(root)
             if relative_report not in changed:
@@ -126,6 +130,34 @@ def _refresh_isolation_result_bindings(report: dict[str, Any], root: Path) -> bo
             sources["result"] = expected
             changed = True
     return changed
+
+
+def _find_report_source_revision(report: dict[str, Any], root: Path) -> str:
+    from evidence_harness.source_binding import archived_runtime_source_binding
+
+    sources = report.get("sources")
+    if not isinstance(sources, dict):
+        raise ValueError("completion isolation report has no source bindings")
+    expected = sources.get("runtime")
+    completed = subprocess.run(
+        (
+            "git",
+            "-C",
+            str(root),
+            "log",
+            "--all",
+            "--format=%H",
+            "--",
+            ISOLATION_REPORT.as_posix(),
+        ),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    for revision in completed.stdout.splitlines():
+        if archived_runtime_source_binding(root, revision) == expected:
+            return revision
+    raise ValueError("cannot identify completion isolation source revision")
 
 
 def _refresh_test_protocol(root: Path) -> Path | None:

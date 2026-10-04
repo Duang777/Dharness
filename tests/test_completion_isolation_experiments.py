@@ -27,6 +27,7 @@ from evidence_harness.protocol import (
 )
 from evidence_harness.source_binding import runtime_source_binding
 from scripts.completion_isolation_experiments import (
+    _artifact_source_revision,
     _dump_json,
     _tracked_file_revision,
     build_experiment_report,
@@ -512,6 +513,9 @@ def test_check_artifacts_uses_report_revision_for_frozen_runtime(tmp_path: Path)
     _git(tmp_path, "commit", "-m", "advance runtime")
 
     assert _tracked_file_revision(report_path, tmp_path) == producer_revision
+    report["source_revision"] = producer_revision
+    report_path.write_bytes(_dump_json(report))
+    assert _artifact_source_revision(report_path, tmp_path) == producer_revision
     assert (
         check_artifacts(
             corpus_path=corpus,

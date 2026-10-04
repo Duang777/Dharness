@@ -279,6 +279,7 @@
     "kind": "prospective_source_bound_replay",
     "statement": "These experiments replay frozen historical candidates and test the new isolation path. They are not fresh full-agent benchmark trials."
   },
+  "source_revision": "289bea40d10e0e94b98b1247617d06a12fc46f52",
   "sources": {
     "calibration": {
       "bytes": 16251,
