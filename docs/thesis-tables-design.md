@@ -161,8 +161,6 @@ campaign 或 reducer 已重跑。
 - 接受 11 个固定输入，以换取完整 binding chain。
 - 接受一个较大的领域模块，以保持公共接口和调用链短。
 - 对缺失的 chronology 或 publication decision 显式报告 unavailable，不推断不存在的事实。
-- 输出发布拒绝目标文件或任一父目录中的符号链接，并通过目录文件描述符创建临时文件和
-  hard link，防止固定输出路径逃逸到仓库外。
 
 ## 风险
 

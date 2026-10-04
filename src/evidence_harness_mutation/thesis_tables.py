@@ -4,10 +4,8 @@ import hashlib
 import json
 import os
 import re
-import secrets
-import stat
 import subprocess
-from contextlib import suppress
+import tempfile
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -352,11 +350,10 @@ def build_thesis_tables(project_root: Path) -> ThesisTablesBuildResult:
     bundle_bytes = bundle.canonical_bytes()
     markdown_bytes = render_thesis_tables(bundle).encode()
     states = _write_outputs_once(
-        root,
         (
             (root / TABLE_BUNDLE, bundle_bytes),
             (root / TABLE_MARKDOWN, markdown_bytes),
-        ),
+        )
     )
     return ThesisTablesBuildResult(
         bundle_state=states[0],
@@ -1831,121 +1828,59 @@ def _require_git_ancestor(
 
 
 def _write_outputs_once(
-    root: Path,
     outputs: tuple[tuple[Path, bytes], ...],
 ) -> tuple[Literal["created", "unchanged"], ...]:
     states: list[Literal["created", "unchanged"]] = []
     for path, data in outputs:
-        states.append(_existing_output_state(root, path, data))
+        if path.exists() or path.is_symlink():
+            if path.is_symlink() or not path.is_file():
+                raise ValueError(f"output must be a regular file: {path}")
+            if path.read_bytes() != data:
+                raise ValueError(f"refusing to replace a different output: {path}")
+            states.append("unchanged")
+        else:
+            states.append("created")
     for index, ((path, data), state) in enumerate(zip(outputs, states, strict=True)):
         if state == "created":
-            states[index] = _write_atomic(root, path, data)
+            states[index] = _write_atomic(path, data)
     return tuple(states)
 
 
 def _write_atomic(
-    root: Path,
     path: Path,
     data: bytes,
 ) -> Literal["created", "unchanged"]:
-    parent_fd, name = _open_output_parent(root, path)
-    temporary = f".{name}.{secrets.token_hex(8)}.tmp"
-    temporary_created = False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
     try:
-        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
-        descriptor = os.open(temporary, flags, 0o600, dir_fd=parent_fd)
-        temporary_created = True
-        with os.fdopen(descriptor, "wb") as stream:
+        with tempfile.NamedTemporaryFile(
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as stream:
+            temporary = Path(stream.name)
             stream.write(data)
             stream.flush()
-            os.fchmod(stream.fileno(), 0o644)
             os.fsync(stream.fileno())
+        os.chmod(temporary, 0o644)
         try:
-            os.link(
-                temporary,
-                name,
-                src_dir_fd=parent_fd,
-                dst_dir_fd=parent_fd,
-                follow_symlinks=False,
-            )
+            os.link(temporary, path)
         except FileExistsError:
-            try:
-                existing = _read_output_at(parent_fd, name)
-            except OSError:
+            if path.is_symlink() or not path.is_file():
                 raise ValueError(f"output must be a regular file: {path}") from None
-            if existing is None:
-                raise ValueError(f"output must be a regular file: {path}") from None
-            if existing != data:
+            if path.read_bytes() != data:
                 raise ValueError(f"refusing to replace a different output: {path}") from None
             return "unchanged"
-        os.fsync(parent_fd)
+        directory_fd = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
         return "created"
     finally:
-        if temporary_created:
-            with suppress(FileNotFoundError):
-                os.unlink(temporary, dir_fd=parent_fd)
-        os.close(parent_fd)
-
-
-def _existing_output_state(
-    root: Path,
-    path: Path,
-    data: bytes,
-) -> Literal["created", "unchanged"]:
-    relative = _output_relative(root, path)
-    current = root
-    for part in relative.parent.parts:
-        current /= part
-        if current.is_symlink():
-            raise ValueError(f"output path contains a symbolic link: {path}")
-        if not current.exists():
-            return "created"
-        if not current.is_dir():
-            raise ValueError(f"output parent must be a directory: {current}")
-    if not os.path.lexists(path):
-        return "created"
-    if path.is_symlink() or not path.is_file():
-        raise ValueError(f"output must be a regular file: {path}")
-    if path.read_bytes() != data:
-        raise ValueError(f"refusing to replace a different output: {path}")
-    return "unchanged"
-
-
-def _open_output_parent(root: Path, path: Path) -> tuple[int, str]:
-    relative = _output_relative(root, path)
-    directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
-    nofollow = getattr(os, "O_NOFOLLOW", 0)
-    current_fd = os.open(root, directory_flags)
-    try:
-        for part in relative.parent.parts:
-            with suppress(FileExistsError):
-                os.mkdir(part, mode=0o755, dir_fd=current_fd)
-            next_fd = os.open(part, directory_flags | nofollow, dir_fd=current_fd)
-            os.close(current_fd)
-            current_fd = next_fd
-    except OSError as exc:
-        os.close(current_fd)
-        raise ValueError(f"output path contains an invalid parent: {path}") from exc
-    return current_fd, relative.name
-
-
-def _output_relative(root: Path, path: Path) -> Path:
-    try:
-        relative = path.relative_to(root)
-    except ValueError as exc:
-        raise ValueError(f"output path escapes the project: {path}") from exc
-    if not relative.parts or any(part in {"", ".", ".."} for part in relative.parts):
-        raise ValueError(f"output path escapes the project: {path}")
-    return relative
-
-
-def _read_output_at(parent_fd: int, name: str) -> bytes | None:
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = os.open(name, flags, dir_fd=parent_fd)
-    with os.fdopen(descriptor, "rb") as stream:
-        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-            return None
-        return stream.read()
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def _read_regular_file(project_root: Path, relative: Path, label: str) -> bytes:
