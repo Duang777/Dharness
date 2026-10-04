@@ -2,7 +2,7 @@
     "id": "dd896459-7155-4ae6-85c0-092dbdcdee49",
     "task_name": "write-compressor",
     "trial_name": "write-compressor__3hTiuiE",
-    "trial_uri": "file:///Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-compressor-final4-20260927/write-compressor__3hTiuiE",
+    "trial_uri": "runs/terminal-bench-2/isolation-exp-compressor-final4-20260927/write-compressor__3hTiuiE",
     "task_id": {
         "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
         "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
@@ -22,7 +22,7 @@
             "source": "terminal-bench"
         },
         "trial_name": "write-compressor__3hTiuiE",
-        "trials_dir": "/Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-compressor-final4-20260927",
+        "trials_dir": "runs/terminal-bench-2/isolation-exp-compressor-final4-20260927",
         "install_only": false,
         "timeout_multiplier": 1.0,
         "agent_timeout_multiplier": 2.0,
@@ -43,10 +43,9 @@
             "load_trajectory": null,
             "extra_allowed_hosts": [],
             "kwargs": {
-                "corpus_path": "/Users/bytedance/develop/harness-4/evaluation/completion-disagreements.json",
-                "journal_path": "/Users/bytedance/develop/harness-4/evaluation/completion-isolation-trials/write-compressor/source-events.jsonl",
-                "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5",
-                "api_base": "https://xpa-relay.bytedance.net/v1"
+                "corpus_path": "evaluation/completion-disagreements.json",
+                "journal_path": "evaluation/completion-isolation-trials/write-compressor/source-events.jsonl",
+                "case_id": "7ce7f787e328e880ea38d90fd40c36416725feb25609c4a55e4aa742f6d225b5"
             },
             "mcp_servers": []
         },

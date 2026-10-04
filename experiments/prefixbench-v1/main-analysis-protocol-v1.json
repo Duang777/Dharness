@@ -70,9 +70,9 @@
       "sha256": "a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb"
     },
     {
-      "bytes": 18041,
+      "bytes": 17987,
       "path": "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-      "sha256": "6cd943d1194d08d25d4674ad5dc92a7e820fd218c0506c691ad288b699ac2e2d"
+      "sha256": "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4"
     }
   ],
   "optional_evidence": {
@@ -111,7 +111,7 @@
   ],
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588909,
+    "bytes": 588730,
     "files": [
       {
         "bytes": 1168,
@@ -209,9 +209,9 @@
         "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
       },
       {
-        "bytes": 71876,
+        "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+        "sha256": "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
       },
       {
         "bytes": 19540,
@@ -219,18 +219,18 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+    "sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
   },
-  "protected_test_source_set_sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a",
+  "protected_test_source_set_sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e",
   "protocol_id": "thesis-main-analysis-v1",
   "protocol_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 91290,
+    "bytes": 91827,
     "files": [
       {
-        "bytes": 18479,
+        "bytes": 18405,
         "path": "docs/thesis-execution-plan.md",
-        "sha256": "677da56c80e7a4212e52b5726d6f1d9420698b502fe22c27f5a9674bb99284ee"
+        "sha256": "f334739a4147bdd44ddccd1eba8191e73dcfa5a0c4bb49eb3cbd335048150fb6"
       },
       {
         "bytes": 24605,
@@ -243,14 +243,14 @@
         "sha256": "27f74bf48c72dcbd65e845842fa43e14c300e1e36690e2eb51d8237998c92008"
       },
       {
-        "bytes": 33655,
+        "bytes": 34073,
         "path": "src/evidence_harness_mutation/main_analysis_protocol.py",
-        "sha256": "988505f51e6f1e49094a33a1e0468f33cc9716b42bc0f6ea174fc24908cd2966"
+        "sha256": "f90e6771cee065ab37e4a6c790494cc7c13255be9167991a0eed875df00a4fac"
       },
       {
-        "bytes": 7609,
+        "bytes": 7802,
         "path": "tests/mutation/test_main_analysis_protocol.py",
-        "sha256": "158ebb41eb4b77c39c494260f6cd4cc8ebaa416802c415dcda648b9df74689b6"
+        "sha256": "17d1c413258835ab30147fd768d5726bee8225c33a3151fac18abc205c244b99"
       },
       {
         "bytes": 3641,
@@ -258,7 +258,7 @@
         "sha256": "58a8c965748a42d800b3447c9e32f44e9b5357916f0ec08a36373fd987f15ead"
       }
     ],
-    "sha256": "529231c28bf045eef39fd70d9a6a77d4270ace7e2497c5dcfc5f0f9eb49bdb58"
+    "sha256": "03253edeed92eb87507a71c5c84afc74ebc376096b26bef4c3983f64ca8ea78a"
   },
   "rq1": {
     "engineering_threshold": "at-least-6-of-7-pairs",

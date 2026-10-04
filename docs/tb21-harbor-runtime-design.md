@@ -16,9 +16,9 @@ executable on `PATH` all come from one installation.
 Run one project-owned command from any directory:
 
 ```bash
-/Users/bytedance/develop/harness-4/tools/harbor-tb21-runtime \
+tools/harbor-tb21-runtime \
   preflight \
-  --tb21-checkout /tmp/harness4-terminal-bench-2-1-5fc7d3b
+  --tb21-checkout "$TB21_CHECKOUT"
 ```
 
 An explicit cache root is useful in CI:

@@ -23,10 +23,10 @@ The CLI exposes the same operations:
 ```bash
 uv run python scripts/tb21_sensitivity.py freeze
 uv run python scripts/tb21_sensitivity.py preflight \
-  --tb21-checkout /absolute/path/to/terminal-bench-2-1
+  --tb21-checkout "$TB21_CHECKOUT"
 uv run python scripts/tb21_sensitivity.py collect \
-  --tb21-checkout /absolute/path/to/terminal-bench-2-1 \
-  --env-file /absolute/path/to/provider.env
+  --tb21-checkout "$TB21_CHECKOUT" \
+  --env-file "$PROVIDER_ENV_FILE"
 uv run python scripts/tb21_sensitivity.py build
 uv run python scripts/tb21_sensitivity.py check
 ```

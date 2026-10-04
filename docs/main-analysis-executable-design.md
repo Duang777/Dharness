@@ -17,21 +17,21 @@ RQ4 的可执行语义。实现只能新增文件，不能修改 held-out protoc
 
 ```bash
 uv run python scripts/thesis_main_analysis.py freeze-executable \
-  --mini-swe-checkout /absolute/path/to/mini-swe-agent \
-  --programbench-checkout /absolute/path/to/programbench
+  --mini-swe-checkout "$MINISWE_CHECKOUT" \
+  --programbench-checkout "$PROGRAMBENCH_CHECKOUT"
 
 uv run python scripts/thesis_main_analysis.py executable-preflight \
-  --mini-swe-checkout /absolute/path/to/mini-swe-agent \
-  --programbench-checkout /absolute/path/to/programbench
+  --mini-swe-checkout "$MINISWE_CHECKOUT" \
+  --programbench-checkout "$PROGRAMBENCH_CHECKOUT"
 
 uv run python scripts/thesis_main_analysis.py build-rq2
 uv run python scripts/thesis_main_analysis.py check-rq2
 uv run python scripts/thesis_main_analysis.py build-rq3
 uv run python scripts/thesis_main_analysis.py check-rq3
 uv run python scripts/thesis_main_analysis.py transfer-collect \
-  --mini-swe-checkout /absolute/path/to/mini-swe-agent \
-  --programbench-checkout /absolute/path/to/programbench \
-  --env-file /absolute/path/to/provider.env
+  --mini-swe-checkout "$MINISWE_CHECKOUT" \
+  --programbench-checkout "$PROGRAMBENCH_CHECKOUT" \
+  --env-file "$PROVIDER_ENV_FILE"
 uv run python scripts/thesis_main_analysis.py build-rq4
 uv run python scripts/thesis_main_analysis.py check-rq4
 uv run python scripts/thesis_main_analysis.py build

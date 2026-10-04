@@ -367,7 +367,7 @@ rosetta error: Unimplemented syscall number 282
 全量恢复阶段为两道 QEMU 题挂载了任务级 Bullseye main 软件源，并使用 Terra 重新运行。
 `qemu-startup` 在 36 turns、35 次环境调用后进入 `verified`；`qemu-alpine-ssh` 在
 40 turns、45 次环境调用后耗尽 Harness 预算，但产物已完成。两题的官方 verifier 均
-以 1/1 通过，canonical reward 都是 1.0。另一次遗漏 `api_base` 的试跑在 turn 0
+以 1/1 通过，canonical reward 都是 1.0。另一次连接参数不完整的试跑在 turn 0
 发生 `model_failure`，属于配置错误，未进入 canonical。
 
 ## Harness 修正
@@ -417,7 +417,7 @@ rosetta error: Unimplemented syscall number 282
   canonical 结果保留每题最终采用的来源，不能视为固定源码的一次性运行。
 - 当前运行位于 Apple Silicon 和 OrbStack。QEMU 任务的表现包含该运行环境的影响。
 - `qemu-alpine-ssh` 和 `qemu-startup` 的早期 verifier 受 Bullseye 包索引影响；修正
-  软件源后，两题的最终 verifier 均通过。遗漏 `api_base` 的试跑已明确排除。
+  软件源后，两题的最终 verifier 均通过。连接参数不完整的试跑已明确排除。
 - provider 成本字段为 0。token 可以复算，实际费用不能从快照推导。
 - 冻结快照保留 allowlist 字段、任务 checksum、Terminal-Bench commit、非敏感 Agent
   参数，以及源结果和源配置 SHA-256。它不包含完整任务输出或模型推理内容。
@@ -456,7 +456,6 @@ uv run python scripts/run_evaluation.py \
 ```bash
 uv run python scripts/run_evaluation.py \
   --model provider/model \
-  --env-file /absolute/path/to/provider.env \
   --include-task-name fix-git \
   --debian-https-sources \
   --n-concurrent 1

@@ -20,8 +20,7 @@
   },
   "cohort": "prefixbench-v1-test",
   "collection": {
-    "agent_kwargs_sha256": "d1f7d9d0eb7d262893939a6f52b7373a8b337b47066d7951eb69fd36334218b5",
-    "api_base": "https://xpa-relay.bytedance.net/v1",
+    "agent_kwargs_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "collector_inputs": "one-fixed-run-root",
     "collector_retry_matrix": "forbidden",
     "completed_results_per_task": 1,
@@ -333,7 +332,7 @@
   "schema_version": 1,
   "source_set": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588909,
+    "bytes": 588730,
     "files": [
       {
         "bytes": 1168,
@@ -431,9 +430,9 @@
         "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
       },
       {
-        "bytes": 71876,
+        "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+        "sha256": "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
       },
       {
         "bytes": 19540,
@@ -441,7 +440,7 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+    "sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
   },
   "split_lineage": {
     "development_matrix": {

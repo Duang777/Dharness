@@ -98,19 +98,19 @@
       "sha256": "a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb"
     },
     {
-      "bytes": 18041,
+      "bytes": 17987,
       "path": "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-      "sha256": "6cd943d1194d08d25d4674ad5dc92a7e820fd218c0506c691ad288b699ac2e2d"
+      "sha256": "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4"
     },
     {
       "bytes": 15012,
       "path": "experiments/prefixbench-v1/main-analysis-protocol-v1.json",
-      "sha256": "8d17c2964b8f9b23b6875b33e5b96b9481ea6eb25c96e52843031d54333829bb"
+      "sha256": "700c7d8432cb41b9aaa71c309887d4597e2570fb19e07c8ad3a0253cfa6a88ed"
     },
     {
       "bytes": 27405,
       "path": "experiments/prefixbench-v1/main-analysis-executable-v1.json",
-      "sha256": "99dc333cc1ed074dd296020f08b5083782ba0b6b5c553faebf24f83d7c507a27"
+      "sha256": "a5935f9d347717c29e2fd32e379988926a72347b6008cb5f7ebcbb98535066f7"
     }
   ],
   "matrix": {
@@ -139,7 +139,7 @@
   ],
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588909,
+    "bytes": 588730,
     "files": [
       {
         "bytes": 1168,
@@ -237,9 +237,9 @@
         "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
       },
       {
-        "bytes": 71876,
+        "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+        "sha256": "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
       },
       {
         "bytes": 19540,
@@ -247,18 +247,18 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+    "sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
   },
-  "protected_test_source_set_sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a",
+  "protected_test_source_set_sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e",
   "protocol_id": "thesis-tb21-sensitivity-v1",
   "protocol_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 74923,
+    "bytes": 75762,
     "files": [
       {
-        "bytes": 8600,
+        "bytes": 8524,
         "path": "docs/tb21-sensitivity-protocol-design.md",
-        "sha256": "760fd8404615d57db01978448c57eb062d2a7ef80418aec2bec8b406028cd183"
+        "sha256": "4a0e2063c4c1ca2ce81c52b47c1dca33dd0e5f14592fa6dd50f6eaa490b1d4d6"
       },
       {
         "bytes": 5252,
@@ -266,9 +266,9 @@
         "sha256": "3f6e6c4ff99a00c3045bbedf3e53e5605e40e28cce6e28ecedd9509d2a7d7f61"
       },
       {
-        "bytes": 45575,
+        "bytes": 46490,
         "path": "src/evidence_harness_mutation/tb21_sensitivity_protocol.py",
-        "sha256": "baf5deb7ee93b004cb43d6931a15cc47859ace30a20086e024a7bb31174c8817"
+        "sha256": "64776045421e27c8fbbb2f5ba4f299a2a898bb8a8e14ba957cbe02017dd03995"
       },
       {
         "bytes": 10621,
@@ -281,7 +281,7 @@
         "sha256": "633fe48876e229d61b84cc58e21d7cb8af9f6eefa85715a83ce50c01f199a791"
       }
     ],
-    "sha256": "39846ddc6e15d50f349145285a9a645d534e1a02a115524857a25d86535ae214"
+    "sha256": "ca58c3059dbf95138dc98cde61a4830fdcb84b86d032eeb5c1bed1aa7cd75d0f"
   },
   "schema_version": 1,
   "separation": {

@@ -2,7 +2,7 @@
     "id": "e9a774f4-e04d-47a8-a6e9-aa2c0be23368",
     "task_name": "fix-ocaml-gc",
     "trial_name": "fix-ocaml-gc__RMkgTk8",
-    "trial_uri": "file:///Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-ocaml-final4-20260927/fix-ocaml-gc__RMkgTk8",
+    "trial_uri": "runs/terminal-bench-2/isolation-exp-ocaml-final4-20260927/fix-ocaml-gc__RMkgTk8",
     "task_id": {
         "git_url": "https://github.com/laude-institute/terminal-bench-2.git",
         "git_commit_id": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
@@ -22,7 +22,7 @@
             "source": "terminal-bench"
         },
         "trial_name": "fix-ocaml-gc__RMkgTk8",
-        "trials_dir": "/Users/bytedance/develop/harness-4/runs/terminal-bench-2/isolation-exp-ocaml-final4-20260927",
+        "trials_dir": "runs/terminal-bench-2/isolation-exp-ocaml-final4-20260927",
         "install_only": false,
         "timeout_multiplier": 1.0,
         "agent_timeout_multiplier": 2.0,
@@ -43,10 +43,9 @@
             "load_trajectory": null,
             "extra_allowed_hosts": [],
             "kwargs": {
-                "corpus_path": "/Users/bytedance/develop/harness-4/evaluation/completion-disagreements.json",
-                "journal_path": "/Users/bytedance/develop/harness-4/evaluation/completion-isolation-trials/fix-ocaml-gc/source-events.jsonl",
-                "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685",
-                "api_base": "https://xpa-relay.bytedance.net/v1"
+                "corpus_path": "evaluation/completion-disagreements.json",
+                "journal_path": "evaluation/completion-isolation-trials/fix-ocaml-gc/source-events.jsonl",
+                "case_id": "2399a3285b05055cefe0ecd37cab4ca6e214b1bffe5c6d7df02c825ab3305685"
             },
             "mcp_servers": []
         },

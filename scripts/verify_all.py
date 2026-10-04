@@ -13,6 +13,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 STATIC_GATES = (
+    (
+        "Repository hygiene",
+        ("uv", "run", "python", "scripts/check_repository_hygiene.py"),
+    ),
     ("Ruff lint", ("uv", "run", "ruff", "check", ".")),
     ("Ruff format", ("uv", "run", "ruff", "format", "--check", ".")),
     ("mypy", ("uv", "run", "mypy", "src", "scripts", "tests")),

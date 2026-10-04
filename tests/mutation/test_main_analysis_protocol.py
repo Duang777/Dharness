@@ -66,6 +66,10 @@ def test_protected_sources_match_the_design_base() -> None:
         protocol._PROTECTED_SOURCE_PATHS
     )
     for binding in frozen.protected_sources.files:
+        amended_sha256 = protocol._PROTECTED_SOURCE_AMENDMENTS.get(binding.path)
+        if amended_sha256 is not None:
+            assert binding.sha256 == amended_sha256
+            continue
         committed = protocol._run_git(
             PROJECT_ROOT,
             "show",

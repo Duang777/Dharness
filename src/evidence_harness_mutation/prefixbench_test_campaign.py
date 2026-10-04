@@ -60,7 +60,6 @@ TEST_PROGRESS = TEST_RUN_ROOT / "progress.jsonl"
 DEVELOPMENT_PROTOCOL = Path("experiments/prefixbench-v1/mutation-protocol-v1.json")
 
 TEST_MODEL = "openai/modelhub/gpt-5.6-terra"
-TEST_API_BASE = "https://xpa-relay.bytedance.net/v1"
 
 _FROZEN_TEST_TASK_ORDER = (
     "bn-fit-modify",
@@ -352,7 +351,6 @@ class PrefixBenchTestArtifactPaths(FrozenModel):
 
 class PrefixBenchTestCollectionProtocol(FrozenModel):
     model: Literal["openai/modelhub/gpt-5.6-terra"] = "openai/modelhub/gpt-5.6-terra"
-    api_base: Literal["https://xpa-relay.bytedance.net/v1"] = "https://xpa-relay.bytedance.net/v1"
     profile: Literal["prefixbench-v1"] = "prefixbench-v1"
     journal_schema_version: Literal[2] = 2
     execution: Literal["sequential-matrix-order-one-task-jobs"] = (
@@ -1667,7 +1665,7 @@ def _orchestration_source_sha256(project_root: Path) -> str:
 
 def _agent_kwargs_sha256() -> str:
     payload = json.dumps(
-        [f"api_base={TEST_API_BASE}"],
+        [],
         separators=(",", ":"),
         ensure_ascii=True,
     )

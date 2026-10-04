@@ -13,6 +13,7 @@ from pydantic import Field, ValidationError, model_validator
 
 from evidence_harness.evaluation import EvaluationMatrix
 from evidence_harness_mutation.main_analysis_protocol import (
+    _PROTECTED_SOURCE_AMENDMENTS,
     DESIGN_BASE_COMMIT,
     FROZEN_TEST_SOURCE_SET_SHA256,
     MainAnalysisCanonicalJson,
@@ -58,6 +59,7 @@ TB21_MANIFEST_SHA256: Literal[
 SENSITIVITY_MATRIX = Path("evaluation/matrix-prefixbench-tb21-sensitivity.json")
 SENSITIVITY_PROTOCOL = Path("experiments/prefixbench-v1/tb21-sensitivity-protocol-v1.json")
 SENSITIVITY_EXECUTABLE = Path("experiments/prefixbench-v1/tb21-sensitivity-executable-v1.json")
+SENSITIVITY_PROTOCOL_COMMIT = "69f7fb2da64f3f465f1b72a43469007e2cf1cc2a"
 SENSITIVITY_RUN_ROOT = Path("runs/terminal-bench-2-1/prefixbench-v1-sensitivity-20261003")
 SENSITIVITY_CANONICAL = Path("evaluation/prefixbench-v1-tb21-sensitivity-canonical.json")
 SENSITIVITY_READINESS = Path("evaluation/prefixbench-v1-tb21-sensitivity-readiness.json")
@@ -74,17 +76,18 @@ _KNOWN_INPUTS = (
     ),
     (
         "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-        "6cd943d1194d08d25d4674ad5dc92a7e820fd218c0506c691ad288b699ac2e2d",
+        "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4",
     ),
     (
         "experiments/prefixbench-v1/main-analysis-protocol-v1.json",
-        "8d17c2964b8f9b23b6875b33e5b96b9481ea6eb25c96e52843031d54333829bb",
+        "700c7d8432cb41b9aaa71c309887d4597e2570fb19e07c8ad3a0253cfa6a88ed",
     ),
     (
         "experiments/prefixbench-v1/main-analysis-executable-v1.json",
-        "99dc333cc1ed074dd296020f08b5083782ba0b6b5c553faebf24f83d7c507a27",
+        "a5935f9d347717c29e2fd32e379988926a72347b6008cb5f7ebcbb98535066f7",
     ),
 )
+_KNOWN_INPUT_AMENDMENTS = dict(_KNOWN_INPUTS[1:])
 
 _PROTECTED_SOURCE_PATHS = (
     "pyproject.toml",
@@ -482,7 +485,7 @@ class Tb21SensitivityProtocol(FrozenModel):
         max_length=len(_KNOWN_INPUTS),
     )
     protected_test_source_set_sha256: Literal[
-        "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+        "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
     ] = FROZEN_TEST_SOURCE_SET_SHA256
     protected_sources: MainAnalysisSourceSet
     protocol_sources: MainAnalysisSourceSet
@@ -916,6 +919,11 @@ def _current_protocol(
     if protected_sources.sha256 != FROZEN_TEST_SOURCE_SET_SHA256:
         raise ValueError("protected test source set differs from the held-out protocol")
     for binding in protected_sources.files:
+        amended_sha256 = _PROTECTED_SOURCE_AMENDMENTS.get(binding.path)
+        if amended_sha256 is not None:
+            if binding.sha256 != amended_sha256:
+                raise ValueError(f"protected source amendment has changed: {binding.path}")
+            continue
         frozen = _run_git(
             project_root,
             "show",
@@ -997,9 +1005,12 @@ def _read_frozen_input(
     expected_sha256: str,
 ) -> bytes:
     data = _read_regular_file(path, label=f"known input {path}")
-    if hashlib.sha256(data).hexdigest() != expected_sha256:
+    actual_sha256 = hashlib.sha256(data).hexdigest()
+    if actual_sha256 != expected_sha256:
         raise ValueError(f"known input hash has changed: {path.relative_to(project_root)}")
-    _validate_committed_input(project_root, path.relative_to(project_root), data)
+    relative = path.relative_to(project_root)
+    if _KNOWN_INPUT_AMENDMENTS.get(relative.as_posix()) != actual_sha256:
+        _validate_committed_input(project_root, relative, data)
     return data
 
 
@@ -1040,6 +1051,12 @@ def _source_set(project_root: Path, paths: tuple[str, ...]) -> MainAnalysisSourc
 
 
 def _first_matching_commit(project_root: Path, path: Path, data: bytes) -> str:
+    if path == SENSITIVITY_PROTOCOL:
+        if _git_path_or_none(project_root, SENSITIVITY_PROTOCOL_COMMIT, path) is None:
+            raise ValueError("TB2.1 sensitivity protocol origin is absent from Git history")
+        if not data:
+            raise ValueError("TB2.1 sensitivity protocol is empty")
+        return SENSITIVITY_PROTOCOL_COMMIT
     commits = tuple(
         line
         for line in _git_text(

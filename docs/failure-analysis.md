@@ -362,7 +362,7 @@ rosetta error: Unimplemented syscall number 282
 重新评分。前者在 36 turns、35 次环境调用后进入 `verified`，后者在 40 turns、45 次
 环境调用后达到预算边界；两题的官方 verifier 都以 1/1 通过，最终 reward 均为 1.0。
 
-第一次全量 QEMU 重跑遗漏了 `api_base`，两题均在 turn 0 以 `model_failure` 结束。该次
+第一次全量 QEMU 重跑的连接参数不完整，两题均在 turn 0 以 `model_failure` 结束。该次
 运行是无效配置探测，未进入 canonical。最终清单只选择配置完整的
 `full89-terra-qemu-rescore2-20260927` 结果。
 

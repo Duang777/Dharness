@@ -156,17 +156,7 @@ uv sync --python 3.12
 docker info
 ```
 
-项目固定 `harbor==0.23.0`。模型凭证放在供应商环境变量或仓库外的 env 文件中；不要把
-key 写入命令、README 或 Git。
-
-创建权限为 `0600` 的临时 env 文件：
-
-```bash
-umask 077
-read -rs EVIDENCE_HARNESS_KEY
-printf 'OPENAI_API_KEY=%s\n' "$EVIDENCE_HARNESS_KEY" > /tmp/evidence-harness.env
-unset EVIDENCE_HARNESS_KEY
-```
+项目固定 `harbor==0.23.0`。运行时凭证由进程环境提供，不写入命令、README 或 Git。
 
 ## 运行评测
 
@@ -194,7 +184,6 @@ uv run python scripts/run_evaluation.py \
 ```bash
 uv run python scripts/run_evaluation.py \
   --model provider/model \
-  --env-file /absolute/path/to/provider.env \
   --debian-https-sources
 ```
 
@@ -204,17 +193,11 @@ uv run python scripts/run_evaluation.py \
 ```bash
 uv run python scripts/run_evaluation.py \
   --matrix evaluation/matrix-20.json \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /tmp/evidence-harness.env \
+  --model provider/model \
   --debian-https-sources \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
   --agent-kwarg max_output_tokens=8192 \
   --agent-kwarg max_model_call_timeout_sec=360
 ```
-
-`api_base` 必须停在 `/v1`。LiteLLM 会追加 `/chat/completions`，因此不要把完整请求路径
-传给 `api_base`。`openai/` 是 LiteLLM provider 前缀，实际发送的模型名仍是
-`modelhub/gpt-5.6-terra`。
 
 全量 89 题使用可恢复的串行编排器。每题保存为独立 Harbor job；进程中断后，用相同
 `--run-name` 重启命令，编排器会根据 trial 的 `result.json` 跳过已完成任务：
@@ -222,10 +205,8 @@ uv run python scripts/run_evaluation.py \
 ```bash
 uv run python scripts/run_full_evaluation.py \
   --matrix evaluation/matrix-89.json \
-  --run-name full89-terra-20260925 \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /tmp/evidence-harness.env \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
+  --run-name full89-provider-20260925 \
+  --model provider/model \
   --agent-kwarg max_output_tokens=8192 \
   --agent-kwarg max_model_call_timeout_sec=360
 ```
@@ -258,9 +239,8 @@ provider env，也不启动任务：
 ```bash
 uv run python scripts/run_evaluation.py \
   --matrix evaluation/matrix-prefixbench-development.json \
-  --model openai/modelhub/gpt-5.6-terra \
+  --model provider/model \
   --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
   --dry-run
 ```
 
@@ -271,10 +251,8 @@ uv run python scripts/run_evaluation.py \
 uv run python scripts/run_full_evaluation.py \
   --matrix evaluation/matrix-prefixbench-development.json \
   --run-name prefixbench-v1-development-20261002 \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /absolute/path/to/provider.env \
-  --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+  --model provider/model \
+  --collection-profile prefixbench-v1
 ```
 
 该 matrix 只含固定的 28 题 development cohort，不包含 61 题 test cohort。采集完成后，
@@ -361,18 +339,15 @@ uv run python scripts/prefixbench_test_campaign.py preflight
 ```bash
 uv run python scripts/run_evaluation.py \
   --matrix evaluation/matrix-prefixbench-test.json \
-  --model openai/modelhub/gpt-5.6-terra \
+  --model provider/model \
   --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
   --dry-run
 
 uv run python scripts/run_full_evaluation.py \
   --matrix evaluation/matrix-prefixbench-test.json \
   --run-name prefixbench-v1-test-20261002 \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /absolute/path/to/provider.env \
-  --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+  --model provider/model \
+  --collection-profile prefixbench-v1
 ```
 
 中断后只允许用完全相同的命令恢复。已完成任务不会因 reward、status 或 exception
@@ -480,7 +455,7 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
   严格的一次性 pass@1。
 - `qemu-alpine-ssh` 和 `qemu-startup` 的早期 verifier 都遇到 Bullseye 包索引问题。
   使用任务级 Bullseye main 源重跑后，两题的官方 verifier 均以 1/1 通过；一次遗漏
-  `api_base` 的无效试跑已从 canonical 排除。
+  连接参数的无效试跑已从 canonical 排除。
 - 三个安全任务被供应商 `cyber_policy` 拒绝。它们反映当前模型通道的策略边界。
 - 冻结快照保留 allowlist 字段、模型与非敏感参数、reward、Harness 元数据、任务
   checksum、Terminal-Bench commit，以及原始结果和配置的 SHA-256。完整命令输出仍

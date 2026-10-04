@@ -301,12 +301,11 @@ uv run python scripts/prefixbench_test_campaign.py preflight
 
 ```bash
 uv run python scripts/run_full_evaluation.py \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /absolute/path/to/provider.env \
+  --model provider/model \
+  --env-file "$PROVIDER_ENV_FILE" \
   --matrix evaluation/matrix-prefixbench-test.json \
   --run-name prefixbench-v1-test-20261002 \
-  --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+  --collection-profile prefixbench-v1
 ```
 
 同一命令可恢复中断。不要为已经完成的任务创建第二个结果。
@@ -429,14 +428,15 @@ uv run python scripts/thesis_main_analysis.py check-rq3
 
 ```bash
 uv run python scripts/thesis_main_analysis.py transfer-preflight \
-  --mini-swe-checkout /absolute/path/to/mini-swe-agent
+  --mini-swe-checkout "$MINISWE_CHECKOUT" \
+  --programbench-checkout "$PROGRAMBENCH_CHECKOUT"
 
 uv run python scripts/thesis_main_analysis.py transfer-collect \
-  --mini-swe-checkout /absolute/path/to/mini-swe-agent \
-  --env-file /absolute/path/to/provider.env
+  --mini-swe-checkout "$MINISWE_CHECKOUT" \
+  --programbench-checkout "$PROGRAMBENCH_CHECKOUT" \
+  --env-file "$PROVIDER_ENV_FILE"
 
-uv run python scripts/thesis_main_analysis.py build-rq4 \
-  --mini-swe-checkout /absolute/path/to/mini-swe-agent
+uv run python scripts/thesis_main_analysis.py build-rq4
 uv run python scripts/thesis_main_analysis.py check-rq4
 ```
 

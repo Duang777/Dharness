@@ -51,10 +51,9 @@ task:
 
 ```bash
 uv run python scripts/run_evaluation.py \
-  --model openai/modelhub/gpt-5.6-terra \
+  --model provider/model \
   --matrix evaluation/matrix-prefixbench-development.json \
   --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1 \
   --dry-run
 ```
 
@@ -62,12 +61,11 @@ Run a resumable collection only after reviewing the dry-run output:
 
 ```bash
 uv run python scripts/run_full_evaluation.py \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /absolute/path/to/provider.env \
+  --model provider/model \
+  --env-file "$PROVIDER_ENV_FILE" \
   --matrix evaluation/matrix-prefixbench-development.json \
   --run-name prefixbench-v1-development-20261002 \
-  --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+  --collection-profile prefixbench-v1
 ```
 
 The frozen test run uses the same model, profile, and connection options with:

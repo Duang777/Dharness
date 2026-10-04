@@ -39,12 +39,11 @@ Run the registered collection:
 
 ```bash
 uv run python scripts/run_full_evaluation.py \
-  --model openai/modelhub/gpt-5.6-terra \
-  --env-file /absolute/path/to/provider.env \
+  --model provider/model \
+  --env-file "$PROVIDER_ENV_FILE" \
   --matrix evaluation/matrix-prefixbench-test.json \
   --run-name prefixbench-v1-test-20261002 \
-  --collection-profile prefixbench-v1 \
-  --agent-kwarg api_base=https://xpa-relay.bytedance.net/v1
+  --collection-profile prefixbench-v1
 ```
 
 Resume with the same command after an interruption. A completed result is

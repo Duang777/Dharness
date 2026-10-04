@@ -23,7 +23,6 @@
       "model_name": "openai/modelhub/gpt-5.6-terra",
       "name": "evidence_harness.harbor_agent:EvidenceHarnessAgent",
       "options": {
-        "api_base": "https://xpa-relay.bytedance.net/v1",
         "max_environment_calls": 80,
         "max_turns": 40,
         "max_wall_time_sec": 1800,

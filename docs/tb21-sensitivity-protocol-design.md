@@ -97,8 +97,8 @@ one trailing newline
 
 ```bash
 uv run python scripts/tb21_sensitivity_protocol.py freeze \
-  --tb20-checkout /absolute/path/to/terminal-bench-2 \
-  --tb21-checkout /absolute/path/to/terminal-bench-2-1
+  --tb20-checkout "$TB20_CHECKOUT" \
+  --tb21-checkout "$TB21_CHECKOUT"
 ```
 
 提交后执行纯仓库检查：
@@ -111,8 +111,8 @@ uv run python scripts/tb21_sensitivity_protocol.py check
 
 ```bash
 uv run python scripts/tb21_sensitivity_protocol.py preflight \
-  --tb20-checkout /absolute/path/to/terminal-bench-2 \
-  --tb21-checkout /absolute/path/to/terminal-bench-2-1
+  --tb20-checkout "$TB20_CHECKOUT" \
+  --tb21-checkout "$TB21_CHECKOUT"
 ```
 
 `preflight` 只声明 `ready_for_executable_freeze=true`。它必须同时声明

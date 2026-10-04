@@ -51,12 +51,12 @@
   },
   "implementation_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 147043,
+    "bytes": 146993,
     "files": [
       {
-        "bytes": 7147,
+        "bytes": 7097,
         "path": "docs/tb21-sensitivity-executable-design.md",
-        "sha256": "543821c586d163ee87a258008da55e73b64d4dd082de2b874cac98722608ed1a"
+        "sha256": "c2514cf6d2061c9c65cb1cccc3336133a2315e949cc3309218624d2b47a8b5d4"
       },
       {
         "bytes": 5908,
@@ -104,11 +104,11 @@
         "sha256": "34048d400037b87bd94bb5a05ef7240ec6f26d1adc35271c6ccb91acae140a54"
       }
     ],
-    "sha256": "d2e7e22ae027cf23a35970dd383617273a4ba68f3d8c0bd83cd5715285a09b78"
+    "sha256": "b32d487c60246ffd138c0de8e6bdb5caa705d4c38c110191c78a410ce42116ca"
   },
   "imported_kernel_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 129278,
+    "bytes": 129696,
     "files": [
       {
         "bytes": 33295,
@@ -116,9 +116,9 @@
         "sha256": "a1ae8adedb5d763a954986b45b300cc6e72ade2f5e1b912c4d771fdfed8e78e4"
       },
       {
-        "bytes": 33655,
+        "bytes": 34073,
         "path": "src/evidence_harness_mutation/main_analysis_protocol.py",
-        "sha256": "988505f51e6f1e49094a33a1e0468f33cc9716b42bc0f6ea174fc24908cd2966"
+        "sha256": "f90e6771cee065ab37e4a6c790494cc7c13255be9167991a0eed875df00a4fac"
       },
       {
         "bytes": 48198,
@@ -131,7 +131,7 @@
         "sha256": "6e16ade6db5b2f9af7d42ea6172176657ee69afc3824194fe2c9697da6f06a75"
       }
     ],
-    "sha256": "3573bba4f4155035f2563be1b92ccf08c72390d516a515fbc166229fbb0ca585"
+    "sha256": "099aa0de016b181263282bb3c5248e2d1f0d321935018127936e4689083274b1"
   },
   "matrix": {
     "bytes": 73376,
@@ -140,7 +140,7 @@
   },
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588909,
+    "bytes": 588730,
     "files": [
       {
         "bytes": 1168,
@@ -238,9 +238,9 @@
         "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
       },
       {
-        "bytes": 71876,
+        "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+        "sha256": "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
       },
       {
         "bytes": 19540,
@@ -248,12 +248,12 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+    "sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
   },
   "protocol": {
     "bytes": 11665,
     "path": "experiments/prefixbench-v1/tb21-sensitivity-protocol-v1.json",
-    "sha256": "5a0fd32597a7bd233189cfbcea51b93c78f46296c9dd7871b55bcd34ae8017d5"
+    "sha256": "0100d728ec49d8c60fbdfd418d865cd43049bf5a35f5c66247b29333000b9936"
   },
   "protocol_commit": "69f7fb2da64f3f465f1b72a43469007e2cf1cc2a",
   "randomness": {

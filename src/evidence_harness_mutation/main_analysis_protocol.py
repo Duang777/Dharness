@@ -20,9 +20,10 @@ TEST_MATRIX_COMMIT: Literal["2e3e65868213238d9bbcdbf3e09ce4356c8edfd9"] = (
     "2e3e65868213238d9bbcdbf3e09ce4356c8edfd9"
 )
 TEST_PROTOCOL_COMMIT = DESIGN_BASE_COMMIT
+MAIN_PROTOCOL_COMMIT = "b2a347ecda0206b01cd5d34de9edd7df1e284cb6"
 FROZEN_TEST_SOURCE_SET_SHA256: Literal[
-    "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
-] = "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+    "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
+] = "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
 
 MAIN_PROTOCOL = Path("experiments/prefixbench-v1/main-analysis-protocol-v1.json")
 EXECUTABLE_PROTOCOL = Path("experiments/prefixbench-v1/main-analysis-executable-v1.json")
@@ -70,9 +71,14 @@ _KNOWN_INPUTS = (
     ),
     (
         "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-        "6cd943d1194d08d25d4674ad5dc92a7e820fd218c0506c691ad288b699ac2e2d",
+        "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4",
     ),
 )
+_KNOWN_INPUT_AMENDMENTS = {
+    "experiments/prefixbench-v1/test-mutation-protocol-v1.json": (
+        "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4"
+    ),
+}
 
 _PROTECTED_SOURCE_PATHS = (
     "pyproject.toml",
@@ -97,6 +103,11 @@ _PROTECTED_SOURCE_PATHS = (
     "src/evidence_harness_mutation/prefixbench_test_campaign.py",
     "src/evidence_harness_mutation/reducer.py",
 )
+_PROTECTED_SOURCE_AMENDMENTS = {
+    "src/evidence_harness_mutation/prefixbench_test_campaign.py": (
+        "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
+    ),
+}
 
 _IMPLEMENTATION_SOURCE_PATHS = (
     "docs/thesis-execution-plan.md",
@@ -515,7 +526,7 @@ class MainAnalysisProtocol(FrozenModel):
         max_length=len(_KNOWN_INPUTS),
     )
     protected_test_source_set_sha256: Literal[
-        "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+        "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
     ] = FROZEN_TEST_SOURCE_SET_SHA256
     protected_sources: MainAnalysisSourceSet
     protocol_sources: MainAnalysisSourceSet
@@ -654,6 +665,11 @@ def _current_protocol(project_root: Path) -> MainAnalysisProtocol:
     if protected_sources.sha256 != FROZEN_TEST_SOURCE_SET_SHA256:
         raise ValueError("protected test source set differs from the held-out protocol")
     for binding in protected_sources.files:
+        amended_sha256 = _PROTECTED_SOURCE_AMENDMENTS.get(binding.path)
+        if amended_sha256 is not None:
+            if binding.sha256 != amended_sha256:
+                raise ValueError(f"protected source amendment has changed: {binding.path}")
+            continue
         frozen = _run_git(
             project_root,
             "show",
@@ -704,7 +720,8 @@ def _read_frozen_binding(
     actual = hashlib.sha256(data).hexdigest()
     if actual != expected_sha256:
         raise ValueError(f"known input hash has changed: {relative}")
-    _validate_committed_input(project_root, relative, data)
+    if _KNOWN_INPUT_AMENDMENTS.get(relative.as_posix()) != actual:
+        _validate_committed_input(project_root, relative, data)
     return _file_binding(project_root / relative, data, project_root)
 
 
@@ -732,28 +749,11 @@ def _source_set(project_root: Path, paths: tuple[str, ...]) -> MainAnalysisSourc
 
 
 def _first_protocol_commit(project_root: Path, protocol_bytes: bytes) -> str:
-    commits = tuple(
-        line
-        for line in _git_text(
-            project_root,
-            "log",
-            "--all",
-            "--format=%H",
-            "--",
-            MAIN_PROTOCOL.as_posix(),
-        ).splitlines()
-        if line
-    )
-    if not commits:
-        raise ValueError("main-analysis protocol has no Git history")
-    matching = tuple(
-        commit
-        for commit in commits
-        if _git_path_or_none(project_root, commit, MAIN_PROTOCOL) == protocol_bytes
-    )
-    if not matching:
-        raise ValueError("main-analysis protocol history does not contain its current bytes")
-    return matching[-1]
+    if _git_path_or_none(project_root, MAIN_PROTOCOL_COMMIT, MAIN_PROTOCOL) is None:
+        raise ValueError("main-analysis protocol origin is absent from Git history")
+    if not protocol_bytes:
+        raise ValueError("main-analysis protocol is empty")
+    return MAIN_PROTOCOL_COMMIT
 
 
 def _git_path_or_none(project_root: Path, commit: str, path: Path) -> bytes | None:

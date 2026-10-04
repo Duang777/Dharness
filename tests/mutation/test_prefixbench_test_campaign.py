@@ -265,7 +265,7 @@ def test_protocol_freezes_held_out_contract_without_a_producer_revision() -> Non
     assert protocol.task_order == campaign._FROZEN_TEST_TASK_ORDER
     assert protocol.matrix.sha256 == campaign.FROZEN_TEST_MATRIX_SHA256
     assert protocol.collection.model == campaign.TEST_MODEL
-    assert protocol.collection.api_base == campaign.TEST_API_BASE
+    assert "api_base" not in payload["collection"]
     assert (
         protocol.collection.orchestration_source_sha256
         == "868d63fb26011ddd692f8b04f7b3bea0072ad5ddbd3086200e442280c55f1e0c"

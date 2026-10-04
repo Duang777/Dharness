@@ -66,9 +66,9 @@
           "sha256": "ec5bd256aa7727e2aeb70af131c799a7591d08b9321e0c3d08f0e30684ec4fab"
         },
         "result": {
-          "bytes": 14695,
+          "bytes": 14483,
           "path": "evaluation/completion-isolation-trials/crack-7z-hash/result.json",
-          "sha256": "ac13733ab51edafeebb5254e68f242ec945ee3d13aa92d24c386fa6bc90d6041"
+          "sha256": "d52e7c7cf29bc24a6db7fc29203e371b8280eb3133154ccb79849003045c0ec4"
         },
         "source_journal": {
           "bytes": 436180,
@@ -158,9 +158,9 @@
           "sha256": "be61b24c9c9a7e39f600f0ead4bb013b8889033d2fe82307295e8fba94adf307"
         },
         "result": {
-          "bytes": 14851,
+          "bytes": 14639,
           "path": "evaluation/completion-isolation-trials/fix-ocaml-gc/result.json",
-          "sha256": "99c00ae1b54090795488347432a15da067c8e541deb5ede4b358d9e1693da7b1"
+          "sha256": "37f01726247eba0cf5b6b0b6cdb85fbc9b3d9b7bc371b8753409579b1dd2a05c"
         },
         "source_journal": {
           "bytes": 416392,
@@ -248,9 +248,9 @@
           "sha256": "a4fd12654ec02ec9952455743171f3be5db77aa5608d3cf12a89be1fe030f08b"
         },
         "result": {
-          "bytes": 14214,
+          "bytes": 14002,
           "path": "evaluation/completion-isolation-trials/write-compressor/result.json",
-          "sha256": "7015da50e7ad9b39cc5f077616331fae0bc3e0c70dbb3f76de137029b2a0fa3f"
+          "sha256": "be099be940bec29e606e03e84fdbe78d0757ec35d72774175fe53302a0f4dd98"
         },
         "source_journal": {
           "bytes": 292248,

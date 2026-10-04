@@ -192,12 +192,12 @@
   "executable_id": "thesis-main-analysis-executable-v1",
   "implementation_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 260582,
+    "bytes": 260515,
     "files": [
       {
-        "bytes": 8937,
+        "bytes": 8870,
         "path": "docs/main-analysis-executable-design.md",
-        "sha256": "fda10f3e22c3aada0b3c852ccac8cb11547aa2e47ef8d61ded04916b755c763c"
+        "sha256": "8c5643c8c580833d9b2da0dd1b7c8577e4fa0cae54d716c6af8d049d26dbfae6"
       },
       {
         "bytes": 9296,
@@ -285,7 +285,7 @@
         "sha256": "4f4a3cfa4b1c57003555297ae501e1d5993e5e3c79ec2488944c6f60aa596d91"
       }
     ],
-    "sha256": "e5e5c9c4bda51b1819bfc41a99fdf5f4047f963934aeccc2e7e06fa8bfd4d474"
+    "sha256": "52b9658a336173a434e5300fecb71ff25045235df07d8a0d7fd73e5c678aa5cb"
   },
   "mini_swe": {
     "commit": "04d809ceab9df28f9adaed044884180159172930",
@@ -519,7 +519,7 @@
   },
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588909,
+    "bytes": 588730,
     "files": [
       {
         "bytes": 1168,
@@ -617,9 +617,9 @@
         "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
       },
       {
-        "bytes": 71876,
+        "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "74035528858ed8a65b0741ac0da11976f9646de157e838353f68d185b5d0f796"
+        "sha256": "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
       },
       {
         "bytes": 19540,
@@ -627,12 +627,12 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "f1080f463e733f41fd6c27fd6c95d2622837759907999a3bc629ed458de1be9a"
+    "sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
   },
   "protocol": {
     "bytes": 15012,
     "path": "experiments/prefixbench-v1/main-analysis-protocol-v1.json",
-    "sha256": "8d17c2964b8f9b23b6875b33e5b96b9481ea6eb25c96e52843031d54333829bb"
+    "sha256": "700c7d8432cb41b9aaa71c309887d4597e2570fb19e07c8ad3a0253cfa6a88ed"
   },
   "protocol_commit": "b2a347ecda0206b01cd5d34de9edd7df1e284cb6",
   "rules": {
