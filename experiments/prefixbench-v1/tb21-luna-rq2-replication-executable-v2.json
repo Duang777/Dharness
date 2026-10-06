@@ -1,0 +1,321 @@
+{
+  "artifacts": {
+    "dependencies": [
+      "raw->canonical",
+      "canonical->readiness",
+      "readiness->campaign",
+      "campaign->luna-rq2-report"
+    ],
+    "paths": [
+      "runs/terminal-bench-2-1/prefixbench-v1-luna-rq2-replication-v2",
+      "evaluation/prefixbench-v1-tb21-luna-rq2-canonical-v2.json",
+      "evaluation/prefixbench-v1-tb21-luna-rq2-readiness-v2.json",
+      "evaluation/prefixbench-v1-tb21-luna-rq2-offline-campaign-v2.json",
+      "evaluation/thesis-tb21-luna-rq2-replication-v2.json"
+    ]
+  },
+  "canonical_json": "ensure-ascii-indent-2-sort-keys-trailing-newline",
+  "cohort": {
+    "bytes": 73376,
+    "path": "evaluation/matrix-prefixbench-tb21-sensitivity.json",
+    "sha256": "ed28553b354067496eabf75d0eb09e00a2a4d28e10183c48806d1666323e8a50"
+  },
+  "collector": {
+    "attempts_per_launch": 1,
+    "collection_profile": "prefixbench-v1",
+    "concurrency": 1,
+    "control_plane_source": "installed-executable-wheel",
+    "credential_transport": "inherited-environment-only",
+    "debian_source_mounts": "inherit-frozen-tb20-task-map",
+    "env_file": "forbidden",
+    "harbor_agent_source": "executable-project-root-src-prepended-to-child-pythonpath",
+    "harbor_max_retries": 0,
+    "model": "openai/modelhub/gpt-5.6-luna",
+    "model_evidence": "saved-config-plus-result-config-plus-model-info",
+    "order": "cohort-order",
+    "provider_environment": [
+      "OPENAI_API_KEY",
+      "OPENAI_BASE_URL"
+    ],
+    "recovery_parser": "same-trial-result-parser-as-live-launch",
+    "result_selection": "exactly-one-trial-result-excluding-job-aggregate",
+    "resume": "interrupted-only-same-command-digest",
+    "retry_by_reward_or_exception": false,
+    "task_selector": "one-exact-registry-name-per-command",
+    "terminal_results_per_task": 1
+  },
+  "executable_id": "thesis-tb21-luna-rq2-replication-executable-v2",
+  "harbor": {
+    "command_prefix": [
+      "harbor",
+      "run",
+      "--repo",
+      "https://github.com/harbor-framework/terminal-bench-2-1.git@5fc7d3b91d27ef0304b4eabe5002e6578160b817",
+      "--registry-path",
+      "tasks/dataset.toml",
+      "--dataset",
+      "terminal-bench-2-1"
+    ],
+    "expected_member_count": 61,
+    "manifest_kind": "dataset-toml-package-members",
+    "provider_calls_during_preflight": 0,
+    "required_identity": "registry-name-plus-package-digest",
+    "selector_field": "registry_name",
+    "version_policy": "behavior-probed-not-version-allowlisted"
+  },
+  "implementation_sources": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 134087,
+    "files": [
+      {
+        "bytes": 3584,
+        "path": "docs/tb21-luna-rq2-replication-executable-v2.md",
+        "sha256": "bc0a93446718f8e1a57e8efaedc1652bb8d720a71281229009bf85f95b45ecde"
+      },
+      {
+        "bytes": 5271,
+        "path": "scripts/tb21_luna_rq2_v2.py",
+        "sha256": "0bde4a3a1b69c1ec8174d95ff5ae8dc94ac61e2a0f0f61bf10f41652003d114b"
+      },
+      {
+        "bytes": 435,
+        "path": "tools/harbor-tb21-luna-v2",
+        "sha256": "0d28c61967455b0a18fd1e143ae58151687f3e5c026c1d19c1f70e12390b9d30"
+      },
+      {
+        "bytes": 41372,
+        "path": "src/evidence_harness_mutation/_tb21_luna_analysis_v2.py",
+        "sha256": "6f3f6ef17b52c41bbeaecc6ad473a1b15dcc4c0839c7c70ecf8442b8fe4688ba"
+      },
+      {
+        "bytes": 28238,
+        "path": "src/evidence_harness_mutation/_tb21_luna_harbor_v2.py",
+        "sha256": "05b1d133585dff3206969468251588736142e91250bcd2df555b18c986a327b2"
+      },
+      {
+        "bytes": 16556,
+        "path": "src/evidence_harness_mutation/_tb21_luna_manifest_v2.py",
+        "sha256": "7a5515bd3ddde7ed5473f0df49560361a086f92b20ec9d1ad44acc231ebca482"
+      },
+      {
+        "bytes": 5903,
+        "path": "src/evidence_harness_mutation/tb21_luna_rq2_v2.py",
+        "sha256": "9a53882027c8369fc2fbac324d9c64cbda614dc8a6b9146fc61af6f6112d81fd"
+      },
+      {
+        "bytes": 9343,
+        "path": "src/evidence_harness_mutation/tb21_luna_runtime_v2.py",
+        "sha256": "5ca9d8e1babb294b9dbfb79f249f49fd1dc7fda6aa8b583cfc33f45f2eb7bdff"
+      },
+      {
+        "bytes": 3935,
+        "path": "tests/mutation/test_tb21_luna_analysis_v2.py",
+        "sha256": "77f0970f6d49d524b454a10eb29515a9c40e6eaaf3dc7ec94f75e90264e383a4"
+      },
+      {
+        "bytes": 8316,
+        "path": "tests/mutation/test_tb21_luna_harbor_v2.py",
+        "sha256": "93b651f2777b924cd27e0139f2ff45d886edebc06014e78814cb59b9f7782145"
+      },
+      {
+        "bytes": 3502,
+        "path": "tests/mutation/test_tb21_luna_manifest_v2.py",
+        "sha256": "ea782ac22b25e383d247823e7aaf8382adafa8c4b7a02d29e510f588301b6c80"
+      },
+      {
+        "bytes": 4791,
+        "path": "tests/mutation/test_tb21_luna_runtime_v2.py",
+        "sha256": "73f69e7a8864b81221383ad07201203b6aed6188a4ba42a6787f3d255b47c004"
+      },
+      {
+        "bytes": 2841,
+        "path": "tests/test_tb21_luna_rq2_v2_script.py",
+        "sha256": "c92afd0c71e4dec231fc6b8f63a06cfc661687fd9e10882202a186e348cc4019"
+      }
+    ],
+    "sha256": "58f91682572b8f517ea8c453a53de298a4afc9e08a70f2e232038df04da6e5f4"
+  },
+  "imported_kernel_sources": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 203839,
+    "files": [
+      {
+        "bytes": 43425,
+        "path": "src/evidence_harness_mutation/_tb21_harbor.py",
+        "sha256": "7c16452ef296db4d925af2cb07f0d540791266dfcd0607045cf71fcc90fa4b74"
+      },
+      {
+        "bytes": 33295,
+        "path": "src/evidence_harness_mutation/main_analysis_baselines.py",
+        "sha256": "a1ae8adedb5d763a954986b45b300cc6e72ade2f5e1b912c4d771fdfed8e78e4"
+      },
+      {
+        "bytes": 34073,
+        "path": "src/evidence_harness_mutation/main_analysis_protocol.py",
+        "sha256": "f90e6771cee065ab37e4a6c790494cc7c13255be9167991a0eed875df00a4fac"
+      },
+      {
+        "bytes": 48198,
+        "path": "src/evidence_harness_mutation/main_analysis_report.py",
+        "sha256": "159dc665a91d54a35d654fe32b1028fb98f121b34bb14aab32b950f78d7b5804"
+      },
+      {
+        "bytes": 14130,
+        "path": "src/evidence_harness_mutation/main_analysis_statistics.py",
+        "sha256": "6e16ade6db5b2f9af7d42ea6172176657ee69afc3824194fe2c9697da6f06a75"
+      },
+      {
+        "bytes": 30718,
+        "path": "src/evidence_harness_mutation/tb21_harbor_runtime.py",
+        "sha256": "f06bb01fd427d22bdabcf174cec6dd798a638a3cc3326f7fc157c6f87d9c9c41"
+      }
+    ],
+    "sha256": "326c3ed80764de7f93e24a1dd4f0bd98b1ceddb3e072a1271d4343206df9eeba"
+  },
+  "operational_inputs": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 16267,
+    "files": [
+      {
+        "bytes": 1659,
+        "path": "config/tb21-harbor-runtime.json",
+        "sha256": "de99fded4101d242f676e8a4281fef57f714361a2c96289dfc8ab5acb298ef5e"
+      },
+      {
+        "bytes": 14608,
+        "path": "patches/harbor-v0.23.0-tb21-dataset-toml.patch",
+        "sha256": "1fc9f9099dcf6066136099860afa2a57320366e415e659f91f8616982016f9d5"
+      }
+    ],
+    "sha256": "b08f9f0d17b0a12b3b077bcfb91c99244b2be20b0faa433548305356db1d29fd"
+  },
+  "protected_sources": {
+    "algorithm": "sha256-length-framed-path-content-v1",
+    "bytes": 588730,
+    "files": [
+      {
+        "bytes": 1168,
+        "path": "pyproject.toml",
+        "sha256": "16b90004e6861dcf11ff525c1eb3276b86735a5c9c5149e752a69e7c6970b8c5"
+      },
+      {
+        "bytes": 301116,
+        "path": "uv.lock",
+        "sha256": "aa764a8aed8e494f737c15dac597a52b8ca9fea89caa665eaf25630c80bab3d8"
+      },
+      {
+        "bytes": 314,
+        "path": "evaluation/debian-https.sources",
+        "sha256": "cdfbaa247442dae546c43aeb25d9f0c6fdaaebd83e75f91ac7145a21a733a8a3"
+      },
+      {
+        "bytes": 104,
+        "path": "evaluation/debian-bullseye-main.list",
+        "sha256": "bcb99092aafb4abe26789e97f08247e25335b96c913a704d47cd932306a34c4f"
+      },
+      {
+        "bytes": 308,
+        "path": "evaluation/debian-trixie-https.sources",
+        "sha256": "8abf8cc4e1dae5c6bde55fd1b15691d48c80073c263707b13d3528a3b5b542dc"
+      },
+      {
+        "bytes": 21122,
+        "path": "scripts/collect_evaluation_results.py",
+        "sha256": "de9305113d85beac0668098cda5ac79e96b0404f135e3fb71dd369453952e954"
+      },
+      {
+        "bytes": 7800,
+        "path": "scripts/run_evaluation.py",
+        "sha256": "e9389719d62db4b6b087e8b948ae380faab2362f2f84be983e499820f820b1f8"
+      },
+      {
+        "bytes": 22694,
+        "path": "scripts/run_full_evaluation.py",
+        "sha256": "9df1f5b207cf905eebbfa3748fbe13e285eaed2ba981aa698dba522eb6f7e77a"
+      },
+      {
+        "bytes": 4108,
+        "path": "src/evidence_harness/collection_profile.py",
+        "sha256": "c285c48cb63e2751f58acbf94fd12ec65d7c1f50167cdd701b4ace1a58f3cbd6"
+      },
+      {
+        "bytes": 12366,
+        "path": "src/evidence_harness/evaluation.py",
+        "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
+      },
+      {
+        "bytes": 12865,
+        "path": "src/evidence_harness/protocol.py",
+        "sha256": "be0d80be68e6a9d86dd9668297f0bd4d816bbaf75be5ab8799957f8fe10b662f"
+      },
+      {
+        "bytes": 6231,
+        "path": "src/evidence_harness/source_binding.py",
+        "sha256": "c56a461c3f83eb70d64b4f87796696975ad8099104e6e556547372517ff0a9bb"
+      },
+      {
+        "bytes": 2317,
+        "path": "src/evidence_harness_mutation/attempts.py",
+        "sha256": "5c67ff40ff43fcff5b7ac876b568a8da17402f294e66a61f29bd3b15111a1d32"
+      },
+      {
+        "bytes": 14235,
+        "path": "src/evidence_harness_mutation/campaign.py",
+        "sha256": "9c506b594e374cb8cb1629f72c2e7c759534919db4e55cf55a47fe9ebeefb1d6"
+      },
+      {
+        "bytes": 14339,
+        "path": "src/evidence_harness_mutation/invariants.py",
+        "sha256": "952d7edb8891f3ec6b36f4b6a161ec5c6ae1201b425617d024b74eaafb5d962f"
+      },
+      {
+        "bytes": 4363,
+        "path": "src/evidence_harness_mutation/journal_loader.py",
+        "sha256": "18da93a9939ccbee82afaa907f8efd7f9000f12fd1df4f83b6c1b9bff1f1a098"
+      },
+      {
+        "bytes": 4055,
+        "path": "src/evidence_harness_mutation/model.py",
+        "sha256": "9f058bd057fb902fe0bfa45207163da39f4a43892c420ccb71a1aa700dbcf6f3"
+      },
+      {
+        "bytes": 7452,
+        "path": "src/evidence_harness_mutation/operators.py",
+        "sha256": "014cd1df65f0834fcd0cad8b785ce75c01f8568a24e6ff86885769c234f9b3e4"
+      },
+      {
+        "bytes": 60536,
+        "path": "src/evidence_harness_mutation/prefixbench.py",
+        "sha256": "e12100b30c342c59685af874f2d51c76bbe4d7c13db4f35c276279fe80347c28"
+      },
+      {
+        "bytes": 71697,
+        "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
+        "sha256": "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
+      },
+      {
+        "bytes": 19540,
+        "path": "src/evidence_harness_mutation/reducer.py",
+        "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
+      }
+    ],
+    "sha256": "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
+  },
+  "protocol": {
+    "bytes": 12823,
+    "path": "experiments/prefixbench-v1/tb21-luna-rq2-replication-protocol-v2.json",
+    "sha256": "946f523584a7da2f87f1297cb63f087ecf0dece5e30a5a2007698a26a6ec2941"
+  },
+  "protocol_commit": "0256046c17c1f39d35979b275a21619b98c1bfb9",
+  "randomness": {
+    "bootstrap_algorithm": "sha256-counter-resample-and-draw-ordinals",
+    "bootstrap_namespace": "thesis-tb21-luna-rq2-replication-v1/bootstrap-rq2-v1",
+    "bootstrap_resamples": 10000,
+    "choice_algorithm": "sha256-first-8-bytes-mod-n-nul-framed",
+    "choice_namespace": "thesis-tb21-luna-rq2-replication-v1",
+    "seed": 20261003
+  },
+  "run_plan_sha256": "c8f4b853bb1c29e37f1aff628abbe509cd537a14da65f1097be6c6d4d34d94e5",
+  "schema_version": 1,
+  "source_set_algorithm": "sha256-length-framed-path-content-v1"
+}
