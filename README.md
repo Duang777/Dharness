@@ -478,6 +478,8 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 
 ## 交付文档
 
+- [文档索引](docs/README.md)
+- [论文定位与贡献计划](docs/thesis-positioning-and-contribution-plan.md)
 - [架构决策](docs/architecture-rationale.md)
 - [评测报告](docs/evaluation-report.md)
 - [89 题逐题结果与统计口径](evaluation/results-89.md)
