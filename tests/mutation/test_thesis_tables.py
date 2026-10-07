@@ -488,3 +488,54 @@ def test_atomic_publish_does_not_overwrite_a_racing_writer(
 
     assert target.read_text(encoding="utf-8") == "racing writer\n"
     assert list(tmp_path.glob(".*.tmp")) == []
+
+
+def test_existing_output_check_does_not_follow_a_racing_symlink(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    target = tmp_path / "table.json"
+    outside = tmp_path / "outside.json"
+    expected = b"expected\n"
+    target.write_bytes(expected)
+    outside.write_bytes(b"outside\n")
+    real_read = thesis_tables_module._read_output_at
+
+    def racing_read(parent_fd: int, name: str) -> bytes | None:
+        target.unlink()
+        target.symlink_to(outside)
+        return real_read(parent_fd, name)
+
+    monkeypatch.setattr(thesis_tables_module, "_read_output_at", racing_read)
+
+    with pytest.raises(ValueError, match="output must be a regular file"):
+        thesis_tables_module._existing_output_state(tmp_path, target, expected)
+
+    assert outside.read_bytes() == b"outside\n"
+
+
+def test_output_publish_revalidates_every_final_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.md"
+    real_write = thesis_tables_module._write_atomic
+
+    def racing_write(root: Path, path: Path, data: bytes) -> str:
+        state = real_write(root, path, data)
+        if path == second:
+            first.unlink()
+            first.write_bytes(b"racing writer\n")
+        return state
+
+    monkeypatch.setattr(thesis_tables_module, "_write_atomic", racing_write)
+
+    with pytest.raises(ValueError, match="refusing to replace"):
+        thesis_tables_module._write_outputs_once(
+            tmp_path,
+            ((first, b"first\n"), (second, b"second\n")),
+        )
+
+    assert first.read_bytes() == b"racing writer\n"
+    assert second.read_bytes() == b"second\n"

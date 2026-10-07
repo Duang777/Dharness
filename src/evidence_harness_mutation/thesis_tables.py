@@ -1840,6 +1840,9 @@ def _write_outputs_once(
     for index, ((path, data), state) in enumerate(zip(outputs, states, strict=True)):
         if state == "created":
             states[index] = _write_atomic(root, path, data)
+    for path, data in outputs:
+        if _existing_output_state(root, path, data) != "unchanged":
+            raise ValueError(f"output disappeared during publishing: {path}")
     return tuple(states)
 
 
@@ -1892,30 +1895,28 @@ def _existing_output_state(
     path: Path,
     data: bytes,
 ) -> Literal["created", "unchanged"]:
-    relative = _output_relative(root, path)
-    current = root
-    for part in relative.parent.parts:
-        current /= part
-        if current.is_symlink():
-            raise ValueError(f"output path contains a symbolic link: {path}")
-        if not current.exists():
+    parent_fd, name = _open_output_parent(root, path)
+    try:
+        try:
+            existing = _read_output_at(parent_fd, name)
+        except FileNotFoundError:
             return "created"
-        if not current.is_dir():
-            raise ValueError(f"output parent must be a directory: {current}")
-    if not os.path.lexists(path):
-        return "created"
-    if path.is_symlink() or not path.is_file():
-        raise ValueError(f"output must be a regular file: {path}")
-    if path.read_bytes() != data:
-        raise ValueError(f"refusing to replace a different output: {path}")
-    return "unchanged"
+        except OSError:
+            raise ValueError(f"output must be a regular file: {path}") from None
+        if existing is None:
+            raise ValueError(f"output must be a regular file: {path}")
+        if existing != data:
+            raise ValueError(f"refusing to replace a different output: {path}")
+        return "unchanged"
+    finally:
+        os.close(parent_fd)
 
 
 def _open_output_parent(root: Path, path: Path) -> tuple[int, str]:
     relative = _output_relative(root, path)
     directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
     nofollow = getattr(os, "O_NOFOLLOW", 0)
-    current_fd = os.open(root, directory_flags)
+    current_fd = os.open(root, directory_flags | nofollow)
     try:
         for part in relative.parent.parts:
             with suppress(FileExistsError):
@@ -1925,7 +1926,7 @@ def _open_output_parent(root: Path, path: Path) -> tuple[int, str]:
             current_fd = next_fd
     except OSError as exc:
         os.close(current_fd)
-        raise ValueError(f"output path contains an invalid parent: {path}") from exc
+        raise ValueError(f"output path contains a symbolic link or invalid parent: {path}") from exc
     return current_fd, relative.name
 
 
