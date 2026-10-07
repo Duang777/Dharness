@@ -63,7 +63,8 @@ uv run pytest \
 
 该测试重算 readiness，并与已提交的 `evaluation/prefixbench-readiness.json` 逐字段比较。
 因此路径、内容或 SHA-256 不匹配都会失败。普通 clone 缺少原始数据时，该用例显示为
-`SKIPPED` 并指向本节；其余测试和质量门禁继续执行。
+`SKIPPED` 并指向本节；其余测试和质量门禁继续执行。如果清单中的文件只恢复了一部分，
+前置检查会失败并报告首个缺失路径，避免把损坏的原始数据目录误判为普通 clone。
 
 ## 状态
 

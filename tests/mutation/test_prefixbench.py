@@ -31,22 +31,76 @@ def _dump(value: object) -> bytes:
     return (json.dumps(value, ensure_ascii=True, indent=2, sort_keys=True) + "\n").encode()
 
 
-def _require_canonical89_raw_data() -> None:
-    readiness: dict[str, Any] = json.loads(READINESS_89_PATH.read_bytes())
+def _require_canonical89_raw_data(
+    *,
+    project_root: Path = PROJECT_ROOT,
+    readiness_path: Path = READINESS_89_PATH,
+) -> None:
+    readiness: dict[str, Any] = json.loads(readiness_path.read_bytes())
     source_paths = tuple(
-        PROJECT_ROOT / source["path"]
+        project_root / source["path"]
         for task in readiness["tasks"]
         for source in task["sources"].values()
         if source is not None
     )
+    if not source_paths:
+        pytest.fail("canonical-89 readiness manifest has no source files")
     missing = tuple(path for path in source_paths if not path.is_file())
-    if missing:
+    if len(missing) == len(source_paths):
         pytest.skip(
             f"requires the untracked canonical-89 Harbor sources ({len(missing)} files missing); "
             "restore the paths and SHA-256 values listed in "
             "evaluation/prefixbench-readiness.json; see "
             "docs/thesis-reproduction-checker-design.md#原始评测数据"
         )
+    if missing:
+        pytest.fail(
+            "canonical-89 Harbor sources are partially restored "
+            f"({len(source_paths) - len(missing)} present, {len(missing)} missing); "
+            f"first missing path: {missing[0].relative_to(project_root)}"
+        )
+
+
+def test_canonical89_raw_data_requires_all_or_none(tmp_path: Path) -> None:
+    readiness_path = tmp_path / "readiness.json"
+    source_paths = (Path("runs/task/result.json"), Path("runs/task/config.json"))
+    readiness_path.write_text(
+        json.dumps(
+            {
+                "tasks": [
+                    {
+                        "sources": {
+                            "result": {"path": source_paths[0].as_posix()},
+                            "config": {"path": source_paths[1].as_posix()},
+                        }
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(pytest.skip.Exception, match="2 files missing"):
+        _require_canonical89_raw_data(
+            project_root=tmp_path,
+            readiness_path=readiness_path,
+        )
+
+    first_source = tmp_path / source_paths[0]
+    first_source.parent.mkdir(parents=True)
+    first_source.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(pytest.fail.Exception, match=r"1 present, 1 missing"):
+        _require_canonical89_raw_data(
+            project_root=tmp_path,
+            readiness_path=readiness_path,
+        )
+
+    second_source = tmp_path / source_paths[1]
+    second_source.write_text("{}\n", encoding="utf-8")
+    _require_canonical89_raw_data(
+        project_root=tmp_path,
+        readiness_path=readiness_path,
+    )
 
 
 def _event(event_type: str, payload: dict[str, object]) -> str:
