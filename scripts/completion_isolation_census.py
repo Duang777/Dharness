@@ -21,9 +21,7 @@ DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix-89.json"
 DEFAULT_CACHE_ROOT = Path.home() / ".cache" / "harbor" / "tasks"
 DEFAULT_REPORT = PROJECT_ROOT / "evaluation" / "completion-isolation-support.json"
 DEFAULT_MARKDOWN = PROJECT_ROOT / "docs" / "completion-isolation-support.md"
-DEFAULT_SOURCE_SNAPSHOT = (
-    PROJECT_ROOT / "evaluation" / "completion-isolation-source-v1.json"
-)
+DEFAULT_SOURCE_SNAPSHOT = PROJECT_ROOT / "evaluation" / "completion-isolation-source-v1.json"
 FACTORY_SOURCE = PROJECT_ROOT / "src" / "evidence_harness" / "docker_completion_isolation.py"
 SUPPORTED_HARBOR_VERSION = "0.23.0"
 SOURCE_COMMIT_PATTERN = re.compile(r"\bsource commit ([0-9a-f]{40})\b")
@@ -137,10 +135,7 @@ def build_source_snapshot(matrix_path: Path, cache_root: Path) -> dict[str, Any]
     tasks: list[dict[str, Any]] = []
     for index, name in enumerate(names, start=1):
         task_path = task_paths[name]
-        files = [
-            _snapshot_source_file(path, task_path)
-            for path in _task_source_paths(task_path)
-        ]
+        files = [_snapshot_source_file(path, task_path) for path in _task_source_paths(task_path)]
         tasks.append(
             {
                 "index": index,
@@ -445,9 +440,7 @@ def _resolve_task_paths(cache_root: Path, names: list[str]) -> dict[str, Path]:
 def _task_source_paths(task_path: Path) -> list[Path]:
     paths = [task_path / SOURCE_RELATIVE_PATHS[0]]
     paths.extend(
-        path
-        for relative in SOURCE_RELATIVE_PATHS[1:]
-        if (path := task_path / relative).is_file()
+        path for relative in SOURCE_RELATIVE_PATHS[1:] if (path := task_path / relative).is_file()
     )
     return paths
 
