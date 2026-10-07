@@ -158,6 +158,90 @@ def test_check_artifacts_rebuilds_from_bound_sources(tmp_path: Path) -> None:
     ]
 
 
+def test_check_artifacts_validates_committed_bindings_without_a_cache(tmp_path: Path) -> None:
+    matrix = tmp_path / "matrix.json"
+    source_cache = tmp_path / "source-cache"
+    empty_cache = tmp_path / "empty-cache"
+    factory = tmp_path / "factory.py"
+    report_path = tmp_path / "support.json"
+    markdown_path = tmp_path / "support.md"
+    _write_matrix(matrix, ["supported"])
+    _write_task(source_cache, "supported")
+    factory.write_text("factory source\n", encoding="utf-8")
+    report = build_support_census(
+        matrix,
+        source_cache,
+        factory_source_path=factory,
+    )
+    report_path.write_bytes(_dump_json(report))
+    markdown_path.write_text(render_markdown(report), encoding="utf-8")
+
+    assert (
+        check_artifacts(
+            matrix,
+            empty_cache,
+            report_path,
+            markdown_path,
+            factory_source_path=factory,
+            allow_missing_cache=True,
+        )
+        == []
+    )
+
+    factory.write_text("changed factory source\n", encoding="utf-8")
+    assert check_artifacts(
+        matrix,
+        empty_cache,
+        report_path,
+        markdown_path,
+        factory_source_path=factory,
+        allow_missing_cache=True,
+    ) == ["completion isolation census source bindings are stale"]
+
+    factory.write_text("factory source\n", encoding="utf-8")
+    report["tasks"][0]["source_files"] = []
+    report_path.write_bytes(_dump_json(report))
+    assert check_artifacts(
+        matrix,
+        empty_cache,
+        report_path,
+        markdown_path,
+        factory_source_path=factory,
+        allow_missing_cache=True,
+    ) == ["invalid completion isolation census report: task row has no source files"]
+
+
+def test_check_artifacts_does_not_ignore_a_partial_cache(tmp_path: Path) -> None:
+    matrix = tmp_path / "matrix.json"
+    source_cache = tmp_path / "source-cache"
+    partial_cache = tmp_path / "partial-cache"
+    factory = tmp_path / "factory.py"
+    report_path = tmp_path / "support.json"
+    markdown_path = tmp_path / "support.md"
+    _write_matrix(matrix, ["task-a", "task-b"])
+    _write_task(source_cache, "task-a")
+    _write_task(source_cache, "task-b")
+    _write_task(partial_cache, "task-a")
+    factory.write_text("factory source\n", encoding="utf-8")
+    report = build_support_census(
+        matrix,
+        source_cache,
+        factory_source_path=factory,
+    )
+    report_path.write_bytes(_dump_json(report))
+    markdown_path.write_text(render_markdown(report), encoding="utf-8")
+
+    missing_cache = "Harbor cache is missing matrix tasks: task-b"
+    assert check_artifacts(
+        matrix,
+        partial_cache,
+        report_path,
+        markdown_path,
+        factory_source_path=factory,
+        allow_missing_cache=True,
+    ) == [f"cannot rebuild completion isolation census: {missing_cache}"]
+
+
 def test_census_rejects_missing_or_duplicate_cache_entries(tmp_path: Path) -> None:
     matrix = tmp_path / "matrix.json"
     cache = tmp_path / "cache"

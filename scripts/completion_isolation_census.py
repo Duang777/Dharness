@@ -7,7 +7,7 @@ import os
 import re
 import tempfile
 from importlib.metadata import PackageNotFoundError, version
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from harbor.models.task.config import TaskConfig
@@ -34,6 +34,17 @@ RUNTIME_REQUIREMENTS = (
     "The source diff remains unchanged while the source stays paused for the snapshot.",
     "A mount-free, network-disabled child starts and contains the shell and check dependencies.",
 )
+REPORT_SCOPE = {
+    "proves": (
+        "Task source inputs do not trigger the Docker completion-isolation "
+        "factory's task-config rejection rules."
+    ),
+    "does_not_prove": (
+        "The runtime container, process tree, image metadata, mounts, or "
+        "isolated check execution satisfy the transaction's runtime checks."
+    ),
+}
+SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
 def parse_args() -> argparse.Namespace:
@@ -47,6 +58,15 @@ def parse_args() -> argparse.Namespace:
         subparser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
         subparser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
         subparser.add_argument("--markdown", type=Path, default=DEFAULT_MARKDOWN)
+        if command == "check":
+            subparser.add_argument(
+                "--allow-missing-cache",
+                action="store_true",
+                help=(
+                    "Validate committed source bindings and rendered artifacts when the "
+                    "Harbor task cache is completely absent."
+                ),
+            )
     return parser.parse_args()
 
 
@@ -56,26 +76,10 @@ def build_support_census(
     *,
     factory_source_path: Path = FACTORY_SOURCE,
 ) -> dict[str, Any]:
-    matrix_bytes = matrix_path.read_bytes()
-    matrix = _object(json.loads(matrix_bytes), "matrix")
-    if matrix.get("schema_version") != 1:
-        raise ValueError("unsupported matrix schema")
-    dataset = _required_string(matrix, "dataset")
-    matrix_tasks = matrix.get("tasks")
-    if not isinstance(matrix_tasks, list):
-        raise ValueError("matrix tasks must be an array")
-
-    names = [_required_string(_object(value, "matrix task"), "name") for value in matrix_tasks]
-    if len(names) != len(set(names)):
-        raise ValueError("matrix task names must be unique")
+    matrix_bytes, matrix, names = _load_matrix(matrix_path)
     task_paths = _resolve_task_paths(cache_root, names)
 
-    try:
-        harbor_version = version("harbor")
-    except PackageNotFoundError as exc:
-        raise ValueError("Harbor is not installed") from exc
-    if harbor_version != SUPPORTED_HARBOR_VERSION:
-        raise ValueError(f"Harbor {SUPPORTED_HARBOR_VERSION} is required, found {harbor_version}")
+    harbor_version = _harbor_version()
 
     rows = [
         _classify_task(
@@ -88,29 +92,15 @@ def build_support_census(
     ]
     supported = sum(row["static_status"] == "supported" for row in rows)
     unsupported = len(rows) - supported
-    source_match = SOURCE_COMMIT_PATTERN.search(str(matrix.get("selection_method", "")))
-    try:
-        factory_source = str(factory_source_path.relative_to(PROJECT_ROOT))
-    except ValueError:
-        factory_source = factory_source_path.name
     return {
         "schema_version": 1,
-        "dataset": dataset,
-        "dataset_source_commit": source_match.group(1) if source_match else None,
+        "dataset": _required_string(matrix, "dataset"),
+        "dataset_source_commit": _dataset_source_commit(matrix),
         "matrix_sha256": _sha256(matrix_bytes),
         "harbor_version": harbor_version,
-        "factory_source": factory_source,
+        "factory_source": _factory_source_name(factory_source_path),
         "factory_source_sha256": _sha256(factory_source_path.read_bytes()),
-        "scope": {
-            "proves": (
-                "Task source inputs do not trigger the Docker completion-isolation "
-                "factory's task-config rejection rules."
-            ),
-            "does_not_prove": (
-                "The runtime container, process tree, image metadata, mounts, or "
-                "isolated check execution satisfy the transaction's runtime checks."
-            ),
-        },
+        "scope": REPORT_SCOPE,
         "summary": {
             "tasks": len(rows),
             "statically_supported": supported,
@@ -198,7 +188,16 @@ def check_artifacts(
     markdown_path: Path,
     *,
     factory_source_path: Path = FACTORY_SOURCE,
+    allow_missing_cache: bool = False,
 ) -> list[str]:
+    if allow_missing_cache and not any(cache_root.glob("*/*/task.toml")):
+        return _check_committed_artifacts(
+            matrix_path,
+            report_path,
+            markdown_path,
+            factory_source_path=factory_source_path,
+        )
+
     errors: list[str] = []
     try:
         expected = build_support_census(
@@ -225,6 +224,114 @@ def check_artifacts(
         if actual_markdown != render_markdown(expected):
             errors.append("completion isolation census markdown is stale")
     return errors
+
+
+def _check_committed_artifacts(
+    matrix_path: Path,
+    report_path: Path,
+    markdown_path: Path,
+    *,
+    factory_source_path: Path,
+) -> list[str]:
+    errors: list[str] = []
+    try:
+        matrix_bytes, matrix, names = _load_matrix(matrix_path)
+        report_data = report_path.read_bytes()
+        actual = _object(json.loads(report_data), "census report")
+        harbor_version = _harbor_version()
+        expected_bindings = {
+            "schema_version": 1,
+            "dataset": _required_string(matrix, "dataset"),
+            "dataset_source_commit": _dataset_source_commit(matrix),
+            "matrix_sha256": _sha256(matrix_bytes),
+            "harbor_version": harbor_version,
+            "factory_source": _factory_source_name(factory_source_path),
+            "factory_source_sha256": _sha256(factory_source_path.read_bytes()),
+            "scope": REPORT_SCOPE,
+            "runtime_requirements_not_evaluated": list(RUNTIME_REQUIREMENTS),
+        }
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return [f"invalid completion isolation census inputs: {exc}"]
+
+    if any(actual.get(key) != value for key, value in expected_bindings.items()):
+        errors.append("completion isolation census source bindings are stale")
+
+    try:
+        rows = actual.get("tasks")
+        if not isinstance(rows, list):
+            raise ValueError("tasks must be an array")
+        row_objects = [_object(value, "task row") for value in rows]
+        row_names = [_required_string(row, "name") for row in row_objects]
+        row_indices = [row.get("index") for row in row_objects]
+        if row_names != names or row_indices != list(range(1, len(names) + 1)):
+            raise ValueError("task rows do not match the matrix")
+        statuses = [row.get("static_status") for row in row_objects]
+        if any(status not in {"supported", "unsupported"} for status in statuses):
+            raise ValueError("task row has an invalid static status")
+        for row, name, status in zip(row_objects, names, statuses, strict=True):
+            _validate_committed_task_row(row, name, str(status))
+        expected_summary = {
+            "tasks": len(row_objects),
+            "statically_supported": statuses.count("supported"),
+            "statically_unsupported": statuses.count("unsupported"),
+            "runtime_evaluated": 0,
+        }
+        if actual.get("summary") != expected_summary:
+            raise ValueError("summary does not match the task rows")
+    except (TypeError, ValueError) as exc:
+        errors.append(f"invalid completion isolation census report: {exc}")
+
+    if report_data != _dump_json(actual):
+        errors.append("completion isolation census report is not canonical JSON")
+
+    try:
+        actual_markdown = markdown_path.read_text(encoding="utf-8")
+        expected_markdown = render_markdown(actual)
+    except (OSError, KeyError, TypeError, ValueError) as exc:
+        errors.append(f"invalid completion isolation census markdown: {exc}")
+    else:
+        if actual_markdown != expected_markdown:
+            errors.append("completion isolation census markdown is stale")
+    return errors
+
+
+def _validate_committed_task_row(row: dict[str, Any], name: str, status: str) -> None:
+    cache_entry = PurePosixPath(_required_string(row, "cache_entry"))
+    if cache_entry.is_absolute() or ".." in cache_entry.parts or cache_entry.name != name:
+        raise ValueError("task row has an invalid cache entry")
+    if row.get("runtime_status") != "not_evaluated" or not SHA256_PATTERN.fullmatch(
+        str(row.get("static_input_sha256", ""))
+    ):
+        raise ValueError("task row has an invalid source binding")
+
+    source_files = row.get("source_files")
+    if not isinstance(source_files, list) or not source_files:
+        raise ValueError("task row has no source files")
+    source_paths: list[str] = []
+    for value in source_files:
+        source = _object(value, "task source file")
+        source_path = PurePosixPath(_required_string(source, "path"))
+        source_paths.append(source_path.as_posix())
+        size = source.get("bytes")
+        if (
+            source_path.is_absolute()
+            or ".." in source_path.parts
+            or not isinstance(size, int)
+            or isinstance(size, bool)
+            or size < 1
+            or not SHA256_PATTERN.fullmatch(str(source.get("sha256", "")))
+        ):
+            raise ValueError("task row has an invalid source file binding")
+    if len(source_paths) != len(set(source_paths)) or "task.toml" not in source_paths:
+        raise ValueError("task row source files are incomplete")
+
+    rejection_reasons = row.get("rejection_reasons")
+    if not isinstance(rejection_reasons, list) or not all(
+        isinstance(reason, str) and reason for reason in rejection_reasons
+    ):
+        raise ValueError("task row has invalid rejection reasons")
+    if (status == "supported") != (not rejection_reasons):
+        raise ValueError("task row status disagrees with its rejection reasons")
 
 
 def _classify_task(
@@ -283,6 +390,43 @@ def _resolve_task_paths(cache_root: Path, names: list[str]) -> dict[str, Path]:
     if duplicates:
         raise ValueError(f"Harbor cache has duplicate matrix tasks: {', '.join(duplicates)}")
     return {name: paths[0] for name, paths in matches.items()}
+
+
+def _load_matrix(matrix_path: Path) -> tuple[bytes, dict[str, Any], list[str]]:
+    matrix_bytes = matrix_path.read_bytes()
+    matrix = _object(json.loads(matrix_bytes), "matrix")
+    if matrix.get("schema_version") != 1:
+        raise ValueError("unsupported matrix schema")
+    _required_string(matrix, "dataset")
+    matrix_tasks = matrix.get("tasks")
+    if not isinstance(matrix_tasks, list):
+        raise ValueError("matrix tasks must be an array")
+    names = [_required_string(_object(value, "matrix task"), "name") for value in matrix_tasks]
+    if len(names) != len(set(names)):
+        raise ValueError("matrix task names must be unique")
+    return matrix_bytes, matrix, names
+
+
+def _harbor_version() -> str:
+    try:
+        harbor_version = version("harbor")
+    except PackageNotFoundError as exc:
+        raise ValueError("Harbor is not installed") from exc
+    if harbor_version != SUPPORTED_HARBOR_VERSION:
+        raise ValueError(f"Harbor {SUPPORTED_HARBOR_VERSION} is required, found {harbor_version}")
+    return harbor_version
+
+
+def _dataset_source_commit(matrix: dict[str, Any]) -> str | None:
+    source_match = SOURCE_COMMIT_PATTERN.search(str(matrix.get("selection_method", "")))
+    return source_match.group(1) if source_match else None
+
+
+def _factory_source_name(factory_source_path: Path) -> str:
+    try:
+        return str(factory_source_path.relative_to(PROJECT_ROOT))
+    except ValueError:
+        return factory_source_path.name
 
 
 def _source_file(path: Path, task_path: Path) -> dict[str, Any]:
@@ -362,12 +506,19 @@ def main() -> int:
         args.cache_root,
         args.report,
         args.markdown,
+        allow_missing_cache=args.allow_missing_cache,
     )
     if errors:
         for error in errors:
             print(error)
         return 1
-    print("completion isolation census artifacts verified")
+    if args.allow_missing_cache and not any(args.cache_root.glob("*/*/task.toml")):
+        print(
+            "completion isolation census committed bindings verified "
+            "(Harbor task cache unavailable)"
+        )
+    else:
+        print("completion isolation census artifacts verified")
     return 0
 
 

@@ -391,6 +391,10 @@ schema、10/20/89 题 dry-run、completion 校准、89 题隔离支持 census、
 uv run python scripts/verify_all.py
 ```
 
+隔离支持 census 在 Harbor 任务缓存完整时逐题重建；全新环境没有任何任务缓存时，
+门禁改为校验已提交报告的矩阵与 factory 源码绑定、任务顺序、汇总、规范化 JSON 和
+Markdown。部分缓存仍视为错误，不会降级为仅检查已提交产物。
+
 没有 Docker 时可仅跳过最后的 smoke：
 
 ```bash
