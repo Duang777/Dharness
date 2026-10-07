@@ -22,10 +22,31 @@ from evidence_harness_mutation import (
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+CANONICAL_89_PATH = PROJECT_ROOT / "evaluation" / "canonical-89.json"
+MATRIX_89_PATH = PROJECT_ROOT / "evaluation" / "matrix-89.json"
+READINESS_89_PATH = PROJECT_ROOT / "evaluation" / "prefixbench-readiness.json"
 
 
 def _dump(value: object) -> bytes:
     return (json.dumps(value, ensure_ascii=True, indent=2, sort_keys=True) + "\n").encode()
+
+
+def _require_canonical89_raw_data() -> None:
+    readiness: dict[str, Any] = json.loads(READINESS_89_PATH.read_bytes())
+    source_paths = tuple(
+        PROJECT_ROOT / source["path"]
+        for task in readiness["tasks"]
+        for source in task["sources"].values()
+        if source is not None
+    )
+    missing = tuple(path for path in source_paths if not path.is_file())
+    if missing:
+        pytest.skip(
+            f"requires the untracked canonical-89 Harbor sources ({len(missing)} files missing); "
+            "restore the paths and SHA-256 values listed in "
+            "evaluation/prefixbench-readiness.json; see "
+            "docs/thesis-reproduction-checker-design.md#原始评测数据"
+        )
 
 
 def _event(event_type: str, payload: dict[str, object]) -> str:
@@ -764,20 +785,23 @@ def test_schema2_readiness_checker_rebuilds_semantic_report(tmp_path: Path) -> N
 
 
 def test_real_canonical89_readiness_census_is_stable() -> None:
+    _require_canonical89_raw_data()
     first = inspect_prefixbench(
-        PROJECT_ROOT / "evaluation" / "canonical-89.json",
-        PROJECT_ROOT / "evaluation" / "matrix-89.json",
+        CANONICAL_89_PATH,
+        MATRIX_89_PATH,
         PROJECT_ROOT,
     )
     second = inspect_prefixbench(
-        PROJECT_ROOT / "evaluation" / "canonical-89.json",
-        PROJECT_ROOT / "evaluation" / "matrix-89.json",
+        CANONICAL_89_PATH,
+        MATRIX_89_PATH,
         PROJECT_ROOT,
     )
+    expected = PrefixBenchReadiness.model_validate_json(READINESS_89_PATH.read_bytes())
 
     assert isinstance(first, PrefixBenchReadiness)
     assert isinstance(second, PrefixBenchReadiness)
     assert first == second
+    assert first == expected
     assert first.canonical_bytes() == second.canonical_bytes()
     assert PrefixBenchReadiness.model_validate_json(first.canonical_bytes()) == first
     assert first.summary.model_dump(mode="json") == {

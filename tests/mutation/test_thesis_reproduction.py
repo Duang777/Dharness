@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
-from evidence_harness_mutation import thesis_reproduction as reproduction
+import evidence_harness_mutation.thesis_reproduction as reproduction
 from evidence_harness_mutation.main_analysis_protocol import (
     MainAnalysisMethod,
     MainAnalysisOutcome,
@@ -38,6 +38,10 @@ def _frozen(root: Path) -> Any:
             spec=SimpleNamespace(artifacts=SimpleNamespace(paths=tb21_paths)),
         ),
     )
+
+
+def _snapshot(**attributes: object) -> reproduction._OutcomeSnapshot:
+    return cast(reproduction._OutcomeSnapshot, SimpleNamespace(**attributes))
 
 
 def _write_tb21_outcome_prefix(root: Path, entries: int) -> None:
@@ -81,7 +85,7 @@ def _patch_complete_prefix(
     manifests: tuple[reproduction._RawManifest, ...],
 ) -> Any:
     frozen = _frozen(root)
-    snapshot = SimpleNamespace()
+    snapshot = _snapshot()
     monkeypatch.setattr(reproduction, "_pass_freeze_gate", lambda _root: frozen)
     monkeypatch.setattr(reproduction, "_load_outcome_snapshot", lambda _frozen: snapshot)
     monkeypatch.setattr(
@@ -291,10 +295,19 @@ def test_complete_artifact_only_package(
     manifests = _manifests(tmp_path)
     _patch_complete_prefix(monkeypatch, tmp_path, manifests=manifests)
     observed: list[tuple[reproduction.RawInputMode | None, ...]] = []
+
+    def record_raw_inputs(
+        _frozen: object,
+        _snapshot: object,
+        raw: tuple[reproduction.RawInputDeclaration, ...],
+    ) -> tuple[str, ...]:
+        observed.append(tuple(item.mode for item in raw))
+        return ()
+
     monkeypatch.setattr(
         reproduction,
         "_check_complete_artifacts",
-        lambda _frozen, _snapshot, raw: observed.append(tuple(item.mode for item in raw)) or (),
+        record_raw_inputs,
     )
 
     result = reproduction.check_thesis_reproduction(tmp_path)
@@ -398,7 +411,12 @@ def test_complete_checker_runs_only_selected_full_rebuilds(
 ) -> None:
     calls: list[str] = []
     frozen = _frozen(tmp_path)
-    snapshot = SimpleNamespace(
+
+    def record(label: str) -> tuple[str, ...]:
+        calls.append(label)
+        return ()
+
+    snapshot = _snapshot(
         canonical_data=b"canonical",
         rq2_data=b"rq2",
         rq3_data=b"rq3",
@@ -433,27 +451,27 @@ def test_complete_checker_runs_only_selected_full_rebuilds(
     monkeypatch.setattr(
         reproduction,
         "check_prefixbench_test_campaign",
-        lambda _root: calls.append("campaign") or (),
+        lambda _root: record("campaign"),
     )
     monkeypatch.setattr(
         reproduction,
         "_check_held_out_canonical_rebuild",
-        lambda _root, _data: calls.append("canonical") or (),
+        lambda _root, _data: record("canonical"),
     )
     monkeypatch.setattr(
         reproduction,
         "_check_report_rebuild",
-        lambda label, _root, _data, _builder: calls.append(label) or (),
+        lambda label, _root, _data, _builder: record(label),
     )
     monkeypatch.setattr(
         reproduction,
         "_check_main_report_rebuild",
-        lambda _root: calls.append("main") or (),
+        lambda _root: record("main"),
     )
     monkeypatch.setattr(
         reproduction,
         "check_thesis_tables",
-        lambda _root: calls.append("tables") or (),
+        lambda _root: record("tables"),
     )
 
     assert reproduction._check_complete_artifacts(frozen, snapshot, modes) == ()
@@ -497,7 +515,7 @@ def test_raw_manifests_come_from_the_fixed_canonical_bindings(tmp_path: Path) ->
         )
         for index in range(1, 21)
     )
-    snapshot = SimpleNamespace(
+    snapshot = _snapshot(
         readiness=SimpleNamespace(tasks=readiness_tasks),
         campaign=SimpleNamespace(
             tasks=campaign_tasks,
@@ -613,7 +631,7 @@ def test_outcome_structure_requires_exact_cross_artifact_membership(tmp_path: Pa
         )
         for task in frozen.executable.spec.cohort.tasks
     )
-    snapshot = SimpleNamespace(
+    snapshot = _snapshot(
         campaign=SimpleNamespace(tasks=campaign_tasks),
         rq2=SimpleNamespace(tasks=rq2_tasks),
         rq3=SimpleNamespace(comparisons=rq3_cases),

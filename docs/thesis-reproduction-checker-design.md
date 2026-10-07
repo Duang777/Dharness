@@ -42,6 +42,29 @@ if result.state is ReproductionState.PARTIAL_INVALID:
 CLI 对 `pre_collection` 和 `complete` 返回 0，对 `partial_invalid` 返回 1。非法参数由
 `argparse` 返回 2。
 
+## 原始评测数据
+
+`runs/` 保存 Harbor 生成的原始 job，不提交到 Git。`evaluation/canonical-89.json`
+记录 89 个选定 trial 的相对路径及 `result.json`、`config.json` SHA-256；
+`evaluation/prefixbench-readiness.json` 进一步记录 85 个 live trial 的 journal 路径、
+字节数和 SHA-256。两份文件共同构成原始数据清单。
+
+原始数据来自 README 中 `scripts/run_full_evaluation.py` 的 89 题运行与后续 replay
+恢复。需要复算 canonical-89 readiness 时，应从运行机保留的 Harbor job 或维护者提供的
+同一份归档恢复 `runs/terminal-bench-2/`，目录结构必须与清单中的相对路径一致。仓库没有
+公开下载这些原始 job，也不能从已提交的脱敏结果反向生成 journal。
+
+恢复后运行：
+
+```bash
+uv run pytest \
+  tests/mutation/test_prefixbench.py::test_real_canonical89_readiness_census_is_stable -vv
+```
+
+该测试重算 readiness，并与已提交的 `evaluation/prefixbench-readiness.json` 逐字段比较。
+因此路径、内容或 SHA-256 不匹配都会失败。普通 clone 缺少原始数据时，该用例显示为
+`SKIPPED` 并指向本节；其余测试和质量门禁继续执行。
+
 ## 状态
 
 检查结果只有三种状态：

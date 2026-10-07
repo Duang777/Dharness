@@ -436,6 +436,27 @@ def test_build_rejects_a_conflict_before_writing_the_other_output(
     assert conflict.read_text(encoding="utf-8") == "different\n"
 
 
+def test_build_rejects_a_symlinked_output_parent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "repository"
+    outside = tmp_path / "outside"
+    root.mkdir()
+    outside.mkdir()
+    (root / "docs").symlink_to(outside, target_is_directory=True)
+    monkeypatch.setattr(
+        "evidence_harness_mutation.thesis_tables._load_inputs",
+        lambda _root: _synthetic_inputs(),
+    )
+
+    with pytest.raises(ValueError, match="output path contains a symbolic link"):
+        build_thesis_tables(root)
+
+    assert not (root / "evaluation/thesis-tables-v1.json").exists()
+    assert not (outside / "thesis-tables-v1.md").exists()
+
+
 def test_atomic_publish_does_not_overwrite_a_racing_writer(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -443,14 +464,27 @@ def test_atomic_publish_does_not_overwrite_a_racing_writer(
     target = tmp_path / "table.json"
     real_link = thesis_tables_module.os.link
 
-    def racing_link(source: Path, destination: Path) -> None:
-        destination.write_text("racing writer\n", encoding="utf-8")
-        real_link(source, destination)
+    def racing_link(
+        source: str,
+        destination: str,
+        *,
+        src_dir_fd: int | None = None,
+        dst_dir_fd: int | None = None,
+        follow_symlinks: bool = True,
+    ) -> None:
+        target.write_text("racing writer\n", encoding="utf-8")
+        real_link(
+            source,
+            destination,
+            src_dir_fd=src_dir_fd,
+            dst_dir_fd=dst_dir_fd,
+            follow_symlinks=follow_symlinks,
+        )
 
     monkeypatch.setattr(thesis_tables_module.os, "link", racing_link)
 
     with pytest.raises(ValueError, match="refusing to replace"):
-        thesis_tables_module._write_atomic(target, b"our output\n")
+        thesis_tables_module._write_atomic(tmp_path, target, b"our output\n")
 
     assert target.read_text(encoding="utf-8") == "racing writer\n"
     assert list(tmp_path.glob(".*.tmp")) == []
