@@ -247,7 +247,9 @@ candidate state.
 
 - The static census found no source-level rejection among the 89 tasks. It did
   not start those task containers, so runtime support remains unproved for 86
-  tasks.
+  tasks. CI reconstructs the census with the production rejection function from
+  a committed minimal source snapshot bound to the dataset commit and matrix
+  hash; it does not accept the committed report as evidence for its own result.
 - The Docker smoke proves that one check can write a temporary file in its
   child while the live source diff remains unchanged.
 - Three frozen completion candidates exercise two checks each after a full

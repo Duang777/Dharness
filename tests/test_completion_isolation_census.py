@@ -7,6 +7,7 @@ import pytest
 
 from scripts.completion_isolation_census import (
     _dump_json,
+    build_source_snapshot,
     build_support_census,
     check_artifacts,
     render_markdown,
@@ -158,16 +159,20 @@ def test_check_artifacts_rebuilds_from_bound_sources(tmp_path: Path) -> None:
     ]
 
 
-def test_check_artifacts_validates_committed_bindings_without_a_cache(tmp_path: Path) -> None:
+def test_check_artifacts_rebuilds_from_a_source_snapshot_without_a_cache(
+    tmp_path: Path,
+) -> None:
     matrix = tmp_path / "matrix.json"
     source_cache = tmp_path / "source-cache"
     empty_cache = tmp_path / "empty-cache"
     factory = tmp_path / "factory.py"
+    snapshot_path = tmp_path / "source.json"
     report_path = tmp_path / "support.json"
     markdown_path = tmp_path / "support.md"
     _write_matrix(matrix, ["supported"])
     _write_task(source_cache, "supported")
     factory.write_text("factory source\n", encoding="utf-8")
+    snapshot_path.write_bytes(_dump_json(build_source_snapshot(matrix, source_cache)))
     report = build_support_census(
         matrix,
         source_cache,
@@ -183,35 +188,60 @@ def test_check_artifacts_validates_committed_bindings_without_a_cache(tmp_path: 
             report_path,
             markdown_path,
             factory_source_path=factory,
-            allow_missing_cache=True,
+            source_snapshot_path=snapshot_path,
         )
         == []
     )
 
-    factory.write_text("changed factory source\n", encoding="utf-8")
-    assert check_artifacts(
-        matrix,
-        empty_cache,
-        report_path,
-        markdown_path,
-        factory_source_path=factory,
-        allow_missing_cache=True,
-    ) == ["completion isolation census source bindings are stale"]
-
-    factory.write_text("factory source\n", encoding="utf-8")
-    report["tasks"][0]["source_files"] = []
+    report["tasks"][0]["static_status"] = "unsupported"
+    report["tasks"][0]["rejection_reasons"] = ["forged rejection"]
     report_path.write_bytes(_dump_json(report))
+    markdown_path.write_text(render_markdown(report), encoding="utf-8")
     assert check_artifacts(
         matrix,
         empty_cache,
         report_path,
         markdown_path,
         factory_source_path=factory,
-        allow_missing_cache=True,
-    ) == ["invalid completion isolation census report: task row has no source files"]
+        source_snapshot_path=snapshot_path,
+    ) == [
+        "completion isolation census report is stale",
+        "completion isolation census markdown is stale",
+    ]
 
 
-def test_check_artifacts_does_not_ignore_a_partial_cache(tmp_path: Path) -> None:
+def test_check_artifacts_rejects_tampered_source_snapshot(tmp_path: Path) -> None:
+    matrix = tmp_path / "matrix.json"
+    source_cache = tmp_path / "source-cache"
+    factory = tmp_path / "factory.py"
+    snapshot_path = tmp_path / "source.json"
+    report_path = tmp_path / "support.json"
+    markdown_path = tmp_path / "support.md"
+    _write_matrix(matrix, ["supported"])
+    _write_task(source_cache, "supported")
+    factory.write_text("factory source\n", encoding="utf-8")
+    snapshot = build_source_snapshot(matrix, source_cache)
+    report = build_support_census(matrix, source_cache, factory_source_path=factory)
+    report_path.write_bytes(_dump_json(report))
+    markdown_path.write_text(render_markdown(report), encoding="utf-8")
+
+    snapshot["tasks"][0]["files"][0]["text"] += "\nforged = true\n"
+    snapshot_path.write_bytes(_dump_json(snapshot))
+
+    assert check_artifacts(
+        matrix,
+        tmp_path / "empty-cache",
+        report_path,
+        markdown_path,
+        factory_source_path=factory,
+        source_snapshot_path=snapshot_path,
+    ) == [
+        "cannot rebuild completion isolation census: "
+        "invalid source snapshot: task source file content does not match its binding"
+    ]
+
+
+def test_check_artifacts_requires_a_complete_cache_without_a_snapshot(tmp_path: Path) -> None:
     matrix = tmp_path / "matrix.json"
     source_cache = tmp_path / "source-cache"
     partial_cache = tmp_path / "partial-cache"
@@ -238,7 +268,6 @@ def test_check_artifacts_does_not_ignore_a_partial_cache(tmp_path: Path) -> None
         report_path,
         markdown_path,
         factory_source_path=factory,
-        allow_missing_cache=True,
     ) == [f"cannot rebuild completion isolation census: {missing_cache}"]
 
 

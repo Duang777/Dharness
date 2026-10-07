@@ -194,7 +194,8 @@ STATIC_GATES = (
             "python",
             "scripts/completion_isolation_census.py",
             "check",
-            "--allow-missing-cache",
+            "--source-snapshot",
+            "evaluation/completion-isolation-source-v1.json",
         ),
     ),
     (

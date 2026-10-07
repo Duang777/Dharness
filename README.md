@@ -391,9 +391,12 @@ schema、10/20/89 题 dry-run、completion 校准、89 题隔离支持 census、
 uv run python scripts/verify_all.py
 ```
 
-隔离支持 census 在 Harbor 任务缓存完整时逐题重建；全新环境没有任何任务缓存时，
-门禁改为校验已提交报告的矩阵与 factory 源码绑定、任务顺序、汇总、规范化 JSON 和
-Markdown。部分缓存仍视为错误，不会降级为仅检查已提交产物。
+完整门禁从
+`evaluation/completion-isolation-source-v1.json` 还原 89 题的 `task.toml` 和环境文件，
+再调用生产代码中的静态拒绝规则逐题重建 census。快照绑定数据集 source commit、矩阵
+SHA-256 以及每个源文件的字节数和 SHA-256，不信任报告中已提交的状态或拒绝原因。
+维护者拥有完整 Harbor 任务缓存时，可不传 `--source-snapshot` 直接运行
+`scripts/completion_isolation_census.py check`，以缓存中的原始任务源码复核报告。
 
 没有 Docker 时可仅跳过最后的 smoke：
 

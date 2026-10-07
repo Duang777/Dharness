@@ -49,6 +49,7 @@ REQUIRED_FILES = (
     Path("evaluation/completion-calibration.json"),
     Path("evaluation/completion-disagreements.json"),
     Path("evaluation/completion-isolation-experiments.json"),
+    Path("evaluation/completion-isolation-source-v1.json"),
     Path("evaluation/completion-isolation-support.json"),
     Path("docs/architecture-rationale.md"),
     Path("docs/completion-calibration-design.md"),

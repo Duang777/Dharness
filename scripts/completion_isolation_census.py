@@ -21,9 +21,17 @@ DEFAULT_MATRIX = PROJECT_ROOT / "evaluation" / "matrix-89.json"
 DEFAULT_CACHE_ROOT = Path.home() / ".cache" / "harbor" / "tasks"
 DEFAULT_REPORT = PROJECT_ROOT / "evaluation" / "completion-isolation-support.json"
 DEFAULT_MARKDOWN = PROJECT_ROOT / "docs" / "completion-isolation-support.md"
+DEFAULT_SOURCE_SNAPSHOT = (
+    PROJECT_ROOT / "evaluation" / "completion-isolation-source-v1.json"
+)
 FACTORY_SOURCE = PROJECT_ROOT / "src" / "evidence_harness" / "docker_completion_isolation.py"
 SUPPORTED_HARBOR_VERSION = "0.23.0"
 SOURCE_COMMIT_PATTERN = re.compile(r"\bsource commit ([0-9a-f]{40})\b")
+SOURCE_RELATIVE_PATHS = (
+    PurePosixPath("task.toml"),
+    PurePosixPath("environment/Dockerfile"),
+    PurePosixPath("environment/docker-compose.yaml"),
+)
 RUNTIME_REQUIREMENTS = (
     "The Docker daemon reports a Linux OSType.",
     "The Harbor Compose project has exactly one running main container and no sidecars.",
@@ -58,14 +66,21 @@ def parse_args() -> argparse.Namespace:
         subparser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
         subparser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
         subparser.add_argument("--markdown", type=Path, default=DEFAULT_MARKDOWN)
-        if command == "check":
+        if command == "build":
             subparser.add_argument(
-                "--allow-missing-cache",
-                action="store_true",
+                "--source-snapshot",
+                type=Path,
+                default=DEFAULT_SOURCE_SNAPSHOT,
                 help=(
-                    "Validate committed source bindings and rendered artifacts when the "
-                    "Harbor task cache is completely absent."
+                    "Write the minimal task sources used to rebuild the census "
+                    f"(default: {DEFAULT_SOURCE_SNAPSHOT})."
                 ),
+            )
+        else:
+            subparser.add_argument(
+                "--source-snapshot",
+                type=Path,
+                help="Rebuild from this frozen task-source snapshot instead of the Harbor cache.",
             )
     return parser.parse_args()
 
@@ -109,6 +124,37 @@ def build_support_census(
         },
         "runtime_requirements_not_evaluated": list(RUNTIME_REQUIREMENTS),
         "tasks": rows,
+    }
+
+
+def build_source_snapshot(matrix_path: Path, cache_root: Path) -> dict[str, Any]:
+    matrix_bytes, matrix, names = _load_matrix(matrix_path)
+    source_commit = _dataset_source_commit(matrix)
+    if source_commit is None:
+        raise ValueError("matrix does not identify a dataset source commit")
+    task_paths = _resolve_task_paths(cache_root, names)
+
+    tasks: list[dict[str, Any]] = []
+    for index, name in enumerate(names, start=1):
+        task_path = task_paths[name]
+        files = [
+            _snapshot_source_file(path, task_path)
+            for path in _task_source_paths(task_path)
+        ]
+        tasks.append(
+            {
+                "index": index,
+                "name": name,
+                "cache_entry": task_path.relative_to(cache_root).as_posix(),
+                "files": files,
+            }
+        )
+    return {
+        "schema_version": 1,
+        "dataset": _required_string(matrix, "dataset"),
+        "dataset_source_commit": source_commit,
+        "matrix_sha256": _sha256(matrix_bytes),
+        "tasks": tasks,
     }
 
 
@@ -188,23 +234,22 @@ def check_artifacts(
     markdown_path: Path,
     *,
     factory_source_path: Path = FACTORY_SOURCE,
-    allow_missing_cache: bool = False,
+    source_snapshot_path: Path | None = None,
 ) -> list[str]:
-    if allow_missing_cache and not any(cache_root.glob("*/*/task.toml")):
-        return _check_committed_artifacts(
-            matrix_path,
-            report_path,
-            markdown_path,
-            factory_source_path=factory_source_path,
-        )
-
     errors: list[str] = []
     try:
-        expected = build_support_census(
-            matrix_path,
-            cache_root,
-            factory_source_path=factory_source_path,
-        )
+        if source_snapshot_path is None:
+            expected = build_support_census(
+                matrix_path,
+                cache_root,
+                factory_source_path=factory_source_path,
+            )
+        else:
+            expected = _build_support_census_from_snapshot(
+                matrix_path,
+                source_snapshot_path,
+                factory_source_path=factory_source_path,
+            )
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         return [f"cannot rebuild completion isolation census: {exc}"]
 
@@ -226,112 +271,121 @@ def check_artifacts(
     return errors
 
 
-def _check_committed_artifacts(
+def _build_support_census_from_snapshot(
     matrix_path: Path,
-    report_path: Path,
-    markdown_path: Path,
+    source_snapshot_path: Path,
     *,
     factory_source_path: Path,
-) -> list[str]:
-    errors: list[str] = []
+) -> dict[str, Any]:
     try:
-        matrix_bytes, matrix, names = _load_matrix(matrix_path)
-        report_data = report_path.read_bytes()
-        actual = _object(json.loads(report_data), "census report")
-        harbor_version = _harbor_version()
-        expected_bindings = {
-            "schema_version": 1,
-            "dataset": _required_string(matrix, "dataset"),
-            "dataset_source_commit": _dataset_source_commit(matrix),
-            "matrix_sha256": _sha256(matrix_bytes),
-            "harbor_version": harbor_version,
-            "factory_source": _factory_source_name(factory_source_path),
-            "factory_source_sha256": _sha256(factory_source_path.read_bytes()),
-            "scope": REPORT_SCOPE,
-            "runtime_requirements_not_evaluated": list(RUNTIME_REQUIREMENTS),
-        }
+        snapshot_data = source_snapshot_path.read_bytes()
+        snapshot = _object(json.loads(snapshot_data), "source snapshot")
+        if snapshot_data != _dump_json(snapshot):
+            raise ValueError("source snapshot is not canonical JSON")
+        tasks = _validate_source_snapshot(matrix_path, snapshot)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
-        return [f"invalid completion isolation census inputs: {exc}"]
+        raise ValueError(f"invalid source snapshot: {exc}") from exc
 
-    if any(actual.get(key) != value for key, value in expected_bindings.items()):
-        errors.append("completion isolation census source bindings are stale")
-
-    try:
-        rows = actual.get("tasks")
-        if not isinstance(rows, list):
-            raise ValueError("tasks must be an array")
-        row_objects = [_object(value, "task row") for value in rows]
-        row_names = [_required_string(row, "name") for row in row_objects]
-        row_indices = [row.get("index") for row in row_objects]
-        if row_names != names or row_indices != list(range(1, len(names) + 1)):
-            raise ValueError("task rows do not match the matrix")
-        statuses = [row.get("static_status") for row in row_objects]
-        if any(status not in {"supported", "unsupported"} for status in statuses):
-            raise ValueError("task row has an invalid static status")
-        for row, name, status in zip(row_objects, names, statuses, strict=True):
-            _validate_committed_task_row(row, name, str(status))
-        expected_summary = {
-            "tasks": len(row_objects),
-            "statically_supported": statuses.count("supported"),
-            "statically_unsupported": statuses.count("unsupported"),
-            "runtime_evaluated": 0,
-        }
-        if actual.get("summary") != expected_summary:
-            raise ValueError("summary does not match the task rows")
-    except (TypeError, ValueError) as exc:
-        errors.append(f"invalid completion isolation census report: {exc}")
-
-    if report_data != _dump_json(actual):
-        errors.append("completion isolation census report is not canonical JSON")
-
-    try:
-        actual_markdown = markdown_path.read_text(encoding="utf-8")
-        expected_markdown = render_markdown(actual)
-    except (OSError, KeyError, TypeError, ValueError) as exc:
-        errors.append(f"invalid completion isolation census markdown: {exc}")
-    else:
-        if actual_markdown != expected_markdown:
-            errors.append("completion isolation census markdown is stale")
-    return errors
+    with tempfile.TemporaryDirectory(prefix="completion-isolation-source-") as temporary:
+        cache_root = Path(temporary)
+        _materialize_source_snapshot(cache_root, tasks)
+        return build_support_census(
+            matrix_path,
+            cache_root,
+            factory_source_path=factory_source_path,
+        )
 
 
-def _validate_committed_task_row(row: dict[str, Any], name: str, status: str) -> None:
-    cache_entry = PurePosixPath(_required_string(row, "cache_entry"))
-    if cache_entry.is_absolute() or ".." in cache_entry.parts or cache_entry.name != name:
-        raise ValueError("task row has an invalid cache entry")
-    if row.get("runtime_status") != "not_evaluated" or not SHA256_PATTERN.fullmatch(
-        str(row.get("static_input_sha256", ""))
+def _validate_source_snapshot(
+    matrix_path: Path,
+    snapshot: dict[str, Any],
+) -> list[dict[str, Any]]:
+    matrix_bytes, matrix, names = _load_matrix(matrix_path)
+    expected_commit = _dataset_source_commit(matrix)
+    expected_bindings = {
+        "schema_version": 1,
+        "dataset": _required_string(matrix, "dataset"),
+        "dataset_source_commit": expected_commit,
+        "matrix_sha256": _sha256(matrix_bytes),
+    }
+    if expected_commit is None or any(
+        snapshot.get(key) != value for key, value in expected_bindings.items()
     ):
-        raise ValueError("task row has an invalid source binding")
+        raise ValueError("source snapshot matrix bindings are stale")
 
-    source_files = row.get("source_files")
-    if not isinstance(source_files, list) or not source_files:
-        raise ValueError("task row has no source files")
-    source_paths: list[str] = []
-    for value in source_files:
-        source = _object(value, "task source file")
-        source_path = PurePosixPath(_required_string(source, "path"))
-        source_paths.append(source_path.as_posix())
-        size = source.get("bytes")
+    values = snapshot.get("tasks")
+    if not isinstance(values, list):
+        raise ValueError("source snapshot tasks must be an array")
+    tasks = [_object(value, "source snapshot task") for value in values]
+    if len(tasks) != len(names):
+        raise ValueError("source snapshot tasks do not match the matrix")
+
+    cache_entries: list[str] = []
+    for index, (task, name) in enumerate(zip(tasks, names, strict=True), start=1):
+        if task.get("index") != index or task.get("name") != name:
+            raise ValueError("source snapshot tasks do not match the matrix")
+        cache_entry = PurePosixPath(_required_string(task, "cache_entry"))
         if (
-            source_path.is_absolute()
-            or ".." in source_path.parts
+            cache_entry.is_absolute()
+            or len(cache_entry.parts) != 2
+            or cache_entry.name != name
+            or any(part in {"", ".", ".."} for part in cache_entry.parts)
+        ):
+            raise ValueError("source snapshot task has an invalid cache entry")
+        cache_entries.append(cache_entry.as_posix())
+        _validate_snapshot_files(task)
+    if len(cache_entries) != len(set(cache_entries)):
+        raise ValueError("source snapshot cache entries must be unique")
+    return tasks
+
+
+def _validate_snapshot_files(task: dict[str, Any]) -> None:
+    values = task.get("files")
+    if not isinstance(values, list):
+        raise ValueError("source snapshot task files must be an array")
+    files = [_object(value, "task source file") for value in values]
+    paths = [PurePosixPath(_required_string(source, "path")) for source in files]
+    allowed = set(SOURCE_RELATIVE_PATHS)
+    expected_order = [path for path in SOURCE_RELATIVE_PATHS if path in paths]
+    if (
+        not paths
+        or paths[0] != SOURCE_RELATIVE_PATHS[0]
+        or paths != expected_order
+        or len(paths) != len(set(paths))
+        or any(path not in allowed for path in paths)
+    ):
+        raise ValueError("source snapshot task files are incomplete")
+
+    for source in files:
+        text = source.get("text")
+        size = source.get("bytes")
+        digest = source.get("sha256")
+        if (
+            not isinstance(text, str)
             or not isinstance(size, int)
             or isinstance(size, bool)
             or size < 1
-            or not SHA256_PATTERN.fullmatch(str(source.get("sha256", "")))
+            or not isinstance(digest, str)
+            or not SHA256_PATTERN.fullmatch(digest)
         ):
-            raise ValueError("task row has an invalid source file binding")
-    if len(source_paths) != len(set(source_paths)) or "task.toml" not in source_paths:
-        raise ValueError("task row source files are incomplete")
+            raise ValueError("task source file has an invalid content binding")
+        data = text.encode()
+        if size != len(data) or digest != _sha256(data):
+            raise ValueError("task source file content does not match its binding")
 
-    rejection_reasons = row.get("rejection_reasons")
-    if not isinstance(rejection_reasons, list) or not all(
-        isinstance(reason, str) and reason for reason in rejection_reasons
-    ):
-        raise ValueError("task row has invalid rejection reasons")
-    if (status == "supported") != (not rejection_reasons):
-        raise ValueError("task row status disagrees with its rejection reasons")
+
+def _materialize_source_snapshot(
+    cache_root: Path,
+    tasks: list[dict[str, Any]],
+) -> None:
+    for task in tasks:
+        task_path = cache_root / _required_string(task, "cache_entry")
+        files = task["files"]
+        for value in files:
+            source = _object(value, "task source file")
+            target = task_path / _required_string(source, "path")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(_required_string(source, "text").encode())
 
 
 def _classify_task(
@@ -341,18 +395,14 @@ def _classify_task(
     task_path: Path,
     cache_root: Path,
 ) -> dict[str, Any]:
-    task_toml = task_path / "task.toml"
+    input_paths = _task_source_paths(task_path)
+    task_toml = input_paths[0]
     config = TaskConfig.model_validate_toml(task_toml.read_text(encoding="utf-8"))
     environment_dir = task_path / "environment"
     reasons = docker_isolation_static_rejection_reasons(
         environment_dir=environment_dir,
         config=config.environment,
     )
-    input_paths = [task_toml]
-    for name in ("Dockerfile", "docker-compose.yaml"):
-        path = environment_dir / name
-        if path.is_file():
-            input_paths.append(path)
     source_files = [_source_file(path, task_path) for path in input_paths]
     return {
         "index": index,
@@ -390,6 +440,16 @@ def _resolve_task_paths(cache_root: Path, names: list[str]) -> dict[str, Path]:
     if duplicates:
         raise ValueError(f"Harbor cache has duplicate matrix tasks: {', '.join(duplicates)}")
     return {name: paths[0] for name, paths in matches.items()}
+
+
+def _task_source_paths(task_path: Path) -> list[Path]:
+    paths = [task_path / SOURCE_RELATIVE_PATHS[0]]
+    paths.extend(
+        path
+        for relative in SOURCE_RELATIVE_PATHS[1:]
+        if (path := task_path / relative).is_file()
+    )
+    return paths
 
 
 def _load_matrix(matrix_path: Path) -> tuple[bytes, dict[str, Any], list[str]]:
@@ -435,6 +495,20 @@ def _source_file(path: Path, task_path: Path) -> dict[str, Any]:
         "path": path.relative_to(task_path).as_posix(),
         "bytes": len(data),
         "sha256": _sha256(data),
+    }
+
+
+def _snapshot_source_file(path: Path, task_path: Path) -> dict[str, Any]:
+    data = path.read_bytes()
+    try:
+        text = data.decode()
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"task source file is not UTF-8: {path}") from exc
+    return {
+        "path": path.relative_to(task_path).as_posix(),
+        "bytes": len(data),
+        "sha256": _sha256(data),
+        "text": text,
     }
 
 
@@ -489,7 +563,13 @@ def _required_string(value: dict[str, Any], key: str) -> str:
 def main() -> int:
     args = parse_args()
     if args.command == "build":
-        report = build_support_census(args.matrix, args.cache_root)
+        snapshot = build_source_snapshot(args.matrix, args.cache_root)
+        _write_atomic(args.source_snapshot, _dump_json(snapshot))
+        report = _build_support_census_from_snapshot(
+            args.matrix,
+            args.source_snapshot,
+            factory_source_path=FACTORY_SOURCE,
+        )
         _write_atomic(args.report, _dump_json(report))
         _write_atomic(args.markdown, render_markdown(report).encode())
         summary = report["summary"]
@@ -506,17 +586,14 @@ def main() -> int:
         args.cache_root,
         args.report,
         args.markdown,
-        allow_missing_cache=args.allow_missing_cache,
+        source_snapshot_path=args.source_snapshot,
     )
     if errors:
         for error in errors:
             print(error)
         return 1
-    if args.allow_missing_cache and not any(args.cache_root.glob("*/*/task.toml")):
-        print(
-            "completion isolation census committed bindings verified "
-            "(Harbor task cache unavailable)"
-        )
+    if args.source_snapshot is not None:
+        print("completion isolation census artifacts verified from frozen task sources")
     else:
         print("completion isolation census artifacts verified")
     return 0
