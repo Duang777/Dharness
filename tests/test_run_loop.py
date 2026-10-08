@@ -8,6 +8,8 @@ from typing import Any
 import pytest
 from conftest import FakeCompletionIsolation, FakeEnvironment, FakeExecResult, ScriptedModel
 
+from evidence_harness.completion_contract import CompletionContract, TaskRequirement
+from evidence_harness.completion_control import CompletionController
 from evidence_harness.journal import RunJournal
 from evidence_harness.protocol import (
     ActionKind,
@@ -65,7 +67,7 @@ def _finish(script: str = "test -s answer.txt") -> AgentDecision:
         ),
         coverage=(
             RequirementCoverage(
-                requirement="create the requested artifact",
+                requirement="REQ-1",
                 check_ids=("check-answer",),
             ),
         ),
@@ -87,6 +89,7 @@ class _LiveBoundTestLoop(EvidenceLoop):
 
 def _loop(tmp_path, model: ModelGateway, **option_overrides) -> EvidenceLoop:
     clock = option_overrides.pop("clock", time.monotonic)
+    completion_contract = option_overrides.pop("completion_contract", None)
     options = LoopOptions(
         max_turns=option_overrides.pop("max_turns", 12),
         max_environment_calls=option_overrides.pop("max_environment_calls", 20),
@@ -100,6 +103,7 @@ def _loop(tmp_path, model: ModelGateway, **option_overrides) -> EvidenceLoop:
         journal=RunJournal(tmp_path, inline_bytes=512),
         options=options,
         completion_isolation=FakeCompletionIsolation(FakeEnvironment()),
+        completion_contract=completion_contract,
         clock=clock,
     )
 
@@ -203,6 +207,23 @@ class AdvancingEnvironment(FakeEnvironment):
         result = await super().exec(command, cwd, timeout_sec)
         if command == self._script:
             self._clock.now = self._target
+        return result
+
+
+class AdvancingCompletionIsolation(FakeCompletionIsolation):
+    def __init__(
+        self,
+        environment: ShellEnvironment,
+        clock: MutableClock,
+        target: float,
+    ) -> None:
+        super().__init__(environment)
+        self._clock = clock
+        self._target = target
+
+    async def verify(self, request, execute):
+        result = await super().verify(request, execute)
+        self._clock.now = self._target
         return result
 
 
@@ -401,6 +422,8 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
     ]
     events = _events(tmp_path)
     event_types = [event["type"] for event in events]
+    assert events[0]["payload"]["control_audit_version"] == 1
+    assert events[0]["payload"]["completion_contract"]["e_req"][0]["id"] == "REQ-1"
     assert event_types.count("executor_turn_started") == 2
     assert event_types.index("agent_decision") < event_types.index("work_batch_started")
     work_index = event_types.index("work_batch_started")
@@ -423,6 +446,61 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
         "review_ordinal": 1,
         "work_epoch": 1,
     }
+
+
+async def test_finish_cannot_omit_a_fixed_contract_requirement(tmp_path) -> None:
+    options = LoopOptions(
+        max_turns=12,
+        max_environment_calls=20,
+        verification_environment_reserve=3,
+    )
+    contract = CompletionContract.create(
+        requirements=(
+            TaskRequirement(
+                id="artifact",
+                statement="answer.txt exists",
+                evidence_kinds=(CheckKind.ARTIFACT,),
+            ),
+            TaskRequirement(
+                id="behavior",
+                statement="answer.txt contains good",
+                evidence_kinds=(CheckKind.BEHAVIOR,),
+            ),
+        ),
+        options=options,
+    )
+    incomplete = _finish()
+    incomplete = incomplete.model_copy(
+        update={
+            "coverage": (
+                RequirementCoverage(
+                    requirement="artifact",
+                    check_ids=("check-answer",),
+                ),
+            )
+        }
+    )
+    stop = AgentDecision(
+        action=ActionKind.STOP,
+        rationale="the fixed contract cannot be satisfied",
+        stop_category="blocked",
+    )
+    environment = FakeEnvironment()
+
+    report = await _loop(
+        tmp_path,
+        ScriptedModel([incomplete, stop]),
+        completion_contract=contract,
+    ).run("Create answer.txt and prove its value", environment)
+
+    assert report.stop_reason is StopReason.MODEL_STOPPED
+    assert len(environment.calls) == 1
+    events = _events(tmp_path)
+    admission = next(event for event in events if event["type"] == "completion_proposal_admission")
+    assert admission["payload"]["accepted"] is False
+    assert admission["payload"]["evidence"]["reasons"] == [
+        "contract requirements are not covered: ['behavior']"
+    ]
 
 
 async def test_failed_verification_returns_to_repair(tmp_path) -> None:
@@ -658,6 +736,41 @@ async def test_wall_time_reserve_starts_finalization_before_turn_reserve(tmp_pat
     assert finalization["payload"]["triggers"] == ["wall_clock"]
     assert finalization["payload"]["wall_time_remaining_sec"] == 100.0
     assert finalization["payload"]["wall_time_reserve_sec"] == 100.0
+
+
+async def test_budget_expiry_after_isolation_skips_review_and_repair(tmp_path) -> None:
+    clock = MutableClock()
+    environment = FakeEnvironment()
+    model = ScriptedModel(
+        [_finish()],
+        [ReviewDecision(verdict="accept", rationale="must not be called")],
+    )
+    options = LoopOptions(
+        max_turns=4,
+        max_environment_calls=5,
+        max_wall_time_sec=60,
+    )
+    loop = EvidenceLoop(
+        model=model,
+        journal=RunJournal(tmp_path, inline_bytes=512),
+        options=options,
+        completion_isolation=AdvancingCompletionIsolation(
+            environment,
+            clock,
+            target=61.0,
+        ),
+        clock=clock,
+    )
+
+    report = await loop.run("Create answer.txt", environment)
+
+    assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+    assert report.repairs_used == 0
+    assert model.review_prompts == []
+    events = _events(tmp_path)
+    guard = next(event for event in events if event["type"] == "completion_guard_result")
+    assert guard["payload"]["budget"]["accepted"] is False
+    assert not any(event["type"] == "repair_admission" for event in events)
 
 
 async def test_work_command_cannot_consume_wall_time_reserve(tmp_path) -> None:
@@ -970,3 +1083,29 @@ def test_recovery_entry_is_unique_per_open_episode(tmp_path) -> None:
     recoveries = [event for event in _events(tmp_path) if event["type"] == "recovery_required"]
     assert [event["payload"]["recovery_ordinal"] for event in recoveries] == [1, 2]
     assert all(event["payload"]["work_epoch"] == 0 for event in recoveries)
+
+
+def test_verified_finish_rejects_an_illegal_phase_even_with_a_controller(tmp_path) -> None:
+    options = LoopOptions(
+        max_turns=12,
+        max_environment_calls=20,
+        verification_environment_reserve=3,
+    )
+    loop = _loop(tmp_path, ScriptedModel(()))
+    controller = CompletionController(
+        CompletionContract.from_instruction("finish safely", options),
+        options=options,
+    )
+    state = RunState(
+        instruction="finish safely",
+        phase=RunPhase.THINKING,
+        started_monotonic=0,
+        deadline_monotonic=1_000,
+    )
+
+    with pytest.raises(RuntimeError, match="not allowed in phase"):
+        loop._finish(
+            state,
+            StopReason.VERIFIED,
+            completion_controller=controller,
+        )

@@ -9,6 +9,7 @@ from pathlib import Path
 from evidence_harness_mutation.prefixbench_test_campaign import (
     TEST_CAMPAIGN,
     TEST_PROTOCOL,
+    PrefixBenchTestMutationProtocol,
     build_prefixbench_test_campaign,
     check_prefixbench_test_campaign,
     freeze_prefixbench_test_protocol,
@@ -18,6 +19,7 @@ from evidence_harness_mutation.prefixbench_test_campaign import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL_PATH = PROJECT_ROOT / TEST_PROTOCOL
 REPORT_PATH = PROJECT_ROOT / TEST_CAMPAIGN
+FROZEN_PROTOCOL_SHA256 = "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4"
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,6 +29,10 @@ def parse_args() -> argparse.Namespace:
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("freeze", help="Create the held-out protocol before collection.")
     subparsers.add_parser("preflight", help="Verify the committed collection prerequisites.")
+    subparsers.add_parser(
+        "verify-frozen",
+        help="Verify the frozen protocol without admitting the current runtime.",
+    )
     subparsers.add_parser("build", help="Build the fixed 61-task test campaign.")
     subparsers.add_parser("check", help="Verify the committed test campaign.")
     return parser.parse_args()
@@ -51,6 +57,17 @@ def _write_atomic(path: Path, data: bytes) -> None:
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+
+
+def verify_frozen_protocol() -> tuple[PrefixBenchTestMutationProtocol, str]:
+    data = PROTOCOL_PATH.read_bytes()
+    digest = hashlib.sha256(data).hexdigest()
+    if digest != FROZEN_PROTOCOL_SHA256:
+        raise ValueError(f"test protocol hash changed: {digest} != {FROZEN_PROTOCOL_SHA256}")
+    protocol = PrefixBenchTestMutationProtocol.model_validate_json(data)
+    if data != protocol.canonical_bytes():
+        raise ValueError("test protocol is not canonical JSON")
+    return protocol, digest
 
 
 def main() -> int:
@@ -82,6 +99,16 @@ def main() -> int:
                 f"runtime_source_sha256={result.runtime_source.sha256} "
                 f"protocol_sha256={result.protocol.file.sha256}"
             )
+            return 0
+
+        if args.command == "verify-frozen":
+            protocol, digest = verify_frozen_protocol()
+            print(
+                "frozen_protocol_valid=true "
+                f"tasks={protocol.task_count} "
+                f"protocol={protocol.protocol_id}"
+            )
+            print(f"sha256={digest}")
             return 0
 
         if args.command == "build":

@@ -300,3 +300,17 @@ async def test_experiment_agent_replays_then_runs_recorded_finish(
     assert metadata["replay_command_count"] == 1
     assert metadata["stop_reason"] == "verified"
     assert metadata["latest_evidence"]["accepted"] is True
+    completion_events = [
+        json.loads(line)
+        for line in (
+            tmp_path / "logs" / "completion-isolation-experiment" / "completion" / "events.jsonl"
+        )
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+    started = next(event for event in completion_events if event["type"] == "run_started")
+    proposal = next(event for event in completion_events if event["type"] == "agent_decision")
+    assert started["payload"]["completion_contract"]["e_req"][0]["statement"] == (
+        "Create answer.txt"
+    )
+    assert proposal["payload"]["coverage"][0]["requirement"] == "REQ-1"
