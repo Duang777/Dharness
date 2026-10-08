@@ -14,7 +14,7 @@ from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext, ModelUsage
 from pydantic import Field
 
-from evidence_harness.completion_contract import CompletionContract, TaskRequirement
+from evidence_harness.completion_contract import CompletionContract
 from evidence_harness.docker_completion_isolation import (
     completion_isolation_for_harbor,
 )
@@ -25,6 +25,7 @@ from evidence_harness.protocol import (
     ActionKind,
     AgentDecision,
     LoopOptions,
+    RequirementCoverage,
     ReviewDecision,
     UsageTotals,
 )
@@ -178,7 +179,6 @@ class CompletionIsolationExperimentAgent(BaseAgent):
             max_output_tokens=self.options.max_output_tokens,
             transport_attempts=self.options.transport_attempts,
         )
-        model = _RecordedFinishModel(candidate.decision, reviewer)
         loop_options = LoopOptions(
             max_turns=1,
             max_environment_calls=max(4, len(candidate.decision.checks) + 1),
@@ -191,12 +191,23 @@ class CompletionIsolationExperimentAgent(BaseAgent):
             verification_environment_reserve=1,
             output_inline_bytes=self.options.output_inline_bytes,
         )
+        decision = candidate.decision.model_copy(
+            update={
+                "coverage": (
+                    RequirementCoverage(
+                        requirement="REQ-1",
+                        check_ids=tuple(check.id for check in candidate.decision.checks),
+                    ),
+                )
+            }
+        )
+        model = _RecordedFinishModel(decision, reviewer)
         loop = EvidenceLoop(
             model=model,
             journal=completion_journal,
             options=loop_options,
-            completion_contract=_recorded_completion_contract(
-                candidate.decision,
+            completion_contract=CompletionContract.from_instruction(
+                instruction,
                 loop_options,
             ),
             completion_isolation=completion_isolation_for_harbor(
@@ -241,27 +252,6 @@ class CompletionIsolationExperimentAgent(BaseAgent):
                 ),
             }
         }
-
-
-def _recorded_completion_contract(
-    decision: AgentDecision,
-    options: LoopOptions,
-) -> CompletionContract:
-    checks = {check.id: check for check in decision.checks}
-    requirements: list[TaskRequirement] = []
-    for coverage in decision.coverage:
-        kinds = tuple(dict.fromkeys(checks[check_id].kind for check_id in coverage.check_ids))
-        requirements.append(
-            TaskRequirement(
-                id=coverage.requirement,
-                statement=coverage.requirement,
-                evidence_kinds=kinds,
-            )
-        )
-    return CompletionContract.create(
-        requirements=tuple(requirements),
-        options=options,
-    )
 
 
 def load_completion_candidate(

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 
+import pytest
+
 from evidence_harness.completion_contract import (
     CompletionContract,
     TaskRequirement,
@@ -153,6 +155,14 @@ def test_default_contract_freezes_the_full_instruction_and_runtime_budgets() -> 
     assert contract.b_req.max_turns == 7
     assert contract.b_req.max_environment_calls == 11
     assert contract.b_req.max_repairs == 2
+
+
+def test_default_contract_preserves_a_long_instruction() -> None:
+    instruction = "x" * 10_000
+
+    contract = CompletionContract.from_instruction(instruction, LoopOptions())
+
+    assert contract.e_req[0].statement == instruction
 
 
 def test_contract_coverage_rejects_an_omitted_requirement() -> None:
@@ -334,3 +344,38 @@ def test_controller_issues_a_permit_only_for_the_complete_conjunction() -> None:
 
     state.phase = RunPhase.THINKING
     assert controller.authorizes(completion.permit, state) is False
+
+
+def test_controller_rejects_an_acceptance_from_another_controller() -> None:
+    options = LoopOptions(enable_completion_review=False)
+    contract = _contract(options)
+    controller = CompletionController(contract, options=options)
+    other_controller = CompletionController(contract, options=options)
+    state = _state()
+    checks = (
+        _check("artifact-check", CheckKind.ARTIFACT),
+        _check("behavior-check", CheckKind.BEHAVIOR),
+    )
+    coverage = (
+        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
+        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
+    )
+    receipts = tuple(_receipt(check, index) for index, check in enumerate(checks, start=1))
+    acceptance = other_controller.evaluate_accept(
+        state=state,
+        checks=receipts,
+        proposed_checks=checks,
+        coverage=coverage,
+        expected_check_ids=tuple(check.id for check in checks),
+        attempt_id=1,
+        isolation=_isolation(checks, receipts),
+        now=10,
+    )
+
+    with pytest.raises(RuntimeError, match="current acceptance result"):
+        controller.evaluate_complete(
+            acceptance,
+            assessment=None,
+            state=state,
+            attempt_id=1,
+        )

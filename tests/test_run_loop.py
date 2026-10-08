@@ -210,6 +210,23 @@ class AdvancingEnvironment(FakeEnvironment):
         return result
 
 
+class AdvancingCompletionIsolation(FakeCompletionIsolation):
+    def __init__(
+        self,
+        environment: ShellEnvironment,
+        clock: MutableClock,
+        target: float,
+    ) -> None:
+        super().__init__(environment)
+        self._clock = clock
+        self._target = target
+
+    async def verify(self, request, execute):
+        result = await super().verify(request, execute)
+        self._clock.now = self._target
+        return result
+
+
 class AdvancingModel(ScriptedModel):
     def __init__(
         self,
@@ -721,6 +738,41 @@ async def test_wall_time_reserve_starts_finalization_before_turn_reserve(tmp_pat
     assert finalization["payload"]["wall_time_reserve_sec"] == 100.0
 
 
+async def test_budget_expiry_after_isolation_skips_review_and_repair(tmp_path) -> None:
+    clock = MutableClock()
+    environment = FakeEnvironment()
+    model = ScriptedModel(
+        [_finish()],
+        [ReviewDecision(verdict="accept", rationale="must not be called")],
+    )
+    options = LoopOptions(
+        max_turns=4,
+        max_environment_calls=5,
+        max_wall_time_sec=60,
+    )
+    loop = EvidenceLoop(
+        model=model,
+        journal=RunJournal(tmp_path, inline_bytes=512),
+        options=options,
+        completion_isolation=AdvancingCompletionIsolation(
+            environment,
+            clock,
+            target=61.0,
+        ),
+        clock=clock,
+    )
+
+    report = await loop.run("Create answer.txt", environment)
+
+    assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+    assert report.repairs_used == 0
+    assert model.review_prompts == []
+    events = _events(tmp_path)
+    guard = next(event for event in events if event["type"] == "completion_guard_result")
+    assert guard["payload"]["budget"]["accepted"] is False
+    assert not any(event["type"] == "repair_admission" for event in events)
+
+
 async def test_work_command_cannot_consume_wall_time_reserve(tmp_path) -> None:
     clock = MutableClock()
     change = "printf good > answer.txt"
@@ -1040,7 +1092,7 @@ def test_verified_finish_rejects_an_illegal_phase_even_with_a_controller(tmp_pat
         verification_environment_reserve=3,
     )
     loop = _loop(tmp_path, ScriptedModel(()))
-    loop._completion_controller = CompletionController(
+    controller = CompletionController(
         CompletionContract.from_instruction("finish safely", options),
         options=options,
     )
@@ -1052,4 +1104,8 @@ def test_verified_finish_rejects_an_illegal_phase_even_with_a_controller(tmp_pat
     )
 
     with pytest.raises(RuntimeError, match="not allowed in phase"):
-        loop._finish(state, StopReason.VERIFIED)
+        loop._finish(
+            state,
+            StopReason.VERIFIED,
+            completion_controller=controller,
+        )

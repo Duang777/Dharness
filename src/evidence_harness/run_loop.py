@@ -109,7 +109,6 @@ class EvidenceLoop:
         self._collection = collection
         self._clock = clock
         self._on_progress = on_progress
-        self._completion_controller: CompletionController | None = None
 
     async def run(self, instruction: str, environment: ShellEnvironment) -> RunReport:
         contract = self._configured_completion_contract or CompletionContract.from_instruction(
@@ -117,7 +116,6 @@ class EvidenceLoop:
             self._options,
         )
         controller = CompletionController(contract, options=self._options)
-        self._completion_controller = controller
         started = self._clock()
         state = RunState(
             instruction=instruction,
@@ -287,9 +285,9 @@ class EvidenceLoop:
             if decision.action is ActionKind.EXECUTE:
                 if state.finalization_started:
                     state.finalization_repair_used = True
-                await self._handle_execute(state, runner, decision)
+                await self._handle_execute(state, runner, decision, controller)
             elif decision.action is ActionKind.FINISH:
-                await self._handle_finish(state, decision)
+                await self._handle_finish(state, decision, controller)
             elif decision.action is ActionKind.REPLAN:
                 self._handle_replan(state, decision)
             else:
@@ -309,8 +307,8 @@ class EvidenceLoop:
         state: RunState,
         runner: CommandRunner,
         decision: AgentDecision,
+        controller: CompletionController,
     ) -> None:
-        controller = self._require_completion_controller()
         budget = controller.contract.b_req
         remaining_calls = budget.max_environment_calls - state.environment_call_count
         available_for_work = remaining_calls - budget.verification_environment_reserve
@@ -442,8 +440,8 @@ class EvidenceLoop:
         self,
         state: RunState,
         decision: AgentDecision,
+        controller: CompletionController,
     ) -> None:
-        controller = self._require_completion_controller()
         admission = controller.admit_proposal(
             state=state,
             checks=decision.checks,
@@ -472,7 +470,7 @@ class EvidenceLoop:
                     failure_category=category,
                 )
             else:
-                self._reject_completion(state, admission.reasons)
+                self._reject_completion(state, admission.reasons, controller)
             return
 
         supporting_observations = list(state.observations)
@@ -533,12 +531,53 @@ class EvidenceLoop:
         if not mechanical_evidence.accepted:
             state.latest_evidence = mechanical_evidence
             self._journal.append("verification_receipt", mechanical_evidence)
-            self._reject_completion(state, mechanical_evidence.rejection_reasons)
+            self._reject_completion(
+                state,
+                mechanical_evidence.rejection_reasons,
+                controller,
+            )
             return
 
         semantic_assessment: SemanticAssessment | None = None
+        state.phase = (
+            RunPhase.REVIEWING if self._options.enable_completion_review else RunPhase.VERIFYING
+        )
+        pre_review_acceptance = controller.evaluate_accept(
+            state=state,
+            checks=receipts,
+            proposed_checks=decision.checks,
+            coverage=decision.coverage,
+            expected_check_ids=tuple(check.id for check in decision.checks),
+            attempt_id=attempt_id,
+            isolation=isolated.evidence,
+            now=self._clock(),
+        )
+        if not pre_review_acceptance.budget.accepted:
+            completion = controller.evaluate_complete(
+                pre_review_acceptance,
+                assessment=None,
+                state=state,
+                attempt_id=attempt_id,
+            )
+            state.latest_evidence = completion.receipt
+            state.unresolved_errors.extend(pre_review_acceptance.budget.reasons)
+            self._journal.append(
+                "completion_guard_result",
+                {
+                    **completion.journal_payload(),
+                    "attempt_id": attempt_id,
+                    "work_epoch": state.work_epoch,
+                },
+            )
+            self._journal.append("verification_receipt", completion.receipt)
+            self._finish(
+                state,
+                StopReason.BUDGET_EXHAUSTED,
+                failure_category="harness_control",
+            )
+            return
+
         if self._options.enable_completion_review:
-            state.phase = RunPhase.REVIEWING
             state.completion_review_count += 1
             self._journal.append(
                 "completion_review_started",
@@ -641,11 +680,24 @@ class EvidenceLoop:
             self._finish(
                 state,
                 StopReason.VERIFIED,
+                completion_controller=controller,
                 completion_permit=completion.permit,
             )
             return
 
-        self._reject_completion(state, evidence.rejection_reasons)
+        if not completion.accept.budget.accepted:
+            state.unresolved_errors.extend(completion.accept.budget.reasons)
+            self._finish(
+                state,
+                StopReason.BUDGET_EXHAUSTED,
+                failure_category="harness_control",
+            )
+            return
+        if not completion.accept.phase.accepted:
+            raise RuntimeError(
+                f"completion evaluation reached an illegal phase: {completion.accept.phase.reasons}"
+            )
+        self._reject_completion(state, evidence.rejection_reasons, controller)
 
     async def _run_completion_check(
         self,
@@ -772,8 +824,12 @@ class EvidenceLoop:
             ),
         )
 
-    def _reject_completion(self, state: RunState, reasons: tuple[str, ...]) -> None:
-        controller = self._require_completion_controller()
+    def _reject_completion(
+        self,
+        state: RunState,
+        reasons: tuple[str, ...],
+        controller: CompletionController,
+    ) -> None:
         budget = controller.contract.b_req
         state.completion_findings = _stable_unique(reasons)
         review_exhausted = (
@@ -904,16 +960,18 @@ class EvidenceLoop:
         reason: StopReason,
         *,
         failure_category: str | None = None,
+        completion_controller: CompletionController | None = None,
         completion_permit: object | None = None,
     ) -> RunReport:
         if state.stop_reason is None:
             if reason is StopReason.VERIFIED:
-                controller = self._require_completion_controller()
-                if not controller.phase_ok(state):
+                if completion_controller is None:
+                    raise RuntimeError("verified completion requires a CompletionController")
+                if not completion_controller.phase_ok(state):
                     raise RuntimeError(
                         f"verified completion is not allowed in phase '{state.phase}'"
                     )
-                if not controller.authorizes(
+                if not completion_controller.authorizes(
                     completion_permit,
                     state,
                 ):
@@ -954,11 +1012,6 @@ class EvidenceLoop:
             failure_category=failure_category or state.failure_category,
             usage=self._model.usage,
         )
-
-    def _require_completion_controller(self) -> CompletionController:
-        if self._completion_controller is None:
-            raise RuntimeError("completion controller is not initialized")
-        return self._completion_controller
 
     def _notify(self, state: RunState) -> None:
         if self._on_progress is None:

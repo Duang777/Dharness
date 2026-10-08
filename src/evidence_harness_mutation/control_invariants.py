@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from evidence_harness.completion_contract import CompletionContract
-from evidence_harness.protocol import VerificationReceipt
+from evidence_harness.protocol import (
+    CommandMode,
+    CommandReceipt,
+    CompletionReviewStarted,
+    VerificationReceipt,
+)
 from evidence_harness_mutation.attempts import (
     CompletionAttempt,
     parse_event,
@@ -92,6 +98,31 @@ class _EventPayload(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
+class _GuardPayload(_EventPayload):
+    name: Literal["evidence", "budget", "phase", "review"]
+    accepted: bool
+    reasons: tuple[str, ...]
+
+
+class _CompletionProposalAdmission(_EventPayload):
+    accepted: bool
+    evidence: _GuardPayload
+    budget: _GuardPayload
+    phase: _GuardPayload
+    work_epoch: int = Field(ge=0)
+    check_ids: tuple[str, ...] = Field(min_length=1)
+
+
+class _CompletionGuardResult(_EventPayload):
+    accepted: bool
+    evidence: _GuardPayload
+    budget: _GuardPayload
+    phase: _GuardPayload
+    review: _GuardPayload
+    attempt_id: int = Field(ge=1)
+    work_epoch: int = Field(ge=0)
+
+
 class _WorkBatchAdmission(_EventPayload):
     accepted: bool
     command_ids: tuple[str, ...]
@@ -140,6 +171,14 @@ def audit_control_trace(trace: OfflineTrace) -> ControlAuditReport:
     )
     legacy = audit_completion_trace(trace)
     results = [_translate_legacy_result(result) for result in legacy.results]
+    results[0] = _merge_violations(
+        results[0],
+        _audit_control_epochs(trace, attempts),
+    )
+    results[2] = _merge_violations(
+        results[2],
+        _audit_completion_authorization(attempts),
+    )
     results.append(_audit_i5(attempts))
 
     contract = _control_contract(trace)
@@ -225,6 +264,11 @@ def _audit_i5(
                 details.append("live candidate was not resumed after isolated verification")
             if not isolation.snapshot_image_disposed:
                 details.append("completion snapshot image was not disposed")
+            undisposed_checks = tuple(
+                record.check_id for record in isolation.checks if not record.disposed
+            )
+            if undisposed_checks:
+                details.append(f"completion check children were not disposed: {undisposed_checks}")
             changed_checks = tuple(
                 record.check_id
                 for record in isolation.checks
@@ -306,30 +350,77 @@ def _audit_i7(
     terminal_line: int,
 ) -> ControlInvariantResult:
     invariant = ControlInvariantId.I7
+    starts = _events(trace, "work_batch_started")
     events = _events(trace, "work_batch_finished")
     details: list[str] = []
-    for event in events:
+    if len(starts) != len(events):
+        details.append("started and finished work batch counts differ")
+    for start_event, event in zip(starts, events, strict=False):
+        start = parse_event(start_event, _WorkBatchStarted)
         batch = parse_event(event, _WorkBatchFinished)
-        progress_ids = set(batch.successful_change_ids) | set(batch.novel_observation_ids)
-        completed_ids = set(batch.completed_command_ids)
+        if start_event.line >= event.line:
+            details.append("work batch finished before it started")
+        if start.command_ids != batch.command_ids:
+            details.append(f"work batch on line {event.line} does not match its start event")
+        if start.work_epoch != batch.work_epoch:
+            details.append(f"work batch on line {event.line} changed work epoch")
+
+        receipt_events = tuple(
+            candidate
+            for candidate in trace.events
+            if start_event.line < candidate.line < event.line
+            and candidate.event_type == "command_receipt"
+        )
+        receipts = tuple(parse_event(candidate, CommandReceipt) for candidate in receipt_events)
+        completed_ids = tuple(receipt.command_id for receipt in receipts)
+        if completed_ids != batch.completed_command_ids:
+            details.append(
+                f"line {event.line} completed command ids do not match recorded receipts"
+            )
+        if completed_ids != batch.command_ids[: len(completed_ids)]:
+            details.append(f"line {event.line} completed commands are not an ordered batch prefix")
+        if any(receipt.work_epoch != batch.work_epoch for receipt in receipts):
+            details.append(f"line {event.line} contains receipts from another work epoch")
+
+        failed_ids = tuple(receipt.command_id for receipt in receipts if not receipt.succeeded)
+        if failed_ids != batch.failed_command_ids:
+            details.append(f"line {event.line} failed command ids do not match receipts")
+        successful_change_ids = tuple(
+            receipt.command_id
+            for receipt in receipts
+            if receipt.succeeded and receipt.mode is CommandMode.CHANGE
+        )
+        if successful_change_ids != batch.successful_change_ids:
+            details.append(f"line {event.line} successful change ids do not match receipts")
+
+        prior_fingerprints = {
+            parse_event(candidate, CommandReceipt).observation_fingerprint
+            for candidate in trace.events
+            if candidate.line < start_event.line and candidate.event_type == "command_receipt"
+        }
+        novel_observation_ids = tuple(
+            receipt.command_id
+            for receipt in receipts
+            if receipt.succeeded
+            and receipt.mode is CommandMode.OBSERVE
+            and receipt.observation_fingerprint not in prior_fingerprints
+        )
+        if novel_observation_ids != batch.novel_observation_ids:
+            details.append(f"line {event.line} novel observation ids do not match receipts")
+
+        progress_ids = successful_change_ids + novel_observation_ids
         expected_progress = bool(progress_ids)
         if batch.progressed != expected_progress:
             details.append(f"line {event.line} progress flag does not match successful evidence")
-        failed_progress = set(batch.failed_command_ids) & progress_ids
+        failed_progress = set(failed_ids) & set(progress_ids)
         if failed_progress:
             details.append(
                 f"line {event.line} counts failed commands as progress: {sorted(failed_progress)}"
             )
-        unknown_results = (set(batch.failed_command_ids) | progress_ids) - completed_ids
-        if unknown_results:
-            details.append(
-                f"line {event.line} classifies commands that did not complete: "
-                f"{sorted(unknown_results)}"
-            )
         expected_stagnation = 0 if expected_progress else batch.stagnant_batches_before + 1
         if batch.stagnant_batches_after != expected_stagnation:
             details.append(f"line {event.line} records an incorrect stagnation transition")
-    return _global_result(invariant, details, terminal_line, events)
+    return _global_result(invariant, details, terminal_line, starts + events)
 
 
 def _audit_i8(
@@ -339,11 +430,20 @@ def _audit_i8(
 ) -> ControlInvariantResult:
     invariant = ControlInvariantId.I8
     events = _events(trace, "repair_admission")
+    review_events = _events(trace, "completion_review_started")
     details: list[str] = []
+    review_ordinals = tuple(
+        parse_event(event, CompletionReviewStarted).review_ordinal for event in review_events
+    )
+    if review_ordinals != tuple(range(1, len(review_events) + 1)):
+        details.append("completion review ordinals are not contiguous")
+    if len(review_events) > contract.b_req.max_completion_reviews:
+        details.append("completion review count exceeds B_req")
     for event in events:
         admission = parse_event(event, _RepairAdmission)
+        actual_reviews_used = sum(review_event.line < event.line for review_event in review_events)
         review_available = (
-            admission.completion_reviews_used < admission.max_completion_reviews
+            actual_reviews_used < contract.b_req.max_completion_reviews
             or not trace.completion_review_enabled
         )
         admissible = review_available and admission.repair_count_before < contract.b_req.max_repairs
@@ -354,6 +454,10 @@ def _audit_i8(
         )
         if admission.max_repairs != contract.b_req.max_repairs:
             details.append(f"line {event.line} uses a repair limit outside B_req")
+        if admission.max_completion_reviews != contract.b_req.max_completion_reviews:
+            details.append(f"line {event.line} uses a review limit outside B_req")
+        if admission.completion_reviews_used != actual_reviews_used:
+            details.append(f"line {event.line} records an incorrect review count")
         if admission.accepted != admissible:
             details.append(f"line {event.line} repair admission contradicts the repair budget")
         if admission.repair_count_after != expected_after:
@@ -372,7 +476,137 @@ def _audit_i8(
                 f"run reports {run.repairs_used} repairs above "
                 f"B_req limit {contract.b_req.max_repairs}"
             )
-    return _global_result(invariant, details, terminal_line, events + finished[-1:])
+    return _global_result(
+        invariant,
+        details,
+        terminal_line,
+        events + review_events + finished[-1:],
+    )
+
+
+def _audit_control_epochs(
+    trace: OfflineTrace,
+    attempts: tuple[CompletionAttempt, ...],
+) -> tuple[ControlInvariantViolation, ...]:
+    if not attempts:
+        return ()
+    starts = _events(trace, "work_batch_started")
+    details: list[str] = []
+    epochs = tuple(parse_event(event, _WorkBatchStarted).work_epoch for event in starts)
+    if epochs != tuple(range(1, len(epochs) + 1)):
+        details.append(f"work batch epochs are not contiguous from one: {epochs}")
+
+    attempt = attempts[-1]
+    accepted = tuple(
+        receipt
+        for event in attempt.of_type("verification_receipt")
+        if (receipt := parse_event(event, VerificationReceipt)).accepted
+    )
+    expected_epoch = epochs[-1] if epochs else 0
+    if len(accepted) == 1 and accepted[0].work_epoch != expected_epoch:
+        details.append(
+            f"verified work epoch {accepted[0].work_epoch} does not match "
+            f"latest work batch epoch {expected_epoch}"
+        )
+    if not details:
+        return ()
+    assert attempt.terminal_line is not None
+    return (
+        ControlInvariantViolation(
+            invariant=ControlInvariantId.I1,
+            terminal_line=attempt.terminal_line,
+            attempt_ordinal=attempt.ordinal,
+            related_lines=tuple(event.line for event in starts),
+            details=tuple(details),
+        ),
+    )
+
+
+def _audit_completion_authorization(
+    attempts: tuple[CompletionAttempt, ...],
+) -> tuple[ControlInvariantViolation, ...]:
+    violations: list[ControlInvariantViolation] = []
+    for attempt in attempts:
+        details: list[str] = []
+        proposal_events = attempt.of_type("completion_proposal_admission")
+        guard_events = attempt.of_type("completion_guard_result")
+        verification_events = attempt.of_type("verification_receipt")
+        verification = (
+            parse_event(verification_events[0], VerificationReceipt)
+            if len(verification_events) == 1
+            else None
+        )
+
+        if len(proposal_events) != 1:
+            details.append("verified attempt must contain one completion proposal admission")
+        else:
+            proposal = parse_event(
+                proposal_events[0],
+                _CompletionProposalAdmission,
+            )
+            expected_ids = tuple(check.id for check in attempt.decision.checks)
+            if proposal.check_ids != expected_ids:
+                details.append("completion proposal admission does not bind the proposed checks")
+            if proposal.accepted != all(
+                guard.accepted for guard in (proposal.evidence, proposal.budget, proposal.phase)
+            ):
+                details.append("completion proposal admission contradicts its guards")
+            if not proposal.accepted:
+                details.append("verified attempt has a rejected completion proposal")
+            if verification is not None and proposal.work_epoch != verification.work_epoch:
+                details.append("completion proposal admission has the wrong work epoch")
+
+        if len(guard_events) != 1:
+            details.append("verified attempt must contain one completion guard result")
+        else:
+            guard = parse_event(guard_events[0], _CompletionGuardResult)
+            guard_results = (guard.evidence, guard.budget, guard.phase, guard.review)
+            if tuple(result.name for result in guard_results) != (
+                "evidence",
+                "budget",
+                "phase",
+                "review",
+            ):
+                details.append("completion guard result has mislabeled guards")
+            if guard.accepted != all(result.accepted for result in guard_results):
+                details.append("completion guard result contradicts its guards")
+            if not guard.accepted:
+                details.append("verified attempt has a rejected completion guard result")
+            if verification is not None:
+                if guard.work_epoch != verification.work_epoch:
+                    details.append("completion guard result has the wrong work epoch")
+                isolation = verification.isolation
+                if isolation is not None and guard.attempt_id != isolation.attempt_id:
+                    details.append("completion guard result has the wrong attempt id")
+                if guard.accepted != verification.accepted:
+                    details.append("completion guard and verification receipt disagree")
+
+        if (
+            len(proposal_events) == 1
+            and len(guard_events) == 1
+            and proposal_events[0].line >= guard_events[0].line
+        ):
+            details.append("completion guard result precedes proposal admission")
+        if (
+            len(guard_events) == 1
+            and len(verification_events) == 1
+            and guard_events[0].line >= verification_events[0].line
+        ):
+            details.append("verification receipt precedes completion guard result")
+
+        if details:
+            assert attempt.terminal_line is not None
+            related = proposal_events + guard_events + verification_events
+            violations.append(
+                ControlInvariantViolation(
+                    invariant=ControlInvariantId.I3,
+                    terminal_line=attempt.terminal_line,
+                    attempt_ordinal=attempt.ordinal,
+                    related_lines=tuple(event.line for event in related),
+                    details=tuple(dict.fromkeys(details)),
+                )
+            )
+    return tuple(violations)
 
 
 def _control_contract(trace: OfflineTrace) -> CompletionContract | None:
@@ -422,6 +656,20 @@ def _result(
         invariant=invariant,
         status=(ControlInvariantStatus.FAIL if violations else ControlInvariantStatus.PASS),
         violations=tuple(violations),
+    )
+
+
+def _merge_violations(
+    result: ControlInvariantResult,
+    violations: tuple[ControlInvariantViolation, ...],
+) -> ControlInvariantResult:
+    if not violations:
+        return result
+    return result.model_copy(
+        update={
+            "status": ControlInvariantStatus.FAIL,
+            "violations": (*result.violations, *violations),
+        }
     )
 
 

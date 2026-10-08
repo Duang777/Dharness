@@ -183,6 +183,12 @@ the frozen I1-I4 auditor results and evaluates I5-I8 from the new facts. A
 schema-2 journal without `control_audit_version=1` reports I6-I8 as
 `unsupported`; it never reports those invariants as passed.
 
+For control-audit v1, the auditor also binds work batches to their raw command
+receipts, checks monotonic work epochs, requires an accepted
+`completion_guard_result` before `verified`, and compares recorded repair and
+review limits with the frozen contract. It does not treat self-reported summary
+fields as independent evidence.
+
 `apply_control_mutation` exposes one deterministic mutation for each invariant.
 The I1-I4 operators delegate to the frozen PrefixBench v1 operators. The I5-I8
 operators mutate only control-audit v1 facts.

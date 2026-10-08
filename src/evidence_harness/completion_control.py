@@ -55,11 +55,23 @@ class ProposalAdmission:
 
 
 @dataclass(frozen=True, slots=True)
+class _EvaluationBinding:
+    authority: object
+    controller_identity: int
+    state_identity: int
+    attempt_id: int
+    work_epoch: int
+    phase: RunPhase
+    counters: tuple[int, int, int, int, int]
+
+
+@dataclass(frozen=True, slots=True)
 class AcceptEvaluation:
     evidence: GuardResult
     budget: GuardResult
     phase: GuardResult
     receipt: VerificationReceipt
+    _binding: _EvaluationBinding
 
     @property
     def accepted(self) -> bool:
@@ -71,14 +83,8 @@ class AcceptEvaluation:
 
 
 @dataclass(frozen=True, slots=True)
-class _CompletionPermit:
-    authority: object
-    controller_identity: int
-    state_identity: int
-    attempt_id: int
-    work_epoch: int
-    phase: RunPhase
-    counters: tuple[int, int, int, int, int]
+class _CompletionPermit(_EvaluationBinding):
+    pass
 
 
 @dataclass(frozen=True, slots=True)
@@ -337,6 +343,15 @@ class CompletionController:
                 review_required=self.options.enable_completion_review,
             ),
             receipt=receipt,
+            _binding=_EvaluationBinding(
+                authority=_PERMIT_AUTHORITY,
+                controller_identity=id(self),
+                state_identity=id(state),
+                attempt_id=attempt_id,
+                work_epoch=state.work_epoch,
+                phase=state.phase,
+                counters=_state_counters(state),
+            ),
         )
 
     def evaluate_complete(
@@ -347,6 +362,8 @@ class CompletionController:
         state: RunState,
         attempt_id: int,
     ) -> CompletionEvaluation:
+        if not self._authorizes_acceptance(acceptance, state, attempt_id):
+            raise RuntimeError("completion evaluation requires a current acceptance result")
         review_required = self.options.enable_completion_review
         review = self.review_gate.evaluate(
             required=review_required,
@@ -404,6 +421,23 @@ class CompletionController:
                 state,
                 review_required=self.options.enable_completion_review,
             ).accepted
+        )
+
+    def _authorizes_acceptance(
+        self,
+        acceptance: AcceptEvaluation,
+        state: RunState,
+        attempt_id: int,
+    ) -> bool:
+        binding = acceptance._binding
+        return (
+            binding.authority is _PERMIT_AUTHORITY
+            and binding.controller_identity == id(self)
+            and binding.state_identity == id(state)
+            and binding.attempt_id == attempt_id
+            and binding.work_epoch == state.work_epoch
+            and binding.phase is state.phase
+            and binding.counters == _state_counters(state)
         )
 
     def phase_ok(self, state: RunState) -> bool:

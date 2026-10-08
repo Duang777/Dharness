@@ -13,7 +13,7 @@ class _FrozenModel(BaseModel):
 
 class TaskRequirement(_FrozenModel):
     id: str = Field(min_length=1, max_length=1_000)
-    statement: str = Field(min_length=1, max_length=4_000)
+    statement: str = Field(min_length=1)
     evidence_kinds: tuple[CheckKind, ...] = Field(min_length=1)
 
     @model_validator(mode="after")
