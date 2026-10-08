@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from evidence_harness.budget import finalization_wall_time_reserve_sec
+from evidence_harness.completion_contract import CompletionContract
 from evidence_harness.protocol import (
     ActionKind,
     AgentDecision,
@@ -49,7 +50,8 @@ Rules:
 - A completion check may create temporary output, but it must not modify or delete a pre-existing
   candidate file. Files created by a check are discarded and do not prove that the candidate
   already contained those files.
-- A finish response must map every explicit task requirement to one or more check IDs.
+- A finish response must map every completion_contract requirement ID to one or more check IDs.
+- Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
 - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
   for completion. Submit focused checks or stop; do not propose more exploration.
 - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
@@ -86,6 +88,7 @@ def build_executor_prompt(
     options: LoopOptions,
     now: float,
     *,
+    contract: CompletionContract,
     allowed_actions: tuple[ActionKind, ...] | None = None,
 ) -> str:
     schema = AgentDecision.model_json_schema()
@@ -101,6 +104,7 @@ def build_executor_prompt(
             recent_limit,
             detail_chars,
             actions,
+            contract,
         )
         prompt = _render(_EXECUTOR_RULES, payload, schema)
         if len(prompt) <= options.context_max_chars:
@@ -121,6 +125,7 @@ def build_executor_prompt(
 def build_review_prompt(
     *,
     instruction: str,
+    contract: CompletionContract,
     checks: tuple[VerificationCheck, ...],
     coverage: tuple[RequirementCoverage, ...],
     verification_receipts: tuple[CommandReceipt, ...],
@@ -130,6 +135,7 @@ def build_review_prompt(
 ) -> str:
     payload = {
         "original_task": instruction,
+        "completion_contract": contract.model_dump(mode="json"),
         "proposed_checks": [item.model_dump(mode="json") for item in checks],
         "requirement_coverage": [item.model_dump(mode="json") for item in coverage],
         "prior_completion_findings": prior_findings,
@@ -153,11 +159,13 @@ def _executor_payload(
     recent_limit: int,
     detail_chars: int,
     allowed_actions: tuple[ActionKind, ...],
+    contract: CompletionContract,
 ) -> dict[str, Any]:
     old_receipts = state.observations[:-recent_limit] if recent_limit else state.observations
     recent_receipts = state.observations[-recent_limit:] if recent_limit else []
     return {
         "original_task": state.instruction,
+        "completion_contract": contract.model_dump(mode="json"),
         "phase": state.phase,
         "current_plan": state.current_plan,
         "current_goal": state.current_goal,

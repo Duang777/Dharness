@@ -1,5 +1,6 @@
 import json
 
+from evidence_harness.completion_contract import CompletionContract
 from evidence_harness.prompting import build_executor_prompt, build_review_prompt
 from evidence_harness.protocol import (
     CommandMode,
@@ -55,8 +56,9 @@ def test_compaction_preserves_task_and_complete_schema() -> None:
         observations=observations,
     )
     options = LoopOptions(context_max_chars=10_000, output_inline_bytes=12_000)
+    contract = CompletionContract.from_instruction(instruction, options)
 
-    prompt = build_executor_prompt(state, options, now=10)
+    prompt = build_executor_prompt(state, options, now=10, contract=contract)
     state_text, schema_text = prompt.split("OUTPUT JSON SCHEMA\n", maxsplit=1)
     payload_text = state_text.split("CURRENT RUN STATE\n", maxsplit=1)[1].strip()
     payload = json.loads(payload_text)
@@ -82,6 +84,10 @@ def test_compaction_preserves_task_and_complete_schema() -> None:
 def test_completion_reviewer_uses_feasible_evidence_standard() -> None:
     prompt = build_review_prompt(
         instruction="Make the query as efficient as possible.",
+        contract=CompletionContract.from_instruction(
+            "Make the query as efficient as possible.",
+            LoopOptions(),
+        ),
         checks=(),
         coverage=(),
         verification_receipts=(),

@@ -67,7 +67,8 @@ journal SHA-256。最终成绩反映含恢复的工程闭环，不是严格 pass
 | 设计亮点 | Harness 的实现 |
 |---|---|
 | 结构化动作协议 | 模型只能返回 `execute`、`finish`、`replan` 或 `stop`。Pydantic 在模型边界解析动作，格式错误只允许一次 schema repair |
-| 证据驱动的完成协议 | `finish` 必须提交检查命令和 requirement-to-check 覆盖表。Harness 在候选快照中重跑检查，模型不能用自然语言自行宣布成功 |
+| 固定完成契约 | `CompletionContract` 在运行开始时冻结 requirement、证据类型和预算。`finish` 必须覆盖固定的 requirement ID，不能靠漏报缩小验收范围 |
+| 组合式完成控制 | `CompletionController` 分别运行 `EvidenceGate`、`BudgetGuard`、`PhaseGuard` 和 `ReviewGate`。只有控制器许可可以写入 `verified` |
 | 隔离完成检查 | 每条检查从同一 Docker 候选镜像启动独立的无挂载、无网络子容器。源容器保持暂停，检查结束后校验源 diff 并清理全部临时资源 |
 | 基于 epoch 的证据新鲜度 | 每次修改环境都会推进 `work_epoch`。旧检查立即失效，避免修改后继续复用过期的通过结果 |
 | 单写者执行边界 | 只有 `CommandRunner` 可以调用 Harbor 环境。executor 和 reviewer 不会并发修改同一个容器 |
@@ -112,7 +113,11 @@ flowchart LR
     I --> K[候选快照子容器]
     C --> J[RunJournal]
     I --> J
-    L --> V[EvidenceGate]
+    L --> V[CompletionController]
+    V --> EG[EvidenceGate]
+    V --> BG[BudgetGuard]
+    V --> PG[PhaseGuard]
+    V --> RG[ReviewGate]
     L --> S[RunState / RunReport]
 ```
 
@@ -122,7 +127,7 @@ flowchart LR
 | 执行策略 | 轻量 plan-in-action；每轮选择 `execute`、`finish`、`replan` 或 `stop` |
 | 错误恢复 | 命令分类、schema repair、模型超时、重复周期检测、恢复预算 |
 | 上下文管理 | 从状态重建 prompt；大输出写 journal，只传摘录与 SHA-256 |
-| 终止判断 | Harness 隔离执行 checks，EvidenceGate 校验快照与结果，reviewer 再审实际 receipts |
+| 终止判断 | Harness 隔离执行 checks；CompletionController 合取证据、预算、阶段和 review 结果，并签发一次性完成许可 |
 
 完整状态机、组件职责、方案比较和取舍见[架构决策](docs/architecture-rationale.md)。
 
@@ -139,9 +144,10 @@ Evidence Harness 的设计不是“让模型多思考几轮”，而是把不稳
 预算、最近观察和日志引用。完整输出进入脱敏 journal。模型需要旧细节时重新执行窄范围
 查询，而不是让历史输出永久占用上下文。
 
-**选择双重完成判定。** Harness 的 `EvidenceGate` 只判断完成声明是否有新鲜、可执行、
-覆盖要求的证据。Harbor verifier 才决定 benchmark reward。两者分离后，报告可以识别
-“任务已通过但 Harness 未收敛”和“内部已验证但外部产物错误”这两种相反问题。
+**选择契约绑定的完成判定。** Harness 在运行开始时冻结 `CompletionContract`。
+`EvidenceGate` 对照固定 requirement 集合检查覆盖、类型和回执。`BudgetGuard`、
+`PhaseGuard` 和 `ReviewGate` 保留各自的拒绝原因。Harbor verifier 仍决定 benchmark
+reward，因此内部 `verified` 不覆盖外部评分。
 
 **选择有限恢复。** schema repair、模型调用超时、命令失败分类和重复周期检测都有明确
 预算。系统宁可返回可解释的 `model_failure` 或 `budget_exhausted`，也不无限重试并把
@@ -489,6 +495,7 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [失败分析](docs/failure-analysis.md)
 - [Completion 校准设计](docs/completion-calibration-design.md)
 - [Completion 校准研究](docs/completion-calibration-research.md)
+- [Completion contract 与 I1-I8 控制审计](docs/completion-control-design.md)
 - [22 例 Completion 分歧语料](evaluation/completion-disagreements.json)
 - [Completion 策略校准结果](evaluation/completion-calibration.json)
 - [隔离完成验证设计](docs/isolated-verification-design.md)

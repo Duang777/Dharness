@@ -88,6 +88,31 @@ def test_preflight_prints_frozen_identity(
     assert f"producer_commit={'b' * 40}" in stdout
 
 
+def test_verify_frozen_checks_protocol_without_live_runtime_preflight(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    protocol = SimpleNamespace(
+        protocol_id="prefixbench-v1-test-offline-mutation-v1",
+        task_count=61,
+    )
+    monkeypatch.setattr(
+        prefixbench_test_campaign,
+        "verify_frozen_protocol",
+        lambda: (protocol, "d" * 64),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["prefixbench_test_campaign.py", "verify-frozen"],
+    )
+
+    assert prefixbench_test_campaign.main() == 0
+    stdout = capsys.readouterr().out
+    assert "frozen_protocol_valid=true tasks=61" in stdout
+    assert f"sha256={'d' * 64}" in stdout
+
+
 def test_build_writes_canonical_report(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

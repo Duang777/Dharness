@@ -38,7 +38,7 @@ def _finish(script: str = "test -s answer.txt") -> AgentDecision:
         ),
         coverage=(
             RequirementCoverage(
-                requirement="answer.txt has the requested content",
+                requirement="REQ-1",
                 check_ids=("check-answer",),
             ),
         ),

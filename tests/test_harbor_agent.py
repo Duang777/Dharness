@@ -31,7 +31,7 @@ async def test_harbor_adapter_populates_context(tmp_path, monkeypatch) -> None:
         ),
         coverage=(
             RequirementCoverage(
-                requirement="answer.txt is non-empty",
+                requirement="REQ-1",
                 check_ids=("check-answer",),
             ),
         ),
@@ -84,7 +84,7 @@ async def test_profiled_harbor_run_rechecks_and_records_producer(
         ),
         coverage=(
             RequirementCoverage(
-                requirement="answer.txt is non-empty",
+                requirement="REQ-1",
                 check_ids=("check-answer",),
             ),
         ),

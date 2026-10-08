@@ -13,6 +13,20 @@ from evidence_harness_mutation.campaign import (
     OtherOracleChangeCase,
     run_offline_campaign,
 )
+from evidence_harness_mutation.control_invariants import (
+    ControlAuditReport,
+    ControlInvariantId,
+    ControlInvariantResult,
+    ControlInvariantStatus,
+    ControlInvariantViolation,
+    audit_control_trace,
+)
+from evidence_harness_mutation.control_operators import (
+    AppliedControlMutation,
+    ControlMutationId,
+    ControlMutationRequest,
+    apply_control_mutation,
+)
 from evidence_harness_mutation.historical import (
     HistoricalInfrastructureError,
     HistoricalRunRequest,
@@ -87,8 +101,16 @@ from evidence_harness_mutation.reducer import (
 from evidence_harness_mutation.replay import ReplayContractError, ReplayGateway
 
 __all__ = [
+    "AppliedControlMutation",
     "AppliedMutation",
     "AuditReport",
+    "ControlAuditReport",
+    "ControlInvariantId",
+    "ControlInvariantResult",
+    "ControlInvariantStatus",
+    "ControlInvariantViolation",
+    "ControlMutationId",
+    "ControlMutationRequest",
     "CounterexampleProvenance",
     "CounterexampleSize",
     "HistoricalInfrastructureError",
@@ -144,8 +166,10 @@ __all__ = [
     "StatePrefix",
     "TraceStructureError",
     "ViolationWitness",
+    "apply_control_mutation",
     "apply_mutation",
     "audit_completion_trace",
+    "audit_control_trace",
     "build_prefixbench_development_analysis",
     "build_prefixbench_development_campaign",
     "build_prefixbench_split_matrix",

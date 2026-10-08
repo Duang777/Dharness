@@ -1,21 +1,21 @@
-# Receipt-aware completion control
+# Contract-bound completion control
 
 ## Problem
 
-The current completion path reviews proposed checks before they execute. After
-`max_completion_reviews` calls, it skips review and can accept the next passing
-check set. This turns a resource limit into a semantic-review bypass. The loop
-also has no reserved executor decisions for finalization, counts failed change
-commands as progress, and grants one more repair than `max_repairs`.
+The receipt-aware path prevents review failures, stale checks, and failed
+commands from producing `verified`. It previously accepted the agent's
+`RequirementCoverage` rows as the complete requirement set. An agent could omit
+a requirement, and only the semantic reviewer could detect the omission.
 
-The canonical 89-task traces make both failure modes measurable. Ten externally
-failing tasks ended as internally `verified`, while ten other tasks exhausted
-their turn budget. The implementation must improve these controller behaviors
-without task-specific rules.
+The completion decision also lacked one object that joined the evidence,
+budget, phase, and review decisions. Those checks existed in separate branches
+of `EvidenceLoop`, which made the acceptance formula hard to audit.
 
 ## Usage
 
-The caller remains unchanged:
+The default caller remains unchanged. `EvidenceLoop` freezes the full
+instruction as requirement `REQ-1` and permits every `CheckKind` for that root
+requirement:
 
 ```python
 report = await EvidenceLoop(
@@ -25,42 +25,81 @@ report = await EvidenceLoop(
 ).run(instruction, environment)
 ```
 
-With completion review enabled, `verified` now means:
+Callers that have structured requirements can supply a narrower contract:
 
-1. the proposed checks and requirement mapping passed deterministic validation;
-2. the checks executed successfully in the current work epoch; and
-3. the semantic reviewer accepted those executed receipts.
+```python
+contract = CompletionContract.create(
+    requirements=(
+        TaskRequirement(
+            id="artifact",
+            statement="answer.txt exists",
+            evidence_kinds=(CheckKind.ARTIFACT,),
+        ),
+        TaskRequirement(
+            id="behavior",
+            statement="the command prints ready",
+            evidence_kinds=(CheckKind.BEHAVIOR,),
+        ),
+    ),
+    options=options,
+)
+loop = EvidenceLoop(
+    model=model,
+    journal=journal,
+    options=options,
+    completion_isolation=isolation,
+    completion_contract=contract,
+)
+```
 
-Exhausting or losing the required reviewer ends the run without reporting
-`verified`. Explicit `enable_completion_review=False` remains a supported
-mechanical-only mode for compatibility.
+The executor prompt includes each requirement ID, statement, and allowed
+evidence kind. `RequirementCoverage.requirement` carries the ID. The
+`EvidenceGate` rejects missing IDs, unknown IDs, duplicate IDs, and evidence
+kind mismatches before it executes completion checks.
 
 ## Shape
 
-`EvidenceLoop` owns one receipt-first completion transaction:
+`CompletionContract` records the four contract sets:
+
+| Field | Meaning |
+|---|---|
+| `e_req` | Fixed requirement IDs, statements, and allowed `CheckKind` values |
+| `o_req` | The required execution order for proposed checks |
+| `v_req` | Freshness, success, integrity, process binding, and isolation rules |
+| `b_req` | Turn, environment-call, repair, recovery, review, wall-time, and verification-reserve limits |
+
+`CompletionController` evaluates the completion transaction:
 
 ```python
 async def _handle_finish(state, runner, decision):
-    validate_proposal()
-    require_review_capacity_when_enabled()
+    controller.admit_proposal(...)
     receipts = await execute_checks()
-    if mechanical_evidence_failed(receipts):
+    if not controller.evaluate_evidence(...).accepted:
         reject_or_stop()
         return
     assessment = await review_executed_receipts_when_enabled()
-    evidence = gate.decide(receipts, assessment)
-    accept_or_reject(evidence)
+    acceptance = controller.evaluate_accept(...)
+    completion = controller.evaluate_complete(acceptance, assessment=assessment)
+    finish_with_controller_permit(completion)
 ```
 
-`EvidenceGate.decide` is the sole acceptance predicate. It requires fresh,
-successful receipts and, when configured, an accepted `SemanticAssessment`.
-The assessment is a domain value rather than the model-facing
-`ReviewDecision`.
+The controller keeps each predicate separate:
 
-`RunState.completion_findings` stores the latest unresolved completion findings.
-The journal keeps the full history. The executor and the next reviewer receive
-the live findings, so prompt compaction cannot silently remove the current
-completion contract.
+| Predicate | Owner |
+|---|---|
+| Coverage, Type, Fresh, Integrity, ProcessBound, Order | `EvidenceGate` |
+| BudgetBound | `BudgetGuard` |
+| PhaseOK | `PhaseGuard` |
+| ReviewOK | `ReviewGate` |
+
+`AcceptEvaluation` is the conjunction of the evidence, budget, and phase
+results. `CompletionEvaluation` adds the review result. Each result retains its
+own rejection reasons.
+
+Only an accepted `CompletionEvaluation` contains a private completion permit.
+`EvidenceLoop._finish(..., StopReason.VERIFIED)` checks the permit and calls
+`phase_ok` again. A run with review enabled can complete only from `REVIEWING`.
+A run with review disabled can complete only from `VERIFYING`.
 
 Finalization is a controller-enforced, sticky phase derived from both existing
 budgets. It begins when three executor decisions remain or when 10% of the wall
@@ -96,14 +135,13 @@ repair.
 | Module | Responsibility |
 |---|---|
 | `budget.py` | Define the shared turn and wall-time finalization policy |
-| `protocol.py` | Add finalization state, semantic assessment, active findings, and assessment-bearing evidence |
-| `run_loop.py` | Sequence checks before review, enforce budgets and finalization, classify progress, grant repairs |
-| `evidence.py` | Enforce the complete mechanical and semantic acceptance conjunction |
-| `prompting.py` | Render executed receipts, active findings, and controller-allowed actions |
-| `tests/` | Exercise the state machine through scripted model and fake shell boundaries |
-
-No completion coordinator is added. It would need the model, runner, journal,
-clock, options, and mutable run state, but would hide no distinct domain.
+| `completion_contract.py` | Freeze `E_req`, `O_req`, `V_req`, and `B_req` |
+| `completion_control.py` | Compose the evidence, budget, phase, and review guards |
+| `run_loop.py` | Execute the transaction and require a controller permit for `verified` |
+| `evidence.py` | Check coverage, type, freshness, integrity, process binding, and order |
+| `prompting.py` | Render the contract, receipts, findings, and allowed actions |
+| `control_invariants.py` | Audit I1-I8 from a schema-2 journal |
+| `control_operators.py` | Apply deterministic I1-I8 mutations |
 
 ## Synthesis decision
 
@@ -121,13 +159,38 @@ derived internally instead of exposed as two new options. It takes Candidate
 2's parameterized repair-limit test, while rejecting that candidate's
 post-increment `>=` algorithm because it grants only `N - 1` repairs.
 
-The following ideas are deferred:
+The following ideas remain out of scope:
 
 - public finalization turn and wall-time settings or an adaptive reserve;
 - a new `RunReport.control_reason` field;
-- a separate completion coordinator;
 - pre-review plus post-review, which doubles model calls;
-- deterministic parsing of task semantics in `EvidenceGate`.
+- automatic semantic decomposition of free-text instructions.
+
+## Control audit
+
+New runs retain journal schema 2 and add `control_audit_version=1`. The
+`run_started` event stores the complete frozen contract. The runtime also writes
+these control facts:
+
+- `work_batch_admission` records the reserve calculation before normal work;
+- `work_batch_finished` records successful and failed progress inputs;
+- `completion_proposal_admission` records each proposal guard result;
+- `completion_guard_result` records the four final guard results;
+- `repair_admission` records the count before and after a repair decision.
+
+`audit_control_trace` returns one `ControlAuditReport` with I1-I8. It translates
+the frozen I1-I4 auditor results and evaluates I5-I8 from the new facts. A
+schema-2 journal without `control_audit_version=1` reports I6-I8 as
+`unsupported`; it never reports those invariants as passed.
+
+`apply_control_mutation` exposes one deterministic mutation for each invariant.
+The I1-I4 operators delegate to the frozen PrefixBench v1 operators. The I5-I8
+operators mutate only control-audit v1 facts.
+
+The committed PrefixBench v1 protocol and its I1-I4 implementation remain
+unchanged. Runtime changes after that experiment intentionally fail its live
+producer preflight. The new control audit is a separate version, so it does not
+rewrite frozen experiment inputs or outcomes.
 
 ## Tradeoffs
 
@@ -147,15 +210,15 @@ The following ideas are deferred:
 
 Behavior tests must prove:
 
-1. two rejected reviews cannot be bypassed by a third finish;
-2. the reviewer sees actual receipt output before acceptance;
-3. finalization blocks late exploration but permits one bounded repair;
-4. a wall-clock boundary can start finalization while many turns remain;
-5. ordinary model calls and work commands cannot consume the wall-time reserve;
-6. a model timeout at the boundary starts a finalization decision;
-7. a model response that crosses the wall boundary has its actions rechecked;
-8. failed change commands accumulate stagnation;
-9. `max_repairs` grants exactly `N` repair cycles for `N` in `0, 1, 2, 4`;
-10. review timeout or protocol failure cannot produce `verified`.
+1. a finish proposal cannot omit a fixed contract requirement;
+2. a check kind must match every requirement that the check covers;
+3. every Guard reports its own rejection reasons;
+4. an illegal phase cannot produce a completion permit;
+5. `_finish` rejects `VERIFIED` without a current permit;
+6. two rejected reviews cannot be bypassed by a third finish;
+7. failed change commands accumulate stagnation;
+8. `max_repairs` grants exactly `N` repair cycles for `N` in `0, 1, 2, 4`;
+9. the control auditor accepts a valid I1-I8 trace;
+10. each I1-I8 mutation fails its target invariant.
 
 The full project gate must pass before this design is considered implemented.

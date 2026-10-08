@@ -167,13 +167,13 @@ STATIC_GATES = (
         ),
     ),
     (
-        "PrefixBench test preregistration",
+        "PrefixBench frozen test protocol",
         (
             "uv",
             "run",
             "python",
             "scripts/prefixbench_test_campaign.py",
-            "preflight",
+            "verify-frozen",
         ),
     ),
     (

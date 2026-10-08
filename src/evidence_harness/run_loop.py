@@ -9,12 +9,13 @@ from evidence_harness.budget import (
     finalization_turn_reserve,
     finalization_wall_time_reserve_sec,
 )
+from evidence_harness.completion_contract import CompletionContract
+from evidence_harness.completion_control import CompletionController
 from evidence_harness.completion_isolation import (
     CompletionIsolation,
     CompletionIsolationError,
     CompletionIsolationRequest,
 )
-from evidence_harness.evidence import EvidenceGate
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import ModelProtocolError, ModelServiceError
 from evidence_harness.policy import (
@@ -95,6 +96,7 @@ class EvidenceLoop:
         journal: RunJournal,
         options: LoopOptions,
         completion_isolation: CompletionIsolation,
+        completion_contract: CompletionContract | None = None,
         collection: CollectionAttestation | None = None,
         clock: Callable[[], float] = time.monotonic,
         on_progress: ProgressCallback | None = None,
@@ -103,12 +105,19 @@ class EvidenceLoop:
         self._journal = journal
         self._options = options
         self._completion_isolation = completion_isolation
+        self._configured_completion_contract = completion_contract
         self._collection = collection
         self._clock = clock
         self._on_progress = on_progress
-        self._gate = EvidenceGate(options)
+        self._completion_controller: CompletionController | None = None
 
     async def run(self, instruction: str, environment: ShellEnvironment) -> RunReport:
+        contract = self._configured_completion_contract or CompletionContract.from_instruction(
+            instruction,
+            self._options,
+        )
+        controller = CompletionController(contract, options=self._options)
+        self._completion_controller = controller
         started = self._clock()
         state = RunState(
             instruction=instruction,
@@ -119,10 +128,12 @@ class EvidenceLoop:
         runner = CommandRunner(environment, self._journal, self._options, self._clock)
         started_payload = {
             "journal_schema_version": 2,
+            "control_audit_version": 1,
             "instruction": instruction,
             "options": (
                 self._collection.options if self._collection is not None else asdict(self._options)
             ),
+            "completion_contract": contract.model_dump(mode="json"),
         }
         if self._collection is not None:
             started_payload.update(
@@ -171,6 +182,7 @@ class EvidenceLoop:
                 state,
                 self._options,
                 self._clock(),
+                contract=contract,
                 allowed_actions=allowed_actions,
             )
             finalization_started_before_decision = state.finalization_started
@@ -298,20 +310,34 @@ class EvidenceLoop:
         runner: CommandRunner,
         decision: AgentDecision,
     ) -> None:
-        remaining_calls = self._options.max_environment_calls - state.environment_call_count
-        available_for_work = remaining_calls - self._options.verification_environment_reserve
-        if len(decision.commands) > available_for_work:
-            self._record_control_feedback(
-                state,
-                "Work command batch would consume the reserved verification calls. "
-                "Finish with focused checks or replan to a smaller batch.",
-            )
-            return
-        if self._options.max_turns - state.turn_count < 1:
-            self._record_control_feedback(
-                state,
-                "No executor turn remains after this batch. Submit completion checks now.",
-            )
+        controller = self._require_completion_controller()
+        budget = controller.contract.b_req
+        remaining_calls = budget.max_environment_calls - state.environment_call_count
+        available_for_work = remaining_calls - budget.verification_environment_reserve
+        admission = controller.budget_guard.evaluate_work(
+            controller.contract,
+            state,
+            command_count=len(decision.commands),
+        )
+        self._journal.append(
+            "work_batch_admission",
+            {
+                "accepted": admission.accepted,
+                "reasons": admission.reasons,
+                "command_ids": tuple(command.id for command in decision.commands),
+                "requested_environment_calls": len(decision.commands),
+                "environment_calls_used": state.environment_call_count,
+                "environment_calls_remaining": remaining_calls,
+                "verification_environment_reserve": budget.verification_environment_reserve,
+                "available_for_work": available_for_work,
+                "turns_used": state.turn_count,
+                "turns_remaining": budget.max_turns - state.turn_count,
+                "started_in_finalization": state.finalization_started,
+            },
+        )
+        if not admission.accepted:
+            feedback = ". ".join(reason.capitalize() for reason in admission.reasons)
+            self._record_control_feedback(state, f"{feedback}.")
             return
 
         state.phase = RunPhase.EXECUTING
@@ -328,6 +354,7 @@ class EvidenceLoop:
             ),
         )
         receipts_before = {item.observation_fingerprint for item in state.observations}
+        batch_receipts: list[CommandReceipt] = []
         batch_progressed = False
         started_in_finalization = state.finalization_started
         command_deadline_monotonic = (
@@ -367,6 +394,7 @@ class EvidenceLoop:
                 command,
                 wall_deadline_monotonic=command_deadline_monotonic,
             )
+            batch_receipts.append(receipt)
             if receipt.succeeded and (
                 receipt.mode is CommandMode.CHANGE
                 or receipt.observation_fingerprint not in receipts_before
@@ -376,8 +404,35 @@ class EvidenceLoop:
                 state.unresolved_errors.append(_failure_summary(receipt))
                 break
 
+        stagnant_before = state.stagnant_batches
         state.last_batch_progressed = batch_progressed
         state.stagnant_batches = 0 if batch_progressed else state.stagnant_batches + 1
+        self._journal.append(
+            "work_batch_finished",
+            {
+                "work_epoch": state.work_epoch,
+                "command_ids": tuple(command.id for command in decision.commands),
+                "completed_command_ids": tuple(receipt.command_id for receipt in batch_receipts),
+                "failed_command_ids": tuple(
+                    receipt.command_id for receipt in batch_receipts if not receipt.succeeded
+                ),
+                "successful_change_ids": tuple(
+                    receipt.command_id
+                    for receipt in batch_receipts
+                    if receipt.succeeded and receipt.mode is CommandMode.CHANGE
+                ),
+                "novel_observation_ids": tuple(
+                    receipt.command_id
+                    for receipt in batch_receipts
+                    if receipt.succeeded
+                    and receipt.mode is CommandMode.OBSERVE
+                    and receipt.observation_fingerprint not in receipts_before
+                ),
+                "progressed": batch_progressed,
+                "stagnant_batches_before": stagnant_before,
+                "stagnant_batches_after": state.stagnant_batches,
+            },
+        )
         if not state.finalization_started:
             self._apply_recovery_policy(state)
         if state.phase is not RunPhase.TERMINATED:
@@ -388,35 +443,36 @@ class EvidenceLoop:
         state: RunState,
         decision: AgentDecision,
     ) -> None:
-        rejection_reasons = self._gate.validate_proposal(
-            decision.checks,
-            decision.coverage,
-            isolated=True,
+        controller = self._require_completion_controller()
+        admission = controller.admit_proposal(
+            state=state,
+            checks=decision.checks,
+            coverage=decision.coverage,
+            now=self._clock(),
         )
-        if rejection_reasons:
-            self._reject_completion(state, rejection_reasons)
-            return
-
-        if (
-            self._options.enable_completion_review
-            and state.completion_review_count >= self._options.max_completion_reviews
-        ):
-            state.unresolved_errors.append("completion review budget exhausted")
-            self._finish(
-                state,
-                StopReason.BUDGET_EXHAUSTED,
-                failure_category="completion_review_budget",
-            )
-            return
-
-        remaining_calls = self._options.max_environment_calls - state.environment_call_count
-        if len(decision.checks) > remaining_calls:
-            state.unresolved_errors.append("not enough environment calls remain for verification")
-            self._finish(
-                state,
-                StopReason.BUDGET_EXHAUSTED,
-                failure_category="harness_control",
-            )
+        self._journal.append(
+            "completion_proposal_admission",
+            {
+                **admission.journal_payload(),
+                "work_epoch": state.work_epoch,
+                "check_ids": tuple(check.id for check in decision.checks),
+            },
+        )
+        if not admission.accepted:
+            if not admission.budget.accepted:
+                state.unresolved_errors.extend(admission.budget.reasons)
+                category = (
+                    "completion_review_budget"
+                    if "completion review budget exhausted" in admission.budget.reasons
+                    else "harness_control"
+                )
+                self._finish(
+                    state,
+                    StopReason.BUDGET_EXHAUSTED,
+                    failure_category=category,
+                )
+            else:
+                self._reject_completion(state, admission.reasons)
             return
 
         supporting_observations = list(state.observations)
@@ -465,15 +521,14 @@ class EvidenceLoop:
 
         receipts = isolated.receipts
 
-        semantic_assessment: SemanticAssessment | None = None
-        mechanical_evidence = self._gate.decide(
-            work_epoch=state.work_epoch,
+        mechanical_evidence = controller.evaluate_evidence(
+            state=state,
             checks=receipts,
+            proposed_checks=decision.checks,
             coverage=decision.coverage,
             expected_check_ids=tuple(check.id for check in decision.checks),
             attempt_id=attempt_id,
             isolation=isolated.evidence,
-            require_isolation=True,
         )
         if not mechanical_evidence.accepted:
             state.latest_evidence = mechanical_evidence
@@ -481,6 +536,7 @@ class EvidenceLoop:
             self._reject_completion(state, mechanical_evidence.rejection_reasons)
             return
 
+        semantic_assessment: SemanticAssessment | None = None
         if self._options.enable_completion_review:
             state.phase = RunPhase.REVIEWING
             state.completion_review_count += 1
@@ -494,6 +550,7 @@ class EvidenceLoop:
             )
             review_prompt = build_review_prompt(
                 instruction=state.instruction,
+                contract=controller.contract,
                 checks=decision.checks,
                 coverage=decision.coverage,
                 verification_receipts=receipts,
@@ -512,17 +569,32 @@ class EvidenceLoop:
                     "completion_review_error",
                     {"error_type": type(exc).__name__, "error": str(exc)},
                 )
-                evidence = self._gate.decide(
-                    work_epoch=state.work_epoch,
+                acceptance = controller.evaluate_accept(
+                    state=state,
                     checks=receipts,
+                    proposed_checks=decision.checks,
                     coverage=decision.coverage,
                     expected_check_ids=tuple(check.id for check in decision.checks),
                     attempt_id=attempt_id,
                     isolation=isolated.evidence,
-                    require_isolation=True,
-                    require_semantic_review=True,
+                    now=self._clock(),
                 )
+                completion = controller.evaluate_complete(
+                    acceptance,
+                    assessment=None,
+                    state=state,
+                    attempt_id=attempt_id,
+                )
+                evidence = completion.receipt
                 state.latest_evidence = evidence
+                self._journal.append(
+                    "completion_guard_result",
+                    {
+                        **completion.journal_payload(),
+                        "attempt_id": attempt_id,
+                        "work_epoch": state.work_epoch,
+                    },
+                )
                 self._journal.append("verification_receipt", evidence)
                 failure_category = (
                     "completion_review_protocol"
@@ -536,23 +608,41 @@ class EvidenceLoop:
                 )
                 return
 
-        evidence = self._gate.decide(
-            work_epoch=state.work_epoch,
+        acceptance = controller.evaluate_accept(
+            state=state,
             checks=receipts,
+            proposed_checks=decision.checks,
             coverage=decision.coverage,
             expected_check_ids=tuple(check.id for check in decision.checks),
             attempt_id=attempt_id,
             isolation=isolated.evidence,
-            require_isolation=True,
-            semantic_assessment=semantic_assessment,
-            require_semantic_review=self._options.enable_completion_review,
+            now=self._clock(),
         )
+        completion = controller.evaluate_complete(
+            acceptance,
+            assessment=semantic_assessment,
+            state=state,
+            attempt_id=attempt_id,
+        )
+        evidence = completion.receipt
         state.latest_evidence = evidence
+        self._journal.append(
+            "completion_guard_result",
+            {
+                **completion.journal_payload(),
+                "attempt_id": attempt_id,
+                "work_epoch": state.work_epoch,
+            },
+        )
         self._journal.append("verification_receipt", evidence)
-        if evidence.accepted:
+        if completion.accepted:
             state.completion_findings = ()
             state.final_summary = decision.summary or decision.rationale
-            self._finish(state, StopReason.VERIFIED)
+            self._finish(
+                state,
+                StopReason.VERIFIED,
+                completion_permit=completion.permit,
+            )
             return
 
         self._reject_completion(state, evidence.rejection_reasons)
@@ -683,15 +773,34 @@ class EvidenceLoop:
         )
 
     def _reject_completion(self, state: RunState, reasons: tuple[str, ...]) -> None:
+        controller = self._require_completion_controller()
+        budget = controller.contract.b_req
         state.completion_findings = _stable_unique(reasons)
         review_exhausted = (
             self._options.enable_completion_review
-            and state.completion_review_count >= self._options.max_completion_reviews
+            and state.completion_review_count >= budget.max_completion_reviews
         )
-        repair_granted = not review_exhausted and state.repair_count < self._options.max_repairs
+        repair_count_before = state.repair_count
+        repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
         if repair_granted:
             state.repair_count += 1
             state.phase = RunPhase.REPAIRING
+        self._journal.append(
+            "repair_admission",
+            {
+                "accepted": repair_granted,
+                "reasons": (
+                    ("completion review budget exhausted",)
+                    if review_exhausted
+                    else (() if repair_granted else ("completion repair budget exhausted",))
+                ),
+                "repair_count_before": repair_count_before,
+                "repair_count_after": state.repair_count,
+                "max_repairs": budget.max_repairs,
+                "completion_reviews_used": state.completion_review_count,
+                "max_completion_reviews": budget.max_completion_reviews,
+            },
+        )
         self._journal.append(
             "completion_rejected",
             {
@@ -795,8 +904,22 @@ class EvidenceLoop:
         reason: StopReason,
         *,
         failure_category: str | None = None,
+        completion_permit: object | None = None,
     ) -> RunReport:
         if state.stop_reason is None:
+            if reason is StopReason.VERIFIED:
+                controller = self._require_completion_controller()
+                if not controller.phase_ok(state):
+                    raise RuntimeError(
+                        f"verified completion is not allowed in phase '{state.phase}'"
+                    )
+                if not controller.authorizes(
+                    completion_permit,
+                    state,
+                ):
+                    raise RuntimeError(
+                        "verified completion requires a current CompletionController permit"
+                    )
             state.stop_reason = reason
             state.failure_category = failure_category
             state.phase = RunPhase.TERMINATED
@@ -831,6 +954,11 @@ class EvidenceLoop:
             failure_category=failure_category or state.failure_category,
             usage=self._model.usage,
         )
+
+    def _require_completion_controller(self) -> CompletionController:
+        if self._completion_controller is None:
+            raise RuntimeError("completion controller is not initialized")
+        return self._completion_controller
 
     def _notify(self, state: RunState) -> None:
         if self._on_progress is None:

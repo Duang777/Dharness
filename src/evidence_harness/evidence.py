@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from collections import Counter
 
+from evidence_harness.completion_contract import CompletionContract
 from evidence_harness.policy import PolicyViolation, normalize_command, validate_check
 from evidence_harness.protocol import (
     CommandReceipt,
     CompletionIsolationEvidence,
     LoopOptions,
     RequirementCoverage,
-    SemanticAssessment,
     VerificationCheck,
     VerificationReceipt,
 )
@@ -23,6 +23,7 @@ class EvidenceGate:
         checks: tuple[VerificationCheck, ...],
         coverage: tuple[RequirementCoverage, ...],
         *,
+        contract: CompletionContract | None = None,
         isolated: bool = False,
     ) -> tuple[str, ...]:
         reasons: list[str] = []
@@ -40,9 +41,38 @@ class EvidenceGate:
         if unused_ids:
             reasons.append(f"checks are not mapped to a requirement: {sorted(unused_ids)}")
 
-        normalized_requirements = [item.requirement.casefold() for item in coverage]
+        requirement_ids = [item.requirement for item in coverage]
+        normalized_requirements = [item.casefold() for item in requirement_ids]
         if len(normalized_requirements) != len(set(normalized_requirements)):
             reasons.append("requirement coverage contains duplicate requirements")
+
+        if contract is not None:
+            contract_ids = {item.id for item in contract.e_req}
+            covered_requirements = set(requirement_ids)
+            missing = contract_ids - covered_requirements
+            unknown = covered_requirements - contract_ids
+            if missing:
+                reasons.append(f"contract requirements are not covered: {sorted(missing)}")
+            if unknown:
+                reasons.append(
+                    f"coverage references unknown contract requirements: {sorted(unknown)}"
+                )
+
+            checks_by_id = {check.id: check for check in checks}
+            requirements_by_id = {item.id: item for item in contract.e_req}
+            for item in coverage:
+                requirement = requirements_by_id.get(item.requirement)
+                if requirement is None:
+                    continue
+                allowed_kinds = set(requirement.evidence_kinds)
+                for check_id in item.check_ids:
+                    check = checks_by_id.get(check_id)
+                    if check is not None and check.kind not in allowed_kinds:
+                        reasons.append(
+                            f"check '{check.id}' has kind '{check.kind}'; "
+                            f"requirement '{requirement.id}' allows "
+                            f"{sorted(kind.value for kind in allowed_kinds)}"
+                        )
 
         for check in checks:
             try:
@@ -58,24 +88,47 @@ class EvidenceGate:
     def decide(
         self,
         *,
+        contract: CompletionContract | None = None,
         work_epoch: int,
         checks: tuple[CommandReceipt, ...],
+        proposed_checks: tuple[VerificationCheck, ...] = (),
         coverage: tuple[RequirementCoverage, ...],
         expected_check_ids: tuple[str, ...] = (),
         attempt_id: int | None = None,
         isolation: CompletionIsolationEvidence | None = None,
         require_isolation: bool = False,
         prior_rejections: tuple[str, ...] = (),
-        semantic_assessment: SemanticAssessment | None = None,
-        require_semantic_review: bool = False,
     ) -> VerificationReceipt:
         reasons = list(prior_rejections)
+        if contract is not None:
+            if not proposed_checks:
+                reasons.append("proposed verification checks are missing")
+            else:
+                reasons.extend(
+                    self.validate_proposal(
+                        proposed_checks,
+                        coverage,
+                        contract=contract,
+                        isolated=require_isolation,
+                    )
+                )
         if not checks:
             reasons.append("no verification commands were executed")
         if any(item.work_epoch != work_epoch for item in checks):
             reasons.append("verification evidence is stale")
         if expected_check_ids and tuple(item.command_id for item in checks) != expected_check_ids:
             reasons.append("not all proposed verification commands were executed in order")
+        if proposed_checks and len(proposed_checks) == len(checks):
+            for proposed, receipt in zip(proposed_checks, checks, strict=True):
+                if (
+                    proposed.id != receipt.command_id
+                    or proposed.script != receipt.script
+                    or proposed.proves != receipt.purpose
+                    or proposed.cwd != receipt.cwd
+                ):
+                    reasons.append(
+                        f"verification receipt does not match proposed check: {proposed.id}"
+                    )
         failed_ids = [item.command_id for item in checks if not item.succeeded]
         if failed_ids:
             reasons.append(f"verification commands failed: {failed_ids}")
@@ -88,19 +141,13 @@ class EvidenceGate:
                     checks=checks,
                 )
             )
-        if not reasons and require_semantic_review and semantic_assessment is None:
-            reasons.append("completion semantic review was not accepted")
-        if semantic_assessment is not None and not semantic_assessment.accepted:
-            reasons.extend(
-                dict.fromkeys((semantic_assessment.rationale, *semantic_assessment.findings))
-            )
+        reasons = list(dict.fromkeys(reasons))
 
         return VerificationReceipt(
             work_epoch=work_epoch,
             checks=checks,
             coverage=coverage,
             isolation=isolation,
-            semantic_assessment=semantic_assessment,
             accepted=not reasons,
             rejection_reasons=tuple(reasons),
         )

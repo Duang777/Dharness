@@ -14,6 +14,7 @@ from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext, ModelUsage
 from pydantic import Field
 
+from evidence_harness.completion_contract import CompletionContract, TaskRequirement
 from evidence_harness.docker_completion_isolation import (
     completion_isolation_for_harbor,
 )
@@ -194,6 +195,10 @@ class CompletionIsolationExperimentAgent(BaseAgent):
             model=model,
             journal=completion_journal,
             options=loop_options,
+            completion_contract=_recorded_completion_contract(
+                candidate.decision,
+                loop_options,
+            ),
             completion_isolation=completion_isolation_for_harbor(
                 journal=completion_journal,
                 environment=environment,
@@ -236,6 +241,27 @@ class CompletionIsolationExperimentAgent(BaseAgent):
                 ),
             }
         }
+
+
+def _recorded_completion_contract(
+    decision: AgentDecision,
+    options: LoopOptions,
+) -> CompletionContract:
+    checks = {check.id: check for check in decision.checks}
+    requirements: list[TaskRequirement] = []
+    for coverage in decision.coverage:
+        kinds = tuple(dict.fromkeys(checks[check_id].kind for check_id in coverage.check_ids))
+        requirements.append(
+            TaskRequirement(
+                id=coverage.requirement,
+                statement=coverage.requirement,
+                evidence_kinds=kinds,
+            )
+        )
+    return CompletionContract.create(
+        requirements=tuple(requirements),
+        options=options,
+    )
 
 
 def load_completion_candidate(

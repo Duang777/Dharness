@@ -259,7 +259,9 @@ def _synthetic_test_cohort(
 
 
 def test_protocol_freezes_held_out_contract_without_a_producer_revision() -> None:
-    protocol = campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
+    protocol = campaign.PrefixBenchTestMutationProtocol.model_validate_json(
+        TEST_PROTOCOL.read_bytes()
+    )
     payload = protocol.model_dump(mode="json")
 
     assert protocol.task_order == campaign._FROZEN_TEST_TASK_ORDER
@@ -282,12 +284,16 @@ def test_protocol_freezes_held_out_contract_without_a_producer_revision() -> Non
     assert '"producer_tree"' not in serialized
 
 
-def test_committed_protocol_bytes_match_the_current_manifest() -> None:
+def test_evolved_runtime_cannot_rewrite_the_committed_protocol() -> None:
     data = TEST_PROTOCOL.read_bytes()
     protocol = campaign.PrefixBenchTestMutationProtocol.model_validate_json(data)
 
     assert data == protocol.canonical_bytes()
-    assert protocol == campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
+    with pytest.raises(
+        ValueError,
+        match="runtime source hash differs from the frozen PrefixBench producer",
+    ):
+        campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
 
 
 def test_development_protocol_remains_frozen() -> None:
@@ -297,7 +303,9 @@ def test_development_protocol_remains_frozen() -> None:
 
 
 def test_test_admission_accepts_complete_phase_incomplete_cohort() -> None:
-    protocol = campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
+    protocol = campaign.PrefixBenchTestMutationProtocol.model_validate_json(
+        TEST_PROTOCOL.read_bytes()
+    )
     readiness, canonical, rows, matrix, sources = _synthetic_test_cohort(protocol)
 
     producer = campaign._validate_test_cohort(
@@ -313,7 +321,9 @@ def test_test_admission_accepts_complete_phase_incomplete_cohort() -> None:
 
 
 def test_test_admission_rejects_source_census_drift() -> None:
-    protocol = campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
+    protocol = campaign.PrefixBenchTestMutationProtocol.model_validate_json(
+        TEST_PROTOCOL.read_bytes()
+    )
     readiness, canonical, rows, matrix, sources = _synthetic_test_cohort(protocol)
     changed_summary = readiness.summary.model_copy(update={"source_excluded": 1})
     changed = readiness.model_copy(update={"summary": changed_summary})
@@ -361,7 +371,9 @@ def test_collection_evidence_binds_run_configuration_and_progress(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    protocol = campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
+    protocol = campaign.PrefixBenchTestMutationProtocol.model_validate_json(
+        TEST_PROTOCOL.read_bytes()
+    )
     readiness, _canonical, rows, _matrix, sources = _synthetic_test_cohort(protocol)
     producer = readiness.tasks[0].producer
     assert producer is not None
@@ -434,7 +446,9 @@ def test_collection_evidence_binds_run_configuration_and_progress(
 
 
 def test_report_derives_all_counts_and_round_trips() -> None:
-    protocol_spec = campaign.freeze_prefixbench_test_protocol(PROJECT_ROOT)
+    protocol_spec = campaign.PrefixBenchTestMutationProtocol.model_validate_json(
+        TEST_PROTOCOL.read_bytes()
+    )
     development = json.loads(
         (
             PROJECT_ROOT / "evaluation" / "prefixbench-v1-development-offline-campaign.json"

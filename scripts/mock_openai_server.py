@@ -42,7 +42,7 @@ def _executor_reply(prompt: str) -> dict[str, object]:
         ],
         "coverage": [
             {
-                "requirement": "create hello.txt with Hello, world! as its content",
+                "requirement": "REQ-1",
                 "check_ids": ["check-hello"],
             }
         ],
