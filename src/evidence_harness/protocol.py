@@ -236,6 +236,8 @@ class CommandReceipt(StrictModel):
     cwd: str | None
     mode: CommandMode
     work_epoch: int = Field(ge=0)
+    attempt_id: int | None = Field(default=None, ge=1, exclude_if=lambda value: value is None)
+    candidate_digest: Sha256 | None = Field(default=None, exclude_if=lambda value: value is None)
     return_code: int | None
     failure: FailureKind | None = None
     duration_sec: float = Field(ge=0)
@@ -291,6 +293,10 @@ class CompletionIsolationEvidence(StrictModel):
     attempt_id: int = Field(ge=1)
     work_epoch: int = Field(ge=0)
     candidate_image_id: str
+    candidate_digest: Sha256 | None = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+    )
     environment_identity_sha256: str
     excluded_control_mounts: tuple[str, ...] = ()
     checks: tuple[CheckIsolationEvidence, ...]
@@ -360,6 +366,7 @@ class RunState:
     recovery_count: int = 0
     completion_review_count: int = 0
     work_epoch: int = 0
+    candidate_digest: str | None = None
     next_sequence: int = 1
     next_completion_attempt: int = 1
     next_executor_attempt: int = 1

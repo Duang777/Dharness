@@ -62,6 +62,7 @@ class StubHarnessAdapter(HarnessAdapter):
         )
         snapshot = CandidateSnapshot(
             identity=identity,
+            candidate_digest=candidate_digest,
             attempt_id=state.next_completion_attempt,
             work_epoch=state.work_epoch,
         )
@@ -113,6 +114,8 @@ class StubHarnessAdapter(HarnessAdapter):
                 cwd=check.cwd,
                 mode=CommandMode.OBSERVE,
                 work_epoch=state.work_epoch,
+                attempt_id=state.next_completion_attempt,
+                candidate_digest=candidate_digest,
                 return_code=return_code,
                 failure=failure,
                 duration_sec=0,
@@ -143,6 +146,7 @@ class StubHarnessAdapter(HarnessAdapter):
             attempt_id=snapshot.attempt_id,
             work_epoch=snapshot.work_epoch,
             candidate_image_id=identity.value,
+            candidate_digest=candidate_digest,
             environment_identity_sha256=candidate_digest,
             checks=tuple(isolation_records),
             source=SourceAttestation(

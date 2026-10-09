@@ -12,7 +12,7 @@
     "file": {
       "bytes": 7747,
       "path": "experiments/prefixbench-v1/mutation-protocol-v1.json",
-      "sha256": "b394fe0f4529d7bd476d5113411230151c0fa3077414cd23f0df34ea287e8c8d"
+      "sha256": "360c09736d24597ffb4e452dd70b9d468a6213df2167d0e546420c22522cd377"
     },
     "spec": {
       "baseline_rule": "credit-only-new-expected-violation-at-attempt-terminal",
@@ -157,7 +157,7 @@
       "schema_version": 1,
       "source_set": {
         "algorithm": "sha256-length-framed-path-content-v1",
-        "bytes": 492231,
+        "bytes": 492585,
         "files": [
           {
             "bytes": 1168,
@@ -180,9 +180,9 @@
             "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
           },
           {
-            "bytes": 12865,
+            "bytes": 13219,
             "path": "src/evidence_harness/protocol.py",
-            "sha256": "be0d80be68e6a9d86dd9668297f0bd4d816bbaf75be5ab8799957f8fe10b662f"
+            "sha256": "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
           },
           {
             "bytes": 2317,
@@ -230,7 +230,7 @@
             "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
           }
         ],
-        "sha256": "b7a2fccd54e6b291ecf3a54637223f33a13555157f377af3682dd09d85176dc8"
+        "sha256": "c3a7653c38239b0bfc7b5858094c3447d77a75aaf203eb6a66c92e3d7a0634f5"
       },
       "task_count": 28,
       "task_order": "readiness-task-order"

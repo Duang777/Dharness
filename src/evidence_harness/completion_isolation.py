@@ -37,7 +37,7 @@ class CompletionIsolationResult:
 
 
 CheckExecutor = Callable[
-    [VerificationCheck, ShellEnvironment, float],
+    [VerificationCheck, ShellEnvironment, float, str],
     Awaitable[CommandReceipt],
 ]
 

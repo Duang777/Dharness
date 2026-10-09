@@ -69,6 +69,7 @@ def _view(*, checks: tuple[VerificationCheck, ...] | None = None) -> CompletionT
             phase=RunPhase.FINALIZING,
             work_epoch=3,
             next_completion_attempt=1,
+            candidate_digest=None,
             deadline_monotonic=100,
             counters=CompletionCounters(
                 turns=1,
@@ -81,11 +82,16 @@ def _view(*, checks: tuple[VerificationCheck, ...] | None = None) -> CompletionT
     )
 
 
-def _verifying_state(view: CompletionTransactionView) -> CompletionState:
+def _verifying_state(
+    view: CompletionTransactionView,
+    *,
+    candidate_digest: str,
+) -> CompletionState:
     return replace(
         view.state,
         phase=RunPhase.VERIFYING,
         next_completion_attempt=view.state.next_completion_attempt + 1,
+        candidate_digest=candidate_digest,
     )
 
 
@@ -116,7 +122,10 @@ async def test_stub_adapter_completes_without_dharness_runtime() -> None:
 
     admission = controller.admit(now=1)
     run = await controller.verify(admission)
-    state = _verifying_state(view)
+    state = _verifying_state(
+        view,
+        candidate_digest=run.snapshot.candidate_digest,
+    )
     acceptance = controller.evaluate_accept(run, state=state, now=2)
     completion = controller.evaluate_complete(
         acceptance,
@@ -131,6 +140,13 @@ async def test_stub_adapter_completes_without_dharness_runtime() -> None:
     assert run.snapshot.identity.algorithm == "sha256"
     assert run.snapshot.identity.value.startswith("sha256:")
     assert controller.authorizes(completion.permit, state)
+    assert (
+        controller.authorizes(
+            completion.permit,
+            replace(state, candidate_digest="9" * 64),
+        )
+        is False
+    )
     assert adapter.isolated_run_count == 1
 
 
@@ -185,6 +201,7 @@ async def test_controller_rejects_snapshot_binding_mismatches() -> None:
         run,
         snapshot=CandidateSnapshot(
             identity=CandidateIdentity(algorithm="sha256", value="sha256:different"),
+            candidate_digest=run.snapshot.candidate_digest,
             attempt_id=2,
             work_epoch=4,
         ),
@@ -192,7 +209,10 @@ async def test_controller_rejects_snapshot_binding_mismatches() -> None:
 
     acceptance = controller.evaluate_accept(
         run,
-        state=_verifying_state(view),
+        state=_verifying_state(
+            view,
+            candidate_digest=run.snapshot.candidate_digest,
+        ),
         now=2,
     )
 
@@ -202,6 +222,30 @@ async def test_controller_rejects_snapshot_binding_mismatches() -> None:
         "candidate snapshot work epoch does not match",
         "candidate snapshot identity does not match isolation evidence",
     )
+
+
+async def test_controller_rejects_completion_state_candidate_drift() -> None:
+    view = _view()
+    controller = CompletionController(
+        StubHarnessAdapter(
+            view=view,
+            candidate_files={"answer.txt": b"ready\n"},
+            check_runners={"answer": lambda files: True},
+        )
+    )
+    run = await controller.verify(controller.admit(now=1))
+
+    acceptance = controller.evaluate_accept(
+        run,
+        state=_verifying_state(
+            view,
+            candidate_digest="9" * 64,
+        ),
+        now=2,
+    )
+
+    assert acceptance.accepted is False
+    assert acceptance.evidence.reasons == ("completion state candidate digest does not match",)
 
 
 def test_portable_completion_modules_do_not_import_dharness_runtime() -> None:

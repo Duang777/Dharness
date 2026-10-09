@@ -339,6 +339,7 @@ class EvidenceLoop:
         state.current_plan = decision.plan
         state.current_goal = decision.commands[0].purpose
         state.work_epoch += 1
+        state.candidate_digest = None
         state.latest_evidence = None
         self._journal.append(
             "work_batch_started",
@@ -439,16 +440,23 @@ class EvidenceLoop:
         decision: AgentDecision,
         contract: CompletionContract,
     ) -> None:
+        attempt_id = state.next_completion_attempt
+        state.candidate_digest = None
+
         async def execute_check(
             check: VerificationCheck,
             environment: ShellEnvironment,
             command_deadline_monotonic: float,
+            candidate_digest: str,
         ) -> CommandReceipt:
+            state.candidate_digest = candidate_digest
             return await self._run_completion_check(
                 state,
                 check,
                 environment,
                 command_deadline_monotonic,
+                completion_attempt_id=attempt_id,
+                completion_candidate_digest=candidate_digest,
             )
 
         adapter = DharnessAdapter.capture(
@@ -461,7 +469,6 @@ class EvidenceLoop:
         )
         controller = CompletionController(adapter)
         proposal = adapter.view.proposal
-        attempt_id = adapter.view.state.next_completion_attempt
         admission = controller.admit(now=self._clock())
         self._journal.append(
             "completion_proposal_admission",
@@ -491,7 +498,6 @@ class EvidenceLoop:
         supporting_observations = list(adapter.view.trace.receipts)
         state.phase = RunPhase.VERIFYING
         state.next_completion_attempt += 1
-
         try:
             isolated = await controller.verify(admission)
         except HarnessAdapterError as exc:
@@ -511,6 +517,7 @@ class EvidenceLoop:
             )
             return
 
+        state.candidate_digest = isolated.snapshot.candidate_digest
         receipts = isolated.receipts
 
         mechanical_evidence = controller.evaluate_evidence(isolated)
@@ -676,6 +683,9 @@ class EvidenceLoop:
         check: VerificationCheck,
         environment: ShellEnvironment,
         command_deadline_monotonic: float,
+        *,
+        completion_attempt_id: int,
+        completion_candidate_digest: str,
     ) -> CommandReceipt:
         command = ShellCommand(
             id=check.id,
@@ -691,6 +701,8 @@ class EvidenceLoop:
             self._journal,
             self._options,
             self._clock,
+            completion_attempt_id=completion_attempt_id,
+            completion_candidate_digest=completion_candidate_digest,
         )
         return await self._run_command(
             state,

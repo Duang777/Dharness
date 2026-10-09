@@ -82,6 +82,7 @@ class DharnessAdapter(HarnessAdapter):
             phase=state.phase,
             work_epoch=state.work_epoch,
             next_completion_attempt=state.next_completion_attempt,
+            candidate_digest=state.candidate_digest,
             deadline_monotonic=state.deadline_monotonic,
             counters=CompletionCounters(
                 turns=state.turn_count,
@@ -114,6 +115,13 @@ class DharnessAdapter(HarnessAdapter):
                 attempt_id=exc.attempt_id,
             ) from exc
 
+        candidate_digest = result.evidence.candidate_digest
+        if candidate_digest is None:
+            raise HarnessAdapterError(
+                "completion_isolation_inspection",
+                "completion isolation did not provide a candidate digest",
+                attempt_id=state.next_completion_attempt,
+            )
         identity = CandidateIdentity(
             algorithm="docker-image-id",
             value=result.evidence.candidate_image_id,
@@ -121,6 +129,7 @@ class DharnessAdapter(HarnessAdapter):
         return IsolatedCheckRun(
             snapshot=CandidateSnapshot(
                 identity=identity,
+                candidate_digest=candidate_digest,
                 attempt_id=result.evidence.attempt_id,
                 work_epoch=result.evidence.work_epoch,
             ),

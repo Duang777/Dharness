@@ -74,10 +74,18 @@ class FakeCompletionIsolation:
         if self.failure is not None:
             raise self.failure
 
+        candidate_digest = hashlib.sha256(
+            f"test-candidate-rootfs:{request.attempt_id}".encode()
+        ).hexdigest()
         receipts = []
         isolated_checks = []
         for index, check in enumerate(request.checks, start=1):
-            receipt = await execute(check, self.environment, request.deadline_monotonic)
+            receipt = await execute(
+                check,
+                self.environment,
+                request.deadline_monotonic,
+                candidate_digest,
+            )
             receipts.append(receipt)
             isolated_checks.append(
                 CheckIsolationEvidence(
@@ -100,6 +108,7 @@ class FakeCompletionIsolation:
                 attempt_id=request.attempt_id,
                 work_epoch=request.work_epoch,
                 candidate_image_id="sha256:test-candidate",
+                candidate_digest=candidate_digest,
                 environment_identity_sha256="a" * 64,
                 checks=tuple(isolated_checks),
                 source=SourceAttestation(

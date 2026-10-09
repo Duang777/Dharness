@@ -86,7 +86,7 @@ observation fingerprints do not change.
 
 Each check record binds these values:
 
-- the completion attempt and `work_epoch`;
+- the completion attempt, `work_epoch`, and candidate content digest;
 - the check identifier;
 - the command sequence and observation fingerprint;
 - the committed image identifier;
@@ -98,6 +98,14 @@ Each check record binds these values:
 Attempt evidence also records the source diff before and after execution,
 whether the source remained paused, source resumption, snapshot disposal, the
 host-operation count, child count, and duration.
+
+The candidate content digest is separate from the Docker image ID. After
+`docker commit`, the provider reads the image's ordered RootFS layer diff IDs
+and computes SHA-256 over a domain separator, the layer count, and each
+length-framed diff ID. The image ID remains the runtime identity used to start
+children. The content digest is copied into `RunState`, every completion
+`CommandReceipt`, and `CompletionIsolationEvidence`, so an image-identity check
+cannot substitute for the `Fresh` content-binding dimension.
 
 Each prospective experiment also binds one aggregate SHA-256 over
 `pyproject.toml`, `uv.lock`, and every Python module under
@@ -112,7 +120,11 @@ decodable. A live schema-2 completion attempt requires isolation evidence.
 `EvidenceGate` remains the only mechanical acceptance authority. It rejects an
 attempt unless:
 
-- the attempt identifier and `work_epoch` match the request;
+- `work_epoch`, the attempt identifier, and the candidate content digest match
+  the current completion state;
+- every reached receipt carries that same candidate content digest;
+- isolation evidence carries that same digest while its Docker image ID remains
+  the child-launch identity;
 - every reached receipt has one matching isolation record;
 - each isolation record matches the receipt sequence and observation hash;
 - every child started from the same committed image and was removed;
@@ -178,9 +190,9 @@ The successful schema-2 event order is:
 ```text
 agent_decision(finish)
 completion_isolation_started
-completion_candidate_committed
+completion_candidate_committed(candidate_image_id, candidate_digest)
 completion_check_started
-command_receipt
+command_receipt(work_epoch, attempt_id, candidate_digest)
 completion_check_isolated
 completion_check_disposed
 completion_source_attested

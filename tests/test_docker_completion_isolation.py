@@ -35,6 +35,8 @@ SOURCE_ID = "1" * 64
 CHILD_ID = "2" * 64
 INSPECTOR_ID = "6" * 64
 IMAGE_ID = "sha256:" + "3" * 64
+ROOTFS_LAYERS = ("sha256:" + "7" * 64, "sha256:" + "8" * 64)
+CANDIDATE_DIGEST = isolation_module._candidate_content_digest(ROOTFS_LAYERS)
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
 
 
@@ -259,6 +261,14 @@ def _success_responses(
                 f"{IMAGE_ID}\n"
             ),
         ),
+        _exact(
+            "image",
+            "inspect",
+            "--format",
+            "{{json .RootFS.Layers}}",
+            IMAGE_ID,
+            stdout=json.dumps(ROOTFS_LAYERS),
+        ),
         _prefix("run", "-d", "--network", "none", stdout=f"{CHILD_ID}\n"),
         _exact("inspect", CHILD_ID, stdout=_child_inspect()),
         _exact(
@@ -334,7 +344,15 @@ def _check() -> VerificationCheck:
     )
 
 
-def _receipt(check: VerificationCheck) -> CommandReceipt:
+def test_candidate_content_digest_binds_ordered_rootfs_layers() -> None:
+    assert isolation_module._candidate_content_digest(ROOTFS_LAYERS) == CANDIDATE_DIGEST
+    assert isolation_module._candidate_content_digest(tuple(reversed(ROOTFS_LAYERS))) != (
+        CANDIDATE_DIGEST
+    )
+    assert hashlib.sha256(IMAGE_ID.encode()).hexdigest() != CANDIDATE_DIGEST
+
+
+def _receipt(check: VerificationCheck, candidate_digest: str) -> CommandReceipt:
     empty = OutputExcerpt(
         head="",
         tail="",
@@ -350,6 +368,7 @@ def _receipt(check: VerificationCheck) -> CommandReceipt:
         cwd=check.cwd,
         mode=CommandMode.OBSERVE,
         work_epoch=1,
+        candidate_digest=candidate_digest,
         return_code=0,
         duration_sec=0.1,
         stdout=empty,
@@ -363,6 +382,7 @@ async def _execute_check(
     check: VerificationCheck,
     environment,
     deadline_monotonic: float,
+    candidate_digest: str,
 ) -> CommandReceipt:
     del deadline_monotonic
     result = await environment.exec(
@@ -371,7 +391,7 @@ async def _execute_check(
         timeout_sec=check.timeout_sec,
     )
     assert result.return_code == 0
-    return _receipt(check)
+    return _receipt(check, candidate_digest)
 
 
 def _provider(
@@ -421,6 +441,8 @@ async def test_runs_unchanged_check_once_in_mount_free_child(tmp_path) -> None:
     assert run_call[run_call.index("--network") + 1] == "none"
     assert "--mount" not in run_call
     assert "--volume" not in run_call
+    assert result.receipts[0].candidate_digest == CANDIDATE_DIGEST
+    assert result.evidence.candidate_digest == CANDIDATE_DIGEST
     assert result.evidence.excluded_control_mounts == ("/logs",)
     assert result.evidence.checks[0].disposed is True
     assert result.evidence.source.remained_paused is True
@@ -463,6 +485,7 @@ async def test_preserves_nonzero_check_result_as_command_failure(tmp_path) -> No
         candidate: VerificationCheck,
         environment,
         deadline_monotonic: float,
+        candidate_digest: str,
     ) -> CommandReceipt:
         del deadline_monotonic
         result = await environment.exec(
@@ -471,7 +494,7 @@ async def test_preserves_nonzero_check_result_as_command_failure(tmp_path) -> No
             timeout_sec=candidate.timeout_sec,
         )
         assert result.return_code == 1
-        return _receipt(candidate).model_copy(
+        return _receipt(candidate, candidate_digest).model_copy(
             update={
                 "return_code": 1,
                 "failure": FailureKind.NONZERO,
@@ -648,7 +671,7 @@ async def test_cleans_up_child_when_post_start_inspection_fails(tmp_path) -> Non
 
 
 async def test_cleans_up_child_by_reserved_name_when_docker_run_times_out(tmp_path) -> None:
-    responses = _success_responses()[:8]
+    responses = _success_responses()[:9]
     responses.extend(
         [
             _Response(
@@ -742,7 +765,7 @@ async def test_commit_timeout_allows_cleanup_when_image_was_not_created(tmp_path
 
 
 async def test_cleanup_order_survives_executor_failure(tmp_path) -> None:
-    responses = _success_responses()[:10]
+    responses = _success_responses()[:11]
     responses.extend(
         [
             _exact("unpause", SOURCE_ID, stdout=SOURCE_ID),

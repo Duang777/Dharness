@@ -62,6 +62,7 @@ class CompletionState:
     phase: RunPhase
     work_epoch: int
     next_completion_attempt: int
+    candidate_digest: str | None
     deadline_monotonic: float
     counters: CompletionCounters
 
@@ -83,6 +84,7 @@ class CompletionTransactionView:
 @dataclass(frozen=True, slots=True)
 class CandidateSnapshot:
     identity: CandidateIdentity
+    candidate_digest: str
     attempt_id: int
     work_epoch: int
 

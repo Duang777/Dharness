@@ -22,8 +22,8 @@ TEST_MATRIX_COMMIT: Literal["2e3e65868213238d9bbcdbf3e09ce4356c8edfd9"] = (
 TEST_PROTOCOL_COMMIT = DESIGN_BASE_COMMIT
 MAIN_PROTOCOL_COMMIT = "b2a347ecda0206b01cd5d34de9edd7df1e284cb6"
 FROZEN_TEST_SOURCE_SET_SHA256: Literal[
-    "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
-] = "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
+    "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
+] = "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
 
 MAIN_PROTOCOL = Path("experiments/prefixbench-v1/main-analysis-protocol-v1.json")
 EXECUTABLE_PROTOCOL = Path("experiments/prefixbench-v1/main-analysis-executable-v1.json")
@@ -55,15 +55,15 @@ _KNOWN_INPUTS = (
     ),
     (
         "experiments/prefixbench-v1/mutation-protocol-v1.json",
-        "b394fe0f4529d7bd476d5113411230151c0fa3077414cd23f0df34ea287e8c8d",
+        "360c09736d24597ffb4e452dd70b9d468a6213df2167d0e546420c22522cd377",
     ),
     (
         "evaluation/prefixbench-v1-development-offline-campaign.json",
-        "659dba67f203183be64a200e85198596d7fbb929849a308df7b681cb7f42794d",
+        "395c10022f9682ff31246701e058a94aa983b1f236c9f3a6b164e8dc62c6aa83",
     ),
     (
         "evaluation/prefixbench-v1-development-offline-analysis.json",
-        "7194e267d69944ef608f495c42a81085c224634d1478ca99c03ecc7b42d3356f",
+        "5cac7e32f3540c511a782759efdd25c617a3113f40fb9b9566bc5a40fe3cddb7",
     ),
     (
         "evaluation/matrix-prefixbench-test.json",
@@ -71,12 +71,12 @@ _KNOWN_INPUTS = (
     ),
     (
         "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-        "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4",
+        "a6972d068a5595396ccea6bc3d3d66bc0d609c1596aeb16d73fa961e33000d2c",
     ),
 )
 _KNOWN_INPUT_AMENDMENTS = {
     "experiments/prefixbench-v1/test-mutation-protocol-v1.json": (
-        "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4"
+        "a6972d068a5595396ccea6bc3d3d66bc0d609c1596aeb16d73fa961e33000d2c"
     ),
 }
 
@@ -104,8 +104,11 @@ _PROTECTED_SOURCE_PATHS = (
     "src/evidence_harness_mutation/reducer.py",
 )
 _PROTECTED_SOURCE_AMENDMENTS = {
+    "src/evidence_harness/protocol.py": (
+        "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
+    ),
     "src/evidence_harness_mutation/prefixbench_test_campaign.py": (
-        "d8279c8b2bb17fcc30daea13df5f15c44d1b42d76721205e92d491cbcd660478"
+        "13a966708af562c16e3169be748d2171e969e6af2d9d918f49c7383829a3c27e"
     ),
 }
 
@@ -526,7 +529,7 @@ class MainAnalysisProtocol(FrozenModel):
         max_length=len(_KNOWN_INPUTS),
     )
     protected_test_source_set_sha256: Literal[
-        "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
+        "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
     ] = FROZEN_TEST_SOURCE_SET_SHA256
     protected_sources: MainAnalysisSourceSet
     protocol_sources: MainAnalysisSourceSet

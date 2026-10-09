@@ -62,7 +62,12 @@ def _state() -> RunState:
     )
 
 
-def _receipt(check: VerificationCheck, state: RunState) -> CommandReceipt:
+def _receipt(
+    check: VerificationCheck,
+    state: RunState,
+    *,
+    candidate_digest: str | None = None,
+) -> CommandReceipt:
     output = OutputExcerpt(
         head="",
         tail="",
@@ -78,6 +83,8 @@ def _receipt(check: VerificationCheck, state: RunState) -> CommandReceipt:
         cwd=check.cwd,
         mode=CommandMode.OBSERVE,
         work_epoch=state.work_epoch,
+        attempt_id=state.next_completion_attempt if candidate_digest is not None else None,
+        candidate_digest=candidate_digest,
         return_code=0,
         duration_sec=0,
         stdout=output,
@@ -87,8 +94,8 @@ def _receipt(check: VerificationCheck, state: RunState) -> CommandReceipt:
     )
 
 
-async def _unused_execute(check, environment, deadline):
-    raise AssertionError((check, environment, deadline))
+async def _unused_execute(check, environment, deadline, candidate_digest):
+    raise AssertionError((check, environment, deadline, candidate_digest))
 
 
 async def test_dharness_adapter_delegates_one_atomic_isolation_run() -> None:
@@ -97,9 +104,13 @@ async def test_dharness_adapter_delegates_one_atomic_isolation_run() -> None:
     decision = _decision()
     isolation = FakeCompletionIsolation(FakeEnvironment())
 
-    async def execute(check, environment, deadline):
+    async def execute(check, environment, deadline, candidate_digest):
         del environment, deadline
-        return _receipt(check, state)
+        return _receipt(
+            check,
+            state,
+            candidate_digest=candidate_digest,
+        )
 
     adapter = DharnessAdapter.capture(
         contract=CompletionContract.from_instruction(state.instruction, options),
@@ -118,6 +129,9 @@ async def test_dharness_adapter_delegates_one_atomic_isolation_run() -> None:
     assert isolation.requests[0].checks == decision.checks
     assert run.snapshot.identity.algorithm == "docker-image-id"
     assert run.snapshot.identity.value == "sha256:test-candidate"
+    assert run.snapshot.candidate_digest == run.isolation.candidate_digest
+    assert run.receipts[0].attempt_id == 1
+    assert run.receipts[0].candidate_digest == run.snapshot.candidate_digest
     assert tuple(receipt.command_id for receipt in run.receipts) == ("answer",)
     assert run.isolation.checks[0].receipt_sequence == run.receipts[0].sequence
     assert (

@@ -16,7 +16,7 @@ Evidence Harness 因此把模型视为不稳定的决策组件，而不是系统
 |---|---|---|
 | 单一任务写者 | 模型命令只通过 `CommandRunner` 进入任务环境；完成检查只在快照子容器中运行 | 让任务修改可归因，并阻止检查污染待评分状态 |
 | 状态由控制器持有 | 预算、epoch、回执和停止原因存入 `RunState` | 模型失忆或重试不会改写事实 |
-| 证据必须新鲜 | 修改后递增 `work_epoch`，旧检查立即失效 | 防止“先测试通过，再修改出错” |
+| 证据必须新鲜 | 修改后递增 `work_epoch`；完成回执绑定当前 `attempt_id` 和 `candidate_digest` | 防止旧工作批次、旧完成尝试或另一候选的检查被复用 |
 | 完成需要双重判定 | Harness 审核证据，Harbor verifier 评分 | 避免内部启发式冒充任务真相 |
 | 恢复必须有上限 | repair、recovery、turn、调用和墙钟都有预算 | 失败能够终止、分类和复现 |
 
@@ -154,6 +154,8 @@ class CommandReceipt(BaseModel):
     command_id: str
     mode: Literal["observe", "change"]
     work_epoch: int
+    attempt_id: int | None
+    candidate_digest: str | None
     return_code: int
     stdout: OutputExcerpt
     stderr: OutputExcerpt
@@ -220,11 +222,22 @@ epoch 重新执行检查。控制器预留三次环境调用给最终验证，�
 触发强制 replan。超过恢复次数、时间、turn 或环境调用预算后由控制器终止。停止原因是
 领域枚举，而不是依赖最后一句自然语言猜测。
 
-### `work_epoch` 如何防止使用旧证据
+### `Fresh(ε,s)` 如何防止使用旧证据
 
-`work_epoch` 是只增不减的工作批次版本号。固定 bootstrap 在 epoch 0 运行。每个
-`execute` 批次开始时，控制器先增加 epoch，再清除 `latest_evidence`。完成检查产生的
-每条 `CommandReceipt` 都记录当前 epoch。
+完成证据 `ε` 只有同时绑定当前状态 `s` 的工作批次、完成尝试和候选内容时才新鲜：
+
+```text
+Fresh(ε, s) =
+  (ε.work_epoch = s.work_epoch)
+  ∧ (ε.attempt_id = s.attempt_id)
+  ∧ (ε.candidate_digest = s.candidate_digest)
+```
+
+`work_epoch` 是只增不减的工作批次版本号。`attempt_id` 是每次 `finish` 的单调编号。
+`candidate_digest` 是候选根文件系统内容链的 SHA-256，不是 Docker image ID 的别名。
+实现读取 commit 后镜像的有序 Docker RootFS layer diff IDs，并对域分隔符、layer 数量和
+每个 length-framed diff ID 计算 SHA-256。Docker image ID 继续用于启动并核对隔离子
+容器，`candidate_digest` 则独立绑定内容。
 
 ```mermaid
 sequenceDiagram
@@ -240,14 +253,16 @@ sequenceDiagram
     L->>E: 执行修改命令
     M->>L: finish，提交检查和覆盖表
     L->>E: 暂停并提交候选快照
-    L->>I: 每条检查在独立子容器执行，epoch 1
+    L->>L: 计算 RootFS candidate_digest，推进当前候选状态
+    L->>I: 每条检查在独立子容器执行，绑定 epoch、attempt、digest
     I-->>L: 返回退出码、输出哈希和文件变化
-    L->>G: 校验检查回执、隔离证据与 epoch 1
+    L->>G: 校验检查回执、隔离证据与 Fresh 三维绑定
     G-->>L: accepted
 ```
 
 如果模型在验证后再次选择 `execute`，`work_epoch` 变为 2。epoch 1 的回执即使退出码
-为 0，也不能证明 epoch 2 的环境状态。模型必须重新提交并执行检查。
+为 0，也不能证明 epoch 2 的环境状态。即使 epoch 相同，旧 attempt 或另一
+`candidate_digest` 的回执也会被拒绝。模型必须重新提交并执行检查。
 
 ## 命令与证据边界
 
@@ -274,8 +289,8 @@ Shell 是 Terminal-Bench 的必要通用能力，完全改成固定工具集合�
    有效。危险路径和宿主控制命令仍由 policy 拒绝。
 2. `DockerCompletionIsolation` 暂停源容器并提交一次候选镜像。每条检查在各自的
    无挂载、无网络子容器中执行。
-3. `EvidenceGate.decide` 校验 `attempt_id`、`work_epoch`、receipt 顺序、观察哈希、
-   文件变化、源容器不变和资源清理状态。
+3. `EvidenceGate.decide` 校验 `work_epoch`、`attempt_id`、`candidate_digest`、
+   receipt 顺序、观察哈希、文件变化、源容器不变和资源清理状态。
 4. 启用 completion review 时，reviewer 读取已经执行的 receipts 和隔离证据，再判断
    检查是否覆盖原始要求。reviewer 故障或配额耗尽不能降级成成功。
 5. Harbor verifier 在 Harness 退出后独立评分。只有获得 reward 的结果进入 scored

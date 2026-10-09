@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 
 from conftest import FakeCompletionIsolation, FakeEnvironment, ScriptedModel
@@ -92,7 +93,11 @@ async def test_repeated_finish_gets_new_attempt_and_global_sequence(tmp_path) ->
     assert [request.attempt_id for request in isolation.requests] == [1, 2]
     evidence = report.latest_evidence
     assert evidence is not None
+    assert evidence.isolation is not None
     assert [receipt.sequence for receipt in evidence.checks] == [3]
+    expected_digest = hashlib.sha256(b"test-candidate-rootfs:2").hexdigest()
+    assert evidence.checks[0].candidate_digest == expected_digest
+    assert evidence.isolation.candidate_digest == expected_digest
     assert report.environment_calls_used == 3
 
 

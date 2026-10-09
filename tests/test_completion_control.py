@@ -43,18 +43,21 @@ from evidence_harness.protocol import (
 from evidence_harness.stub_harness_adapter import StubHarnessAdapter
 
 _EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
+_CANDIDATE_DIGEST = hashlib.sha256(b"candidate-rootfs").hexdigest()
 
 
 def _state(
     *,
     phase: RunPhase = RunPhase.FINALIZING,
     next_completion_attempt: int = 1,
+    candidate_digest: str | None = None,
     counters: CompletionCounters | None = None,
 ) -> CompletionState:
     return CompletionState(
         phase=phase,
         work_epoch=1,
         next_completion_attempt=next_completion_attempt,
+        candidate_digest=candidate_digest,
         deadline_monotonic=100,
         counters=counters
         or CompletionCounters(
@@ -161,6 +164,8 @@ def _receipt(check: VerificationCheck, sequence: int) -> CommandReceipt:
         cwd=check.cwd,
         mode=CommandMode.OBSERVE,
         work_epoch=1,
+        attempt_id=1,
+        candidate_digest=_CANDIDATE_DIGEST,
         return_code=0,
         duration_sec=0.1,
         stdout=output,
@@ -180,6 +185,7 @@ def _isolation(
         attempt_id=1,
         work_epoch=1,
         candidate_image_id=candidate,
+        candidate_digest=_CANDIDATE_DIGEST,
         environment_identity_sha256="9" * 64,
         checks=tuple(
             CheckIsolationEvidence(
@@ -223,6 +229,7 @@ def _run(
                 algorithm="sha256",
                 value=isolation.candidate_image_id,
             ),
+            candidate_digest=_CANDIDATE_DIGEST,
             attempt_id=1,
             work_epoch=1,
         ),
@@ -235,6 +242,7 @@ def _completion_state(*, review_required: bool) -> CompletionState:
     return _state(
         phase=RunPhase.REVIEWING if review_required else RunPhase.VERIFYING,
         next_completion_attempt=2,
+        candidate_digest=_CANDIDATE_DIGEST,
     )
 
 

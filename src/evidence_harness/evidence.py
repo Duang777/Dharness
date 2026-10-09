@@ -108,6 +108,7 @@ class EvidenceGate:
         coverage: tuple[RequirementCoverage, ...],
         expected_check_ids: tuple[str, ...] = (),
         attempt_id: int | None = None,
+        candidate_digest: str | None = None,
         isolation: CompletionIsolationEvidence | None = None,
         require_isolation: bool = False,
         prior_rejections: tuple[str, ...] = (),
@@ -129,6 +130,12 @@ class EvidenceGate:
             reasons.append("no verification commands were executed")
         if any(item.work_epoch != work_epoch for item in checks):
             reasons.append("verification evidence is stale")
+        if attempt_id is not None and any(item.attempt_id != attempt_id for item in checks):
+            reasons.append("verification receipt attempt does not match")
+        if candidate_digest is not None and any(
+            item.candidate_digest != candidate_digest for item in checks
+        ):
+            reasons.append("verification receipt candidate digest does not match")
         if expected_check_ids and tuple(item.command_id for item in checks) != expected_check_ids:
             reasons.append("not all proposed verification commands were executed in order")
         if proposed_checks and len(proposed_checks) == len(checks):
@@ -150,6 +157,7 @@ class EvidenceGate:
                 _isolation_rejections(
                     isolation=isolation,
                     attempt_id=attempt_id,
+                    candidate_digest=candidate_digest,
                     work_epoch=work_epoch,
                     checks=checks,
                 )
@@ -170,6 +178,7 @@ def _isolation_rejections(
     *,
     isolation: CompletionIsolationEvidence | None,
     attempt_id: int | None,
+    candidate_digest: str | None,
     work_epoch: int,
     checks: tuple[CommandReceipt, ...],
 ) -> tuple[str, ...]:
@@ -179,6 +188,8 @@ def _isolation_rejections(
     reasons: list[str] = []
     if attempt_id is None or isolation.attempt_id != attempt_id:
         reasons.append("completion isolation attempt does not match")
+    if candidate_digest is not None and isolation.candidate_digest != candidate_digest:
+        reasons.append("completion isolation candidate digest does not match")
     if isolation.work_epoch != work_epoch:
         reasons.append("completion isolation evidence is stale")
     if len(isolation.checks) != len(checks):

@@ -71,14 +71,15 @@ and a completion-specific state value. Each adapter captures a deep copy and ret
 copies. The controller reads one copy during construction, so later host mutations cannot
 change the transaction.
 
-`IsolatedCheckRun` contains the candidate snapshot identity, command receipts, and isolation
-proof. The operation returns only after cleanup. It raises the existing isolation error when
-the backend cannot complete cleanup.
+`IsolatedCheckRun` contains the backend snapshot identity, candidate content digest, command
+receipts, and isolation proof. Each receipt binds the completion attempt and content digest.
+The operation returns only after cleanup. It raises the existing isolation error when the
+backend cannot complete cleanup.
 
-The controller validates that the snapshot identity, attempt, and work epoch agree with the
-isolation proof and frozen view. It binds admission, acceptance, and permits to one controller
-and portable state values. It no longer imports `RunState`, `CommandRunner`, `RunJournal`,
-`CompletionIsolation`, Harbor, or Docker.
+The controller validates that the snapshot identity, content digest, attempt, and work epoch
+agree with the receipts, isolation proof, and frozen view. It binds admission, acceptance, and
+permits to one controller and portable state values. It no longer imports `RunState`,
+`CommandRunner`, `RunJournal`, `CompletionIsolation`, Harbor, or Docker.
 
 The interface is small because the adapter hides the candidate lifecycle and execution
 backend. Callers still own host state transitions and semantic review because moving them is
@@ -120,8 +121,6 @@ wire format for compatibility.
   backend-neutral record?
 - Should semantic review move behind a separate protocol interface after the adapter boundary
   has proven stable?
-- Will concurrent work that adds receipt attempt bindings require a small mapping update in
-  both adapter implementations?
 
 ## Next implementation step
 

@@ -69,6 +69,7 @@ class _EvaluationBinding:
     state: CompletionState
     attempt_id: int
     work_epoch: int
+    candidate_digest: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -318,6 +319,7 @@ class CompletionController:
             coverage=proposal.coverage,
             expected_check_ids=tuple(check.id for check in proposal.checks),
             attempt_id=state.next_completion_attempt,
+            candidate_digest=verified_run.snapshot.candidate_digest,
             isolation=verified_run.isolation,
             require_isolation=self.contract.v_req.require_isolation,
             prior_rejections=self._run_binding_rejections(verified_run),
@@ -332,6 +334,21 @@ class CompletionController:
     ) -> AcceptEvaluation:
         expected_state = self._view.state
         receipt = self.evaluate_evidence(run)
+        if state.candidate_digest != run.snapshot.candidate_digest:
+            reasons = tuple(
+                dict.fromkeys(
+                    (
+                        *receipt.rejection_reasons,
+                        "completion state candidate digest does not match",
+                    )
+                )
+            )
+            receipt = receipt.model_copy(
+                update={
+                    "accepted": False,
+                    "rejection_reasons": reasons,
+                }
+            )
         return AcceptEvaluation(
             evidence=_result("evidence", receipt.rejection_reasons),
             budget=self.budget_guard.evaluate_completion(
@@ -352,6 +369,7 @@ class CompletionController:
                 state=state,
                 attempt_id=expected_state.next_completion_attempt,
                 work_epoch=expected_state.work_epoch,
+                candidate_digest=run.snapshot.candidate_digest,
             ),
         )
 
@@ -387,8 +405,9 @@ class CompletionController:
                 authority=_PERMIT_AUTHORITY,
                 controller_identity=id(self),
                 state=state,
-                attempt_id=self._view.state.next_completion_attempt,
-                work_epoch=self._view.state.work_epoch,
+                attempt_id=acceptance._binding.attempt_id,
+                work_epoch=acceptance._binding.work_epoch,
+                candidate_digest=acceptance._binding.candidate_digest,
             )
             if accepted
             else None
@@ -412,6 +431,7 @@ class CompletionController:
             and permit.state == state
             and permit.attempt_id == self._view.state.next_completion_attempt
             and permit.work_epoch == self._view.state.work_epoch
+            and permit.candidate_digest == state.candidate_digest
             and self.phase_guard.evaluate_completion(
                 state,
                 review_required=self.policy.review_required,
@@ -432,6 +452,7 @@ class CompletionController:
             and binding.state == state
             and binding.attempt_id == self._view.state.next_completion_attempt
             and binding.work_epoch == self._view.state.work_epoch
+            and binding.candidate_digest == state.candidate_digest
         )
 
     def phase_ok(self, state: CompletionState) -> bool:
@@ -449,6 +470,8 @@ class CompletionController:
             reasons.append("candidate snapshot work epoch does not match")
         if run.snapshot.identity.value != run.isolation.candidate_image_id:
             reasons.append("candidate snapshot identity does not match isolation evidence")
+        if run.snapshot.candidate_digest != run.isolation.candidate_digest:
+            reasons.append("candidate snapshot digest does not match isolation evidence")
         return tuple(reasons)
 
 
