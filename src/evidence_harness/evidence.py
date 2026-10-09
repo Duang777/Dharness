@@ -15,8 +15,21 @@ from evidence_harness.protocol import (
 
 
 class EvidenceGate:
-    def __init__(self, options: LoopOptions) -> None:
-        self._options = options
+    def __init__(
+        self,
+        options: LoopOptions | None = None,
+        *,
+        max_command_timeout_sec: int | None = None,
+    ) -> None:
+        if options is None and max_command_timeout_sec is None:
+            raise ValueError("a command timeout limit is required")
+        if options is not None and max_command_timeout_sec is not None:
+            raise ValueError("provide options or a command timeout limit, not both")
+        if options is not None:
+            self._max_command_timeout_sec = options.max_command_timeout_sec
+        else:
+            assert max_command_timeout_sec is not None
+            self._max_command_timeout_sec = max_command_timeout_sec
 
     def validate_proposal(
         self,
@@ -78,7 +91,7 @@ class EvidenceGate:
             try:
                 validate_check(
                     check,
-                    self._options.max_command_timeout_sec,
+                    self._max_command_timeout_sec,
                     allow_potential_writes=isolated,
                 )
             except PolicyViolation as exc:

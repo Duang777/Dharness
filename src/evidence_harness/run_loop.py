@@ -10,12 +10,10 @@ from evidence_harness.budget import (
     finalization_wall_time_reserve_sec,
 )
 from evidence_harness.completion_contract import CompletionContract
-from evidence_harness.completion_control import CompletionController
-from evidence_harness.completion_isolation import (
-    CompletionIsolation,
-    CompletionIsolationError,
-    CompletionIsolationRequest,
-)
+from evidence_harness.completion_control import BudgetGuard, CompletionController
+from evidence_harness.completion_isolation import CompletionIsolation
+from evidence_harness.dharness_adapter import DharnessAdapter
+from evidence_harness.harness_adapter import HarnessAdapterError
 from evidence_harness.journal import RunJournal
 from evidence_harness.model_client import ModelProtocolError, ModelServiceError
 from evidence_harness.policy import (
@@ -115,7 +113,6 @@ class EvidenceLoop:
             instruction,
             self._options,
         )
-        controller = CompletionController(contract, options=self._options)
         started = self._clock()
         state = RunState(
             instruction=instruction,
@@ -285,9 +282,9 @@ class EvidenceLoop:
             if decision.action is ActionKind.EXECUTE:
                 if state.finalization_started:
                     state.finalization_repair_used = True
-                await self._handle_execute(state, runner, decision, controller)
+                await self._handle_execute(state, runner, decision, contract)
             elif decision.action is ActionKind.FINISH:
-                await self._handle_finish(state, decision, controller)
+                await self._handle_finish(state, decision, contract)
             elif decision.action is ActionKind.REPLAN:
                 self._handle_replan(state, decision)
             else:
@@ -307,14 +304,14 @@ class EvidenceLoop:
         state: RunState,
         runner: CommandRunner,
         decision: AgentDecision,
-        controller: CompletionController,
+        contract: CompletionContract,
     ) -> None:
-        budget = controller.contract.b_req
+        budget = contract.b_req
         remaining_calls = budget.max_environment_calls - state.environment_call_count
         available_for_work = remaining_calls - budget.verification_environment_reserve
-        admission = controller.budget_guard.evaluate_work(
-            controller.contract,
-            state,
+        admission = BudgetGuard().evaluate_work(
+            contract,
+            DharnessAdapter.project_state(state),
             command_count=len(decision.commands),
         )
         self._journal.append(
@@ -440,20 +437,38 @@ class EvidenceLoop:
         self,
         state: RunState,
         decision: AgentDecision,
-        controller: CompletionController,
+        contract: CompletionContract,
     ) -> None:
-        admission = controller.admit_proposal(
+        async def execute_check(
+            check: VerificationCheck,
+            environment: ShellEnvironment,
+            command_deadline_monotonic: float,
+        ) -> CommandReceipt:
+            return await self._run_completion_check(
+                state,
+                check,
+                environment,
+                command_deadline_monotonic,
+            )
+
+        adapter = DharnessAdapter.capture(
+            contract=contract,
+            options=self._options,
             state=state,
-            checks=decision.checks,
-            coverage=decision.coverage,
-            now=self._clock(),
+            decision=decision,
+            isolation=self._completion_isolation,
+            execute_check=execute_check,
         )
+        controller = CompletionController(adapter)
+        proposal = adapter.view.proposal
+        attempt_id = adapter.view.state.next_completion_attempt
+        admission = controller.admit(now=self._clock())
         self._journal.append(
             "completion_proposal_admission",
             {
                 **admission.journal_payload(),
                 "work_epoch": state.work_epoch,
-                "check_ids": tuple(check.id for check in decision.checks),
+                "check_ids": tuple(check.id for check in proposal.checks),
             },
         )
         if not admission.accepted:
@@ -470,37 +485,16 @@ class EvidenceLoop:
                     failure_category=category,
                 )
             else:
-                self._reject_completion(state, admission.reasons, controller)
+                self._reject_completion(state, admission.reasons, contract)
             return
 
-        supporting_observations = list(state.observations)
+        supporting_observations = list(adapter.view.trace.receipts)
         state.phase = RunPhase.VERIFYING
-        attempt_id = state.next_completion_attempt
         state.next_completion_attempt += 1
 
-        async def execute_check(
-            check: VerificationCheck,
-            environment: ShellEnvironment,
-            command_deadline_monotonic: float,
-        ) -> CommandReceipt:
-            return await self._run_completion_check(
-                state,
-                check,
-                environment,
-                command_deadline_monotonic,
-            )
-
         try:
-            isolated = await self._completion_isolation.verify(
-                CompletionIsolationRequest(
-                    attempt_id=attempt_id,
-                    work_epoch=state.work_epoch,
-                    checks=decision.checks,
-                    deadline_monotonic=state.deadline_monotonic,
-                ),
-                execute_check,
-            )
-        except CompletionIsolationError as exc:
+            isolated = await controller.verify(admission)
+        except HarnessAdapterError as exc:
             state.unresolved_errors.append(str(exc))
             self._journal.append(
                 "completion_isolation_failed",
@@ -513,51 +507,38 @@ class EvidenceLoop:
             self._finish(
                 state,
                 StopReason.INFRA_FAILURE,
-                failure_category=exc.kind.value,
+                failure_category=exc.kind,
             )
             return
 
         receipts = isolated.receipts
 
-        mechanical_evidence = controller.evaluate_evidence(
-            state=state,
-            checks=receipts,
-            proposed_checks=decision.checks,
-            coverage=decision.coverage,
-            expected_check_ids=tuple(check.id for check in decision.checks),
-            attempt_id=attempt_id,
-            isolation=isolated.evidence,
-        )
+        mechanical_evidence = controller.evaluate_evidence(isolated)
         if not mechanical_evidence.accepted:
             state.latest_evidence = mechanical_evidence
             self._journal.append("verification_receipt", mechanical_evidence)
             self._reject_completion(
                 state,
                 mechanical_evidence.rejection_reasons,
-                controller,
+                contract,
             )
             return
 
         semantic_assessment: SemanticAssessment | None = None
         state.phase = (
-            RunPhase.REVIEWING if self._options.enable_completion_review else RunPhase.VERIFYING
+            RunPhase.REVIEWING if controller.policy.review_required else RunPhase.VERIFYING
         )
         pre_review_acceptance = controller.evaluate_accept(
-            state=state,
-            checks=receipts,
-            proposed_checks=decision.checks,
-            coverage=decision.coverage,
-            expected_check_ids=tuple(check.id for check in decision.checks),
-            attempt_id=attempt_id,
-            isolation=isolated.evidence,
+            isolated,
+            state=DharnessAdapter.project_state(state),
             now=self._clock(),
         )
         if not pre_review_acceptance.budget.accepted:
+            completion_state = DharnessAdapter.project_state(state)
             completion = controller.evaluate_complete(
                 pre_review_acceptance,
                 assessment=None,
-                state=state,
-                attempt_id=attempt_id,
+                state=completion_state,
             )
             state.latest_evidence = completion.receipt
             state.unresolved_errors.extend(pre_review_acceptance.budget.reasons)
@@ -577,7 +558,7 @@ class EvidenceLoop:
             )
             return
 
-        if self._options.enable_completion_review:
+        if controller.policy.review_required:
             state.completion_review_count += 1
             self._journal.append(
                 "completion_review_started",
@@ -590,10 +571,10 @@ class EvidenceLoop:
             review_prompt = build_review_prompt(
                 instruction=state.instruction,
                 contract=controller.contract,
-                checks=decision.checks,
-                coverage=decision.coverage,
+                checks=proposal.checks,
+                coverage=proposal.coverage,
                 verification_receipts=receipts,
-                isolation=isolated.evidence,
+                isolation=isolated.isolation,
                 supporting_observations=supporting_observations,
                 prior_findings=state.completion_findings,
             )
@@ -609,20 +590,15 @@ class EvidenceLoop:
                     {"error_type": type(exc).__name__, "error": str(exc)},
                 )
                 acceptance = controller.evaluate_accept(
-                    state=state,
-                    checks=receipts,
-                    proposed_checks=decision.checks,
-                    coverage=decision.coverage,
-                    expected_check_ids=tuple(check.id for check in decision.checks),
-                    attempt_id=attempt_id,
-                    isolation=isolated.evidence,
+                    isolated,
+                    state=DharnessAdapter.project_state(state),
                     now=self._clock(),
                 )
+                completion_state = DharnessAdapter.project_state(state)
                 completion = controller.evaluate_complete(
                     acceptance,
                     assessment=None,
-                    state=state,
-                    attempt_id=attempt_id,
+                    state=completion_state,
                 )
                 evidence = completion.receipt
                 state.latest_evidence = evidence
@@ -648,20 +624,15 @@ class EvidenceLoop:
                 return
 
         acceptance = controller.evaluate_accept(
-            state=state,
-            checks=receipts,
-            proposed_checks=decision.checks,
-            coverage=decision.coverage,
-            expected_check_ids=tuple(check.id for check in decision.checks),
-            attempt_id=attempt_id,
-            isolation=isolated.evidence,
+            isolated,
+            state=DharnessAdapter.project_state(state),
             now=self._clock(),
         )
+        completion_state = DharnessAdapter.project_state(state)
         completion = controller.evaluate_complete(
             acceptance,
             assessment=semantic_assessment,
-            state=state,
-            attempt_id=attempt_id,
+            state=completion_state,
         )
         evidence = completion.receipt
         state.latest_evidence = evidence
@@ -676,7 +647,7 @@ class EvidenceLoop:
         self._journal.append("verification_receipt", evidence)
         if completion.accepted:
             state.completion_findings = ()
-            state.final_summary = decision.summary or decision.rationale
+            state.final_summary = proposal.summary or decision.rationale
             self._finish(
                 state,
                 StopReason.VERIFIED,
@@ -697,7 +668,7 @@ class EvidenceLoop:
             raise RuntimeError(
                 f"completion evaluation reached an illegal phase: {completion.accept.phase.reasons}"
             )
-        self._reject_completion(state, evidence.rejection_reasons, controller)
+        self._reject_completion(state, evidence.rejection_reasons, contract)
 
     async def _run_completion_check(
         self,
@@ -828,9 +799,9 @@ class EvidenceLoop:
         self,
         state: RunState,
         reasons: tuple[str, ...],
-        controller: CompletionController,
+        contract: CompletionContract,
     ) -> None:
-        budget = controller.contract.b_req
+        budget = contract.b_req
         state.completion_findings = _stable_unique(reasons)
         review_exhausted = (
             self._options.enable_completion_review
@@ -967,13 +938,14 @@ class EvidenceLoop:
             if reason is StopReason.VERIFIED:
                 if completion_controller is None:
                     raise RuntimeError("verified completion requires a CompletionController")
-                if not completion_controller.phase_ok(state):
+                completion_state = DharnessAdapter.project_state(state)
+                if not completion_controller.phase_ok(completion_state):
                     raise RuntimeError(
                         f"verified completion is not allowed in phase '{state.phase}'"
                     )
                 if not completion_controller.authorizes(
                     completion_permit,
-                    state,
+                    completion_state,
                 ):
                     raise RuntimeError(
                         "verified completion requires a current CompletionController permit"

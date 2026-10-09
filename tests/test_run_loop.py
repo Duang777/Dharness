@@ -10,6 +10,7 @@ from conftest import FakeCompletionIsolation, FakeEnvironment, FakeExecResult, S
 
 from evidence_harness.completion_contract import CompletionContract, TaskRequirement
 from evidence_harness.completion_control import CompletionController
+from evidence_harness.dharness_adapter import DharnessAdapter
 from evidence_harness.journal import RunJournal
 from evidence_harness.protocol import (
     ActionKind,
@@ -1092,15 +1093,25 @@ def test_verified_finish_rejects_an_illegal_phase_even_with_a_controller(tmp_pat
         verification_environment_reserve=3,
     )
     loop = _loop(tmp_path, ScriptedModel(()))
-    controller = CompletionController(
-        CompletionContract.from_instruction("finish safely", options),
-        options=options,
-    )
     state = RunState(
         instruction="finish safely",
         phase=RunPhase.THINKING,
         started_monotonic=0,
         deadline_monotonic=1_000,
+    )
+
+    async def execute_check(check, environment, deadline):
+        raise AssertionError((check, environment, deadline))
+
+    controller = CompletionController(
+        DharnessAdapter.capture(
+            contract=CompletionContract.from_instruction("finish safely", options),
+            options=options,
+            state=state,
+            decision=_finish(),
+            isolation=FakeCompletionIsolation(FakeEnvironment()),
+            execute_check=execute_check,
+        )
     )
 
     with pytest.raises(RuntimeError, match="not allowed in phase"):

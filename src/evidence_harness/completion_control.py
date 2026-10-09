@@ -1,21 +1,21 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from evidence_harness.completion_contract import CompletionBudget, CompletionContract
+from evidence_harness.completion_contract import CompletionContract
 from evidence_harness.evidence import EvidenceGate
+from evidence_harness.harness_adapter import (
+    CompletionState,
+    HarnessAdapter,
+    IsolatedCheckRun,
+)
 from evidence_harness.protocol import (
-    CommandReceipt,
-    CompletionIsolationEvidence,
-    LoopOptions,
-    RequirementCoverage,
     RunPhase,
-    RunState,
     SemanticAssessment,
-    VerificationCheck,
     VerificationReceipt,
 )
 
@@ -32,10 +32,18 @@ class GuardResult(BaseModel):
 
 
 @dataclass(frozen=True, slots=True)
+class _AdmissionBinding:
+    authority: object
+    controller_identity: int
+    view_identity: int
+
+
+@dataclass(frozen=True, slots=True)
 class ProposalAdmission:
     evidence: GuardResult
     budget: GuardResult
     phase: GuardResult
+    _binding: _AdmissionBinding
 
     @property
     def accepted(self) -> bool:
@@ -58,11 +66,9 @@ class ProposalAdmission:
 class _EvaluationBinding:
     authority: object
     controller_identity: int
-    state_identity: int
+    state: CompletionState
     attempt_id: int
     work_epoch: int
-    phase: RunPhase
-    counters: tuple[int, int, int, int, int]
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,7 +118,7 @@ class BudgetGuard:
     def evaluate_proposal(
         self,
         contract: CompletionContract,
-        state: RunState,
+        state: CompletionState,
         *,
         now: float,
         requested_environment_calls: int,
@@ -120,18 +126,18 @@ class BudgetGuard:
     ) -> GuardResult:
         reasons = list(self._counter_reasons(contract, state, now=now))
         budget = contract.b_req
-        if state.environment_call_count + requested_environment_calls > (
+        if state.counters.environment_calls + requested_environment_calls > (
             budget.max_environment_calls
         ):
             reasons.append("completion checks exceed the remaining environment-call budget")
-        if review_required and state.completion_review_count >= budget.max_completion_reviews:
+        if review_required and state.counters.completion_reviews >= budget.max_completion_reviews:
             reasons.append("completion review budget exhausted")
         return _result("budget", reasons)
 
     def evaluate_completion(
         self,
         contract: CompletionContract,
-        state: RunState,
+        state: CompletionState,
         *,
         now: float,
     ) -> GuardResult:
@@ -140,46 +146,48 @@ class BudgetGuard:
     def evaluate_work(
         self,
         contract: CompletionContract,
-        state: RunState,
+        state: CompletionState,
         *,
         command_count: int,
     ) -> GuardResult:
         budget = contract.b_req
         reasons: list[str] = []
-        remaining_calls = budget.max_environment_calls - state.environment_call_count
+        remaining_calls = budget.max_environment_calls - state.counters.environment_calls
         available_for_work = remaining_calls - budget.verification_environment_reserve
         if command_count > available_for_work:
             reasons.append("work command batch would consume the reserved verification calls")
-        if budget.max_turns - state.turn_count < 1:
+        if budget.max_turns - state.counters.turns < 1:
             reasons.append("no executor turn remains after this batch")
         return _result("budget", reasons)
 
     @staticmethod
     def _counter_reasons(
         contract: CompletionContract,
-        state: RunState,
+        state: CompletionState,
         *,
         now: float,
     ) -> tuple[str, ...]:
         budget = contract.b_req
         reasons: list[str] = []
-        if state.turn_count > budget.max_turns:
-            reasons.append(f"turn budget exceeded: {state.turn_count} > {budget.max_turns}")
-        if state.environment_call_count > budget.max_environment_calls:
+        if state.counters.turns > budget.max_turns:
+            reasons.append(f"turn budget exceeded: {state.counters.turns} > {budget.max_turns}")
+        if state.counters.environment_calls > budget.max_environment_calls:
             reasons.append(
                 "environment-call budget exceeded: "
-                f"{state.environment_call_count} > {budget.max_environment_calls}"
+                f"{state.counters.environment_calls} > {budget.max_environment_calls}"
             )
-        if state.repair_count > budget.max_repairs:
-            reasons.append(f"repair budget exceeded: {state.repair_count} > {budget.max_repairs}")
-        if state.recovery_count > budget.max_recoveries:
+        if state.counters.repairs > budget.max_repairs:
             reasons.append(
-                f"recovery budget exceeded: {state.recovery_count} > {budget.max_recoveries}"
+                f"repair budget exceeded: {state.counters.repairs} > {budget.max_repairs}"
             )
-        if state.completion_review_count > budget.max_completion_reviews:
+        if state.counters.recoveries > budget.max_recoveries:
+            reasons.append(
+                f"recovery budget exceeded: {state.counters.recoveries} > {budget.max_recoveries}"
+            )
+        if state.counters.completion_reviews > budget.max_completion_reviews:
             reasons.append(
                 "completion review budget exceeded: "
-                f"{state.completion_review_count} > {budget.max_completion_reviews}"
+                f"{state.counters.completion_reviews} > {budget.max_completion_reviews}"
             )
         if now > state.deadline_monotonic:
             reasons.append(f"wall-clock budget exceeded: {now:g} > {state.deadline_monotonic:g}")
@@ -187,7 +195,7 @@ class BudgetGuard:
 
 
 class PhaseGuard:
-    def evaluate_proposal(self, state: RunState) -> GuardResult:
+    def evaluate_proposal(self, state: CompletionState) -> GuardResult:
         allowed = {
             RunPhase.THINKING,
             RunPhase.FINALIZING,
@@ -202,19 +210,23 @@ class PhaseGuard:
 
     def evaluate_completion(
         self,
-        state: RunState,
+        state: CompletionState,
         *,
         review_required: bool,
+        attempt_id: int,
+        work_epoch: int,
     ) -> GuardResult:
         expected = RunPhase.REVIEWING if review_required else RunPhase.VERIFYING
-        reasons = (
-            ()
-            if phase_ok(state, review_required=review_required)
-            else (
+        reasons: list[str] = []
+        if not phase_ok(state, review_required=review_required):
+            reasons.append(
                 f"completion requires phase '{expected}' when review is "
-                f"{'enabled' if review_required else 'disabled'}; got '{state.phase}'",
+                f"{'enabled' if review_required else 'disabled'}; got '{state.phase}'"
             )
-        )
+        if state.next_completion_attempt != attempt_id + 1:
+            reasons.append("completion attempt state does not match")
+        if state.work_epoch != work_epoch:
+            reasons.append("completion work epoch changed during verification")
         return _result("phase", reasons)
 
 
@@ -233,104 +245,93 @@ class ReviewGate:
         return _result("review", reasons)
 
 
-def phase_ok(state: RunState, *, review_required: bool) -> bool:
+def phase_ok(state: CompletionState, *, review_required: bool) -> bool:
     expected = RunPhase.REVIEWING if review_required else RunPhase.VERIFYING
     return state.phase is expected
 
 
 class CompletionController:
-    def __init__(
-        self,
-        contract: CompletionContract,
-        *,
-        options: LoopOptions | None = None,
-    ) -> None:
-        self.contract = contract
-        self.options = options or LoopOptions()
-        if contract.b_req != CompletionBudget.from_options(self.options):
-            raise ValueError("completion contract budget does not match controller options")
-        self.evidence_gate = EvidenceGate(self.options)
+    def __init__(self, adapter: HarnessAdapter) -> None:
+        self._adapter = adapter
+        self._view = adapter.view
+        self.contract = self._view.contract
+        self.policy = self._view.policy
+        self.evidence_gate = EvidenceGate(max_command_timeout_sec=self.policy.max_check_timeout_sec)
         self.budget_guard = BudgetGuard()
         self.phase_guard = PhaseGuard()
         self.review_gate = ReviewGate()
+        self._verification_started = False
 
-    def validate_proposal(
-        self,
-        checks: tuple[VerificationCheck, ...],
-        coverage: tuple[RequirementCoverage, ...],
-    ) -> GuardResult:
+    def validate_proposal(self) -> GuardResult:
+        proposal = self._view.proposal
         reasons = self.evidence_gate.validate_proposal(
-            checks,
-            coverage,
+            proposal.checks,
+            proposal.coverage,
             contract=self.contract,
             isolated=True,
         )
         return _result("evidence", reasons)
 
-    def admit_proposal(
-        self,
-        *,
-        state: RunState,
-        checks: tuple[VerificationCheck, ...],
-        coverage: tuple[RequirementCoverage, ...],
-        now: float,
-    ) -> ProposalAdmission:
+    def admit(self, *, now: float) -> ProposalAdmission:
+        state = self._view.state
         return ProposalAdmission(
-            evidence=self.validate_proposal(checks, coverage),
+            evidence=self.validate_proposal(),
             budget=self.budget_guard.evaluate_proposal(
                 self.contract,
                 state,
                 now=now,
-                requested_environment_calls=len(checks),
-                review_required=self.options.enable_completion_review,
+                requested_environment_calls=len(self._view.proposal.checks),
+                review_required=self.policy.review_required,
             ),
             phase=self.phase_guard.evaluate_proposal(state),
+            _binding=_AdmissionBinding(
+                authority=_PERMIT_AUTHORITY,
+                controller_identity=id(self),
+                view_identity=id(self._view),
+            ),
         )
 
-    def evaluate_evidence(
-        self,
-        *,
-        state: RunState,
-        checks: tuple[CommandReceipt, ...],
-        proposed_checks: tuple[VerificationCheck, ...],
-        coverage: tuple[RequirementCoverage, ...],
-        expected_check_ids: tuple[str, ...],
-        attempt_id: int,
-        isolation: CompletionIsolationEvidence | None,
-    ) -> VerificationReceipt:
+    async def verify(self, admission: ProposalAdmission) -> IsolatedCheckRun:
+        if not admission.accepted:
+            raise RuntimeError("isolated checks require an accepted proposal")
+        binding = admission._binding
+        if (
+            binding.authority is not _PERMIT_AUTHORITY
+            or binding.controller_identity != id(self)
+            or binding.view_identity != id(self._view)
+        ):
+            raise RuntimeError("proposal admission belongs to another completion controller")
+        if self._verification_started:
+            raise RuntimeError("a completion controller can verify only once")
+        self._verification_started = True
+        return deepcopy(await self._adapter.run_checks_isolated())
+
+    def evaluate_evidence(self, run: IsolatedCheckRun) -> VerificationReceipt:
+        verified_run = deepcopy(run)
+        proposal = self._view.proposal
+        state = self._view.state
         return self.evidence_gate.decide(
             contract=self.contract,
             work_epoch=state.work_epoch,
-            checks=checks,
-            proposed_checks=proposed_checks,
-            coverage=coverage,
-            expected_check_ids=expected_check_ids,
-            attempt_id=attempt_id,
-            isolation=isolation,
+            checks=verified_run.receipts,
+            proposed_checks=proposal.checks,
+            coverage=proposal.coverage,
+            expected_check_ids=tuple(check.id for check in proposal.checks),
+            attempt_id=state.next_completion_attempt,
+            isolation=verified_run.isolation,
             require_isolation=self.contract.v_req.require_isolation,
+            prior_rejections=self._run_binding_rejections(verified_run),
         )
 
     def evaluate_accept(
         self,
+        run: IsolatedCheckRun,
         *,
-        state: RunState,
-        checks: tuple[CommandReceipt, ...],
-        proposed_checks: tuple[VerificationCheck, ...],
-        coverage: tuple[RequirementCoverage, ...],
-        expected_check_ids: tuple[str, ...],
-        attempt_id: int,
-        isolation: CompletionIsolationEvidence | None,
+        state: CompletionState,
         now: float,
     ) -> AcceptEvaluation:
-        receipt = self.evaluate_evidence(
-            state=state,
-            checks=checks,
-            proposed_checks=proposed_checks,
-            coverage=coverage,
-            expected_check_ids=expected_check_ids,
-            attempt_id=attempt_id,
-            isolation=isolation,
-        )
+        expected_state = self._view.state
+        receipt = self.evaluate_evidence(run)
         return AcceptEvaluation(
             evidence=_result("evidence", receipt.rejection_reasons),
             budget=self.budget_guard.evaluate_completion(
@@ -340,17 +341,17 @@ class CompletionController:
             ),
             phase=self.phase_guard.evaluate_completion(
                 state,
-                review_required=self.options.enable_completion_review,
+                review_required=self.policy.review_required,
+                attempt_id=expected_state.next_completion_attempt,
+                work_epoch=expected_state.work_epoch,
             ),
             receipt=receipt,
             _binding=_EvaluationBinding(
                 authority=_PERMIT_AUTHORITY,
                 controller_identity=id(self),
-                state_identity=id(state),
-                attempt_id=attempt_id,
-                work_epoch=state.work_epoch,
-                phase=state.phase,
-                counters=_state_counters(state),
+                state=state,
+                attempt_id=expected_state.next_completion_attempt,
+                work_epoch=expected_state.work_epoch,
             ),
         )
 
@@ -359,14 +360,12 @@ class CompletionController:
         acceptance: AcceptEvaluation,
         *,
         assessment: SemanticAssessment | None,
-        state: RunState,
-        attempt_id: int,
+        state: CompletionState,
     ) -> CompletionEvaluation:
-        if not self._authorizes_acceptance(acceptance, state, attempt_id):
+        if not self._authorizes_acceptance(acceptance, state):
             raise RuntimeError("completion evaluation requires a current acceptance result")
-        review_required = self.options.enable_completion_review
         review = self.review_gate.evaluate(
-            required=review_required,
+            required=self.policy.review_required,
             assessment=assessment,
         )
         reasons = _stable_reasons(
@@ -387,11 +386,9 @@ class CompletionController:
             _CompletionPermit(
                 authority=_PERMIT_AUTHORITY,
                 controller_identity=id(self),
-                state_identity=id(state),
-                attempt_id=attempt_id,
-                work_epoch=state.work_epoch,
-                phase=state.phase,
-                counters=_state_counters(state),
+                state=state,
+                attempt_id=self._view.state.next_completion_attempt,
+                work_epoch=self._view.state.work_epoch,
             )
             if accepted
             else None
@@ -406,45 +403,53 @@ class CompletionController:
     def authorizes(
         self,
         permit: object | None,
-        state: RunState,
+        state: CompletionState,
     ) -> bool:
         return (
             isinstance(permit, _CompletionPermit)
             and permit.authority is _PERMIT_AUTHORITY
             and permit.controller_identity == id(self)
-            and permit.state_identity == id(state)
-            and permit.attempt_id == state.next_completion_attempt - 1
-            and permit.work_epoch == state.work_epoch
-            and permit.phase is state.phase
-            and permit.counters == _state_counters(state)
+            and permit.state == state
+            and permit.attempt_id == self._view.state.next_completion_attempt
+            and permit.work_epoch == self._view.state.work_epoch
             and self.phase_guard.evaluate_completion(
                 state,
-                review_required=self.options.enable_completion_review,
+                review_required=self.policy.review_required,
+                attempt_id=permit.attempt_id,
+                work_epoch=permit.work_epoch,
             ).accepted
         )
 
     def _authorizes_acceptance(
         self,
         acceptance: AcceptEvaluation,
-        state: RunState,
-        attempt_id: int,
+        state: CompletionState,
     ) -> bool:
         binding = acceptance._binding
         return (
             binding.authority is _PERMIT_AUTHORITY
             and binding.controller_identity == id(self)
-            and binding.state_identity == id(state)
-            and binding.attempt_id == attempt_id
-            and binding.work_epoch == state.work_epoch
-            and binding.phase is state.phase
-            and binding.counters == _state_counters(state)
+            and binding.state == state
+            and binding.attempt_id == self._view.state.next_completion_attempt
+            and binding.work_epoch == self._view.state.work_epoch
         )
 
-    def phase_ok(self, state: RunState) -> bool:
+    def phase_ok(self, state: CompletionState) -> bool:
         return phase_ok(
             state,
-            review_required=self.options.enable_completion_review,
+            review_required=self.policy.review_required,
         )
+
+    def _run_binding_rejections(self, run: IsolatedCheckRun) -> tuple[str, ...]:
+        expected_state = self._view.state
+        reasons: list[str] = []
+        if run.snapshot.attempt_id != expected_state.next_completion_attempt:
+            reasons.append("candidate snapshot attempt does not match")
+        if run.snapshot.work_epoch != expected_state.work_epoch:
+            reasons.append("candidate snapshot work epoch does not match")
+        if run.snapshot.identity.value != run.isolation.candidate_image_id:
+            reasons.append("candidate snapshot identity does not match isolation evidence")
+        return tuple(reasons)
 
 
 def _result(name: GuardName, reasons: tuple[str, ...] | list[str]) -> GuardResult:
@@ -454,13 +459,3 @@ def _result(name: GuardName, reasons: tuple[str, ...] | list[str]) -> GuardResul
 
 def _stable_reasons(*results: GuardResult) -> tuple[str, ...]:
     return tuple(dict.fromkeys(reason for result in results for reason in result.reasons))
-
-
-def _state_counters(state: RunState) -> tuple[int, int, int, int, int]:
-    return (
-        state.turn_count,
-        state.environment_call_count,
-        state.repair_count,
-        state.recovery_count,
-        state.completion_review_count,
-    )

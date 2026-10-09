@@ -1,18 +1,28 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace
 
 import pytest
 
-from evidence_harness.completion_contract import (
-    CompletionContract,
-    TaskRequirement,
-)
+from evidence_harness.completion_contract import CompletionContract, TaskRequirement
 from evidence_harness.completion_control import (
     BudgetGuard,
     CompletionController,
     PhaseGuard,
     ReviewGate,
+)
+from evidence_harness.harness_adapter import (
+    CandidateIdentity,
+    CandidateSnapshot,
+    CompletionCounters,
+    CompletionPolicy,
+    CompletionProposal,
+    CompletionState,
+    CompletionTrace,
+    CompletionTransactionView,
+    CurrentCandidate,
+    IsolatedCheckRun,
 )
 from evidence_harness.protocol import (
     CheckIsolationEvidence,
@@ -26,22 +36,34 @@ from evidence_harness.protocol import (
     OutputExcerpt,
     RequirementCoverage,
     RunPhase,
-    RunState,
     SemanticAssessment,
     SourceAttestation,
     VerificationCheck,
 )
+from evidence_harness.stub_harness_adapter import StubHarnessAdapter
 
 _EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
 
 
-def _state(*, phase: RunPhase = RunPhase.VERIFYING) -> RunState:
-    return RunState(
-        instruction="Create answer.txt and make the command print ready",
+def _state(
+    *,
+    phase: RunPhase = RunPhase.FINALIZING,
+    next_completion_attempt: int = 1,
+    counters: CompletionCounters | None = None,
+) -> CompletionState:
+    return CompletionState(
         phase=phase,
-        started_monotonic=0,
-        deadline_monotonic=100,
         work_epoch=1,
+        next_completion_attempt=next_completion_attempt,
+        deadline_monotonic=100,
+        counters=counters
+        or CompletionCounters(
+            turns=0,
+            environment_calls=0,
+            repairs=0,
+            recoveries=0,
+            completion_reviews=0,
+        ),
     )
 
 
@@ -74,6 +96,52 @@ def _check(
         kind=kind,
         script=script or f"test {check_id}",
         proves=check_id,
+    )
+
+
+def _checks() -> tuple[VerificationCheck, ...]:
+    return (
+        _check("artifact-check", CheckKind.ARTIFACT),
+        _check("behavior-check", CheckKind.BEHAVIOR),
+    )
+
+
+def _coverage() -> tuple[RequirementCoverage, ...]:
+    return (
+        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
+        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
+    )
+
+
+def _controller(
+    *,
+    checks: tuple[VerificationCheck, ...] | None = None,
+    coverage: tuple[RequirementCoverage, ...] | None = None,
+    options: LoopOptions | None = None,
+    state: CompletionState | None = None,
+) -> CompletionController:
+    configured_options = options or LoopOptions()
+    configured_checks = checks or _checks()
+    view = CompletionTransactionView(
+        proposal=CompletionProposal(
+            checks=configured_checks,
+            coverage=coverage or _coverage(),
+            candidate=CurrentCandidate(),
+        ),
+        contract=_contract(configured_options),
+        policy=CompletionPolicy(
+            review_required=configured_options.enable_completion_review,
+            max_check_timeout_sec=configured_options.max_command_timeout_sec,
+        ),
+        trace=CompletionTrace(),
+        state=state or _state(),
+    )
+    return CompletionController(
+        StubHarnessAdapter(
+            view=view,
+            candidate_files={"answer.txt": b"ready\n"},
+            check_runners={check.id: lambda files: True for check in configured_checks},
+        )
     )
 
 
@@ -144,6 +212,32 @@ def _isolation(
     )
 
 
+def _run(
+    checks: tuple[VerificationCheck, ...],
+    receipts: tuple[CommandReceipt, ...],
+) -> IsolatedCheckRun:
+    isolation = _isolation(checks, receipts)
+    return IsolatedCheckRun(
+        snapshot=CandidateSnapshot(
+            identity=CandidateIdentity(
+                algorithm="sha256",
+                value=isolation.candidate_image_id,
+            ),
+            attempt_id=1,
+            work_epoch=1,
+        ),
+        receipts=receipts,
+        isolation=isolation,
+    )
+
+
+def _completion_state(*, review_required: bool) -> CompletionState:
+    return _state(
+        phase=RunPhase.REVIEWING if review_required else RunPhase.VERIFYING,
+        next_completion_attempt=2,
+    )
+
+
 def test_default_contract_freezes_the_full_instruction_and_runtime_budgets() -> None:
     options = LoopOptions(max_turns=7, max_environment_calls=11, max_repairs=2)
 
@@ -166,98 +260,84 @@ def test_default_contract_preserves_a_long_instruction() -> None:
 
 
 def test_contract_coverage_rejects_an_omitted_requirement() -> None:
-    controller = CompletionController(_contract())
     checks = (_check("artifact-check", CheckKind.ARTIFACT),)
     coverage = (RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),)
+    controller = _controller(checks=checks, coverage=coverage)
 
-    result = controller.validate_proposal(checks, coverage)
+    result = controller.validate_proposal()
 
     assert result.accepted is False
     assert result.reasons == ("contract requirements are not covered: ['behavior']",)
 
 
 def test_finish_proposal_is_rejected_in_an_illegal_phase() -> None:
-    controller = CompletionController(_contract())
-    state = _state(phase=RunPhase.EXECUTING)
-    checks = (
-        _check("artifact-check", CheckKind.ARTIFACT),
-        _check("behavior-check", CheckKind.BEHAVIOR),
-    )
-    coverage = (
-        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
-        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
-    )
+    controller = _controller(state=_state(phase=RunPhase.EXECUTING))
 
-    admission = controller.admit_proposal(
-        state=state,
-        checks=checks,
-        coverage=coverage,
-        now=10,
-    )
+    admission = controller.admit(now=10)
 
     assert admission.accepted is False
     assert admission.phase.reasons == ("finish proposal is not allowed in phase 'executing'",)
 
 
 def test_contract_type_rejects_a_mismatched_check_kind_during_acceptance() -> None:
-    controller = CompletionController(_contract())
     checks = (
         _check("artifact-check", CheckKind.ARTIFACT),
         _check("behavior-check", CheckKind.ARTIFACT),
     )
-    coverage = (
-        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
-        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
-    )
     receipts = tuple(_receipt(check, index) for index, check in enumerate(checks, start=1))
+    controller = _controller(checks=checks)
 
     evaluation = controller.evaluate_accept(
-        state=_state(phase=RunPhase.REVIEWING),
-        checks=receipts,
-        proposed_checks=checks,
-        coverage=coverage,
-        expected_check_ids=tuple(check.id for check in checks),
-        attempt_id=1,
-        isolation=_isolation(checks, receipts),
+        _run(checks, receipts),
+        state=_completion_state(review_required=True),
         now=10,
     )
 
     assert evaluation.accepted is False
-    assert evaluation.evidence.accepted is False
     assert evaluation.evidence.reasons == (
         "check 'behavior-check' has kind 'artifact'; requirement 'behavior' allows ['behavior']",
     )
 
 
 def test_acceptance_rejects_a_receipt_for_different_check_content() -> None:
-    controller = CompletionController(_contract())
-    checks = (
-        _check("artifact-check", CheckKind.ARTIFACT),
-        _check("behavior-check", CheckKind.BEHAVIOR),
-    )
-    coverage = (
-        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
-        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
-    )
+    checks = _checks()
     receipts = tuple(_receipt(check, index) for index, check in enumerate(checks, start=1))
     receipts = (
         receipts[0].model_copy(update={"script": "different command"}),
         receipts[1],
     )
+    controller = _controller(checks=checks)
 
     evaluation = controller.evaluate_accept(
-        state=_state(phase=RunPhase.REVIEWING),
-        checks=receipts,
-        proposed_checks=checks,
-        coverage=coverage,
-        expected_check_ids=tuple(check.id for check in checks),
-        attempt_id=1,
-        isolation=_isolation(checks, receipts),
+        _run(checks, receipts),
+        state=_completion_state(review_required=True),
         now=10,
     )
 
     assert evaluation.evidence.reasons == (
         "verification receipt does not match proposed check: artifact-check",
+    )
+
+
+def test_acceptance_rejects_host_attempt_and_epoch_drift() -> None:
+    checks = _checks()
+    receipts = tuple(_receipt(check, index) for index, check in enumerate(checks, start=1))
+    controller = _controller(checks=checks)
+    drifted_state = replace(
+        _completion_state(review_required=True),
+        work_epoch=2,
+        next_completion_attempt=3,
+    )
+
+    evaluation = controller.evaluate_accept(
+        _run(checks, receipts),
+        state=drifted_state,
+        now=10,
+    )
+
+    assert evaluation.phase.reasons == (
+        "completion attempt state does not match",
+        "completion work epoch changed during verification",
     )
 
 
@@ -270,14 +350,24 @@ def test_each_completion_guard_reports_its_own_reason() -> None:
         max_wall_time_sec=100,
     )
     contract = _contract(options)
-    state = _state(phase=RunPhase.THINKING)
-    state.turn_count = 3
-    state.environment_call_count = 4
-    state.repair_count = 1
-    state.completion_review_count = 2
+    state = _state(
+        phase=RunPhase.THINKING,
+        counters=CompletionCounters(
+            turns=3,
+            environment_calls=4,
+            repairs=1,
+            recoveries=0,
+            completion_reviews=2,
+        ),
+    )
 
     budget = BudgetGuard().evaluate_completion(contract, state, now=101)
-    phase = PhaseGuard().evaluate_completion(state, review_required=True)
+    phase = PhaseGuard().evaluate_completion(
+        state,
+        review_required=True,
+        attempt_id=1,
+        work_epoch=1,
+    )
     review = ReviewGate().evaluate(
         required=True,
         assessment=SemanticAssessment(
@@ -293,6 +383,7 @@ def test_each_completion_guard_reports_its_own_reason() -> None:
     assert phase.accepted is False
     assert phase.reasons == (
         "completion requires phase 'reviewing' when review is enabled; got 'thinking'",
+        "completion attempt state does not match",
     )
     assert review.accepted is False
     assert review.reasons == ("behavior is not proven", "missing output assertion")
@@ -300,75 +391,45 @@ def test_each_completion_guard_reports_its_own_reason() -> None:
 
 def test_controller_issues_a_permit_only_for_the_complete_conjunction() -> None:
     options = LoopOptions(enable_completion_review=False)
-    contract = _contract(options)
-    controller = CompletionController(contract, options=options)
-    state = _state()
-    state.next_completion_attempt = 2
-    checks = (
-        _check("artifact-check", CheckKind.ARTIFACT),
-        _check("behavior-check", CheckKind.BEHAVIOR),
-    )
-    coverage = (
-        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
-        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
-    )
+    checks = _checks()
     receipts = tuple(_receipt(check, index) for index, check in enumerate(checks, start=1))
-    accept = controller.evaluate_accept(
+    controller = _controller(checks=checks, options=options)
+    state = _completion_state(review_required=False)
+    acceptance = controller.evaluate_accept(
+        _run(checks, receipts),
         state=state,
-        checks=receipts,
-        proposed_checks=checks,
-        coverage=coverage,
-        expected_check_ids=tuple(check.id for check in checks),
-        attempt_id=1,
-        isolation=_isolation(checks, receipts),
         now=10,
     )
 
     completion = controller.evaluate_complete(
-        accept,
+        acceptance,
         assessment=None,
         state=state,
-        attempt_id=1,
     )
 
     assert completion.accepted is True
     assert completion.receipt.accepted is True
     assert controller.authorizes(completion.permit, state)
+    assert _controller(options=options).authorizes(completion.permit, state) is False
     assert (
-        CompletionController(contract, options=options).authorizes(
+        controller.authorizes(
             completion.permit,
-            state,
+            replace(state, phase=RunPhase.THINKING),
         )
         is False
     )
 
-    state.phase = RunPhase.THINKING
-    assert controller.authorizes(completion.permit, state) is False
-
 
 def test_controller_rejects_an_acceptance_from_another_controller() -> None:
     options = LoopOptions(enable_completion_review=False)
-    contract = _contract(options)
-    controller = CompletionController(contract, options=options)
-    other_controller = CompletionController(contract, options=options)
-    state = _state()
-    checks = (
-        _check("artifact-check", CheckKind.ARTIFACT),
-        _check("behavior-check", CheckKind.BEHAVIOR),
-    )
-    coverage = (
-        RequirementCoverage(requirement="artifact", check_ids=("artifact-check",)),
-        RequirementCoverage(requirement="behavior", check_ids=("behavior-check",)),
-    )
+    checks = _checks()
     receipts = tuple(_receipt(check, index) for index, check in enumerate(checks, start=1))
+    controller = _controller(options=options)
+    other_controller = _controller(options=options)
+    state = _completion_state(review_required=False)
     acceptance = other_controller.evaluate_accept(
+        _run(checks, receipts),
         state=state,
-        checks=receipts,
-        proposed_checks=checks,
-        coverage=coverage,
-        expected_check_ids=tuple(check.id for check in checks),
-        attempt_id=1,
-        isolation=_isolation(checks, receipts),
         now=10,
     )
 
@@ -377,5 +438,4 @@ def test_controller_rejects_an_acceptance_from_another_controller() -> None:
             acceptance,
             assessment=None,
             state=state,
-            attempt_id=1,
         )
