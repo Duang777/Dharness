@@ -63,6 +63,7 @@ _COMMIT_PAUSE_DEPRECATION = (
     "Flag --pause has been deprecated, and enabled by default. "
     "Use --no-pause to disable pausing during commit."
 )
+_CANDIDATE_DIGEST_DOMAIN = b"evidence-harness-candidate-rootfs-v1\0"
 
 
 @dataclass(slots=True)
@@ -146,6 +147,7 @@ class _OwnedResources:
     inspector_id: str | None = None
     image_id: str | None = None
     image_reference: str | None = None
+    candidate_digest: str | None = None
     snapshot_disposed: bool = False
     source_resumed: bool = False
 
@@ -245,6 +247,7 @@ class _DockerIsolationTransaction:
             attempt_id=self._request.attempt_id,
             work_epoch=self._request.work_epoch,
             candidate_image_id=self._owned.image_id or "",
+            candidate_digest=self._owned.candidate_digest,
             environment_identity_sha256=self._source.identity_sha256,
             excluded_control_mounts=self._source.excluded_mounts,
             checks=tuple(self._checks),
@@ -363,14 +366,49 @@ class _DockerIsolationTransaction:
                 "Docker commit returned an invalid image identifier",
             )
         self._owned.image_id = image_id
+        self._owned.candidate_digest = await self._candidate_digest(image_id)
         self._journal.append(
             "completion_candidate_committed",
             {
                 "attempt_id": self._request.attempt_id,
                 "candidate_image_id": image_id,
+                "candidate_digest": self._owned.candidate_digest,
                 "source_container_id_sha256": _sha256_text(self._source.container_id),
             },
         )
+
+    async def _candidate_digest(self, image_id: str) -> str:
+        result = await self._run(
+            (
+                "image",
+                "inspect",
+                "--format",
+                "{{json .RootFS.Layers}}",
+                image_id,
+            ),
+            kind=IsolationFailureKind.PREPARE,
+            timeout_sec=15,
+        )
+        try:
+            value = json.loads((result.stdout or "").strip())
+        except json.JSONDecodeError as exc:
+            raise self._error(
+                IsolationFailureKind.PREPARE,
+                "Docker image rootfs layers are not valid JSON",
+            ) from exc
+        if (
+            not isinstance(value, list)
+            or not value
+            or any(
+                not isinstance(layer, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", layer) is None
+                for layer in value
+            )
+        ):
+            raise self._error(
+                IsolationFailureKind.PREPARE,
+                "Docker image rootfs layers are invalid",
+            )
+        return _candidate_content_digest(tuple(value))
 
     async def _pause_source(self, source_id: str) -> None:
         task = asyncio.create_task(
@@ -393,6 +431,7 @@ class _DockerIsolationTransaction:
     async def _run_checks(self, execute: CheckExecutor) -> None:
         assert self._source is not None
         assert self._owned.image_id is not None
+        assert self._owned.candidate_digest is not None
         for ordinal, check in enumerate(self._request.checks, start=1):
             self._journal.append(
                 "completion_check_started",
@@ -412,6 +451,7 @@ class _DockerIsolationTransaction:
                 check,
                 environment,
                 self._request.deadline_monotonic - _CLEANUP_RESERVE_SEC,
+                self._owned.candidate_digest,
             )
             self._receipts.append(receipt)
             delta = await self._inspect_delta(child_id)
@@ -1375,6 +1415,16 @@ def _object(value: Any, label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} is not an object")
     return value
+
+
+def _candidate_content_digest(layers: Sequence[str]) -> str:
+    digest = hashlib.sha256(_CANDIDATE_DIGEST_DOMAIN)
+    digest.update(len(layers).to_bytes(8, "big"))
+    for layer in layers:
+        encoded = layer.encode()
+        digest.update(len(encoded).to_bytes(8, "big"))
+        digest.update(encoded)
+    return digest.hexdigest()
 
 
 def _sha256_text(value: str) -> str:

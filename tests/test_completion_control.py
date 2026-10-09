@@ -33,6 +33,7 @@ from evidence_harness.protocol import (
 )
 
 _EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
+_CANDIDATE_DIGEST = hashlib.sha256(b"candidate-rootfs").hexdigest()
 
 
 def _state(*, phase: RunPhase = RunPhase.VERIFYING) -> RunState:
@@ -42,6 +43,7 @@ def _state(*, phase: RunPhase = RunPhase.VERIFYING) -> RunState:
         started_monotonic=0,
         deadline_monotonic=100,
         work_epoch=1,
+        candidate_digest=_CANDIDATE_DIGEST,
     )
 
 
@@ -94,6 +96,7 @@ def _receipt(check: VerificationCheck, sequence: int) -> CommandReceipt:
         mode=CommandMode.OBSERVE,
         work_epoch=1,
         attempt_id=1,
+        candidate_digest=_CANDIDATE_DIGEST,
         return_code=0,
         duration_sec=0.1,
         stdout=output,
@@ -113,6 +116,7 @@ def _isolation(
         attempt_id=1,
         work_epoch=1,
         candidate_image_id=candidate,
+        candidate_digest=_CANDIDATE_DIGEST,
         environment_identity_sha256="9" * 64,
         checks=tuple(
             CheckIsolationEvidence(

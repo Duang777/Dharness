@@ -52,17 +52,17 @@
     {
       "bytes": 7747,
       "path": "experiments/prefixbench-v1/mutation-protocol-v1.json",
-      "sha256": "6cfca06ef69edc57625ffb5205c1f25dd37fda4544e892eee496835503122e47"
+      "sha256": "360c09736d24597ffb4e452dd70b9d468a6213df2167d0e546420c22522cd377"
     },
     {
       "bytes": 1510691,
       "path": "evaluation/prefixbench-v1-development-offline-campaign.json",
-      "sha256": "324988e1f87b6e26e841cc75824ac69949756938d332da6dbacc032f7f627dab"
+      "sha256": "395c10022f9682ff31246701e058a94aa983b1f236c9f3a6b164e8dc62c6aa83"
     },
     {
       "bytes": 7318,
       "path": "evaluation/prefixbench-v1-development-offline-analysis.json",
-      "sha256": "af7ea362666a636749cc8096ee5509d9beb148076bb851847798d9fcd1d31dba"
+      "sha256": "5cac7e32f3540c511a782759efdd25c617a3113f40fb9b9566bc5a40fe3cddb7"
     },
     {
       "bytes": 12130,
@@ -72,7 +72,7 @@
     {
       "bytes": 17987,
       "path": "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-      "sha256": "5c96395b642ef4a5edc4364dc97e50cf26d1e82200fd041ff4cd0e8042b9767d"
+      "sha256": "a6972d068a5595396ccea6bc3d3d66bc0d609c1596aeb16d73fa961e33000d2c"
     }
   ],
   "optional_evidence": {
@@ -111,7 +111,7 @@
   ],
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588825,
+    "bytes": 589084,
     "files": [
       {
         "bytes": 1168,
@@ -164,9 +164,9 @@
         "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
       },
       {
-        "bytes": 12960,
+        "bytes": 13219,
         "path": "src/evidence_harness/protocol.py",
-        "sha256": "078a07f83e44a075ba138a0129c00b8536ff931dcbab7114ed56682925481cb7"
+        "sha256": "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
       },
       {
         "bytes": 6231,
@@ -211,7 +211,7 @@
       {
         "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "fc8cf6592584f3cca1a5e5bde61fd86a90ef33ea80a057083fa81ca591324199"
+        "sha256": "13a966708af562c16e3169be748d2171e969e6af2d9d918f49c7383829a3c27e"
       },
       {
         "bytes": 19540,
@@ -219,9 +219,9 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "47d43a1088f106ea7467bfc9789760130499643a3836f953de209eb66495cd2c"
+    "sha256": "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
   },
-  "protected_test_source_set_sha256": "47d43a1088f106ea7467bfc9789760130499643a3836f953de209eb66495cd2c",
+  "protected_test_source_set_sha256": "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632",
   "protocol_id": "thesis-main-analysis-v1",
   "protocol_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
@@ -235,7 +235,7 @@
       {
         "bytes": 24605,
         "path": "docs/thesis-main-experiment-spec.md",
-        "sha256": "a32780a3e6f3cf98a3d418bd92fdb00a926b3e3c5301a68500eb50a0784f580e"
+        "sha256": "f04dc15f07c2cc06dd56eb5353dfaf01ca8e639e05aab2aa0c06c348096dca60"
       },
       {
         "bytes": 3301,
@@ -245,7 +245,7 @@
       {
         "bytes": 34197,
         "path": "src/evidence_harness_mutation/main_analysis_protocol.py",
-        "sha256": "d636b01ce1ba19ca58b3dc72b19b3d8b517df2d06061439e3b43a750ab504519"
+        "sha256": "0e02b60a9a317b9ebd6f9d01ff7024a1db6f3139894a47a7a721ea41640aa6dc"
       },
       {
         "bytes": 7802,
@@ -258,7 +258,7 @@
         "sha256": "58a8c965748a42d800b3447c9e32f44e9b5357916f0ec08a36373fd987f15ead"
       }
     ],
-    "sha256": "87c7d719ec0fe0dcb8f1e98bf240861781e6db17e20421334be1a4547f1b973c"
+    "sha256": "31ee61548b000414a13e9d3b9df99135e8b8abd70a26bbf498d0b603c358efa9"
   },
   "rq1": {
     "engineering_threshold": "at-least-6-of-7-pairs",

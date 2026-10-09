@@ -1,7 +1,7 @@
 {
   "acceptance": {
     "executable_artifact": "experiments/prefixbench-v1/tb21-sensitivity-executable-v1.json",
-    "executable_artifact_sha256": "aa48dbb05b6074ecbc32d9cb73f6ad54a60431b9cf7f7e2435c9ab9f387ce0cb",
+    "executable_artifact_sha256": "9f8095c40ac59b226dc21fabc3ce3fdc0d0ca3dd30ec94a85261ed272ab4cba0",
     "executable_commit": "96b4af2dfb14e07be6f424d243cc391ce8aeaf86",
     "expected_member_count": 61,
     "preflight_script": "scripts/tb21_sensitivity.py",

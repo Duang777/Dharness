@@ -141,7 +141,7 @@
   "schema_version": 1,
   "source_set": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 492326,
+    "bytes": 492585,
     "files": [
       {
         "bytes": 1168,
@@ -164,9 +164,9 @@
         "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
       },
       {
-        "bytes": 12960,
+        "bytes": 13219,
         "path": "src/evidence_harness/protocol.py",
-        "sha256": "078a07f83e44a075ba138a0129c00b8536ff931dcbab7114ed56682925481cb7"
+        "sha256": "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
       },
       {
         "bytes": 2317,
@@ -214,7 +214,7 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "53c2944d7d1b7974c9784a44d64a4a608dbaef82fa87c1874e994702c542e0dc"
+    "sha256": "c3a7653c38239b0bfc7b5858094c3447d77a75aaf203eb6a66c92e3d7a0634f5"
   },
   "task_count": 28,
   "task_order": "readiness-task-order"

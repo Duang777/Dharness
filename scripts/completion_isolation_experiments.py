@@ -346,6 +346,7 @@ def _build_experiment_row(
         coverage=evidence.coverage,
         expected_check_ids=expected_check_ids,
         attempt_id=isolation.attempt_id if isolation else None,
+        candidate_digest=isolation.candidate_digest if isolation else None,
         isolation=isolation,
         require_isolation=True,
     )

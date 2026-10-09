@@ -118,7 +118,7 @@
       {
         "bytes": 34197,
         "path": "src/evidence_harness_mutation/main_analysis_protocol.py",
-        "sha256": "d636b01ce1ba19ca58b3dc72b19b3d8b517df2d06061439e3b43a750ab504519"
+        "sha256": "0e02b60a9a317b9ebd6f9d01ff7024a1db6f3139894a47a7a721ea41640aa6dc"
       },
       {
         "bytes": 48198,
@@ -131,7 +131,7 @@
         "sha256": "6e16ade6db5b2f9af7d42ea6172176657ee69afc3824194fe2c9697da6f06a75"
       }
     ],
-    "sha256": "6ab0070d3a1e2af7fc1e56de099b956e387755ac809d1aaac766c50a43791fd9"
+    "sha256": "a3aa08b50c03ec1b02bf14ce264c9d290a9dea6c21a0c5926e97d61975b80b0a"
   },
   "matrix": {
     "bytes": 73376,
@@ -140,7 +140,7 @@
   },
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588825,
+    "bytes": 589084,
     "files": [
       {
         "bytes": 1168,
@@ -193,9 +193,9 @@
         "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
       },
       {
-        "bytes": 12960,
+        "bytes": 13219,
         "path": "src/evidence_harness/protocol.py",
-        "sha256": "078a07f83e44a075ba138a0129c00b8536ff931dcbab7114ed56682925481cb7"
+        "sha256": "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
       },
       {
         "bytes": 6231,
@@ -240,7 +240,7 @@
       {
         "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "fc8cf6592584f3cca1a5e5bde61fd86a90ef33ea80a057083fa81ca591324199"
+        "sha256": "13a966708af562c16e3169be748d2171e969e6af2d9d918f49c7383829a3c27e"
       },
       {
         "bytes": 19540,
@@ -248,12 +248,12 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "47d43a1088f106ea7467bfc9789760130499643a3836f953de209eb66495cd2c"
+    "sha256": "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
   },
   "protocol": {
     "bytes": 11665,
     "path": "experiments/prefixbench-v1/tb21-sensitivity-protocol-v1.json",
-    "sha256": "d6c9280b3d462df1f55d90aa2f562d6ba570a0665e3e733d0958fc6c91dc4c59"
+    "sha256": "dfe121fb99b4744f8c76ca2f1398891abaa4ad0935922aeea14b99bc67420529"
   },
   "protocol_commit": "69f7fb2da64f3f465f1b72a43469007e2cf1cc2a",
   "randomness": {

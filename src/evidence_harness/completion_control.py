@@ -61,6 +61,7 @@ class _EvaluationBinding:
     state_identity: int
     attempt_id: int
     work_epoch: int
+    candidate_digest: str | None
     phase: RunPhase
     counters: tuple[int, int, int, int, int]
 
@@ -306,6 +307,7 @@ class CompletionController:
             coverage=coverage,
             expected_check_ids=expected_check_ids,
             attempt_id=attempt_id,
+            candidate_digest=state.candidate_digest,
             isolation=isolation,
             require_isolation=self.contract.v_req.require_isolation,
         )
@@ -349,6 +351,7 @@ class CompletionController:
                 state_identity=id(state),
                 attempt_id=attempt_id,
                 work_epoch=state.work_epoch,
+                candidate_digest=state.candidate_digest,
                 phase=state.phase,
                 counters=_state_counters(state),
             ),
@@ -390,6 +393,7 @@ class CompletionController:
                 state_identity=id(state),
                 attempt_id=attempt_id,
                 work_epoch=state.work_epoch,
+                candidate_digest=state.candidate_digest,
                 phase=state.phase,
                 counters=_state_counters(state),
             )
@@ -415,6 +419,7 @@ class CompletionController:
             and permit.state_identity == id(state)
             and permit.attempt_id == state.next_completion_attempt - 1
             and permit.work_epoch == state.work_epoch
+            and permit.candidate_digest == state.candidate_digest
             and permit.phase is state.phase
             and permit.counters == _state_counters(state)
             and self.phase_guard.evaluate_completion(
@@ -436,6 +441,7 @@ class CompletionController:
             and binding.state_identity == id(state)
             and binding.attempt_id == attempt_id
             and binding.work_epoch == state.work_epoch
+            and binding.candidate_digest == state.candidate_digest
             and binding.phase is state.phase
             and binding.counters == _state_counters(state)
         )

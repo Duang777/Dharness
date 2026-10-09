@@ -270,7 +270,7 @@ def test_protocol_freezes_held_out_contract_without_a_producer_revision() -> Non
     assert "api_base" not in payload["collection"]
     assert (
         protocol.collection.orchestration_source_sha256
-        == "8bc3fcd650e4087ad0aace79d393953850d37ff5fe49b2245cf773de3df68cd6"
+        == "32bfd20662318cb1a923e366526e28a07933e99111888687b29a43cb8f420ca2"
     )
     assert protocol.producer.runtime_source_sha256 == campaign.FROZEN_RUNTIME_SOURCE_SHA256
     assert tuple(file.path for file in protocol.source_set.files) == (

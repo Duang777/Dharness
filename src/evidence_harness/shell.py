@@ -31,12 +31,14 @@ class CommandRunner:
         clock: Callable[[], float] = time.monotonic,
         *,
         completion_attempt_id: int | None = None,
+        completion_candidate_digest: str | None = None,
     ) -> None:
         self._environment = environment
         self._journal = journal
         self._options = options
         self._clock = clock
         self._completion_attempt_id = completion_attempt_id
+        self._completion_candidate_digest = completion_candidate_digest
 
     async def execute(
         self,
@@ -109,6 +111,7 @@ class CommandRunner:
             mode=command.mode,
             work_epoch=work_epoch,
             attempt_id=self._completion_attempt_id,
+            candidate_digest=self._completion_candidate_digest,
             return_code=return_code,
             failure=failure,
             duration_sec=duration,

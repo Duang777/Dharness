@@ -37,6 +37,7 @@ from scripts.completion_isolation_experiments import (
 )
 
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
+CANDIDATE_DIGEST = hashlib.sha256(b"candidate-rootfs").hexdigest()
 
 
 def _git(root: Path, *args: str) -> str:
@@ -103,6 +104,7 @@ def _evidence() -> VerificationReceipt:
         mode=CommandMode.OBSERVE,
         work_epoch=0,
         attempt_id=1,
+        candidate_digest=CANDIDATE_DIGEST,
         return_code=0,
         duration_sec=0.1,
         stdout=output,
@@ -121,6 +123,7 @@ def _evidence() -> VerificationReceipt:
         attempt_id=1,
         work_epoch=0,
         candidate_image_id="sha256:" + "c" * 64,
+        candidate_digest=CANDIDATE_DIGEST,
         environment_identity_sha256="d" * 64,
         checks=(
             CheckIsolationEvidence(

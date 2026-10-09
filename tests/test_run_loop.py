@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import time
 from typing import Any
@@ -416,6 +417,11 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
     assert report.latest_evidence.accepted is True
     assert report.latest_evidence.work_epoch == 1
     assert report.latest_evidence.checks[0].attempt_id == 1
+    assert report.latest_evidence.isolation is not None
+    assert (
+        report.latest_evidence.checks[0].candidate_digest
+        == report.latest_evidence.isolation.candidate_digest
+    )
     assert report.latest_evidence.checks[0].sequence == 3
     assert [call[0] for call in environment.calls[1:]] == [
         "printf good > answer.txt",
@@ -440,10 +446,13 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
     )
     review_index = event_types.index("completion_review_started")
     review_result_index = event_types.index("completion_review")
+    candidate_digest = hashlib.sha256(b"test-candidate-rootfs:1").hexdigest()
     assert work_index < change_index
     assert review_index < review_result_index
     assert "attempt_id" not in events[change_index]["payload"]
+    assert "candidate_digest" not in events[change_index]["payload"]
     assert events[check_index]["payload"]["attempt_id"] == 1
+    assert events[check_index]["payload"]["candidate_digest"] == candidate_digest
     assert events[work_index]["payload"] == {
         "command_ids": ["change"],
         "started_in_finalization": False,

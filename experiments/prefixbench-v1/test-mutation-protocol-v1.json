@@ -97,7 +97,7 @@
     "execution": "sequential-matrix-order-one-task-jobs",
     "journal_schema_version": 2,
     "model": "openai/modelhub/gpt-5.6-terra",
-    "orchestration_source_sha256": "8bc3fcd650e4087ad0aace79d393953850d37ff5fe49b2245cf773de3df68cd6",
+    "orchestration_source_sha256": "32bfd20662318cb1a923e366526e28a07933e99111888687b29a43cb8f420ca2",
     "profile": "prefixbench-v1",
     "provider_credentials": "external-file-run-config-hash-only",
     "result_policy": "accept-every-live-completed-result",
@@ -265,10 +265,10 @@
     "file": {
       "bytes": 7747,
       "path": "experiments/prefixbench-v1/mutation-protocol-v1.json",
-      "sha256": "6cfca06ef69edc57625ffb5205c1f25dd37fda4544e892eee496835503122e47"
+      "sha256": "360c09736d24597ffb4e452dd70b9d468a6213df2167d0e546420c22522cd377"
     },
     "protocol_id": "prefixbench-v1-development-offline-mutation-v1",
-    "source_set_sha256": "53c2944d7d1b7974c9784a44d64a4a608dbaef82fa87c1874e994702c542e0dc"
+    "source_set_sha256": "c3a7653c38239b0bfc7b5858094c3447d77a75aaf203eb6a66c92e3d7a0634f5"
   },
   "frozen_matrix_commit": "2e3e65868213238d9bbcdbf3e09ce4356c8edfd9",
   "matrix": {
@@ -322,7 +322,7 @@
     "producer_tree_policy": "not-frozen-all-tasks-must-share-one-tree",
     "runtime_source_algorithm": "sha256-length-framed-runtime-source-binding-v1",
     "runtime_source_description": "pyproject.toml, uv.lock, and src/evidence_harness/**/*.py",
-    "runtime_source_sha256": "f22b1b5b9e8fd3e73eb8c83bb5470e3ee4076034923a575b47f765f71c86f52d"
+    "runtime_source_sha256": "9a7ab2e1c5d0f2912aa15e6bdcecc2e90aa3784a78ca34d11a7fe982b4158cf3"
   },
   "protocol_id": "prefixbench-v1-test-offline-mutation-v1",
   "reducer_algorithm": "source-anchored-ddmin-v1",
@@ -332,7 +332,7 @@
   "schema_version": 1,
   "source_set": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588825,
+    "bytes": 589084,
     "files": [
       {
         "bytes": 1168,
@@ -385,9 +385,9 @@
         "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
       },
       {
-        "bytes": 12960,
+        "bytes": 13219,
         "path": "src/evidence_harness/protocol.py",
-        "sha256": "078a07f83e44a075ba138a0129c00b8536ff931dcbab7114ed56682925481cb7"
+        "sha256": "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
       },
       {
         "bytes": 6231,
@@ -432,7 +432,7 @@
       {
         "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "fc8cf6592584f3cca1a5e5bde61fd86a90ef33ea80a057083fa81ca591324199"
+        "sha256": "13a966708af562c16e3169be748d2171e969e6af2d9d918f49c7383829a3c27e"
       },
       {
         "bytes": 19540,
@@ -440,7 +440,7 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "47d43a1088f106ea7467bfc9789760130499643a3836f953de209eb66495cd2c"
+    "sha256": "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
   },
   "split_lineage": {
     "development_matrix": {

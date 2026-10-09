@@ -42,9 +42,9 @@ TEST_TASKS = 61
 FROZEN_MATRIX_COMMIT = "2e3e65868213238d9bbcdbf3e09ce4356c8edfd9"
 FROZEN_TEST_MATRIX_SHA256 = "a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb"
 FROZEN_DEVELOPMENT_PROTOCOL_SHA256 = (
-    "6cfca06ef69edc57625ffb5205c1f25dd37fda4544e892eee496835503122e47"
+    "360c09736d24597ffb4e452dd70b9d468a6213df2167d0e546420c22522cd377"
 )
-FROZEN_RUNTIME_SOURCE_SHA256 = "f22b1b5b9e8fd3e73eb8c83bb5470e3ee4076034923a575b47f765f71c86f52d"
+FROZEN_RUNTIME_SOURCE_SHA256 = "9a7ab2e1c5d0f2912aa15e6bdcecc2e90aa3784a78ca34d11a7fe982b4158cf3"
 
 SOURCE_MATRIX = Path("evaluation/matrix-89.json")
 SPLIT_READINESS = Path("evaluation/prefixbench-readiness.json")
@@ -394,8 +394,8 @@ class PrefixBenchTestProducerProtocol(FrozenModel):
         "pyproject.toml, uv.lock, and src/evidence_harness/**/*.py"
     ] = "pyproject.toml, uv.lock, and src/evidence_harness/**/*.py"
     runtime_source_sha256: Literal[
-        "f22b1b5b9e8fd3e73eb8c83bb5470e3ee4076034923a575b47f765f71c86f52d"
-    ] = "f22b1b5b9e8fd3e73eb8c83bb5470e3ee4076034923a575b47f765f71c86f52d"
+        "9a7ab2e1c5d0f2912aa15e6bdcecc2e90aa3784a78ca34d11a7fe982b4158cf3"
+    ] = "9a7ab2e1c5d0f2912aa15e6bdcecc2e90aa3784a78ca34d11a7fe982b4158cf3"
     producer_commit_policy: Literal["not-frozen-protocol-must-exist-in-producer-commit"] = (
         "not-frozen-protocol-must-exist-in-producer-commit"
     )

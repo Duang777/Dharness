@@ -519,7 +519,7 @@
   },
   "protected_sources": {
     "algorithm": "sha256-length-framed-path-content-v1",
-    "bytes": 588825,
+    "bytes": 589084,
     "files": [
       {
         "bytes": 1168,
@@ -572,9 +572,9 @@
         "sha256": "9ccee42eb95bc8662bb5dff08a6b804f650009785def84cacb2bfc9f148d578c"
       },
       {
-        "bytes": 12960,
+        "bytes": 13219,
         "path": "src/evidence_harness/protocol.py",
-        "sha256": "078a07f83e44a075ba138a0129c00b8536ff931dcbab7114ed56682925481cb7"
+        "sha256": "07837a2f7cfc108e8e492ad6950a32c813fb9a2d37851d4f4c725991739a0157"
       },
       {
         "bytes": 6231,
@@ -619,7 +619,7 @@
       {
         "bytes": 71697,
         "path": "src/evidence_harness_mutation/prefixbench_test_campaign.py",
-        "sha256": "fc8cf6592584f3cca1a5e5bde61fd86a90ef33ea80a057083fa81ca591324199"
+        "sha256": "13a966708af562c16e3169be748d2171e969e6af2d9d918f49c7383829a3c27e"
       },
       {
         "bytes": 19540,
@@ -627,12 +627,12 @@
         "sha256": "5bece3a2c71858f9259e2df86d044bfc3cbc228b733ea39df1e4db10dd7d5f17"
       }
     ],
-    "sha256": "47d43a1088f106ea7467bfc9789760130499643a3836f953de209eb66495cd2c"
+    "sha256": "5f8c3b622f4b1e58a880489403c403c14a0886c4f5f537eb157da4fbd46dc632"
   },
   "protocol": {
     "bytes": 15012,
     "path": "experiments/prefixbench-v1/main-analysis-protocol-v1.json",
-    "sha256": "ee7aa127de0c54227c661e1cb93120a2a7b81543fef97ea0ab28e4485d390abf"
+    "sha256": "298b54da4f5aa0f6970d7e4bcc0be9a02a10e86943534d2227b34c82cad43243"
   },
   "protocol_commit": "b2a347ecda0206b01cd5d34de9edd7df1e284cb6",
   "rules": {

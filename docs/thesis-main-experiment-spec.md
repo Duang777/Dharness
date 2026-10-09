@@ -62,11 +62,11 @@ Terminal-Bench 2.1 只允许进入独立敏感性分析。production mutation sc
 | Historical-7 manifest | `experiments/historical-7/manifest.json` | `498959a371dca885792d2b8807c24808c88035c46534f55284b5ac1baf1bf20e` |
 | Historical-7 report | `evaluation/historical-7.json` | `bac8ac96373332473a5cc5011a43cd7a5d0aad3fca730617b062e60cb0077c97` |
 | development matrix | `evaluation/matrix-prefixbench-development.json` | `f95bfc0ac1836b49dcab8323e6ff702586edc97c1f71f2986ae3c1e6645a6067` |
-| development mutation protocol | `experiments/prefixbench-v1/mutation-protocol-v1.json` | `6cfca06ef69edc57625ffb5205c1f25dd37fda4544e892eee496835503122e47` |
-| development campaign | `evaluation/prefixbench-v1-development-offline-campaign.json` | `324988e1f87b6e26e841cc75824ac69949756938d332da6dbacc032f7f627dab` |
-| development analysis | `evaluation/prefixbench-v1-development-offline-analysis.json` | `af7ea362666a636749cc8096ee5509d9beb148076bb851847798d9fcd1d31dba` |
+| development mutation protocol | `experiments/prefixbench-v1/mutation-protocol-v1.json` | `360c09736d24597ffb4e452dd70b9d468a6213df2167d0e546420c22522cd377` |
+| development campaign | `evaluation/prefixbench-v1-development-offline-campaign.json` | `395c10022f9682ff31246701e058a94aa983b1f236c9f3a6b164e8dc62c6aa83` |
+| development analysis | `evaluation/prefixbench-v1-development-offline-analysis.json` | `5cac7e32f3540c511a782759efdd25c617a3113f40fb9b9566bc5a40fe3cddb7` |
 | test matrix | `evaluation/matrix-prefixbench-test.json` | `a09d843fd1c4c356b7b48e5982655e9e20eded2fe394b7667ba86b00ce1826cb` |
-| test mutation protocol | `experiments/prefixbench-v1/test-mutation-protocol-v1.json` | `5c96395b642ef4a5edc4364dc97e50cf26d1e82200fd041ff4cd0e8042b9767d` |
+| test mutation protocol | `experiments/prefixbench-v1/test-mutation-protocol-v1.json` | `a6972d068a5595396ccea6bc3d3d66bc0d609c1596aeb16d73fa961e33000d2c` |
 
 测试矩阵冻结提交是
 `2e3e65868213238d9bbcdbf3e09ce4356c8edfd9`。held-out 协议冻结提交和本规范的设计基线是
