@@ -28,9 +28,24 @@
 
 </div>
 
-| Terminal-Bench 2.0 | 通过率 | Canonical error | 评分覆盖率 |
-|:---:|:---:|:---:|:---:|
-| **59 / 89** | **66.3%** | **0** | **100%** |
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Reward 1.0</th>
+      <th>通过率</th>
+      <th>Canonical error</th>
+      <th>评分覆盖率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><strong>59 / 89</strong></td>
+      <td align="center"><strong>66.3%</strong></td>
+      <td align="center"><strong>0</strong></td>
+      <td align="center"><strong>100%</strong></td>
+    </tr>
+  </tbody>
+</table>
 
 > [!NOTE]
 > 评测结果包含受控恢复和 4 个 journal replay，不应解读为严格的 pass@1。
