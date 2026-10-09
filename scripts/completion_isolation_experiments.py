@@ -133,6 +133,7 @@ def build_experiment_report(
             factory_source_sha256=_required_string(factory_binding, "sha256"),
             agent_source_sha256=_required_string(agent_binding, "sha256"),
             runtime_source_sha256=runtime_binding["sha256"],
+            bind_legacy_attempts=source_revision is not None,
         )
         for task_name in expected
     ]
@@ -256,6 +257,7 @@ def _build_experiment_row(
     factory_source_sha256: str,
     agent_source_sha256: str,
     runtime_source_sha256: str,
+    bind_legacy_attempts: bool,
 ) -> dict[str, Any]:
     case_id = _required_string(candidate, "case_id")
     if case.get("task_name") != task_name or case.get("case_id") != case_id:
@@ -329,13 +331,23 @@ def _build_experiment_row(
         decision=expected_decision,
         task_name=task_name,
     )
+    isolation = evidence.isolation
+    mechanical_checks = evidence.checks
+    if bind_legacy_attempts and isolation is not None:
+        mechanical_checks = tuple(
+            receipt
+            if receipt.attempt_id is not None
+            else receipt.model_copy(update={"attempt_id": isolation.attempt_id})
+            for receipt in evidence.checks
+        )
     mechanical = EvidenceGate(LoopOptions(enable_completion_review=False)).decide(
         work_epoch=evidence.work_epoch,
-        checks=evidence.checks,
+        checks=mechanical_checks,
         coverage=evidence.coverage,
         expected_check_ids=expected_check_ids,
-        attempt_id=evidence.isolation.attempt_id if evidence.isolation else None,
-        isolation=evidence.isolation,
+        attempt_id=isolation.attempt_id if isolation else None,
+        candidate_digest=isolation.candidate_digest if isolation else None,
+        isolation=isolation,
         require_isolation=True,
     )
     semantic_status = _semantic_review_status(evidence, metadata)
@@ -358,7 +370,6 @@ def _build_experiment_row(
     )
     verifier_result = _object(result.get("verifier_result"), "verifier result")
     rewards = _object(verifier_result.get("rewards"), "verifier rewards")
-    isolation = evidence.isolation
     if isolation is None:
         raise ValueError(f"experiment has no isolation evidence: {task_name}")
     replay_command_count = _required_int(metadata, "replay_command_count")

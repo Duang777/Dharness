@@ -342,6 +342,7 @@ class EvidenceLoop:
         state.current_plan = decision.plan
         state.current_goal = decision.commands[0].purpose
         state.work_epoch += 1
+        state.candidate_digest = None
         state.latest_evidence = None
         self._journal.append(
             "work_batch_started",
@@ -477,17 +478,22 @@ class EvidenceLoop:
         state.phase = RunPhase.VERIFYING
         attempt_id = state.next_completion_attempt
         state.next_completion_attempt += 1
+        state.candidate_digest = None
 
         async def execute_check(
             check: VerificationCheck,
             environment: ShellEnvironment,
             command_deadline_monotonic: float,
+            candidate_digest: str,
         ) -> CommandReceipt:
+            state.candidate_digest = candidate_digest
             return await self._run_completion_check(
                 state,
                 check,
                 environment,
                 command_deadline_monotonic,
+                completion_attempt_id=attempt_id,
+                completion_candidate_digest=candidate_digest,
             )
 
         try:
@@ -705,6 +711,9 @@ class EvidenceLoop:
         check: VerificationCheck,
         environment: ShellEnvironment,
         command_deadline_monotonic: float,
+        *,
+        completion_attempt_id: int,
+        completion_candidate_digest: str,
     ) -> CommandReceipt:
         command = ShellCommand(
             id=check.id,
@@ -720,6 +729,8 @@ class EvidenceLoop:
             self._journal,
             self._options,
             self._clock,
+            completion_attempt_id=completion_attempt_id,
+            completion_candidate_digest=completion_candidate_digest,
         )
         return await self._run_command(
             state,

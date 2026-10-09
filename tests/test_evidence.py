@@ -17,9 +17,14 @@ from evidence_harness.protocol import (
 )
 
 _EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
+_CANDIDATE_DIGEST = hashlib.sha256(b"candidate-rootfs").hexdigest()
 
 
-def _successful_receipt() -> CommandReceipt:
+def _successful_receipt(
+    *,
+    attempt_id: int | None = None,
+    candidate_digest: str | None = _CANDIDATE_DIGEST,
+) -> CommandReceipt:
     empty = OutputExcerpt(
         head="",
         tail="",
@@ -35,6 +40,8 @@ def _successful_receipt() -> CommandReceipt:
         cwd="/workspace",
         mode=CommandMode.OBSERVE,
         work_epoch=1,
+        attempt_id=attempt_id,
+        candidate_digest=candidate_digest,
         return_code=0,
         duration_sec=0.1,
         stdout=empty,
@@ -54,12 +61,13 @@ def _coverage() -> tuple[RequirementCoverage, ...]:
 
 
 def _isolation() -> CompletionIsolationEvidence:
-    receipt = _successful_receipt()
+    receipt = _successful_receipt(attempt_id=1)
     return CompletionIsolationEvidence(
         backend="test-isolation-v1",
         attempt_id=1,
         work_epoch=1,
         candidate_image_id="sha256:candidate",
+        candidate_digest=_CANDIDATE_DIGEST,
         environment_identity_sha256="3" * 64,
         checks=(
             CheckIsolationEvidence(
@@ -139,7 +147,7 @@ def test_explicit_review_opt_out_keeps_mechanical_mode() -> None:
 
 
 def test_isolation_evidence_accepts_only_a_fully_bound_attempt() -> None:
-    receipt = _successful_receipt()
+    receipt = _successful_receipt(attempt_id=1)
 
     evidence = EvidenceGate(LoopOptions(enable_completion_review=False)).decide(
         work_epoch=1,
@@ -147,6 +155,7 @@ def test_isolation_evidence_accepts_only_a_fully_bound_attempt() -> None:
         coverage=_coverage(),
         expected_check_ids=(receipt.command_id,),
         attempt_id=1,
+        candidate_digest=_CANDIDATE_DIGEST,
         isolation=_isolation(),
         require_isolation=True,
     )
@@ -155,8 +164,47 @@ def test_isolation_evidence_accepts_only_a_fully_bound_attempt() -> None:
     assert evidence.isolation == _isolation()
 
 
+def test_isolation_evidence_rejects_a_receipt_from_another_attempt() -> None:
+    receipt = _successful_receipt(attempt_id=2)
+
+    evidence = EvidenceGate(LoopOptions(enable_completion_review=False)).decide(
+        work_epoch=1,
+        checks=(receipt,),
+        coverage=_coverage(),
+        expected_check_ids=(receipt.command_id,),
+        attempt_id=1,
+        candidate_digest=_CANDIDATE_DIGEST,
+        isolation=_isolation(),
+        require_isolation=True,
+    )
+
+    assert evidence.accepted is False
+    assert evidence.rejection_reasons == ("verification receipt attempt does not match",)
+
+
+def test_isolation_evidence_rejects_a_receipt_from_another_candidate() -> None:
+    receipt = _successful_receipt(
+        attempt_id=1,
+        candidate_digest=hashlib.sha256(b"stale-candidate").hexdigest(),
+    )
+
+    evidence = EvidenceGate(LoopOptions(enable_completion_review=False)).decide(
+        work_epoch=1,
+        checks=(receipt,),
+        coverage=_coverage(),
+        expected_check_ids=(receipt.command_id,),
+        attempt_id=1,
+        candidate_digest=_CANDIDATE_DIGEST,
+        isolation=_isolation(),
+        require_isolation=True,
+    )
+
+    assert evidence.accepted is False
+    assert evidence.rejection_reasons == ("verification receipt candidate digest does not match",)
+
+
 def test_isolation_evidence_rejects_missing_or_mismatched_bindings() -> None:
-    receipt = _successful_receipt()
+    receipt = _successful_receipt(attempt_id=1)
     gate = EvidenceGate(LoopOptions(enable_completion_review=False))
     missing = gate.decide(
         work_epoch=1,
@@ -164,6 +212,7 @@ def test_isolation_evidence_rejects_missing_or_mismatched_bindings() -> None:
         coverage=_coverage(),
         expected_check_ids=(receipt.command_id,),
         attempt_id=1,
+        candidate_digest=_CANDIDATE_DIGEST,
         require_isolation=True,
     )
 
@@ -178,6 +227,10 @@ def test_isolation_evidence_rejects_missing_or_mismatched_bindings() -> None:
         (
             base.model_copy(update={"work_epoch": 2}),
             "completion isolation evidence is stale",
+        ),
+        (
+            base.model_copy(update={"candidate_digest": "9" * 64}),
+            "completion isolation candidate digest does not match",
         ),
         (
             base.model_copy(
@@ -231,6 +284,7 @@ def test_isolation_evidence_rejects_missing_or_mismatched_bindings() -> None:
             coverage=_coverage(),
             expected_check_ids=(receipt.command_id,),
             attempt_id=1,
+            candidate_digest=_CANDIDATE_DIGEST,
             isolation=isolation,
             require_isolation=True,
         )

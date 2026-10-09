@@ -37,6 +37,7 @@ from scripts.completion_isolation_experiments import (
 )
 
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
+CANDIDATE_DIGEST = hashlib.sha256(b"candidate-rootfs").hexdigest()
 
 
 def _git(root: Path, *args: str) -> str:
@@ -102,6 +103,8 @@ def _evidence() -> VerificationReceipt:
         cwd=check.cwd,
         mode=CommandMode.OBSERVE,
         work_epoch=0,
+        attempt_id=1,
+        candidate_digest=CANDIDATE_DIGEST,
         return_code=0,
         duration_sec=0.1,
         stdout=output,
@@ -120,6 +123,7 @@ def _evidence() -> VerificationReceipt:
         attempt_id=1,
         work_epoch=0,
         candidate_image_id="sha256:" + "c" * 64,
+        candidate_digest=CANDIDATE_DIGEST,
         environment_identity_sha256="d" * 64,
         checks=(
             CheckIsolationEvidence(
@@ -438,6 +442,62 @@ def test_build_experiment_report_separates_mechanical_and_semantic_results(
     assert row["source_attestation"]["diff_sha256_before"] == EMPTY_SHA256
     assert "canonical 59/89 result is unchanged" in render_markdown(report)
     assert "Command trajectories replayed: 1 / 1" in render_markdown(report)
+
+
+def test_historical_report_replay_binds_pre_attempt_receipts(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='fixture'\n", encoding="utf-8")
+    (tmp_path / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+    corpus, calibration, factory, agent, result = _write_fixture(tmp_path)
+
+    result_payload = json.loads(result.read_text(encoding="utf-8"))
+    metadata = result_payload["agent_result"]["metadata"]["completion_isolation_experiment"]
+    del metadata["latest_evidence"]["checks"][0]["attempt_id"]
+    _write_json(result, result_payload)
+
+    completion_journal = (
+        result.parent / "agent" / "completion-isolation-experiment" / "completion" / "events.jsonl"
+    )
+    completion_events = [
+        json.loads(line) for line in completion_journal.read_text(encoding="utf-8").splitlines()
+    ]
+    for event in completion_events:
+        payload = event.get("payload", {})
+        if event["type"] == "command_receipt" and payload.get("command_id") == "check-answer":
+            del payload["attempt_id"]
+        elif event["type"] == "verification_receipt":
+            del payload["checks"][0]["attempt_id"]
+    _write_jsonl(completion_journal, completion_events)
+
+    current = build_experiment_report(
+        corpus_path=corpus,
+        calibration_path=calibration,
+        result_paths=[result],
+        project_root=tmp_path,
+        factory_source_path=factory,
+        agent_source_path=agent,
+    )
+    assert current["experiments"][0]["mechanical_rejection_reasons"] == [
+        "verification receipt attempt does not match"
+    ]
+
+    _git(tmp_path, "init")
+    _git(tmp_path, "config", "user.name", "Test")
+    _git(tmp_path, "config", "user.email", "test@example.com")
+    _git(tmp_path, "add", ".")
+    _git(tmp_path, "commit", "-m", "freeze legacy experiment")
+    source_revision = _git(tmp_path, "rev-parse", "HEAD")
+
+    historical = build_experiment_report(
+        corpus_path=corpus,
+        calibration_path=calibration,
+        result_paths=[result],
+        project_root=tmp_path,
+        factory_source_path=factory,
+        agent_source_path=agent,
+        source_revision=source_revision,
+    )
+    assert historical["experiments"][0]["mechanical_isolation_passed"] is True
+    assert historical["experiments"][0]["mechanical_rejection_reasons"] == []
 
 
 def test_check_artifacts_rebuilds_available_results(tmp_path: Path) -> None:

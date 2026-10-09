@@ -32,7 +32,7 @@ def test_real_development_analysis_is_deterministic_and_exact() -> None:
     assert first.source_campaign.model_dump() == {
         "path": "evaluation/prefixbench-v1-development-offline-campaign.json",
         "bytes": 1_510_691,
-        "sha256": "659dba67f203183be64a200e85198596d7fbb929849a308df7b681cb7f42794d",
+        "sha256": "395c10022f9682ff31246701e058a94aa983b1f236c9f3a6b164e8dc62c6aa83",
     }
     assert first.tasks.model_dump(mode="json") == {
         "tasks": 28,

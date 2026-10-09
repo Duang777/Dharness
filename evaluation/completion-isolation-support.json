@@ -2,7 +2,7 @@
   "dataset": "terminal-bench@2.0",
   "dataset_source_commit": "69671fbaac6d67a7ef0dfec016cc38a64ef7a77c",
   "factory_source": "src/evidence_harness/docker_completion_isolation.py",
-  "factory_source_sha256": "1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040",
+  "factory_source_sha256": "eda91dad0379de537b3d33de043542ffc96bad28d4f76d3092e8221a1bb542d7",
   "harbor_version": "0.23.0",
   "matrix_sha256": "51a6e58f5591d3d247543b53dc4f7008d663a085ca0928b2d4d2852f813f9939",
   "runtime_requirements_not_evaluated": [

@@ -10,7 +10,7 @@ task-source checks used by the Docker completion-isolation factory.
 - Matrix SHA-256: `51a6e58f5591d3d247543b53dc4f7008d663a085ca0928b2d4d2852f813f9939`
 - Harbor version: `0.23.0`
 - Factory source: `src/evidence_harness/docker_completion_isolation.py`
-- Factory source SHA-256: `1b3712f48685728e53d1334fb4860762219480c45830993fc6497a7794469040`
+- Factory source SHA-256: `eda91dad0379de537b3d33de043542ffc96bad28d4f76d3092e8221a1bb542d7`
 
 ## Result
 
