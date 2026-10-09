@@ -521,6 +521,31 @@ async def test_finish_cannot_omit_a_fixed_contract_requirement(tmp_path) -> None
     ]
 
 
+async def test_configured_contract_budget_must_match_loop_options(tmp_path) -> None:
+    contract = CompletionContract.from_instruction(
+        "Create answer.txt",
+        LoopOptions(
+            max_turns=12,
+            max_environment_calls=21,
+            verification_environment_reserve=3,
+        ),
+    )
+    environment = FakeEnvironment()
+
+    with pytest.raises(
+        ValueError,
+        match="completion contract budget does not match controller options",
+    ):
+        await _loop(
+            tmp_path,
+            ScriptedModel(()),
+            completion_contract=contract,
+        ).run("Create answer.txt", environment)
+
+    assert environment.calls == []
+    assert not (tmp_path / "events.jsonl").exists()
+
+
 async def test_failed_verification_returns_to_repair(tmp_path) -> None:
     check = 'test "$(cat answer.txt)" = good'
     model = ScriptedModel(

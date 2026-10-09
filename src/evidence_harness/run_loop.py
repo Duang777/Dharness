@@ -9,7 +9,7 @@ from evidence_harness.budget import (
     finalization_turn_reserve,
     finalization_wall_time_reserve_sec,
 )
-from evidence_harness.completion_contract import CompletionContract
+from evidence_harness.completion_contract import CompletionBudget, CompletionContract
 from evidence_harness.completion_control import BudgetGuard, CompletionController
 from evidence_harness.completion_isolation import CompletionIsolation
 from evidence_harness.dharness_adapter import DharnessAdapter
@@ -113,6 +113,8 @@ class EvidenceLoop:
             instruction,
             self._options,
         )
+        if contract.b_req != CompletionBudget.from_options(self._options):
+            raise ValueError("completion contract budget does not match controller options")
         started = self._clock()
         state = RunState(
             instruction=instruction,
