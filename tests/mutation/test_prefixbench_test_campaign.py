@@ -270,7 +270,7 @@ def test_protocol_freezes_held_out_contract_without_a_producer_revision() -> Non
     assert "api_base" not in payload["collection"]
     assert (
         protocol.collection.orchestration_source_sha256
-        == "868d63fb26011ddd692f8b04f7b3bea0072ad5ddbd3086200e442280c55f1e0c"
+        == "8bc3fcd650e4087ad0aace79d393953850d37ff5fe49b2245cf773de3df68cd6"
     )
     assert protocol.producer.runtime_source_sha256 == campaign.FROZEN_RUNTIME_SOURCE_SHA256
     assert tuple(file.path for file in protocol.source_set.files) == (
@@ -284,9 +284,18 @@ def test_protocol_freezes_held_out_contract_without_a_producer_revision() -> Non
     assert '"producer_tree"' not in serialized
 
 
-def test_evolved_runtime_cannot_rewrite_the_committed_protocol() -> None:
+def test_evolved_runtime_cannot_rewrite_the_committed_protocol(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     data = TEST_PROTOCOL.read_bytes()
     protocol = campaign.PrefixBenchTestMutationProtocol.model_validate_json(data)
+    drifted_runtime = campaign.runtime_source_binding(PROJECT_ROOT)
+    drifted_runtime["sha256"] = "0" * 64
+    monkeypatch.setattr(
+        campaign,
+        "runtime_source_binding",
+        lambda _root: drifted_runtime,
+    )
 
     assert data == protocol.canonical_bytes()
     with pytest.raises(

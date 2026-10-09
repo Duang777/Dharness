@@ -29,11 +29,14 @@ class CommandRunner:
         journal: RunJournal,
         options: LoopOptions,
         clock: Callable[[], float] = time.monotonic,
+        *,
+        completion_attempt_id: int | None = None,
     ) -> None:
         self._environment = environment
         self._journal = journal
         self._options = options
         self._clock = clock
+        self._completion_attempt_id = completion_attempt_id
 
     async def execute(
         self,
@@ -105,6 +108,7 @@ class CommandRunner:
             cwd=command.cwd,
             mode=command.mode,
             work_epoch=work_epoch,
+            attempt_id=self._completion_attempt_id,
             return_code=return_code,
             failure=failure,
             duration_sec=duration,

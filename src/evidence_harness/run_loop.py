@@ -488,6 +488,7 @@ class EvidenceLoop:
                 check,
                 environment,
                 command_deadline_monotonic,
+                completion_attempt_id=attempt_id,
             )
 
         try:
@@ -705,6 +706,8 @@ class EvidenceLoop:
         check: VerificationCheck,
         environment: ShellEnvironment,
         command_deadline_monotonic: float,
+        *,
+        completion_attempt_id: int,
     ) -> CommandReceipt:
         command = ShellCommand(
             id=check.id,
@@ -720,6 +723,7 @@ class EvidenceLoop:
             self._journal,
             self._options,
             self._clock,
+            completion_attempt_id=completion_attempt_id,
         )
         return await self._run_command(
             state,

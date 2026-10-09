@@ -25,7 +25,7 @@ from evidence_harness_mutation.reducer import ReductionRejections
 
 DEVELOPMENT_CAMPAIGN = Path("evaluation/prefixbench-v1-development-offline-campaign.json")
 DEVELOPMENT_ANALYSIS = Path("evaluation/prefixbench-v1-development-offline-analysis.json")
-DEVELOPMENT_CAMPAIGN_SHA256 = "659dba67f203183be64a200e85198596d7fbb929849a308df7b681cb7f42794d"
+DEVELOPMENT_CAMPAIGN_SHA256 = "324988e1f87b6e26e841cc75824ac69949756938d332da6dbacc032f7f627dab"
 
 _OPERATOR_INVARIANTS = (
     (MutationId.STALE_EVIDENCE_EPOCH, InvariantId.I1),

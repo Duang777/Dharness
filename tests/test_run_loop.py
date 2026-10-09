@@ -415,6 +415,7 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
     assert report.latest_evidence is not None
     assert report.latest_evidence.accepted is True
     assert report.latest_evidence.work_epoch == 1
+    assert report.latest_evidence.checks[0].attempt_id == 1
     assert report.latest_evidence.checks[0].sequence == 3
     assert [call[0] for call in environment.calls[1:]] == [
         "printf good > answer.txt",
@@ -432,10 +433,17 @@ async def test_success_requires_fresh_check_after_change(tmp_path) -> None:
         for index, event in enumerate(events)
         if event["type"] == "command_receipt" and event["payload"]["command_id"] == "change"
     )
+    check_index = next(
+        index
+        for index, event in enumerate(events)
+        if event["type"] == "command_receipt" and event["payload"]["command_id"] == "check-answer"
+    )
     review_index = event_types.index("completion_review_started")
     review_result_index = event_types.index("completion_review")
     assert work_index < change_index
     assert review_index < review_result_index
+    assert "attempt_id" not in events[change_index]["payload"]
+    assert events[check_index]["payload"]["attempt_id"] == 1
     assert events[work_index]["payload"] == {
         "command_ids": ["change"],
         "started_in_finalization": False,
@@ -532,6 +540,7 @@ async def test_failed_verification_returns_to_repair(tmp_path) -> None:
     assert report.repairs_used == 1
     assert report.latest_evidence is not None
     assert report.latest_evidence.work_epoch == 2
+    assert report.latest_evidence.checks[0].attempt_id == 2
     assert any("verification commands failed" in error for error in model.prompts[-1].splitlines())
 
 

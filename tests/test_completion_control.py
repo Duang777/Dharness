@@ -93,6 +93,7 @@ def _receipt(check: VerificationCheck, sequence: int) -> CommandReceipt:
         cwd=check.cwd,
         mode=CommandMode.OBSERVE,
         work_epoch=1,
+        attempt_id=1,
         return_code=0,
         duration_sec=0.1,
         stdout=output,

@@ -19,7 +19,7 @@ from evidence_harness_mutation.prefixbench_test_campaign import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL_PATH = PROJECT_ROOT / TEST_PROTOCOL
 REPORT_PATH = PROJECT_ROOT / TEST_CAMPAIGN
-FROZEN_PROTOCOL_SHA256 = "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4"
+FROZEN_PROTOCOL_SHA256 = "5c96395b642ef4a5edc4364dc97e50cf26d1e82200fd041ff4cd0e8042b9767d"
 
 
 def parse_args() -> argparse.Namespace:

@@ -47,7 +47,7 @@ Analysis v1 accepts only:
 
 ```text
 evaluation/prefixbench-v1-development-offline-campaign.json
-SHA-256 659dba67f203183be64a200e85198596d7fbb929849a308df7b681cb7f42794d
+SHA-256 324988e1f87b6e26e841cc75824ac69949756938d332da6dbacc032f7f627dab
 ```
 
 The loader requires a regular file, parses it as

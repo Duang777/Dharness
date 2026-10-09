@@ -116,6 +116,8 @@ class EvidenceGate:
             reasons.append("no verification commands were executed")
         if any(item.work_epoch != work_epoch for item in checks):
             reasons.append("verification evidence is stale")
+        if attempt_id is not None and any(item.attempt_id != attempt_id for item in checks):
+            reasons.append("verification receipt attempt does not match")
         if expected_check_ids and tuple(item.command_id for item in checks) != expected_check_ids:
             reasons.append("not all proposed verification commands were executed in order")
         if proposed_checks and len(proposed_checks) == len(checks):

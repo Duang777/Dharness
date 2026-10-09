@@ -236,6 +236,7 @@ class CommandReceipt(StrictModel):
     cwd: str | None
     mode: CommandMode
     work_epoch: int = Field(ge=0)
+    attempt_id: int | None = Field(default=None, ge=1, exclude_if=lambda value: value is None)
     return_code: int | None
     failure: FailureKind | None = None
     duration_sec: float = Field(ge=0)

@@ -76,15 +76,15 @@ _KNOWN_INPUTS = (
     ),
     (
         "experiments/prefixbench-v1/test-mutation-protocol-v1.json",
-        "d08e57fc7226bd659061500bd175ea7d336de0a3ea2b581b90d4bdd4e6ad09b4",
+        "5c96395b642ef4a5edc4364dc97e50cf26d1e82200fd041ff4cd0e8042b9767d",
     ),
     (
         "experiments/prefixbench-v1/main-analysis-protocol-v1.json",
-        "700c7d8432cb41b9aaa71c309887d4597e2570fb19e07c8ad3a0253cfa6a88ed",
+        "ee7aa127de0c54227c661e1cb93120a2a7b81543fef97ea0ab28e4485d390abf",
     ),
     (
         "experiments/prefixbench-v1/main-analysis-executable-v1.json",
-        "a5935f9d347717c29e2fd32e379988926a72347b6008cb5f7ebcbb98535066f7",
+        "7d151a8fa7b6698bce30b7c314e8b02baf92bfdf6f0bf3870944ecdabc8a538c",
     ),
 )
 _KNOWN_INPUT_AMENDMENTS = dict(_KNOWN_INPUTS[1:])
@@ -485,7 +485,7 @@ class Tb21SensitivityProtocol(FrozenModel):
         max_length=len(_KNOWN_INPUTS),
     )
     protected_test_source_set_sha256: Literal[
-        "cac696babe8429bad66429661730ab73bf1dae3f26b544aaae1f9073fe9fd02e"
+        "47d43a1088f106ea7467bfc9789760130499643a3836f953de209eb66495cd2c"
     ] = FROZEN_TEST_SOURCE_SET_SHA256
     protected_sources: MainAnalysisSourceSet
     protocol_sources: MainAnalysisSourceSet
