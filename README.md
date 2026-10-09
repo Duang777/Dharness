@@ -1,13 +1,48 @@
 # Evidence Harness
 
+[CI](https://github.com/Duang777/Dharness/actions/workflows/ci.yml) · `Python 3.12` ·
+`Harbor 0.23.0` · `Terminal-Bench 2.0`
+
 Evidence Harness 是面向 Terminal-Bench 2.0 的 Harbor 自定义 Agent。它把“任务完成”
-改造成控制器执行的证据协议：模型提出操作和验收条件，Harness 串行执行命令、保存观察、
-在候选快照中重新运行最终检查，只有新鲜证据覆盖全部任务要求时才结束。
+变成一套由控制器验证的证据协议。模型提出操作和验收条件，Harness 串行执行命令、
+保存观察，并在候选快照中重新运行最终检查。只有新鲜证据覆盖全部任务要求时，任务
+才会结束。
 
-Terminal-Bench 2.0 全量评测已经完成。最终结果为 59/89，全部任务均已评分，
-canonical `error` 为 0。
+仓库包含 Agent 运行时、可恢复评测编排器、冻结评测产物和 PrefixBench 研究工具。
 
-## 成绩
+当前 Terminal-Bench 2.0 全量评测结果为 **59/89**。89 个任务均已评分，canonical
+`error` 为 0。结果包含受控恢复和 journal replay，不能按严格的 pass@1 解读。
+
+[快速开始](#安装与快速开始) · [评测结果](#成绩terminal-bench-20) ·
+[架构](#架构) · [运行评测](#运行评测) · [完整验收](#完整验收) ·
+[文档索引](#交付文档索引)
+
+## 安装与快速开始
+
+需要 Python 3.12 或 3.13、[`uv`](https://docs.astral.sh/uv/) 和可用的 Docker daemon：
+
+```bash
+git clone https://github.com/Duang777/Dharness.git
+cd Dharness
+uv sync --python 3.12
+docker info
+```
+
+运行一个 Terminal-Bench 任务：
+
+```bash
+uv run harbor run \
+  --dataset terminal-bench@2.0 \
+  --include-task-name fix-git \
+  --agent evidence_harness.harbor_agent:EvidenceHarnessAgent \
+  --model provider/model \
+  --n-concurrent 1
+```
+
+把 `provider/model` 替换为实际模型。运行时凭证由进程环境提供，不要写入命令、README
+或 Git。提交改动前，运行[完整验收](#完整验收)。
+
+## 成绩：Terminal-Bench 2.0
 
 固定矩阵覆盖官方 Terminal-Bench 2.0 的全部 89 题。85 个任务使用
 `openai/modelhub/gpt-5.6-terra` 实时运行，4 个任务使用同一批运行中保存的 Agent
@@ -29,7 +64,7 @@ canonical `error` 为 0。
 [`canonical-89.json`](evaluation/canonical-89.json)，每个原始 `result.json` 都由
 SHA-256 绑定。
 
-### 如何解读成绩
+### 结果口径
 
 本项目同时报告两种通过率。Attempted pass rate 以全部已运行任务为分母，能暴露模型、
 Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifier 正常给出评分的
@@ -47,7 +82,7 @@ Harness 和基础设施共同造成的损失。Scored pass rate 只统计 verifi
 Harness 配置和源码有修订。replay 不发起新模型调用，只重放已记录的命令，并保留源
 journal SHA-256。最终成绩反映含恢复的工程闭环，不是严格 pass@1。
 
-### 实验结论
+### 从结果中能看到什么
 
 1. **Harbor reward 必须保持最终权威。** 85 个 live trial 中有 10 个内部
    `verified` 但 reward 为 0，另有 12 个 reward 1.0 的任务未以 `verified` 结束。
@@ -60,11 +95,11 @@ journal SHA-256。最终成绩反映含恢复的工程闭环，不是严格 pass
 4. **恢复流程清除了基础设施错误。** Docker EOF、镜像启动超时和 verifier 超时没有
    留在最终 `error` 中。恢复后要么得到 reward 1.0，要么得到可归因的 reward 0。
 
-## 核心亮点
+## 核心亮点：运行时保证
 
-这里的亮点只描述 Harness 的运行时设计。评测统计、文档和 Skills 放在后续独立章节。
+下面这些约束由 Harness 执行，不依赖模型自行报告。
 
-| 设计亮点 | Harness 的实现 |
+| 保证 | Harness 的实现 |
 |---|---|
 | 结构化动作协议 | 模型只能返回 `execute`、`finish`、`replan` 或 `stop`。Pydantic 在模型边界解析动作，格式错误只允许一次 schema repair |
 | 固定完成契约 | `CompletionContract` 在运行开始时冻结 requirement、证据类型和预算。`finish` 必须覆盖固定的 requirement ID，不能靠漏报缩小验收范围 |
@@ -77,24 +112,6 @@ journal SHA-256。最终成绩反映含恢复的工程闭环，不是严格 pass
 | 分层恢复机制 | 命令失败触发分类处理，协议错误进入 repair，重复周期触发 replan，模型停滞由独立超时截断 |
 | 有界预算与明确停止 | turn、环境调用、repair、recovery 和墙钟时间分别计数。预算耗尽后返回明确的停止原因，不无限循环 |
 | 内外两层验收 | `EvidenceGate` 判断 Harness 是否具备完成证据，Harbor verifier 决定 benchmark reward。内部 `verified` 不覆盖外部评分 |
-
-## 工程方法与知识覆盖
-
-开发过程使用了五项可追踪的 Skills：
-
-| Skill | 在项目中的作用 |
-|---|---|
-| `show-me-your-work` | 把工程决定写入 TSV，并绑定证据和结果 |
-| `principle-prove-it-works` | 要求真实 Harbor、Docker 和 verifier 结果 |
-| `technical-writing` | 组织架构说明、评测方法和复现文档 |
-| `write` | 中文化并统一报告语气 |
-| `unslop` | 删除模板化表述和重复结论 |
-
-89 道任务扩大了技术覆盖。项目实际处理了 Coq 证明、Nginx、OpenSSL、ELF32/ELF64、
-SQLite 查询优化、JSON/CSV/Parquet 合并、CWE-93、文件系统取证、Python 科学计算栈和
-Golden Gate DNA assembly，也覆盖 QEMU、分布式 PyTorch、编译器、图像处理和逆向工程。
-每项只按本次任务的实现和验证结果陈述。完整记录见
-[AI Coding 工程日志](docs/vibe-coding-log.md)。
 
 ## 架构
 
@@ -131,51 +148,41 @@ flowchart LR
 
 完整状态机、组件职责、方案比较和取舍见[架构决策](docs/architecture-rationale.md)。
 
-## 架构判断
+### 设计取舍
 
 Evidence Harness 的设计不是“让模型多思考几轮”，而是把不稳定的模型放进一个确定性的
 控制器。模型负责提出下一步，控制器负责维护事实、执行副作用和裁决是否允许结束。
 
-**选择单写者。** 只有 `CommandRunner` 可以修改任务环境。reviewer 不持有环境引用，
+**选择单写者**，只有 `CommandRunner` 可以修改任务环境。reviewer 不持有环境引用，
 因此不会和 executor 并发写同一容器，也不能用自然语言伪造执行结果。这个选择牺牲并行
 探索速度，换来可归因的命令序列和稳定的状态。
 
-**选择状态投影，不保留无限对话。** 每轮 prompt 从 `RunState` 重建，只携带当前计划、
+**选择状态投影，不保留无限对话**，每轮 prompt 从 `RunState` 重建，只携带当前计划、
 预算、最近观察和日志引用。完整输出进入脱敏 journal。模型需要旧细节时重新执行窄范围
 查询，而不是让历史输出永久占用上下文。
 
-**选择契约绑定的完成判定。** Harness 在运行开始时冻结 `CompletionContract`。
+**选择契约绑定的完成判定**，Harness 在运行开始时冻结 `CompletionContract`。
 `EvidenceGate` 对照固定 requirement 集合检查覆盖、类型和回执。`BudgetGuard`、
 `PhaseGuard` 和 `ReviewGate` 保留各自的拒绝原因。Harbor verifier 仍决定 benchmark
 reward，因此内部 `verified` 不覆盖外部评分。
 
-**选择有限恢复。** schema repair、模型调用超时、命令失败分类和重复周期检测都有明确
+**选择有限恢复**，schema repair、模型调用超时、命令失败分类和重复周期检测都有明确
 预算。系统宁可返回可解释的 `model_failure` 或 `budget_exhausted`，也不无限重试并把
 成本隐藏在长对话中。
 
-## 安装
+### 仓库结构
 
-需要 Python 3.12、[`uv`](https://docs.astral.sh/uv/) 和可用的 Docker daemon。
-
-```bash
-uv sync --python 3.12
-docker info
-```
-
-项目固定 `harbor==0.23.0`。运行时凭证由进程环境提供，不写入命令、README 或 Git。
+| 路径 | 内容 |
+|---|---|
+| `src/evidence_harness/` | Agent 运行时、完成控制、隔离检查与 journal |
+| `src/evidence_harness_mutation/` | PrefixBench mutation 与分析实现 |
+| `scripts/` | 评测、结果冻结、报告生成和交付验证命令 |
+| `evaluation/` | 固定矩阵、canonical 清单、冻结结果和研究产物 |
+| `docs/` | 架构决策、实验设计、评测报告和复现说明 |
 
 ## 运行评测
 
-运行单题：
-
-```bash
-uv run harbor run \
-  --dataset terminal-bench@2.0 \
-  --include-task-name fix-git \
-  --agent evidence_harness.harbor_agent:EvidenceHarnessAgent \
-  --model provider/model \
-  --n-concurrent 1
-```
+项目固定 `harbor==0.23.0`。
 
 验证固定矩阵和 Harbor 参数，不调用模型：
 
@@ -230,8 +237,13 @@ Trixie HTTPS 软件源。相同 `--run-name` 只能使用相同模型、矩阵�
 ### PrefixBench 采集
 
 PrefixBench 使用独立的冻结 profile。它要求当前 runtime source 与 `git archive HEAD`
-完全一致，并把 commit、tree 和 source SHA-256 写入每个 live journal。先从已绑定的
-89 题 readiness 产物生成固定的 28 题 development matrix：
+完全一致，并把 commit、tree 和 source SHA-256 写入每个 live journal。常规评测不需要
+执行下面的冻结流程。
+
+<details>
+<summary>展开完整的 development 与 held-out test 流程</summary>
+
+先从已绑定的 89 题 readiness 产物生成固定的 28 题 development matrix：
 
 ```bash
 uv run python scripts/prefixbench.py matrix \
@@ -387,6 +399,8 @@ mutation score 或 RQ4 live cost savings。
 和 [PrefixBench development offline mutation campaign](docs/prefixbench-mutation-campaign-design.md)，
 分析口径见 [PrefixBench development analysis](docs/prefixbench-analysis-design.md)。
 
+</details>
+
 ## 完整验收
 
 一条命令运行 Ruff lint/format、mypy、pytest coverage、构建、三个 Harbor Agent
@@ -409,6 +423,9 @@ SHA-256 以及每个源文件的字节数和 SHA-256，不信任报告中已提�
 ```bash
 uv run python scripts/verify_all.py --skip-smoke
 ```
+
+<details>
+<summary>展开结果冻结与报告重建命令</summary>
 
 从原始 Harbor 目录生成可提交的脱敏快照，再重建 10 题报告：
 
@@ -459,6 +476,8 @@ uv run python scripts/summarize_results.py evaluation/trials-89 \
   --markdown-out evaluation/results-89.md
 ```
 
+</details>
+
 本地 smoke 使用固定 fixture 和确定性 mock server，只证明 Harness、Docker、Harbor 与
 verifier 的集成链路，不计入 Terminal-Bench 成绩。
 
@@ -482,19 +501,25 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
   `0/3` 以内部 `verified` 结束。该实验验证 fail-closed 路径，不是新的全量 Agent
   评测，不改变 59/89。
 
-## 交付文档
+## 工程方法与知识覆盖
+
+开发过程用 `show-me-your-work` 记录工程决策，用 `principle-prove-it-works` 要求真实的
+Harbor、Docker 和 verifier 结果。架构与复现文档使用 `technical-writing`、`write`
+和 `unslop` 组织内容并统一表述。
+
+89 道任务扩大了技术覆盖。项目实际处理了 Coq 证明、Nginx、OpenSSL、ELF32/ELF64、
+SQLite 查询优化、JSON/CSV/Parquet 合并、CWE-93、文件系统取证、Python 科学计算栈和
+Golden Gate DNA assembly，也覆盖 QEMU、分布式 PyTorch、编译器、图像处理和逆向工程。
+每项只按本次任务的实现和验证结果陈述。完整记录见
+[AI Coding 工程日志](docs/vibe-coding-log.md)。
+
+## 交付文档索引
+
+### 架构与完成协议
 
 - [文档索引](docs/README.md)
 - [论文定位与贡献计划](docs/thesis-positioning-and-contribution-plan.md)
 - [架构决策](docs/architecture-rationale.md)
-- [评测报告](docs/evaluation-report.md)
-- [89 题逐题结果与统计口径](evaluation/results-89.md)
-- [89 题 canonical 选择清单](evaluation/canonical-89.json)
-- [20 题逐题结果与统计口径](evaluation/results-20.md)
-- [首批 10 题冻结结果](evaluation/results.md)
-- [首批 10 题逐题分析](docs/ten-task-analysis.md)
-- [新增 10 题逐题分析](docs/expanded-ten-analysis.md)
-- [失败分析](docs/failure-analysis.md)
 - [Completion 校准设计](docs/completion-calibration-design.md)
 - [Completion 校准研究](docs/completion-calibration-research.md)
 - [Completion contract 与 I1-I8 控制审计](docs/completion-control-design.md)
@@ -504,6 +529,22 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [隔离运行时研究](docs/isolated-verification-runtime-research.md)
 - [89 题隔离支持 census](docs/completion-isolation-support.md)
 - [隔离完成验证实验](docs/completion-isolation-experiments.md)
+- [终端 Agent 隔离与结项机制调研](docs/terminal-agent-isolation-research.md)
+
+### 评测结果
+
+- [评测报告](docs/evaluation-report.md)
+- [89 题逐题结果与统计口径](evaluation/results-89.md)
+- [89 题 canonical 选择清单](evaluation/canonical-89.json)
+- [20 题逐题结果与统计口径](evaluation/results-20.md)
+- [首批 10 题冻结结果](evaluation/results.md)
+- [首批 10 题逐题分析](docs/ten-task-analysis.md)
+- [新增 10 题逐题分析](docs/expanded-ten-analysis.md)
+- [失败分析](docs/failure-analysis.md)
+- [独立 fix-git replay 结果](evaluation/replay-results.md)
+
+### PrefixBench
+
 - [PrefixBench live collection 设计](docs/prefixbench-collection-design.md)
 - [PrefixBench test matrix](evaluation/matrix-prefixbench-test.json)
 - [PrefixBench held-out test campaign 设计](docs/prefixbench-test-mutation-campaign-design.md)
@@ -512,7 +553,13 @@ verifier 的集成链路，不计入 Terminal-Bench 成绩。
 - [PrefixBench development 离线 campaign](evaluation/prefixbench-v1-development-offline-campaign.json)
 - [PrefixBench development 分析设计](docs/prefixbench-analysis-design.md)
 - [PrefixBench development 分析](evaluation/prefixbench-v1-development-offline-analysis.json)
-- [终端 Agent 隔离与结项机制调研](docs/terminal-agent-isolation-research.md)
+
+### 工程过程
+
 - [如果再给 10 小时](docs/next-10-hours.md)
 - [AI Coding 工程日志](docs/vibe-coding-log.md)
-- [独立 fix-git replay 结果](evaluation/replay-results.md)
+
+## 参与贡献
+
+问题和改进建议请提交到 [GitHub Issues](https://github.com/Duang777/Dharness/issues)。
+代码改动需要通过[完整验收](#完整验收)。CI 会在 push 和 pull request 上运行同一命令。
