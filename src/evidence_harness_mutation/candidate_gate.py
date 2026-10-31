@@ -50,6 +50,12 @@ class GuardProperty(StrEnum):
     ISOLATION = "isolation"
 
 
+class GuardComponent(StrEnum):
+    PROTOCOL = "protocol"
+    TRAJECTORY = "trajectory"
+    HISTORICAL = "historical"
+
+
 class GateDecision(StrEnum):
     ACCEPT = "accept"
     REJECT = "reject"
@@ -65,6 +71,7 @@ class ProbeStatus(StrEnum):
 
 class GuardProbe(FrozenModel):
     probe_id: str = Field(pattern=r"^[a-z_]+\.[a-z0-9_]+$")
+    component: GuardComponent
     property: GuardProperty
     pytest_node: str = Field(pattern=r"^tests/[A-Za-z0-9_/]+\.py(::[A-Za-z0-9_]+)+$")
 
@@ -91,6 +98,7 @@ class GuardSuite(FrozenModel):
 
 class ProbeResult(FrozenModel):
     probe_id: str
+    component: GuardComponent
     property: GuardProperty
     status: ProbeStatus
 
@@ -437,7 +445,12 @@ def _probe_result(probe: GuardProbe, outcomes: _JunitOutcomes) -> ProbeResult:
                 f"suite node missing from junit report: {probe.pytest_node}",
             )
         status = ProbeStatus.HELD if all(passed) else ProbeStatus.VIOLATED
-    return ProbeResult(probe_id=probe.probe_id, property=probe.property, status=status)
+    return ProbeResult(
+        probe_id=probe.probe_id,
+        component=probe.component,
+        property=probe.property,
+        status=status,
+    )
 
 
 def _run_candidate_python(
