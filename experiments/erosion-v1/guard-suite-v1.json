@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "suite_id": "guard-suite-v1",
+  "probes": [
+    {
+      "probe_id": "freshness.epoch_drift",
+      "property": "freshness",
+      "pytest_node": "tests/test_completion_control.py::test_acceptance_rejects_host_attempt_and_epoch_drift"
+    },
+    {
+      "probe_id": "freshness.check_content_drift",
+      "property": "freshness",
+      "pytest_node": "tests/test_completion_control.py::test_acceptance_rejects_a_receipt_for_different_check_content"
+    },
+    {
+      "probe_id": "freshness.receipt_from_other_attempt",
+      "property": "freshness",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_rejects_a_receipt_from_another_attempt"
+    },
+    {
+      "probe_id": "freshness.receipt_from_other_candidate",
+      "property": "freshness",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_rejects_a_receipt_from_another_candidate"
+    },
+    {
+      "probe_id": "freshness.isolation_binding_mismatch",
+      "property": "freshness",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_rejects_missing_or_mismatched_bindings"
+    },
+    {
+      "probe_id": "freshness.snapshot_binding_mismatch",
+      "property": "freshness",
+      "pytest_node": "tests/test_harness_adapter.py::test_controller_rejects_snapshot_binding_mismatches"
+    },
+    {
+      "probe_id": "freshness.completion_state_candidate_drift",
+      "property": "freshness",
+      "pytest_node": "tests/test_harness_adapter.py::test_controller_rejects_completion_state_candidate_drift"
+    },
+    {
+      "probe_id": "freshness.fresh_check_after_change",
+      "property": "freshness",
+      "pytest_node": "tests/test_run_loop.py::test_success_requires_fresh_check_after_change"
+    },
+    {
+      "probe_id": "coverage.omitted_requirement",
+      "property": "coverage",
+      "pytest_node": "tests/test_completion_control.py::test_contract_coverage_rejects_an_omitted_requirement"
+    },
+    {
+      "probe_id": "coverage.loop_finish_omits_requirement",
+      "property": "coverage",
+      "pytest_node": "tests/test_run_loop.py::test_finish_cannot_omit_a_fixed_contract_requirement"
+    },
+    {
+      "probe_id": "fail_closed.permit_requires_full_conjunction",
+      "property": "fail_closed",
+      "pytest_node": "tests/test_completion_control.py::test_controller_issues_a_permit_only_for_the_complete_conjunction"
+    },
+    {
+      "probe_id": "fail_closed.foreign_controller_acceptance",
+      "property": "fail_closed",
+      "pytest_node": "tests/test_completion_control.py::test_controller_rejects_an_acceptance_from_another_controller"
+    },
+    {
+      "probe_id": "fail_closed.finish_in_illegal_phase",
+      "property": "fail_closed",
+      "pytest_node": "tests/test_completion_control.py::test_finish_proposal_is_rejected_in_an_illegal_phase"
+    },
+    {
+      "probe_id": "fail_closed.loop_finish_in_illegal_phase",
+      "property": "fail_closed",
+      "pytest_node": "tests/test_run_loop.py::test_verified_finish_rejects_an_illegal_phase_even_with_a_controller"
+    },
+    {
+      "probe_id": "review.timeout_no_fallback",
+      "property": "review",
+      "pytest_node": "tests/test_run_loop.py::test_reviewer_timeout_cannot_fall_back_to_verified"
+    },
+    {
+      "probe_id": "review.budget_exhaustion_no_bypass",
+      "property": "review",
+      "pytest_node": "tests/test_run_loop.py::test_review_budget_exhaustion_never_bypasses_semantic_review"
+    },
+    {
+      "probe_id": "review.judges_executed_receipt",
+      "property": "review",
+      "pytest_node": "tests/test_run_loop.py::test_reviewer_judges_executed_receipt_before_acceptance"
+    },
+    {
+      "probe_id": "review.required_review_present",
+      "property": "review",
+      "pytest_node": "tests/test_evidence.py::test_required_semantic_review_cannot_be_missing"
+    },
+    {
+      "probe_id": "budget.verification_reserve",
+      "property": "budget",
+      "pytest_node": "tests/test_run_loop.py::test_work_cannot_consume_verification_reserve"
+    },
+    {
+      "probe_id": "budget.wall_time_reserve_before_turn_reserve",
+      "property": "budget",
+      "pytest_node": "tests/test_run_loop.py::test_wall_time_reserve_starts_finalization_before_turn_reserve"
+    },
+    {
+      "probe_id": "budget.work_command_wall_time_reserve",
+      "property": "budget",
+      "pytest_node": "tests/test_run_loop.py::test_work_command_cannot_consume_wall_time_reserve"
+    },
+    {
+      "probe_id": "budget.max_repairs_exact",
+      "property": "budget",
+      "pytest_node": "tests/test_run_loop.py::test_max_repairs_grants_exactly_n_cycles"
+    },
+    {
+      "probe_id": "isolation.isolated_environment_only",
+      "property": "isolation",
+      "pytest_node": "tests/test_completion_isolation.py::test_completion_check_runs_only_in_isolated_environment"
+    },
+    {
+      "probe_id": "isolation.fresh_attempt_per_finish",
+      "property": "isolation",
+      "pytest_node": "tests/test_completion_isolation.py::test_repeated_finish_gets_new_attempt_and_global_sequence"
+    },
+    {
+      "probe_id": "isolation.failure_stops_before_review",
+      "property": "isolation",
+      "pytest_node": "tests/test_completion_isolation.py::test_isolation_failure_stops_before_semantic_review"
+    }
+  ]
+}
