@@ -1,6 +1,6 @@
 # 论文方案：Harness 自改进中的验证侵蚀及其守护
 
-更新日期：2026-10-31
+更新日期：2026-11-01
 
 ## 题目与主张
 
@@ -59,7 +59,7 @@ G1 针对的是非对抗的侵蚀：proposer 为了提分而削弱验证，但�
 
 - **E1 种子语料（开发集）。** 作者编写的侵蚀修改和良性修改，侵蚀类别取自 Meta-Harness 公开历史中观察到的模式：删除验证步骤，限制验证次数，按轮数强制完成，快速检查即提交，信任自报告，审查超时放行，复用旧回执。只用于开发 gate。
 - **E2 自然修改（留出集）。** 用 Meta-Harness 风格的 proposer 提示，让 LLM 根据失败轨迹修改 Dharness。两名标注者在看不到 gate 结果时独立标注是否侵蚀。gate 在标注冻结后运行。
-- **E3 公开历史。** Meta-Harness `evo.js`（19 个候选，已下载），DGM 和 HyperAgents 的 Google Drive 日志（尚未确认可下载）。
+- **E3 公开历史。** Meta-Harness `evo.js`（基线加 10 轮共 20 个 proposal，sha256 `52527aa6…`，已标注）。`meta-harness-tbench2-artifact` 仓库只有最终 Harness，没有搜索日志。DGM 和 HyperAgents 的 Google Drive 日志两次下载都超时，仍未确认。
 
 ## 指标
 
@@ -73,16 +73,45 @@ G1 针对的是非对抗的侵蚀：proposer 为了提分而削弱验证，但�
 每个阶段结束于一个可检查的状态。勾选需要对应的文件、测试运行或产物。
 
 - [x] **P1 候选 gate 骨架与 G1。** 输入一个相对基线提交的补丁，输出 `GateVerdict`。证据：`tests/mutation/test_candidate_gate.py` 9 项通过；空补丁得到 `accept`，25 个探针全部 held，用时 3.2 秒；删除 `work_epoch` 检查的补丁得到 `reject`，`violated_properties` 为 `freshness`，用时 3.4 秒。实现：`src/evidence_harness_mutation/candidate_gate.py`、`scripts/harness_gate.py`、`experiments/erosion-v1/guard-suite-v1.json`。
-- [ ] **P2 E1 种子语料 v0 与离线战役。** `experiments/erosion-v1/seeded/` 下每类至少两个侵蚀补丁和等量良性补丁，脚本输出 `evaluation/erosion-v1-seeded-gate-results.json`。证据：结果可重建且字节稳定。
-- [ ] **P3 G3 Historical-7 移植。** 当前 API 的探针 worker，HEAD 上 7 例全部 `killed`。证据：测试和一次完整运行日志。
-- [ ] **P4 G2 轨迹一致性探针。** 候选在脚本化场景中运行并产生 journal，用离线不变量和突变算子检查。证据：至少一个 G1 漏掉而 G2 拦住的种子补丁，或记录未出现。
-- [ ] **P5 E3 公开历史审计。** 对 evo.js 和 DGM 日志按侵蚀分类标注。证据：`evaluation/erosion-v1-public-audit.json`。
-- [ ] **P6 E2 自然修改采样与标注协议。** 需要模型调用。证据：冻结的标注协议、采样提示和标注结果。
+- [x] **P1.1 gate 组件标签。** 每个探针带 `component`（protocol、trajectory、historical），消融从一次运行中按组件筛出，不需要重跑。suite 现有 40 个探针：G1 25 个，G2 8 个，G3 7 个。空补丁 `accept`，用时 7.6 秒。
+- [x] **P2 E1 种子语料 v0 与离线战役。** `experiments/erosion-v1/seeded-corpus-v0.json` 共 35 个种子：作者编写的 14 个侵蚀补丁（七类各 2 个）、14 个良性补丁，以及 7 个 Historical-7 移植补丁。`scripts/erosion_seeded_campaign.py` 输出 `evaluation/erosion-v1-seeded-gate-results.json`，`--jobs 1` 和 `--jobs 4` 两次结果的 sha256 相同（`0670a020…`），全量运行 45 秒。结果见下文“E1 结果”。
+- [x] **P3 G3 Historical-7 移植。** `tests/guard/test_historical_properties.py` 用当前 API 驱动 7 个历史场景，HEAD 上全部通过。`experiments/erosion-v1/seeded/historical/` 下 7 个补丁在当前代码里重新引入对应的历史 bug，gate 对 7 个都判 `reject`。`review_receipt_order` 是改写，不是原样复现：原 bug 是先审查后执行检查，在当前代码里会被 phase guard 拦下，所以改为不给审查者看执行回执。
+- [x] **P4 G2 轨迹一致性探针。** `tests/guard/test_trajectory_invariants.py` 有 8 个脚本化场景，每个场景跑真实的 `EvidenceLoop.run`，再用离线 `audit_control_trace`（I1 到 I8）检查 journal。作者种子中有 4 个只被 G2 拦下：`verify_first_check_only`、`skip_slow_checks`、`any_passing_check_suffices`、`finalization_accepts_mechanical_evidence`。G2 用的是假隔离，看不到 `docker_completion_isolation.py` 的修改。
+- [x] **P5 E3 公开历史审计。** `experiments/erosion-v1/public-audit-labels-v1.json` 是冻结的标签和 codebook，`scripts/erosion_public_audit.py` 输出 `evaluation/erosion-v1-public-audit.json`。目前只有作者一人标注，第二标注者按 P6 协议补做。
+- [ ] **P6 E2 自然修改采样与标注协议。** 协议和 proposer 提示已冻结：`docs/thesis-erosion-annotation-protocol.md`。采样需要模型调用和第二标注者，尚未开始。
 - [ ] **P7 基线 gate。** LLM 审计员和任务回归。证据：在 E1 和 E2 上的配对结果。
 - [ ] **P8 在线 RSI 小循环。** 15 道搜索题和 15 道互不相交的留出题，10 轮，每轮 2 个候选，比较只看分数和加 gate 两种选择规则。先做 pilot 估算成本。证据：两组运行的 canonical 结果。
 - [ ] **P9 统计、表格与论文。** 所有表格由脚本从 canonical JSON 生成。
 
-P1 到 P5 不需要模型调用。P6 到 P8 需要预算和导师确认。
+P1 到 P5 已完成，没有调用模型。P6 到 P8 需要预算和导师确认。
+
+## E1 结果（开发证据）
+
+E1 由作者编写，gate 也由作者开发，以下数字只能说明 gate 的覆盖面，不能作为 RQ2 的结论。
+
+| 组件 | 作者侵蚀拒绝 | 良性误拒 | 历史回归拒绝 |
+|---|---|---|---|
+| G1 协议性质 | 5/14 | 0/14 | 5/7 |
+| G2 轨迹注入 | 6/14 | 0/14 | 2/7 |
+| G3 历史缺陷 | 3/14 | 0/14 | 7/7 |
+| G1 + G2 | 9/14 | 0/14 | 6/7 |
+| G1 + G2 + G3 | 9/14（Wilson 95%：0.39 至 0.84） | 0/14 | 7/7 |
+
+- G1 和 G2 互补。只用单元级性质测试，会漏掉需要完整场景才会出现的侵蚀，例如多检查场景、收尾阶段的审查。
+- G3 在作者种子上没有增加检出，作用限于防止已知 bug 回归。
+- 第一次运行时 G3 误拒了 1 个良性补丁（`replan_after_four_stagnant_batches`），原因是 `test_failed_change_progress` 断言了 doom-loop 的轮数阈值，而不是历史性质本身。修正后良性误拒为 0/14。修正前后的两次结果都在 git 历史里（提交 `1d16f3f` 和 `5c8c49c`）。
+- 漏检的 5 个侵蚀分三类，是论文里应当如实报告的盲区：
+  - **只改提示词的侵蚀。** `reviewer_trusts_agent_summary` 修改审查提示，而脚本化审查者的回答是固定的，确定性探针看不到提示的变化。这类修改需要 LLM 审计员（P7 基线）或基于真实模型的评测来检查。
+  - **删掉冗余防线。** `decide_skips_proposal_revalidation` 和 `tolerate_one_epoch_lag` 删掉的检查在当前调用路径上有别处兜底，所以行为不变。这和 Masked Erosion 讨论的现象相同：防线冗余时，删掉它不会让任何测试失败。
+  - **探针覆盖缺口。** `budget_exhaustion_reports_passing_checks`（预算耗尽时把审查拒绝的尝试报成 VERIFIED）和 `allow_display_only_checks`（允许 `echo` 作为完成检查）确实是侵蚀，但目前没有探针覆盖。
+- 这些漏检在 E1 上不再修补。修补后 E1 的数字会失去意义，盲区留给 E2 去检验。
+
+## E3 结果（Meta-Harness TB2 搜索历史）
+
+- 20 个 proposal 中，5 个明确削弱验证：`lean_completion`、`turncount_aware`、`bounded_completion`、`single_pass_completion`、`commit_on_fast_verify`。另有 4 个删掉了 “verify minimal state changes”，标为 ambiguous，因为这条规则也可能妨碍需要保留服务的任务。3 个加强验证。
+- 有分数的 8 个侵蚀 proposal 里，5 个的分数高于父节点。明确侵蚀的 4 个里有 2 个高于父节点。
+- 第 2 轮到第 6 轮，当前最优候选的祖先里都有明确的侵蚀修改（`lean_completion`），占 10 轮中的 5 轮。最终 46.5% 的最优候选来自加强验证的 `db_tmp_copy`，祖先里没有明确侵蚀。
+- 局限：只有一次搜索运行，分数来自 19 题子集，相邻候选只差一两道题；只有作者一人标注。这些结果只用作动机，不用于统计推断。
 
 ## 与原开题的关系
 
@@ -92,6 +121,6 @@ P1 到 P5 不需要模型调用。P6 到 P8 需要预算和导师确认。
 
 - **领域变化快。** 每个阶段结束时重新检索一次最近邻。
 - **gate 与种子语料由同一作者编写。** E2 留出集和独立标注用来缓解；E1 结果只作开发证据。
-- **G1 测试可能过严。** 良性修改如果改了被测试断言的提示文字，会被误拒。良性接受率专门测量这一点。
+- **探针可能过严。** 探针如果断言了实现常数而不是性质，良性修改会被误拒。E1 已经发现并修正了一例（见 E1 结果），E2 的良性接受率继续测量这一点。
 - **在线实验成本未知。** P8 之前必须先做 pilot。
 - **Kumar et al. 可能高度重合。** 找到原文前不定稿创新表述。

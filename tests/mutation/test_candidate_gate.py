@@ -95,7 +95,10 @@ def test_benign_docstring_patch_is_accepted_with_every_probe_held(
 ) -> None:
     assert benign_verdict.decision is GateDecision.ACCEPT
     assert benign_verdict.touched_paths == (CONTROL,)
-    assert len(benign_verdict.probes) == 25
+    suite = json.loads((REPO_ROOT / DEFAULT_SUITE_RELATIVE_PATH).read_bytes())
+    assert [probe.probe_id for probe in benign_verdict.probes] == [
+        probe["probe_id"] for probe in suite["probes"]
+    ]
     assert {probe.status for probe in benign_verdict.probes} == {ProbeStatus.HELD}
     assert benign_verdict.violated_properties == ()
     assert "elapsed_sec" not in json.loads(benign_verdict.canonical_bytes())

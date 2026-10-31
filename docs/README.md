@@ -15,6 +15,9 @@
 
 ## 研究路线与论文定位
 
+- [`thesis-erosion-plan.md`](thesis-erosion-plan.md)：新方向“Harness 自改进中的验证侵蚀”的研究方案、阶段证据，以及 E1 和 E3 结果。
+- [`thesis-erosion-annotation-protocol.md`](thesis-erosion-annotation-protocol.md)：E2 自然修改的采样与标注协议，在采样前冻结。
+- [`thesis-erosion-supervisor-brief.md`](thesis-erosion-supervisor-brief.md)：新方向给导师的陈述稿和当面介绍顺序。
 - [`agent-harness-research-roadmap.md`](agent-harness-research-roadmap.md)：研究空白、候选路线、研究问题和总体实施顺序。
 - [`thesis-positioning-and-contribution-plan.md`](thesis-positioning-and-contribution-plan.md)：硕士论文与 B 类会议的定位、贡献层次、证据要求和完成门槛。
 - [`thesis-execution-plan.md`](thesis-execution-plan.md)：主实验的阶段、前置条件、输出和验收规则。
