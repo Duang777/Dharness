@@ -1,0 +1,47 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..79748c9 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -598,39 +598,10 @@ class EvidenceLoop:
+                     "completion_review_error",
+                     {"error_type": type(exc).__name__, "error": str(exc)},
+                 )
+-                acceptance = controller.evaluate_accept(
+-                    isolated,
+-                    state=DharnessAdapter.project_state(state),
+-                    now=self._clock(),
++                semantic_assessment = SemanticAssessment(
++                    accepted=True,
++                    rationale="completion review unavailable; mechanical evidence accepted",
+                 )
+-                completion_state = DharnessAdapter.project_state(state)
+-                completion = controller.evaluate_complete(
+-                    acceptance,
+-                    assessment=None,
+-                    state=completion_state,
+-                )
+-                evidence = completion.receipt
+-                state.latest_evidence = evidence
+-                self._journal.append(
+-                    "completion_guard_result",
+-                    {
+-                        **completion.journal_payload(),
+-                        "attempt_id": attempt_id,
+-                        "work_epoch": state.work_epoch,
+-                    },
+-                )
+-                self._journal.append("verification_receipt", evidence)
+-                failure_category = (
+-                    "completion_review_protocol"
+-                    if isinstance(exc, ModelProtocolError)
+-                    else "completion_review_service"
+-                )
+-                self._finish(
+-                    state,
+-                    StopReason.MODEL_FAILURE,
+-                    failure_category=failure_category,
+-                )
+-                return
+ 
+         acceptance = controller.evaluate_accept(
+             isolated,

@@ -151,6 +151,96 @@
       "component": "protocol",
       "property": "isolation",
       "pytest_node": "tests/test_completion_isolation.py::test_isolation_failure_stops_before_semantic_review"
+    },
+    {
+      "probe_id": "freshness.trajectory_stale_receipt_across_epochs",
+      "component": "trajectory",
+      "property": "freshness",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_work_after_a_passing_check_requires_a_new_passing_check"
+    },
+    {
+      "probe_id": "fail_closed.trajectory_failing_check_returns_to_repair",
+      "component": "trajectory",
+      "property": "fail_closed",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_failing_completion_check_returns_to_repair"
+    },
+    {
+      "probe_id": "coverage.trajectory_every_proposed_check_runs",
+      "component": "trajectory",
+      "property": "coverage",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_every_proposed_check_runs_before_verified"
+    },
+    {
+      "probe_id": "review.trajectory_review_failure_never_verified",
+      "component": "trajectory",
+      "property": "review",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_required_review_failure_is_never_verified"
+    },
+    {
+      "probe_id": "review.trajectory_repeated_finish_needs_new_acceptance",
+      "component": "trajectory",
+      "property": "review",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_repeated_finish_after_review_rejection_needs_a_new_acceptance"
+    },
+    {
+      "probe_id": "budget.trajectory_finalization_still_reviews",
+      "component": "trajectory",
+      "property": "budget",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_turn_budget_finalization_still_requires_semantic_review"
+    },
+    {
+      "probe_id": "isolation.trajectory_self_report_cannot_replace_check",
+      "component": "trajectory",
+      "property": "isolation",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_agent_reported_test_run_cannot_replace_the_isolated_check"
+    },
+    {
+      "probe_id": "budget.trajectory_failed_batch_not_progress",
+      "component": "trajectory",
+      "property": "budget",
+      "pytest_node": "tests/guard/test_trajectory_invariants.py::test_failed_work_batch_is_not_counted_as_progress"
+    },
+    {
+      "probe_id": "review.historical_review_timeout_fallback",
+      "component": "historical",
+      "property": "review",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_review_timeout_fallback"
+    },
+    {
+      "probe_id": "freshness.historical_reorder_check_receipts",
+      "component": "historical",
+      "property": "freshness",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_reorder_check_receipts"
+    },
+    {
+      "probe_id": "review.historical_review_receipt_order",
+      "component": "historical",
+      "property": "review",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_review_receipt_order"
+    },
+    {
+      "probe_id": "review.historical_review_quota_no_bypass",
+      "component": "historical",
+      "property": "review",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_review_quota_no_bypass"
+    },
+    {
+      "probe_id": "budget.historical_failed_change_progress",
+      "component": "historical",
+      "property": "budget",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_failed_change_progress"
+    },
+    {
+      "probe_id": "budget.historical_max_repairs_exact",
+      "component": "historical",
+      "property": "budget",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_max_repairs_exact"
+    },
+    {
+      "probe_id": "budget.historical_wall_time_command_deadline",
+      "component": "historical",
+      "property": "budget",
+      "pytest_node": "tests/guard/test_historical_properties.py::test_wall_time_command_deadline"
     }
   ]
 }

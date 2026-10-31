@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..a64aef9 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -822,7 +822,7 @@ class EvidenceLoop:
+             and state.completion_review_count >= budget.max_completion_reviews
+         )
+         repair_count_before = state.repair_count
+-        repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
++        repair_granted = not review_exhausted and repair_count_before <= budget.max_repairs
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING

@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..ad37ca4 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -393,7 +393,7 @@ class EvidenceLoop:
+                 wall_deadline_monotonic=command_deadline_monotonic,
+             )
+             batch_receipts.append(receipt)
+-            if receipt.succeeded and (
++            if (
+                 receipt.mode is CommandMode.CHANGE
+                 or receipt.observation_fingerprint not in receipts_before
+             ):
