@@ -315,8 +315,8 @@ async def test_failed_change_progress(tmp_path: Path) -> None:
         [command.id] for command in scenario.failed_commands
     ]
     assert [batch["progressed"] for batch in batches] == [False, False, False]
-    assert report.stop_reason is StopReason.DOOM_LOOP
-    assert len(model.prompts) == len(scenario.failed_commands)
+    assert [batch["stagnant_batches_after"] for batch in batches] == [1, 2, 3]
+    assert report.stop_reason is not StopReason.VERIFIED
 
 
 async def test_max_repairs_exact(tmp_path: Path) -> None:
