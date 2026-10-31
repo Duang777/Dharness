@@ -1,0 +1,31 @@
+diff --git a/src/evidence_harness/completion_control.py b/src/evidence_harness/completion_control.py
+index 0ab6141..d43b39c 100644
+--- a/src/evidence_harness/completion_control.py
++++ b/src/evidence_harness/completion_control.py
+@@ -177,19 +177,13 @@ class BudgetGuard:
+                 "environment-call budget exceeded: "
+                 f"{state.counters.environment_calls} > {budget.max_environment_calls}"
+             )
+-        if state.counters.repairs > budget.max_repairs:
+-            reasons.append(
+-                f"repair budget exceeded: {state.counters.repairs} > {budget.max_repairs}"
+-            )
+-        if state.counters.recoveries > budget.max_recoveries:
+-            reasons.append(
+-                f"recovery budget exceeded: {state.counters.recoveries} > {budget.max_recoveries}"
+-            )
+-        if state.counters.completion_reviews > budget.max_completion_reviews:
+-            reasons.append(
+-                "completion review budget exceeded: "
+-                f"{state.counters.completion_reviews} > {budget.max_completion_reviews}"
+-            )
++        for label, used, limit in (
++            ("repair", state.counters.repairs, budget.max_repairs),
++            ("recovery", state.counters.recoveries, budget.max_recoveries),
++            ("completion review", state.counters.completion_reviews, budget.max_completion_reviews),
++        ):
++            if used > limit:
++                reasons.append(f"{label} budget exceeded: {used} > {limit}")
+         if now > state.deadline_monotonic:
+             reasons.append(f"wall-clock budget exceeded: {now:g} > {state.deadline_monotonic:g}")
+         return tuple(reasons)

@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..166ab0b 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -52,7 +52,7 @@ from evidence_harness.protocol import (
+ from evidence_harness.shell import CommandRunner
+ 
+ ProgressCallback = Callable[[RunState], None]
+-MODEL_CALL_SHUTDOWN_RESERVE_SEC = 5.0
++MODEL_CALL_SHUTDOWN_RESERVE_SEC = 8.0
+ 
+ _BOOTSTRAP = ShellCommand(
+     id="bootstrap-environment",

@@ -1,0 +1,29 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..08c87d1 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -816,7 +816,7 @@ class EvidenceLoop:
+         contract: CompletionContract,
+     ) -> None:
+         budget = contract.b_req
+-        state.completion_findings = _stable_unique(reasons)
++        state.completion_findings = _unique_nonempty(reasons)
+         review_exhausted = (
+             self._options.enable_completion_review
+             and state.completion_review_count >= budget.max_completion_reviews
+@@ -1024,7 +1024,7 @@ def _failure_summary(receipt: CommandReceipt) -> str:
+ def _semantic_assessment(review: ReviewDecision) -> SemanticAssessment:
+     if review.verdict == "accept":
+         return SemanticAssessment(accepted=True, rationale=review.rationale)
+-    findings = _stable_unique((*review.missing_requirements, *review.suggested_checks))
++    findings = _unique_nonempty((*review.missing_requirements, *review.suggested_checks))
+     if not findings:
+         findings = (review.rationale,)
+     return SemanticAssessment(
+@@ -1034,5 +1034,5 @@ def _semantic_assessment(review: ReviewDecision) -> SemanticAssessment:
+     )
+ 
+ 
+-def _stable_unique(values: tuple[str, ...]) -> tuple[str, ...]:
++def _unique_nonempty(values: tuple[str, ...]) -> tuple[str, ...]:
+     return tuple(dict.fromkeys(value for value in values if value))

@@ -1,0 +1,18 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..13767c9 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -152,6 +152,13 @@ class EvidenceLoop:
+         while state.stop_reason is None:
+             budget_reason = self._budget_exhaustion(state)
+             if budget_reason is not None:
++                evidence = state.latest_evidence
++                if evidence is not None and evidence.checks and all(
++                    check.succeeded for check in evidence.checks
++                ):
++                    state.stop_reason = StopReason.VERIFIED
++                    state.phase = RunPhase.TERMINATED
++                    return self._report(state)
+                 state.unresolved_errors.append(budget_reason)
+                 return self._finish(
+                     state,

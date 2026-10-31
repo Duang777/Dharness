@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py
+index 1267cc2..8083f1a 100644
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -93,7 +93,7 @@ def build_executor_prompt(
+ ) -> str:
+     schema = AgentDecision.model_json_schema()
+     recent_limit = min(options.recent_observation_count, len(state.observations))
+-    detail_chars = min(6_000, max(1_000, options.output_inline_bytes // 2))
++    detail_chars = min(8_000, max(1_000, options.output_inline_bytes // 2))
+     actions = allowed_actions or tuple(ActionKind)
+ 
+     while True:

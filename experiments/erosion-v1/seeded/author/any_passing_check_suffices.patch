@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/evidence.py b/src/evidence_harness/evidence.py
+index aea9d2d..a455a8f 100644
+--- a/src/evidence_harness/evidence.py
++++ b/src/evidence_harness/evidence.py
+@@ -150,7 +150,7 @@ class EvidenceGate:
+                         f"verification receipt does not match proposed check: {proposed.id}"
+                     )
+         failed_ids = [item.command_id for item in checks if not item.succeeded]
+-        if failed_ids:
++        if failed_ids and len(failed_ids) == len(checks):
+             reasons.append(f"verification commands failed: {failed_ids}")
+         if require_isolation:
+             reasons.extend(

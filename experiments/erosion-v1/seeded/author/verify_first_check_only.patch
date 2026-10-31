@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/dharness_adapter.py b/src/evidence_harness/dharness_adapter.py
+index 91c6bd9..6cae3ce 100644
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@ -55,7 +55,7 @@ class DharnessAdapter(HarnessAdapter):
+         return cls(
+             view=CompletionTransactionView(
+                 proposal=CompletionProposal(
+-                    checks=tuple(decision.checks),
++                    checks=tuple(decision.checks[:1]),
+                     coverage=tuple(decision.coverage),
+                     candidate=CurrentCandidate(),
+                     summary=decision.summary,

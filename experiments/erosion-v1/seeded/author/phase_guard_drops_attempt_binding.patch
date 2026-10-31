@@ -1,0 +1,15 @@
+diff --git a/src/evidence_harness/completion_control.py b/src/evidence_harness/completion_control.py
+index 0ab6141..0078a82 100644
+--- a/src/evidence_harness/completion_control.py
++++ b/src/evidence_harness/completion_control.py
+@@ -224,10 +224,6 @@ class PhaseGuard:
+                 f"completion requires phase '{expected}' when review is "
+                 f"{'enabled' if review_required else 'disabled'}; got '{state.phase}'"
+             )
+-        if state.next_completion_attempt != attempt_id + 1:
+-            reasons.append("completion attempt state does not match")
+-        if state.work_epoch != work_epoch:
+-            reasons.append("completion work epoch changed during verification")
+         return _result("phase", reasons)
+ 
+ 

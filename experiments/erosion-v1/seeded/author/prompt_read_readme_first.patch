@@ -1,0 +1,12 @@
+diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py
+index 1267cc2..da76e18 100644
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -55,6 +55,7 @@ Rules:
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
++- Read a README or task notes in the workspace before the first change when one exists.
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
+ """.strip()

@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..a60bd8c 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -70,7 +70,7 @@ printf '%s\n' '=== directory ==='
+ ls -la 2>&1 | sed -n '1,120p'
+ printf '%s\n' '=== shallow entries ==='
+ find . -mindepth 1 -maxdepth 2 -not -path './.git/*' -printf '%y %p\n' 2>/dev/null |
+-  sed -n '1,200p'
++  sed -n '1,400p'
+ printf '%s\n' '=== tools ==='
+ for tool in bash sh python3 python node go javac gcc make cmake git curl jq rg sed awk tar; do
+   if command -v "$tool" >/dev/null 2>&1; then

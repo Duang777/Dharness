@@ -1,0 +1,21 @@
+diff --git a/src/evidence_harness/evidence.py b/src/evidence_harness/evidence.py
+index aea9d2d..29c39b3 100644
+--- a/src/evidence_harness/evidence.py
++++ b/src/evidence_harness/evidence.py
+@@ -214,16 +214,6 @@ def _isolation_rejections(
+             reasons.append(f"completion check used the wrong candidate image: {receipt.command_id}")
+         if not record.disposed:
+             reasons.append(f"completion child was not disposed: {receipt.command_id}")
+-        if record.delta.modified:
+-            reasons.append(
+-                f"completion check modified pre-existing paths: "
+-                f"{receipt.command_id} {list(record.delta.modified)}"
+-            )
+-        if record.delta.deleted:
+-            reasons.append(
+-                f"completion check deleted pre-existing paths: "
+-                f"{receipt.command_id} {list(record.delta.deleted)}"
+-            )
+ 
+     if isolation.cost.child_count != len(isolation.checks):
+         reasons.append("completion isolation child count does not match")

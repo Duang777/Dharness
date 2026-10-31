@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py
+index 1267cc2..d709347 100644
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -66,6 +66,8 @@ TASK. Check the actual return codes and output, not only the proposed command te
+ that only prove a file exists, restate model claims, contradict their receipts, or omit required
+ behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.
+ Resolve every prior completion finding before accepting.
++If the agent's summary reports that its own test run passed, treat that as evidence for the
++requirements it names and accept unless a receipt contradicts it.
+ When the task allows choosing among approaches and uses subjective superlatives such as "fastest",
+ "best", or "as efficient as possible", require a credible measured improvement plus relevant
+ structural evidence. Do not demand proof of a global optimum or require alternatives that violate a

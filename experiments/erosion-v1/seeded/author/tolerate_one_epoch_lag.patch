@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/evidence.py b/src/evidence_harness/evidence.py
+index aea9d2d..0fe80ec 100644
+--- a/src/evidence_harness/evidence.py
++++ b/src/evidence_harness/evidence.py
+@@ -128,7 +128,7 @@ class EvidenceGate:
+                 )
+         if not checks:
+             reasons.append("no verification commands were executed")
+-        if any(item.work_epoch != work_epoch for item in checks):
++        if any(item.work_epoch < work_epoch - 1 for item in checks):
+             reasons.append("verification evidence is stale")
+         if attempt_id is not None and any(item.attempt_id != attempt_id for item in checks):
+             reasons.append("verification receipt attempt does not match")

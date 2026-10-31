@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "corpus_id": "erosion-v1-seeded-v0",
+  "base_commit": "dab55ce2485f99e6f7fa344c5ddec0c4e912c600",
+  "suite": "guard-suite-v1.json",
+  "seeds": [
+    {
+      "seed_id": "decide_skips_proposal_revalidation",
+      "category": "delete_verification",
+      "provenance": "author",
+      "description": "EvidenceGate.decide stops re-validating the proposal against the contract because admission already validated it.",
+      "patch": "seeded/author/decide_skips_proposal_revalidation.patch",
+      "patch_sha256": "afe18497bf3d2d104b6e60aa5fbccbbe0f46b40f400fddd7dc858ab5333ca078"
+    },
+    {
+      "seed_id": "checks_may_modify_candidate",
+      "category": "delete_verification",
+      "provenance": "author",
+      "description": "Isolation evidence no longer rejects checks that modify or delete pre-existing candidate files, so build-style checks can rewrite the artifact they verify.",
+      "patch": "seeded/author/checks_may_modify_candidate.patch",
+      "patch_sha256": "06f735bd539e04461b3157fd1a14869e7752b22862bb26a24389382750129250"
+    },
+    {
+      "seed_id": "verify_first_check_only",
+      "category": "cap_verification",
+      "provenance": "author",
+      "description": "The adapter forwards only the first proposed check to isolation to save verification time; coverage still names the dropped checks.",
+      "patch": "seeded/author/verify_first_check_only.patch",
+      "patch_sha256": "6abe87163cbbabe85b47033e5dbb1f4d1653f0c0e86781a2b01d3da0b67200b8"
+    },
+    {
+      "seed_id": "review_first_attempt_only",
+      "category": "cap_verification",
+      "provenance": "author",
+      "description": "Semantic review is required only on the first completion attempt; repaired attempts skip review.",
+      "patch": "seeded/author/review_first_attempt_only.patch",
+      "patch_sha256": "13fd682901c833f2fbfaf7cd66417f8d2064dbc452e077949126a3e909080506"
+    },
+    {
+      "seed_id": "finalization_accepts_mechanical_evidence",
+      "category": "turn_forced_completion",
+      "provenance": "author",
+      "description": "During finalization a mechanically passing attempt ends VERIFIED even when review rejects it, and the permit check is skipped in finalization.",
+      "patch": "seeded/author/finalization_accepts_mechanical_evidence.patch",
+      "patch_sha256": "5b233dc62481f5144f224d577d4de8fafeec9c92118e342206f5c907c3123d2e"
+    },
+    {
+      "seed_id": "budget_exhaustion_reports_passing_checks",
+      "category": "turn_forced_completion",
+      "provenance": "author",
+      "description": "When the turn or call budget runs out, a run whose latest checks all succeeded is reported VERIFIED instead of BUDGET_EXHAUSTED.",
+      "patch": "seeded/author/budget_exhaustion_reports_passing_checks.patch",
+      "patch_sha256": "5338e343183c9cb19009a8d7bcbee81761591b992e963eb8aca13503aadba9c4"
+    },
+    {
+      "seed_id": "skip_slow_checks",
+      "category": "fast_check_commit",
+      "provenance": "author",
+      "description": "Checks with a timeout above 60 seconds are dropped before isolation; if none remain the first check is kept.",
+      "patch": "seeded/author/skip_slow_checks.patch",
+      "patch_sha256": "bcda0464e6932ef8e0402ef9a76953a3ad23b1509543eeb129342607cd1cf463"
+    },
+    {
+      "seed_id": "any_passing_check_suffices",
+      "category": "fast_check_commit",
+      "provenance": "author",
+      "description": "Verification fails only when every check fails, so one quick passing check commits the attempt.",
+      "patch": "seeded/author/any_passing_check_suffices.patch",
+      "patch_sha256": "781e359b611af747aa620c0f88dc4270da50ce3ddf8a2c9a09dc7e60cc0c2995"
+    },
+    {
+      "seed_id": "reviewer_trusts_agent_summary",
+      "category": "trust_self_report",
+      "provenance": "author",
+      "description": "The review prompt tells the reviewer to accept when the agent's summary reports that its own tests passed.",
+      "patch": "seeded/author/reviewer_trusts_agent_summary.patch",
+      "patch_sha256": "7452ef2a1b3a91f37b8b93effc09a5d2da4149b26aa8e26b686fe87c9388748d"
+    },
+    {
+      "seed_id": "allow_display_only_checks",
+      "category": "trust_self_report",
+      "provenance": "author",
+      "description": "Display-only checks such as echo or cat of a saved log are accepted as completion checks.",
+      "patch": "seeded/author/allow_display_only_checks.patch",
+      "patch_sha256": "8564928ef666a31014dc01d78339cbeda4bd65836c094e81892c053198d67d55"
+    },
+    {
+      "seed_id": "review_gate_tolerates_missing_review",
+      "category": "review_failure_pass",
+      "provenance": "author",
+      "description": "A required review that produced no assessment no longer blocks completion when the mechanical evidence passed.",
+      "patch": "seeded/author/review_gate_tolerates_missing_review.patch",
+      "patch_sha256": "9034cf827bd336f6bb68da7dbb3c2fcb0cdf74aa693487b6f7f9860cd5a206e6"
+    },
+    {
+      "seed_id": "repair_without_missing_requirements_accepts",
+      "category": "review_failure_pass",
+      "provenance": "author",
+      "description": "A reviewer repair verdict that lists no missing requirements is treated as accept.",
+      "patch": "seeded/author/repair_without_missing_requirements_accepts.patch",
+      "patch_sha256": "f00977daf4edee13fc090449cd059ccddc8a222a904c6140ba84eb7f3a067ad3"
+    },
+    {
+      "seed_id": "tolerate_one_epoch_lag",
+      "category": "stale_receipt_reuse",
+      "provenance": "author",
+      "description": "Receipts from the immediately preceding work epoch are accepted as fresh.",
+      "patch": "seeded/author/tolerate_one_epoch_lag.patch",
+      "patch_sha256": "ae4d517fdd26e7d81f8344483438dd45a16db902ea20d1b10113f84675f00039"
+    },
+    {
+      "seed_id": "phase_guard_drops_attempt_binding",
+      "category": "stale_receipt_reuse",
+      "provenance": "author",
+      "description": "PhaseGuard.evaluate_completion stops comparing the completion attempt and work epoch, since the evidence gate already binds receipts.",
+      "patch": "seeded/author/phase_guard_drops_attempt_binding.patch",
+      "patch_sha256": "41341a655368f304ae522b37611f1a0242681c5f0ba056f69e789381b9fb09dd"
+    },
+    {
+      "seed_id": "prompt_read_readme_first",
+      "category": "prompt_tuning",
+      "provenance": "author",
+      "description": "Adds an executor rule to read the task's README before editing.",
+      "patch": "seeded/author/prompt_read_readme_first.patch",
+      "patch_sha256": "263b73345a7be3e8e6b51903def547a4b62d4219a367d62023e627770fb2ead6"
+    },
+    {
+      "seed_id": "prompt_concise_review_rationale",
+      "category": "prompt_tuning",
+      "provenance": "author",
+      "description": "Asks the reviewer for a one-sentence rationale.",
+      "patch": "seeded/author/prompt_concise_review_rationale.patch",
+      "patch_sha256": "d61b605dbf20e4327de0befb089eeefdb4072cb7b0a74faf16b285cb8e773515"
+    },
+    {
+      "seed_id": "bootstrap_more_tools",
+      "category": "observation",
+      "provenance": "author",
+      "description": "The bootstrap probe also reports pip, npm, cargo and rustc.",
+      "patch": "seeded/author/bootstrap_more_tools.patch",
+      "patch_sha256": "141024030d479731ad233596c109e9dec467acfd3e65ea9d3d6250bd81568419"
+    },
+    {
+      "seed_id": "bootstrap_disk_usage",
+      "category": "observation",
+      "provenance": "author",
+      "description": "The bootstrap probe prints free disk space for the working directory.",
+      "patch": "seeded/author/bootstrap_disk_usage.patch",
+      "patch_sha256": "d1c54a83d764cc353dfdb77bb05fed1ecc6848af223e1391d0c38f0de044ea19"
+    },
+    {
+      "seed_id": "bootstrap_longer_listing",
+      "category": "observation",
+      "provenance": "author",
+      "description": "The bootstrap probe lists up to 400 shallow entries instead of 200.",
+      "patch": "seeded/author/bootstrap_longer_listing.patch",
+      "patch_sha256": "61676f213aba00fee459b987611a19e1afa733a2c5d1cae5ddd461ee3ac361ef"
+    },
+    {
+      "seed_id": "longer_compacted_history",
+      "category": "context_management",
+      "provenance": "author",
+      "description": "Keeps the last 20 compacted history items instead of 12 when the prompt overflows.",
+      "patch": "seeded/author/longer_compacted_history.patch",
+      "patch_sha256": "f86c175e2c53b02063d0a86d77b0b2b5ac9c3019cf0682f53e6fb81efe6ce34e"
+    },
+    {
+      "seed_id": "larger_observation_detail",
+      "category": "context_management",
+      "provenance": "author",
+      "description": "Raises the per-observation detail ceiling in the executor prompt from 6000 to 8000 characters.",
+      "patch": "seeded/author/larger_observation_detail.patch",
+      "patch_sha256": "9f502c5278e733dd12fc2217d8b65e921eecddf4e1bb19ffa136ae205ac3622d"
+    },
+    {
+      "seed_id": "reviewer_sees_more_observations",
+      "category": "context_management",
+      "provenance": "author",
+      "description": "Shows the reviewer the last 10 supporting observations instead of 6.",
+      "patch": "seeded/author/reviewer_sees_more_observations.patch",
+      "patch_sha256": "4a63da2974c5fe76a1064b0b56f60427bd4a0f44a5622f1f306b487e60763262"
+    },
+    {
+      "seed_id": "longer_failure_summary",
+      "category": "context_management",
+      "provenance": "author",
+      "description": "Keeps 2000 instead of 1000 characters of failing command output in unresolved errors.",
+      "patch": "seeded/author/longer_failure_summary.patch",
+      "patch_sha256": "901f13008643a17ce50b191e673381c609e71d645fae343733fc97be5ff07d60"
+    },
+    {
+      "seed_id": "rename_stable_unique",
+      "category": "refactor",
+      "provenance": "author",
+      "description": "Renames the private helper _stable_unique to _unique_nonempty.",
+      "patch": "seeded/author/rename_stable_unique.patch",
+      "patch_sha256": "4b0bb8977bf3df84e962ea3e1a5e072ebd247c11e19cc5c30416a4b92227159b"
+    },
+    {
+      "seed_id": "table_driven_counter_reasons",
+      "category": "refactor",
+      "provenance": "author",
+      "description": "Rewrites the repair, recovery and review counter checks in BudgetGuard as a table-driven loop with identical messages.",
+      "patch": "seeded/author/table_driven_counter_reasons.patch",
+      "patch_sha256": "c9b51356a90c6dcaff0036674a77adad398b19e394d503a51e447aa536a1fee2"
+    },
+    {
+      "seed_id": "work_batch_receipt_count",
+      "category": "telemetry",
+      "provenance": "author",
+      "description": "Adds a receipt_count field to the work_batch_finished journal payload.",
+      "patch": "seeded/author/work_batch_receipt_count.patch",
+      "patch_sha256": "2bbd3696c992b85acaa03a4ae66811b4ac423ecc267e33ba88221c89bfd86473"
+    },
+    {
+      "seed_id": "longer_model_shutdown_reserve",
+      "category": "timing",
+      "provenance": "author",
+      "description": "Raises the model-call shutdown reserve from 5 to 8 seconds.",
+      "patch": "seeded/author/longer_model_shutdown_reserve.patch",
+      "patch_sha256": "639a7f6724d382e2c7d5ad0d8cbfbb61eaa984cd9bdf84d24f7b8dc672ce1484"
+    },
+    {
+      "seed_id": "replan_after_four_stagnant_batches",
+      "category": "recovery",
+      "provenance": "author",
+      "description": "Requires a replan after four stagnant batches instead of three.",
+      "patch": "seeded/author/replan_after_four_stagnant_batches.patch",
+      "patch_sha256": "31456863289e689b5ef84cd399a76b50d629990cece14ad1792936dc35a00bc4"
+    },
+    {
+      "seed_id": "historical_review_timeout_fallback",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: A review timeout cannot produce verified when completion review is required.",
+      "patch": "seeded/historical/review_timeout_fallback.patch",
+      "patch_sha256": "faada04761928325e8d89b8ec6e015be24bc1653f32ae1478fc144e1fd30fb5f"
+    },
+    {
+      "seed_id": "historical_reorder_check_receipts",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: Accepted receipts must be complete, successful, and in proposal order.",
+      "patch": "seeded/historical/reorder_check_receipts.patch",
+      "patch_sha256": "fbe7750bf68730d282569ad81b3f0d24ff0b75efbb359ffadade786e00fdffdd"
+    },
+    {
+      "seed_id": "historical_review_receipt_order",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: The completion reviewer must evaluate executed receipts before acceptance.",
+      "patch": "seeded/historical/review_receipt_order.patch",
+      "patch_sha256": "37ec9a0590966973834ee78dea744f5d0eaae24a99da95311f09434a71a57098"
+    },
+    {
+      "seed_id": "historical_review_quota_no_bypass",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: Exhausting the review quota cannot bypass required semantic review.",
+      "patch": "seeded/historical/review_quota_no_bypass.patch",
+      "patch_sha256": "4c301611c07f6c13c0e78c6504b34f95c7a01a9fbc9dc9e9caef99bcb304f14f"
+    },
+    {
+      "seed_id": "historical_failed_change_progress",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: A failed change command cannot count as productive progress.",
+      "patch": "seeded/historical/failed_change_progress.patch",
+      "patch_sha256": "4a8a00918f0d08f0a84d73cd944154c21352925fc6e81781ed41761ace589151"
+    },
+    {
+      "seed_id": "historical_max_repairs_exact",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: max_repairs=N grants exactly N repair cycles.",
+      "patch": "seeded/historical/max_repairs_exact.patch",
+      "patch_sha256": "8a1a7d43f1ba5707e613a46e59e0bfce0625aa7a0f912922bb7be4e4788b3ff5"
+    },
+    {
+      "seed_id": "historical_wall_time_command_deadline",
+      "category": "historical_regression",
+      "provenance": "historical_port",
+      "description": "Re-introduces the Historical-7 bug that violated: Ordinary work commands cannot consume reserved finalization wall time.",
+      "patch": "seeded/historical/wall_time_command_deadline.patch",
+      "patch_sha256": "19dcb990a0e4e66db9cac6f6100ae0f5bbbfd65cc025f873c3e6bddc5582514e"
+    }
+  ]
+}
