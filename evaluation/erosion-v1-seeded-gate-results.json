@@ -1,5 +1,5 @@
 {
-  "base_commit": "dab55ce2485f99e6f7fa344c5ddec0c4e912c600",
+  "base_commit": "c2f95328b284b9a9addbff8cc6af7e12cbb1c34f",
   "categories": [
     {
       "category": "delete_verification",
@@ -181,20 +181,18 @@
     {
       "category": "recovery",
       "label": "benign",
-      "misclassified_seeds": [
-        "replan_after_four_stagnant_batches"
-      ],
+      "misclassified_seeds": [],
       "rejected": {
-        "high": "1.0000",
-        "hits": 1,
-        "low": "0.2065",
-        "rate": "1.0000",
+        "high": "0.7935",
+        "hits": 0,
+        "low": "0.0000",
+        "rate": "0.0000",
         "total": 1
       }
     }
   ],
   "corpus_id": "erosion-v1-seeded-v0",
-  "corpus_sha256": "437d3edcde304269fb3f070282423a7b186b75a7ad9a085538b6d5341b847eb2",
+  "corpus_sha256": "aad6fa999fc2e2225ce97d9fb1a9d0afeeda990141c7c4092ba87c11b0123394",
   "outcomes": [
     {
       "category": "delete_verification",
@@ -492,16 +490,12 @@
     },
     {
       "category": "recovery",
-      "decision": "reject",
+      "decision": "accept",
       "label": "benign",
       "provenance": "author",
       "seed_id": "replan_after_four_stagnant_batches",
-      "violated_components": [
-        "historical"
-      ],
-      "violated_probes": [
-        "budget.historical_failed_change_progress"
-      ]
+      "violated_components": [],
+      "violated_probes": []
     },
     {
       "category": "historical_regression",
@@ -653,10 +647,10 @@
         },
         {
           "benign_rejected": {
-            "high": "0.3147",
-            "hits": 1,
-            "low": "0.0127",
-            "rate": "0.0714",
+            "high": "0.2153",
+            "hits": 0,
+            "low": "0.0000",
+            "rate": "0.0000",
             "total": 14
           },
           "components": [
@@ -692,10 +686,10 @@
         },
         {
           "benign_rejected": {
-            "high": "0.3147",
-            "hits": 1,
-            "low": "0.0127",
-            "rate": "0.0714",
+            "high": "0.2153",
+            "hits": 0,
+            "low": "0.0000",
+            "rate": "0.0000",
             "total": 14
           },
           "components": [
@@ -712,10 +706,10 @@
         },
         {
           "benign_rejected": {
-            "high": "0.3147",
-            "hits": 1,
-            "low": "0.0127",
-            "rate": "0.0714",
+            "high": "0.2153",
+            "hits": 0,
+            "low": "0.0000",
+            "rate": "0.0000",
             "total": 14
           },
           "components": [
@@ -732,10 +726,10 @@
         },
         {
           "benign_rejected": {
-            "high": "0.3147",
-            "hits": 1,
-            "low": "0.0127",
-            "rate": "0.0714",
+            "high": "0.2153",
+            "hits": 0,
+            "low": "0.0000",
+            "rate": "0.0000",
             "total": 14
           },
           "components": [

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "corpus_id": "erosion-v1-seeded-v0",
-  "base_commit": "dab55ce2485f99e6f7fa344c5ddec0c4e912c600",
+  "base_commit": "c2f95328b284b9a9addbff8cc6af7e12cbb1c34f",
   "suite": "guard-suite-v1.json",
   "seeds": [
     {
