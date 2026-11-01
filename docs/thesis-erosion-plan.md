@@ -1,14 +1,14 @@
-# 论文方案：Harness 自改进中的验证侵蚀及其守护
+# 论文方案：终端智能体 Harness 的可信自改进
 
 更新日期：2026-11-01
 
 ## 题目与主张
 
-拟定题目：**终端智能体 Harness 自改进中的验证侵蚀：基于验证单调性的差分守护**
+拟定题目：**终端智能体 Harness 的可信自改进：基于验证单调性的反例引导方法**
 
-英文题目：Verification Erosion in Harness Self-Improvement for Terminal Agents: Differential Guarding by Verification Monotonicity
+英文题目：Trustworthy Harness Self-Improvement for Terminal Agents: Counterexample-Guided Evolution under Verification Monotonicity
 
-LLM 在递归修改 Harness 代码时，会提出削弱完成与验证逻辑的修改。这类修改可能提高搜索集分数，却不提高真实任务正确性。本文测量这种侵蚀，并提出以验证单调性为准则的差分守护：候选 Harness 接受的每一次完成，基线也必须接受。方法细节见 [方法设计](thesis-erosion-monotonicity-method.md)。
+LLM 在递归修改 Harness 代码时，会提出削弱完成与验证逻辑的修改。这类修改可能提高搜索集分数，却不提高真实任务正确性。本文测量这种侵蚀，并提出以验证单调性为准则的差分守护：候选 Harness 接受的每一次完成，基线也必须接受。方法细节见 [方法设计](thesis-erosion-monotonicity-method.md)。论文的最终交付是一个完整的自改进系统（暂名 MonoEvolve）：提议器按失败轨迹修改 Harness，候选先过单调性守护，被拒的候选带着最短反例回到提议器修复，反例沉淀进反例库。系统设计、实验分组和进度见 [开题答辩稿](thesis-erosion-defense.md)。
 
 早期版本的主张是“单元测试式 gate 拦不住侵蚀，需要有状态的轨迹故障注入”。E2 留出实验不支持这一主张（见“E2 与基线结果”），原 G1 至 G3 gate 保留为对比方法和差分重放的基础设施。
 
@@ -39,7 +39,7 @@ LLM 在递归修改 Harness 代码时，会提出削弱完成与验证逻辑的�
 |---|---|---|
 | RQ1 侵蚀现象 | RSI proposer 提出的修改中，有多少削弱完成与验证逻辑？被接受的比例和在谱系中的存续如何？ | 公开 RSI 历史（Meta-Harness evo.js，DGM 日志），本文 proposer 采样 |
 | RQ2 离线检测 | 验证单调性差分守护能否拒绝侵蚀修改并接受良性修改？与 G1 至 G3、回归测试和 LLM 审计员相比如何？ | 种子语料（开发集）和 proposer 自然修改（留出集） |
-| RQ3 在线影响 | 在小规模 RSI 循环中，gate 是否减少虚假提升，同时不损失留出任务表现？ | TB2 子集上的配对 RSI 运行 |
+| RQ3 在线影响 | 在小规模 RSI 循环中，单调性守护是否减少虚假提升、守住完成声明的可信度，同时不损失留出任务表现？反例引导修复能否挽回被拒候选中的合理改进？ | TB2 子集上 A0（只看分数）、A3（只拒绝）、A4（拒绝加修复）的配对运行 |
 | RQ4 组成与成本 | 每类 gate 拦截哪类侵蚀？gate 的时间成本是多少？ | 单组件消融和计时 |
 
 ## 威胁模型与可编辑面
@@ -88,7 +88,7 @@ G1 针对的是非对抗的侵蚀：proposer 为了提分而削弱验证，但�
 - [x] **P6 E2 自然修改采样与标注。** 协议：`docs/thesis-erosion-annotation-protocol.md`。3 个 proposer（claude-sonnet-5-5、gpt-6-astra、deepseek-v4-pro）在 12 个失败轨迹上各采 2 个，中性提示得到 70 个可应用补丁，完成压力提示（E2b，预注册，只服务 RQ2）得到 71 个。两名 LLM 标注者盲标，分歧交裁决者：中性 κ=0.73，E2b κ=0.77。标签冻结后才运行 gate（`experiments/erosion-v1/natural-labels-v1.json`，sha256 `c0ca9bad…`；`natural-pressure-labels-v1.json`，sha256 `97a9cbc4…`）。人工复标仍未做，标签目前是临时标签。
 - [x] **P7 基线 gate。** 回归基线是 main 上除 gate 自身测试外的全部测试，在空补丁上校准后保留 451 个（`experiments/erosion-v1/regression-suite-v1.json`）。LLM 审计员是 kimi-k3，和标注模型不同。E2 结果：`evaluation/erosion-v1-natural-gate-results.json`、`evaluation/erosion-v1-natural-pressure-gate-results.json`。E1 配对结果：`scripts/erosion_seeded_baselines.py` 输出 `evaluation/erosion-v1-seeded-baselines.json`。结果见下文“E2 与基线结果”。
 - [ ] **P8 验证单调性差分守护。** 按 [方法设计](thesis-erosion-monotonicity-method.md) 第 7 节的 M1 至 M6 实施。先冻结验证原因分类和评测协议，再实现。证据：E1、E2、E2b 上与全部对比方法的 canonical 结果。
-- [ ] **P9 在线 RSI 小循环。** 15 道搜索题和 15 道互不相交的留出题，10 轮，每轮 2 个候选，比较只看分数和加差分守护两种选择规则。指标包括留出通过率、完成声明的可信度（宣布完成的任务中真正通过外部评测的比例）和虚假提升。循环中使用已知会诱发侵蚀的压力提示。先做 pilot 估算成本。证据：两组运行的 canonical 结果。
+- [ ] **P9 MonoEvolve 系统与在线循环。** 实现反例引导修复（修复最多 2 轮）、反例库和系统主循环。15 道搜索题和 15 道互不相交的留出题，10 代，每代 2 个候选。必做组 A0（只看分数）、A3（单调性守护只拒绝）、A4（守护加反例修复）；预算允许时加 A1（回归测试）、A2（大模型审计）。指标包括留出通过率、完成声明的可信度（宣布完成的任务中真正通过外部评测的比例）、虚假提升、谱系中被接受的侵蚀数和修复挽回率。循环中使用已知会诱发侵蚀的压力提示。先做 pilot 估算成本。证据：各组运行的 canonical 结果。
 - [ ] **P10 统计、表格与论文。** 所有表格由脚本从 canonical JSON 生成。
 - [ ] **人工复标。** 第二位人类标注者按 `docs/thesis-erosion-annotation-protocol.md` 复标 E2、E2b 和 E3，所有比较用人工标签重算一次。
 

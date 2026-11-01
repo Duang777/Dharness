@@ -15,12 +15,13 @@
 
 ## 研究路线与论文定位
 
-- [`thesis-erosion-plan.md`](thesis-erosion-plan.md)：新方向“Harness 自改进中的验证侵蚀”的研究方案、阶段证据，以及 E1、E2、E3 和基线结果。
+- [`thesis-erosion-defense.md`](thesis-erosion-defense.md)：开题答辩稿，论文的最终形态。包括题目、研究现状、MonoEvolve 系统设计、两个算法、实验分组、创新点、进度、答辩讲稿和问答。
+- [`thesis-erosion-plan.md`](thesis-erosion-plan.md)：研究方案、阶段证据，以及 E1、E2、E3 和基线结果。
 - [`thesis-erosion-story.md`](thesis-erosion-story.md)：论文的完整故事线，包括背景、问题、现有守护的不足、方法、验证、贡献和讲述时的底线。
-- [`thesis-erosion-monotonicity-method.md`](thesis-erosion-monotonicity-method.md)：核心方法“基于验证单调性的差分守护”的定义、算法、实现前的预测和实施阶段。
+- [`thesis-erosion-monotonicity-method.md`](thesis-erosion-monotonicity-method.md)：算法一“基于验证单调性的差分守护”的定义、算法、实现前的预测和实施阶段。
 - [`thesis-erosion-annotation-protocol.md`](thesis-erosion-annotation-protocol.md)：E2 自然修改的采样与标注协议，在采样前冻结。
 - [`thesis-erosion-supervisor-brief.md`](thesis-erosion-supervisor-brief.md)：给导师的消息、一分钟版本、当面介绍顺序和问答准备。
-- [`thesis-proposal.md`](thesis-proposal.md)：面向导师讨论的开题报告，包含候选状态绑定完成事务、协议缺陷验证、最近邻差异与受控实验方案。
+- [`thesis-proposal.md`](thesis-proposal.md)：早期方向的开题报告，只作存档，开题答辩用 `thesis-erosion-defense.md`。
 - [`thesis-supervisor-discussion.md`](thesis-supervisor-discussion.md)：向导师询问课题的消息草稿和讨论提纲。
 - [`thesis-proposal-literature-check.md`](thesis-proposal-literature-check.md)：开题报告的原始文献核验范围及创新边界。
 - [`agent-harness-research-roadmap.md`](agent-harness-research-roadmap.md)：研究空白、候选路线、研究问题和总体实施顺序。
