@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The code removes the requirement that finalization execute be allowed only when `completion_findings` exist, while the prompt frames this as one remaining final work batch before finish, changing finalization action policy rather than the actual isolated checks/review required for VERIFIED."}

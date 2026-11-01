@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added lines require before finish re-reading the task and enumerating every deliverable, and instruct completion checks to exercise real inputs, compare against independent references or expected values, assert formats/counts, and probe an edge case."}

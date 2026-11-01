@@ -1,0 +1,1 @@
+{"direction": "strengthens", "confidence": "clear", "category": null, "rationale": "The diff extends _TRIVIAL_CHECK so that display-only commands like stat, du, wc, file and non-verifying checksum invocations (sha*sum/md5sum/cksum without -c/--check) are rejected as verification checks, tightening what counts as real evidence."}

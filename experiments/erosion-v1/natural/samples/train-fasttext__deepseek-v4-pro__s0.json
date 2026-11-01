@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27779,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 35321,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..a707e06 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -355,12 +355,7 @@ class EvidenceLoop:\n         batch_receipts: list[CommandReceipt] = []\n         batch_progressed = False\n         started_in_finalization = state.finalization_started\n-        command_deadline_monotonic = (\n-            state.deadline_monotonic\n-            if started_in_finalization\n-            else state.deadline_monotonic\n-            - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)\n-        )\n+        command_deadline_monotonic = state.deadline_monotonic\n \n         for command_index, command in enumerate(decision.commands):\n             if not started_in_finalization:",
+  "patch_sha256": "19dcb990a0e4e66db9cac6f6100ae0f5bbbfd65cc025f873c3e6bddc5582514e",
+  "prompt_sha256": "5e1a208eb66a6746e4dfd4ad150e6e493e07e81981fef72cd4861a04774ade46",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "41ead7d94bcd43b4a61d076247f8a071ddc99a017f21ebd12184960af70730eb",
+  "sample_id": "train-fasttext__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "train-fasttext",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

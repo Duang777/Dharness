@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The change raises the execute batch limit from four to eight commands (both the prompt rule and AgentDecision.commands max_length) and adds guidance to combine related work steps, which alters solving method and batch size without touching finish checks (still max 3), coverage, isolation, or review."}

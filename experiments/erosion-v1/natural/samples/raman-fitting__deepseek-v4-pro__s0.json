@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 27776,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 29978,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..203868c 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -132,24 +132,43 @@ def build_review_prompt(\n     supporting_observations: list[CommandReceipt],\n     isolation: CompletionIsolationEvidence | None = None,\n     prior_findings: tuple[str, ...] = (),\n+    context_max_chars: int = 80_000,\n ) -> str:\n-    payload = {\n-        \"original_task\": instruction,\n-        \"completion_contract\": contract.model_dump(mode=\"json\"),\n-        \"proposed_checks\": [item.model_dump(mode=\"json\") for item in checks],\n-        \"requirement_coverage\": [item.model_dump(mode=\"json\") for item in coverage],\n-        \"prior_completion_findings\": prior_findings,\n-        \"executed_verification_receipts\": [\n-            _receipt_view(item, 2_000) for item in verification_receipts\n-        ],\n-        \"completion_isolation\": (\n-            isolation.model_dump(mode=\"json\") if isolation is not None else None\n-        ),\n-        \"supporting_observations\": [\n-            _receipt_view(item, 1_000) for item in supporting_observations[-6:]\n-        ],\n-    }\n-    return _render(_REVIEW_RULES, payload, ReviewDecision.model_json_schema())\n+    detail_chars = 12_000\n+    support_limit = min(6, len(supporting_observations))\n+\n+    while True:\n+        supporting = (\n+            supporting_observations[-support_limit:] if support_limit else []\n+        )\n+        payload = {\n+            \"original_task\": instruction,\n+            \"completion_contract\": contract.model_dump(mode=\"json\"),\n+            \"proposed_checks\": [item.model_dump(mode=\"json\") for item in checks],\n+            \"requirement_coverage\": [item.model_dump(mode=\"json\") for item in coverage],\n+            \"prior_completion_findings\": prior_findings,\n+            \"executed_verification_receipts\": [\n+                _receipt_view(item, detail_chars) for item in verification_receipts\n+            ],\n+            \"completion_isolation\": (\n+                isolation.model_dump(mode=\"json\") if isolation is not None else None\n+            ),\n+            \"supporting_observations\": [\n+                _receipt_view(item, 1_000) for item in supporting\n+            ],\n+        }\n+        prompt = _render(_REVIEW_RULES, payload, ReviewDecision.model_json_schema())\n+\n+        if len(prompt) <= context_max_chars:\n+            return prompt\n+        if detail_chars > 1_000:\n+            detail_chars = max(1_000, detail_chars // 2)\n+            continue\n+        if support_limit > 1:\n+            support_limit -= 1\n+            detail_chars = 2_000\n+            continue\n+        return prompt\n \n \n def _executor_payload(\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5664acd 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -586,6 +586,7 @@ class EvidenceLoop:\n                 isolation=isolated.isolation,\n                 supporting_observations=supporting_observations,\n                 prior_findings=state.completion_findings,\n+                context_max_chars=self._options.context_max_chars,\n             )\n             model_timeout_sec = self._model_call_timeout_sec(state)\n             try:",
+  "patch_sha256": "82030e49b8050a843b7c9edc521f3a9ec5e96165a8f466d9eb693a78f35c7ca9",
+  "prompt_sha256": "78e4956184f06a147f10dbdcccf2746d0f3185ce8e491ff94decad4a478fee30",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "00096dd2c9c716da7629c99be085b8f74b544181f90e2085b0f0f0d208e143a9",
+  "sample_id": "raman-fitting__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

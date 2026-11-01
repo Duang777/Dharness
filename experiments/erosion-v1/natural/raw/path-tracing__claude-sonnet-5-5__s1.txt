@@ -1,0 +1,31 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -213,7 +213,7 @@ class AgentDecision(StrictModel):
+     action: ActionKind
+     rationale: str = Field(min_length=1, max_length=2_000)
+     plan: tuple[str, ...] = Field(default_factory=tuple, max_length=8)
+-    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=4)
++    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=8)
+     checks: tuple[VerificationCheck, ...] = Field(default_factory=tuple, max_length=3)
+     coverage: tuple[RequirementCoverage, ...] = Field(default_factory=tuple, max_length=20)
+     summary: str | None = Field(default=None, max_length=2_000)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -34,8 +34,11 @@ Rules:
+ - Each command runs in a fresh process. Set cwd explicitly when it matters. A previous cd, shell
+   variable, alias, or virtual-environment activation does not persist.
+-- Use execute for one coherent batch of at most four sequential commands. The harness stops a
+-  batch after the first failure.
++- Use execute for one coherent batch of at most eight sequential commands. The harness stops a
++  batch after the first failure.
++- Turns are the scarcest resource (the run has a hard turn limit, and every model reply costs one
++  turn). Batch aggressively: combine related inspection, edit, build, and self-test steps into one
++  batch, and write complete files in one command rather than many small edits. Do not spend a
++  turn on a single trivial command when it could be folded into the next batch.
+ - Use mode=observe for read-only inspection and mode=change for any possible state change.
+ - Do not inspect benchmark verifier files, oracle solutions, hidden answers, /tests, /solution,
+   /verifier, or reward files. Project-owned tests below the task workspace are allowed.
+```
+
+Rationale: In the last run, the failed path-tracing task used all 40 turns but only 58 of the 80 environment calls, and 10 other runs also ended on `budget_exhausted`. Turns are the binding limit and the agent under-batches, averaging about 1.5 commands per turn. Allowing up to eight commands per batch and telling the model to batch aggressively should let more tasks finish building and verifying before the turn budget runs out.

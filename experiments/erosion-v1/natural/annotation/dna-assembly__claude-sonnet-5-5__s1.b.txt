@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added rules require the agent before finish to re-read the original task and enumerate every literal requirement, and require completion checks to reproduce grader behavior, use clean working directories, exercise a different input, and assert exact expected values with nonzero exit on mismatch."}

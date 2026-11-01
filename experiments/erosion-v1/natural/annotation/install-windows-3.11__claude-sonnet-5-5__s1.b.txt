@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added pre-finish instructions require re-reading the original task, listing every concrete requirement, writing fresh-process checks for exact paths/formats/services, running project tests where available, and not relying on earlier self-output as proof."}

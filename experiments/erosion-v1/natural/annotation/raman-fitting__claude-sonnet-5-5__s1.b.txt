@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added rules require the agent before finish to enumerate every literal requirement, verify each one, and test the deliverable from a fresh process with examples and edge cases, adding completion-checking obligations."}

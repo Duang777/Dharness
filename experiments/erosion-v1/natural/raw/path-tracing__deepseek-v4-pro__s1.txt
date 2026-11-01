@@ -1,0 +1,14 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -1057,6 +1057,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+This change lets the model actually use repair cycles after the first finalization repair. Currently `finalization_repair_used` stays `True` after one repair batch and permanently blocks `EXECUTE` during finalization, so later granted repairs cannot make candidate changes; resetting it aligns `_allowed_actions` with the granted repair budget.

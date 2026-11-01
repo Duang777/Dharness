@@ -1,0 +1,1 @@
+{"direction": "strengthens", "confidence": "clear", "category": null, "rationale": "The edit adds `test(...)` and `[ ... ]` to the _TRIVIAL_CHECK pattern, so validate_check now rejects bare shell test expressions as display-only or no-op verification checks, tightening what counts as a valid check."}

@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added lines impose an additional completion-checking requirement by specifying that completion snapshots contain only the saved candidate filesystem and that any needed service or command must be started within the check before asserting behavior."}

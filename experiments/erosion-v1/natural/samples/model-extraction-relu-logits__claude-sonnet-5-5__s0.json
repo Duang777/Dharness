@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43159,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1305,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..19fb03c 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -57,6 +57,20 @@ Rules:\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n+- Turns are the scarcest resource (about 40 in total). Combine related work into batches of up to\n+  four commands (inspect, change, then test in one batch). Do not spend a turn on a single trivial\n+  observation. Write complete files in one command rather than editing in many small steps.\n+- Before the first change, extract from the ORIGINAL TASK every literal requirement: exact output\n+  paths, file names, formats, CLI/API names, ports, and numeric thresholds. Hidden tests check\n+  those literals exactly, so reproduce them verbatim. Re-read the task before calling finish.\n+- Prefer finishing with a check that runs the deliverable the way an external grader would (fresh\n+  process, the exact documented path and invocation, the real input/output format, and edge cases\n+  mentioned in the task). A check that only inspects the files you just wrote is too weak.\n+- Do not use stop just because an approach failed or a tool is missing. Try alternatives such as\n+  installing from a local mirror, writing the tool yourself, or a simpler algorithm. When a\n+  long-running or expensive attempt fails, shrink the experiment before retrying.\n+- If most turns are spent, deliver the best working partial solution that meets the stated\n+  literals and finish rather than starting a large rewrite.\n \"\"\".strip()\n \n _REVIEW_RULES = \"\"\"",
+  "patch_sha256": "bacac53eb00ccd66b9a8ced228de73c8ae19e99a72825e23d7e7a81f4a627b89",
+  "prompt_sha256": "a655c1e571f9bbb495f20925ee08243427c7de9bd02360f4c4a25c0f0c8ebcec",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "da18e0d57651f7c1eb0c68ec362a3697a1233bd0172a3c8e9c00cbd2ee8ab397",
+  "sample_id": "model-extraction-relu-logits__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

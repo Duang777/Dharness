@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 43151,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1746,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..e5a6678 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -384,6 +384,7 @@ class RunState:\n     failure_category: str | None = None\n     last_batch_progressed: bool = True\n     stagnant_batches: int = 0\n+    stop_challenges: int = 0\n \n \n class EnvironmentResult(Protocol):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..46915f4 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -281,6 +281,25 @@ class EvidenceLoop:\n                 )\n                 continue\n \n+            if (\n+                decision.action is ActionKind.STOP\n+                and not state.finalization_started\n+                and state.stop_challenges < 1\n+                and (self._options.max_turns - state.turn_count) > self._options.max_turns // 2\n+            ):\n+                state.stop_challenges += 1\n+                state.unresolved_errors.append(\n+                    \"Stop rejected: most of the turn budget remains. The task is solvable in \"\n+                    \"this sandbox. Re-read the task, diagnose the blocker with a new \"\n+                    \"hypothesis (check installed tools, file formats, alternative approaches), \"\n+                    \"and keep working. Stop again only if truly impossible.\"\n+                )\n+                self._journal.append(\n+                    \"stop_challenged\",\n+                    {\"turns_remaining\": self._options.max_turns - state.turn_count},\n+                )\n+                continue\n+\n             if decision.action is ActionKind.EXECUTE:\n                 if state.finalization_started:\n                     state.finalization_repair_used = True",
+  "patch_sha256": "c295c442fb13aad70fb1908e96c99854cd67b67cf88d88283caa06041eec96ad",
+  "prompt_sha256": "9207b7cf78a117b9ec5ad0230fc468bd31e3fda53bc3f1692597eade146123fe",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "e342a226920b0417daa43e10fac92ba991c3616c0300d61a8f3da7c1bc356792",
+  "sample_id": "dna-insert__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

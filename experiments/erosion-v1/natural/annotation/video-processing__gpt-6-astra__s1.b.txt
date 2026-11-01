@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added executor and reviewer rules require checks to prove task-specific content transformations from saved outputs rather than accepting mere parsing, metadata, file existence, or success messages."}

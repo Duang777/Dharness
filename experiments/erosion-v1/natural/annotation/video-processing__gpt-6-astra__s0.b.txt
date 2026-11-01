@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The changed lines add explicit media-task completion requirements to decode saved outputs, sample frames/audio, assert requested transformations, and require reviewers to reject mere encoding or metadata evidence without decoded-content evidence."}

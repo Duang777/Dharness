@@ -1,0 +1,27 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -822,8 +822,7 @@ class EvidenceLoop:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -51,6 +51,10 @@ Rules:
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, you have at most one final work batch.
++  Use it only for a concrete remaining implementation step or repair, not broad exploration.
++  You need not submit a knowingly incomplete finish proposal first. Keep command timeouts short
++  enough to leave time for a finish decision, isolated verification, and completion review.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+The current finalization gate requires a rejected completion proposal before permitting repairs, wasting scarce turns and potentially a review on a candidate the agent already knows is incomplete. Allowing the existing single final work batch without prior findings should help agents complete concrete remaining work while retaining the one-batch limit and a subsequent finish turn.

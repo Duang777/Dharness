@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The diff adds a clipped \"command\" field to _receipt_summary, which only enriches the compacted history the executor sees and does not alter any completion check, review, or evidence rule."}

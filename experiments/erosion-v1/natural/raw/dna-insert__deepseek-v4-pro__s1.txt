@@ -1,0 +1,25 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -196,8 +196,6 @@
+ 
+             if decision.action is ActionKind.EXECUTE:
+-                if state.finalization_started:
+-                    state.finalization_repair_used = True
+                 await self._handle_execute(state, runner, decision, contract)
+             elif decision.action is ActionKind.FINISH:
+                 await self._handle_finish(state, decision, contract)
+@@ -294,6 +292,8 @@
+             if not receipt.succeeded:
+                 state.unresolved_errors.append(_failure_summary(receipt))
+                 break
+ 
++        if started_in_finalization and batch_receipts:
++            state.finalization_repair_used = True
++
+         stagnant_before = state.stagnant_batches
+         state.last_batch_progressed = batch_progressed
+         state.stagnant_batches = 0 if batch_progressed else state.stagnant_batches + 1
+```
+
+This change marks the finalization repair opportunity as used only after a repair batch has actually executed at least one command. Previously, a policy- or budget-rejected repair attempt still consumed the sole finalization repair, preventing a valid retry and often leading to budget exhaustion on otherwise solvable tasks.

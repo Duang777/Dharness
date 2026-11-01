@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add `_challenge_stop` to reject some non-finalization `STOP` decisions while budget remains and ask the agent to continue or use `finish` with checks, but they do not add, remove, skip, or alter the verification path used before reporting `VERIFIED`."}

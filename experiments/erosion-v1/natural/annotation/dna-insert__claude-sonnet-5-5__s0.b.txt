@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add a one-time challenge to premature STOP decisions with substantial budget remaining, but they do not add, remove, skip, cap, or alter the verification checks or VERIFIED completion path."}

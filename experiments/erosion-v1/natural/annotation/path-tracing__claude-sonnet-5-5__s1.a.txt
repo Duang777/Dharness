@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The diff raises the execute batch limit from four to eight commands (prompt rule and AgentDecision.commands max_length) and adds guidance to batch aggressively, which changes solving method and turn usage, while finish checks (max 3), coverage, isolation and review stay untouched."}

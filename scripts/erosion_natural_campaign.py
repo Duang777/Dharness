@@ -18,15 +18,17 @@ from evidence_harness_mutation.natural_campaign import (
     parse_auditor,
     run_gates,
 )
-from evidence_harness_mutation.natural_erosion import NaturalSample, SampleStatus, SamplingManifest
+from evidence_harness_mutation.natural_erosion import (
+    Condition,
+    NaturalSample,
+    SampleStatus,
+    SamplingManifest,
+    condition_paths,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-NATURAL_DIR = PROJECT_ROOT / "experiments/erosion-v1/natural"
-LABELS = PROJECT_ROOT / "experiments/erosion-v1/natural-labels-v1.json"
 GUARD_SUITE = PROJECT_ROOT / "experiments/erosion-v1/guard-suite-v1.json"
 REGRESSION_SUITE = PROJECT_ROOT / "experiments/erosion-v1/regression-suite-v1.json"
-OUTPUT = PROJECT_ROOT / "evaluation/erosion-v1-natural-gate-results.json"
-TIMING = PROJECT_ROOT / "evaluation/erosion-v1-natural-gate-timing.json"
 AUDITOR = "kimi-k3"
 
 
@@ -35,19 +37,20 @@ def parse_args() -> argparse.Namespace:
         description="Run the gate, the regression-suite baseline and the LLM auditor on E2 patches."
     )
     parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument("--condition", type=Condition, default=Condition.NEUTRAL)
     return parser.parse_args()
 
 
-def labels_are_committed() -> bool:
+def labels_are_committed(labels: Path) -> bool:
     status = subprocess.run(
-        ("git", "status", "--porcelain", "--", str(LABELS)),
+        ("git", "status", "--porcelain", "--", str(labels)),
         cwd=PROJECT_ROOT,
         capture_output=True,
         text=True,
         check=True,
     ).stdout
     tracked = subprocess.run(
-        ("git", "ls-files", "--error-unmatch", str(LABELS)),
+        ("git", "ls-files", "--error-unmatch", str(labels)),
         cwd=PROJECT_ROOT,
         capture_output=True,
         check=False,
@@ -55,8 +58,10 @@ def labels_are_committed() -> bool:
     return not status.strip() and tracked.returncode == 0
 
 
-def audit(endpoint: LLMEndpoint, sample: NaturalSample, base_commit: str) -> AuditorDecision:
-    cache = NATURAL_DIR / "auditor" / f"{sample.sample_id}.txt"
+def audit(
+    endpoint: LLMEndpoint, sample: NaturalSample, base_commit: str, cache_dir: Path
+) -> AuditorDecision:
+    cache = cache_dir / f"{sample.sample_id}.txt"
     if cache.exists():
         decision = parse_auditor(cache.read_text())
         if decision is not None:
@@ -85,17 +90,19 @@ def audit(endpoint: LLMEndpoint, sample: NaturalSample, base_commit: str) -> Aud
 
 def main() -> int:
     args = parse_args()
-    if not labels_are_committed():
-        print("freeze and commit natural-labels-v1.json before running the gate", file=sys.stderr)
+    paths = condition_paths(PROJECT_ROOT, args.condition)
+    natural_dir = paths.samples_dir
+    if not labels_are_committed(paths.labels):
+        print(f"freeze and commit {paths.labels.name} before running the gate", file=sys.stderr)
         return 1
-    manifest = SamplingManifest.model_validate_json((NATURAL_DIR / "manifest.json").read_bytes())
-    labels_data = LABELS.read_bytes()
+    manifest = SamplingManifest.model_validate_json((natural_dir / "manifest.json").read_bytes())
+    labels_data = paths.labels.read_bytes()
     labels = NaturalLabels.model_validate_json(labels_data)
     labelled = {item.sample_id for item in labels.labels}
     samples = tuple(
         sample
         for slot in manifest.slots
-        if (record := NATURAL_DIR / "samples" / f"{slot.sample_id}.json").exists()
+        if (record := natural_dir / "samples" / f"{slot.sample_id}.json").exists()
         and (sample := NaturalSample.model_validate_json(record.read_bytes())).status
         is SampleStatus.PATCH
         and sample.sample_id in labelled
@@ -103,7 +110,12 @@ def main() -> int:
     try:
         endpoint = LLMEndpoint.from_environment()
         with ThreadPoolExecutor(max_workers=8) as pool:
-            decisions = list(pool.map(lambda s: audit(endpoint, s, manifest.base_commit), samples))
+            decisions = list(
+                pool.map(
+                    lambda s: audit(endpoint, s, manifest.base_commit, natural_dir / "auditor"),
+                    samples,
+                )
+            )
         guard, regression = run_gates(
             samples,
             repo_root=PROJECT_ROOT,
@@ -127,8 +139,8 @@ def main() -> int:
     except (OSError, ValueError, CandidateGateError, LLMEndpointError) as exc:
         print(f"natural campaign failed: {exc}", file=sys.stderr)
         return 1
-    OUTPUT.write_bytes(report.canonical_bytes())
-    TIMING.write_text(
+    paths.results.write_bytes(report.canonical_bytes())
+    paths.timing.write_text(
         json.dumps(
             {
                 sample_id: {

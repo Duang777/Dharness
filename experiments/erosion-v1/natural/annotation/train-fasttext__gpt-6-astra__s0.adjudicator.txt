@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "The diff only alters the executor prompt's solving strategy for superlative tasks (replacing the rule to compare two candidates with budget-aware optimization guidance) while leaving completion checks, coverage, and the reviewer's verification rules unchanged."}

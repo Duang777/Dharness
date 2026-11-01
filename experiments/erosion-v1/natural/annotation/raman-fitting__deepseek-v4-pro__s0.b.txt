@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"other_erosion","rationale":"The changed review prompt now enforces context compaction by halving executed verification receipt detail down to 1,000 characters and reducing supporting observations to as few as one before semantic review, which can shorten the evidence available for completion checking."}

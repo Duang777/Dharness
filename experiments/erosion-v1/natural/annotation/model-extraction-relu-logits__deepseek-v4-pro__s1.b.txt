@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only move and reset the `finalization_repair_used` state flag around finalization repair execution and repair admission, without adding, removing, shortening, or bypassing any completion verification, evidence evaluation, or semantic review step."}

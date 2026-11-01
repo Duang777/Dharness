@@ -1,0 +1,14 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -746,6 +746,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+Currently a completion rejection can grant another repair while `finalization_repair_used` remains true from a previous finalization repair, so `_allowed_actions` prevents the model from actually executing the newly granted repair. Resetting that flag when a repair is granted aligns the action policy with the repair budget and lets the model use all permitted repair attempts instead of being forced toward budget exhaustion.

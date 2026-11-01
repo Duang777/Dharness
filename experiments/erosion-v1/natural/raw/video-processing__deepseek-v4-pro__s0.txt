@@ -1,0 +1,23 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -723,6 +723,7 @@ class EvidenceLoop:
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+             bool(state.completion_findings)
++            and state.repair_count < self._options.max_repairs
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+@@ -786,6 +787,8 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            if state.finalization_started:
++                state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+Rationale: This prevents a single finalization repair from permanently blocking later repair attempts even when the repair budget remains. It allows one repair batch per rejected completion attempt, which should recover solved tasks that currently exhaust their turn budget after a second weak completion check.

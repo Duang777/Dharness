@@ -1,0 +1,24 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -823,8 +823,7 @@
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -49,6 +49,9 @@
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
++- During finalization, if execute is allowed, you have at most one final work batch. Use it only
++  for a concrete missing deliverable or targeted correction, leaving time for completion checks.
++  Do not submit a knowingly failing finish proposal just to obtain permission to repair.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+The current finalization policy requires a rejected completion proposal before allowing any final correction, wasting scarce turns and potentially forcing an unfinished task to stop. Allowing the existing single final work batch without that prerequisite should help nearly complete tasks succeed while retaining the work-budget guard and all completion checks.

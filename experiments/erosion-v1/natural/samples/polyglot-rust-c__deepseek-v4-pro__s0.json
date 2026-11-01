@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27779,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 26100,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..1592dc1 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -218,6 +218,7 @@ def _receipt_summary(receipt: CommandReceipt) -> dict[str, Any]:\n         \"sequence\": receipt.sequence,\n         \"id\": receipt.command_id,\n         \"purpose\": receipt.purpose,\n+        \"command\": _clip_text(receipt.script, 600),\n         \"cwd\": receipt.cwd,\n         \"return_code\": receipt.return_code,\n         \"failure\": receipt.failure,",
+  "patch_sha256": "36dbb08338eca0b97b28b5ef1e9fed1f91b574a455d2525737c072100841453a",
+  "prompt_sha256": "7c037a2451ab50b2b50f1deec497e0101b2128d61d2d9d7d9bf54665c90faae1",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "413fd663cdf430f657b72ea4a604d4b7f3600b7891ddfd51b7f894742d6ee75d",
+  "sample_id": "polyglot-rust-c__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

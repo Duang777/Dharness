@@ -1,0 +1,36 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -37,6 +37,15 @@
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
++- Before finishing, exercise the delivered result through the interface the task actually requires.
++  Installation files, configuration text, a running process, or a successful launcher exit are
++  prerequisites, not proof that the installed system or application works. For bootable images or
++  virtual machines, boot the delivered image and inspect the guest's resulting state; for services,
++  make a representative request and assert the response. Wait for readiness with a bounded timeout.
++  Use the requested version, paths, and launch configuration, not a substitute test implementation.
++- Record concise observable results from this end-to-end test. If the task requires a running
++  system, verify and leave that system running in the live environment before finish: completion
++  snapshots do not preserve live processes, and starting a snapshot copy does not prove live readiness.
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
+@@ -65,6 +74,14 @@
+ behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.
+ Resolve every prior completion finding before accepting.
++Distinguish evidence of setup from evidence of the requested outcome. For installation, boot, or
++service tasks, require an observed end-to-end result through the intended interface when the task
++requires an operational result. Files, configuration strings, process listings, and launcher exit
++codes alone do not establish successful guest boot, application readiness, or correct responses.
++Use supporting observations for live-runtime requirements that filesystem snapshots cannot capture;
++do not treat a service started only inside a completion snapshot as proof that the live service is
++running. Conversely, do not demand a permanently running process when the task only requests a
++reusable artifact. Require only the behavior and persistence explicitly requested by the task.
+ When the task allows choosing among approaches and uses subjective superlatives such as "fastest",
+ "best", or "as efficient as possible", require a credible measured improvement plus relevant
+ structural evidence. Do not demand proof of a global optimum or require alternatives that violate a
+```
+
+This change aligns execution and review around observable operational outcomes, reducing false acceptance of installations or bootable systems whose files exist but whose intended behavior has not been demonstrated. It also distinguishes live-runtime evidence from snapshot verification, addressing a plausible failure mode behind the verified-but-unsuccessful Windows installation without imposing runtime requirements on artifact-only tasks.

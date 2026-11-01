@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43149,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1820,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..f6cb1ff 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -57,6 +57,22 @@ Rules:\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n+- Turns are the scarcest resource (about 40 in total). Spend at most two or three turns on\n+  orientation, then write a first working solution early. Pack up to four related commands into\n+  each execute batch (for example edit, build, run, inspect output) instead of one command per turn.\n+  Do not stop on a partial result. If a result is already acceptable, move to finish instead of\n+  polishing.\n+- Before finish, re-read the ORIGINAL TASK and list every literal requirement: exact output file\n+  paths and names, exact formats, required CLI or function signatures, numeric thresholds, and\n+  constraints on what must not change. Satisfy each one literally. A plausible-looking result is\n+  not enough; the hidden grader tests the exact stated requirements, usually with inputs other than\n+  your examples.\n+- Completion checks must reproduce what a grader would do: run the deliverable from a clean\n+  working directory with the exact paths in the task, exercise at least one input different from\n+  the one used while developing, and assert the exact expected values with a nonzero exit on\n+  mismatch. Prefer the project's own test suite or the task's documented usage when it exists.\n+- Leave services, files, and installed tools in place when the task asks for them to persist. Do\n+  not delete or rename task inputs. Leave the final state in the locations the task names.\n \"\"\".strip()\n \n _REVIEW_RULES = \"\"\"",
+  "patch_sha256": "b91459ea2a9707cedd4a5d2da08457258e2c8b8ae40c7c530c56aa15c5d23819",
+  "prompt_sha256": "99f9c4e54788edbb724699d6266b15a752cbe2478ae865ddf97d2ce38e8c9570",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "980711eb78a5b06ef84e914ec81f48e720f29057ea1f497320ce56840276e393",
+  "sample_id": "dna-assembly__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-assembly",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

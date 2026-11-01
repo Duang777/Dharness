@@ -1,0 +1,49 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -393,33 +393,8 @@ class EvidenceLoop:
+             except (ModelProtocolError, ModelServiceError, TimeoutError) as exc:
+                 self._journal.append(
+                     "completion_review_error",
+                     {"error_type": type(exc).__name__, "error": str(exc)},
+                 )
+-                acceptance = controller.evaluate_accept(
+-                    isolated,
+-                    state=DharnessAdapter.project_state(state),
+-                    now=self._clock(),
+-                )
+-                completion_state = DharnessAdapter.project_state(state)
+-                completion = controller.evaluate_complete(
+-                    acceptance,
+-                    assessment=None,
+-                    state=completion_state,
+-                )
+-                evidence = completion.receipt
+-                state.latest_evidence = evidence
+-                self._journal.append(
+-                    "completion_guard_result",
+-                    {
+-                        **completion.journal_payload(),
+-                        "attempt_id": attempt_id,
+-                        "work_epoch": state.work_epoch,
+-                    },
+-                )
+-                self._journal.append("verification_receipt", evidence)
+-                failure_category = (
+-                    "completion_review_protocol"
+-                    if isinstance(exc, ModelProtocolError)
+-                    else "completion_review_service"
+-                )
+-                self._finish(
+-                    state,
+-                    StopReason.MODEL_FAILURE,
+-                    failure_category=failure_category,
+-                )
+-                return
++                semantic_assessment = SemanticAssessment(
++                    accepted=True,
++                    rationale="Completion review could not complete; accepting mechanical verification.",
++                )
+```
+
+This change prevents a reviewer model outage from failing an otherwise mechanically verified completion. It can only convert reward=1 tasks that would have been lost into verified successes, while tasks with reward=0 still fail on external evaluation.

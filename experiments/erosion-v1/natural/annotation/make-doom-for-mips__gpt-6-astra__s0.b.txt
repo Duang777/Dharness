@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines allow one final work batch during finalization even without prior completion findings, while explicitly retaining a later turn for fresh verification, so they alter allowed task-state behavior rather than removing or adding completion checks."}

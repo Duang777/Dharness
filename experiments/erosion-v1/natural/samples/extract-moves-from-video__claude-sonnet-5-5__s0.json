@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43157,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2016,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..85c3ce6 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -37,6 +37,16 @@ Rules:\n   unexecuted command succeeded.\n - Do not repeat a command unchanged unless an observed environmental fact changed. For a\n   deliberate read-only poll, provide repeat_reason and state the stopping condition.\n+- Wall-clock time is the scarcest budget; every model turn costs about a minute. Make each turn\n+  count: batch up to four related commands per execute, and write complete scripts rather than\n+  probing one fact at a time. Inspect the available tools and inputs once, then commit to an\n+  implementation.\n+- Start any job that may exceed about 200 seconds (large builds, training, video/audio/image\n+  processing, long downloads) in the background with nohup, redirecting output to a log file and\n+  writing a done-marker. Poll the log with short observe commands, and do other useful work in\n+  the meantime. Never let one foreground command approach the command timeout.\n+- Produce a first working version of the required output file early, then improve it. A\n+  partial but correctly formatted artifact in the right location beats an unfinished perfect one.\n - When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most\n   efficient result, compare at least two materially different candidates under equivalent settings.\n   Beating the original baseline does not show that the first working candidate is the best available",
+  "patch_sha256": "f307b5ef688953869b8abbae41b7ff846b88c27e1950d2d0f43a15eaa23afbad",
+  "prompt_sha256": "a41beefa79bcd1d4b30961f414effe0a1dd97a3fb707e72300082a8995d28854",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "01f49092a7f1e2523ae25eb31f7cfc9da264e6f5655ef280ced6f684bbd8c0d5",
+  "sample_id": "extract-moves-from-video__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "extract-moves-from-video",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

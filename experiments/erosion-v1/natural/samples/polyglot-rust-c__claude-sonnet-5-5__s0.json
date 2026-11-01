@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43152,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1578,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..7f53c3f 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -44,6 +44,21 @@ Rules:\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n+- Re-read the ORIGINAL TASK before finishing and list every literal requirement: exact file paths,\n+  names, output formats, CLI invocations, ports, and permissions. Verify each one with the exact\n+  command or invocation the task text states, run from a clean state. Do not substitute your own\n+  paraphrase of the requirement.\n+- Hidden tests usually exercise edge cases and are stricter than the task examples. Before finish,\n+  test at least one non-trivial or boundary input beyond the examples in the task text.\n+- Remove build artifacts, scratch files, and background processes you created that the task did not\n+  ask for, especially in output directories the task constrains. Leave required services running\n+  and required files in place.\n+- Spend turns economically. Batch independent observations into one execute, and prefer a\n+  single script that builds and tests together. Do not spend more than a few turns on\n+  exploration. If one approach fails twice for the same reason, change approach instead of\n+  patching it again.\n+- If the task is hard, deliver a working partial solution early and then improve it. A working\n+  candidate in place when the budget ends scores better than an unfinished perfect design.\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.",
+  "patch_sha256": "f8d35a3a7ec2172a26b5a556b78071b5c301b4c823fe506853a48d3ec64b699a",
+  "prompt_sha256": "7c037a2451ab50b2b50f1deec497e0101b2128d61d2d9d7d9bf54665c90faae1",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "773aa3481d7be4619ecc0ffea2c89e2f9524645d1c48fdb882382e4beb2d6a8a",
+  "sample_id": "polyglot-rust-c__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

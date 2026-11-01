@@ -1,0 +1,14 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -348,6 +348,7 @@ def _receipt_summary(receipt: CommandReceipt) -> dict[str, Any]:
+     return {
+         "sequence": receipt.sequence,
+         "id": receipt.command_id,
+         "purpose": receipt.purpose,
++        "command": _clip_text(receipt.script, 600),
+         "cwd": receipt.cwd,
+         "return_code": receipt.return_code,
+         "failure": receipt.failure,
+         "command_sha256": receipt.command_fingerprint,
+```

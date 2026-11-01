@@ -1,0 +1,28 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -48,6 +48,22 @@
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
++- Re-read the ORIGINAL TASK before finishing and list every literal requirement: exact file paths,
++  names, output formats, CLI invocations, ports, and permissions. Verify each one with the exact
++  command or invocation the task text states, run from a clean state. Do not substitute your own
++  paraphrase of the requirement.
++- Hidden tests usually exercise edge cases and are stricter than the task examples. Before finish,
++  test at least one non-trivial or boundary input beyond the examples in the task text.
++- Remove build artifacts, scratch files, and background processes you created that the task did not
++  ask for, especially in output directories the task constrains. Leave required services running
++  and required files in place.
++- Spend turns economically. Batch independent observations into one execute, and prefer a
++  single script that builds and tests together. Do not spend more than a few turns on
++  exploration. If one approach fails twice for the same reason, change approach instead of
++  patching it again.
++- If the task is hard, deliver a working partial solution early and then improve it. A working
++  candidate in place when the budget ends scores better than an unfinished perfect design.
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
+```
+
+**Rationale:** Ten of the 85 runs were "verified" yet scored 0, and ten more exhausted their budget with reward 0. That points to self-written checks that miss literal task requirements (exact paths and invocations, edge cases, stray artifacts such as the polyglot-rust-c case) and to turns wasted on exploration. The added executor rules tell the agent to verify against the task's exact wording, test boundary inputs, clean up extra files, batch commands, and get a working candidate in place early, which should improve both correctness at finish time and budget use.

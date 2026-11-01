@@ -1,0 +1,24 @@
+**Rationale:** Ten tasks ended `verified` with reward 0, so the agent's own completion checks are accepting wrong or incomplete work, and four early `model_stopped` runs also failed. I'm adding prompt rules that make the agent turn the task into a literal checklist (exact paths, formats, units, ports), test the deliverable the way a hidden grader would from a clean process, and try alternatives before it stops as "impossible".
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -62,6 +62,17 @@
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Before choosing finish, re-read the ORIGINAL TASK and enumerate every literal requirement: exact
++  output paths and filenames, formats, field names, units, rounding, ordering, ports, and
++  permissions. Verify each one literally; a plausible-looking result is not proof.
++- Test the deliverable the way an independent grader would: from a fresh process, using the
++  required path (not a scratch location), with any example inputs and expected outputs given in the
++  task, and with at least one edge case or different input. Compare against expected values
++  numerically or byte-wise rather than by eye. Persistent services and files must still work
++  without any state from earlier shell sessions.
++- Do not stop as "impossible" or "blocked" until you have tried at least two different
++  approaches (alternative tools, installing from available local packages, simpler algorithms).
++  Prefer a working partial-to-full solution over giving up.
+ """.strip()
+ 
+ 
+```

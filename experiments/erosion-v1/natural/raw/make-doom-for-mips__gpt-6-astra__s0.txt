@@ -1,0 +1,27 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -842,8 +842,9 @@
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
++        # Allow one final work batch without requiring a failed completion
++        # attempt first; retain a subsequent turn for fresh verification.
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -53,6 +53,9 @@
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
++- During finalization, if execute is allowed, at most one final work batch remains. Use it only
++  for a necessary, focused fix or missing deliverable, not exploration. Keep it short enough
++  to leave time for fresh completion checks and review; finish directly if already ready.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+The current finalization gate prevents unfinished work from continuing until the agent first submits a rejected completion proposal, wasting scarce turns and potentially repair or review budget. Allowing one focused final work batch without that prerequisite should help produce complete deliverables while preserving the existing work-budget guard and mandatory completion verification.

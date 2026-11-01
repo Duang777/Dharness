@@ -1,0 +1,26 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -40,10 +40,15 @@
+ - Do not repeat a command unchanged unless an observed environmental fact changed. For a
+   deliberate read-only poll, provide repeat_reason and state the stopping condition.
+-- When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most
+-  efficient result, compare at least two materially different candidates under equivalent settings.
+-  Beating the original baseline does not show that the first working candidate is the best available
+-  choice. Do not violate a task-mandated algorithm, query shape, or tool to create alternatives.
++- For expensive training, builds, or optimization, first establish an end-to-end working
++  deliverable at the required output paths before spending the remaining budget on improvements.
++  Save usable checkpoints or intermediate results when supported; keep the last valid artifact
++  until a replacement has been validated.
++- Bound expensive experiments using measured runtime and the remaining work budget, leaving time
++  to save artifacts and verify them before finalization. Prefer short representative trials before
++  full runs. Once explicit acceptance thresholds are met, prioritize verification over more tuning.
++- For "fastest", "best", or "as efficient as possible", seek credible measured improvement and
++  relevant structural evidence, not proof of a global optimum. Compare additional candidates when
++  explicitly required or when the remaining budget justifies it; do not automatically run multiple
++  expensive full experiments. Preserve task-mandated algorithms, query shapes, tools, and settings.
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+```
+
+This replaces mandatory multi-candidate optimization with a budget-aware, artifact-first strategy, aligning executor guidance with the reviewer’s existing acceptance standard. It should reduce expensive training and tuning runs that exhaust the wall-clock budget without a usable deliverable, while preserving explicit task requirements.

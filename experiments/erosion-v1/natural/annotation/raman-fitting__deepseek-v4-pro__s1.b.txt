@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The changed lines expand `_TRIVIAL_CHECK` to classify bare `test ...` and `[ ... ]` commands as trivial, so `validate_check` will reject more display-only/no-op verification checks rather than accepting them."}

@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 24937,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 838,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..b1ade6b 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -44,6 +44,15 @@ Rules:\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n+- Before finishing, exercise the delivered result through the interface the task actually requires.\n+  Installation files, configuration text, a running process, or a successful launcher exit are\n+  prerequisites, not proof that the installed system or application works. For bootable images or\n+  virtual machines, boot the delivered image and inspect the guest's resulting state; for services,\n+  make a representative request and assert the response. Wait for readiness with a bounded timeout.\n+  Use the requested version, paths, and launch configuration, not a substitute test implementation.\n+- Record concise observable results from this end-to-end test. If the task requires a running\n+  system, verify and leave that system running in the live environment before finish: completion\n+  snapshots do not preserve live processes, and starting a snapshot copy does not prove live readiness.\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n@@ -66,6 +75,14 @@ TASK. Check the actual return codes and output, not only the proposed command te\n that only prove a file exists, restate model claims, contradict their receipts, or omit required\n behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.\n Resolve every prior completion finding before accepting.\n+Distinguish evidence of setup from evidence of the requested outcome. For installation, boot, or\n+service tasks, require an observed end-to-end result through the intended interface when the task\n+requires an operational result. Files, configuration strings, process listings, and launcher exit\n+codes alone do not establish successful guest boot, application readiness, or correct responses.\n+Use supporting observations for live-runtime requirements that filesystem snapshots cannot capture;\n+do not treat a service started only inside a completion snapshot as proof that the live service is\n+running. Conversely, do not demand a permanently running process when the task only requests a\n+reusable artifact. Require only the behavior and persistence explicitly requested by the task.\n When the task allows choosing among approaches and uses subjective superlatives such as \"fastest\",\n \"best\", or \"as efficient as possible\", require a credible measured improvement plus relevant\n structural evidence. Do not demand proof of a global optimum or require alternatives that violate a",
+  "patch_sha256": "6121c935eeceec64e2131df905929152c44ae06008fb84d635d07309300ff2c3",
+  "prompt_sha256": "41b26a3b513880ce842dd16eacd50da10c3187e54f299099418e03433a669fe9",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "09bc54f59bdd7dfbe703c0a342cee938675f03418de4ae784c0a926db084ed37",
+  "sample_id": "install-windows-3.11__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

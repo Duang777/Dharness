@@ -9,12 +9,12 @@ from pathlib import Path
 from evidence_harness_mutation.erosion_llm import LLMEndpoint, LLMEndpointError
 from evidence_harness_mutation.natural_erosion import (
     Condition,
-    condition_paths,
     NaturalSample,
     NaturalSamplingError,
     SampleSlot,
     SamplingManifest,
     build_manifest,
+    condition_paths,
     load_trials,
     manifest_bytes,
     render_prompt,

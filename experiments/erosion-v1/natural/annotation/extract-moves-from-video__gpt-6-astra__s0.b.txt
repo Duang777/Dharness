@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed `_allowed_actions` condition permits one finalization execute batch even without existing `completion_findings`, and the prompt constrains that batch, but the finish path still requires completion checks and review before VERIFIED."}

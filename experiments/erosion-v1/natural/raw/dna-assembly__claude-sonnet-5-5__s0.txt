@@ -1,0 +1,24 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -60,6 +60,19 @@
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
++- Turns are scarce. Do a short orientation, then write a complete first solution early and iterate
++  on observed failures. Combine related steps into one batch of up to four commands, and do not
++  spend turns on broad exploration or repeated re-inspection.
++- Before you choose finish, re-read the ORIGINAL TASK and list every literal requirement: exact
++  file paths and names, output formats, numeric thresholds, CLI or API shapes, and services that
++  must stay running. A hidden grader checks these literally and may use inputs you have not seen.
++  Fix any mismatch first, and leave deliverables in the exact required location.
++- Make completion checks behave like a strict independent grader. Run the deliverable end to end
++  on varied inputs and edge cases, and run any project-owned tests. Compare against the task's
++  stated requirements, not against values you derived yourself with the same logic you are
++  testing. Passing a check that restates your own implementation is not evidence of correctness.
++- If a long-running or persistent service is required, make sure it is started and survives after
++  your command returns, for example with nohup or setsid, and verify it by connecting to it.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
+ """.strip()
+```
+
+Rationale: Of the 85 tasks, 19 ended with budget exhausted and 10 were verified but scored 0, so many runs wasted turns on exploration or passed self-checks that did not match what the hidden grader tests. The added prompt rules push the agent to write a full solution early, batch commands, re-read the literal requirements before finishing, and use independent grader-style checks, which should convert some of these failures into passes without changing the control logic.

@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added `_TRIVIAL_CHECK` alternatives classify `test -...`, `[ -... ]`, and `stat` commands as display-only/no-op verification checks, causing `validate_check` to reject them rather than accept them as completion evidence."}

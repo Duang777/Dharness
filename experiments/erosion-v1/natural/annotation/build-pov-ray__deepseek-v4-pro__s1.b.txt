@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only reorder context compaction in build_executor_prompt, halving detail_chars before reducing recent_limit, and do not add, remove, cap, skip, or force any verification or completion-checking step."}

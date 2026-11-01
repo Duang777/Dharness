@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 24936,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 755,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..3e48e6b 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -44,6 +44,12 @@ Rules:\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n+- Before finishing, validate the deliverable through the interface the ORIGINAL TASK specifies:\n+  exact paths, filenames, entry points, tool invocations, and required execution modes. When\n+  multiple compilers, languages, or consumers are required, exercise each against the same saved\n+  deliverable. Do not substitute a wrapper, extracted fragment, rewritten copy, or extra flags\n+  unless the task permits them. Prefer these end-to-end checks over redundant smoke tests, and\n+  assert the required outputs or behavior rather than merely successful execution.\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n@@ -65,6 +71,11 @@ Assess whether the executed completion receipts prove every explicit requirement\n TASK. Check the actual return codes and output, not only the proposed command text. Reject checks\n that only prove a file exists, restate model claims, contradict their receipts, or omit required\n behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.\n+Compare the tested interface with the task-required interface: paths, filenames, entry points,\n+tool invocations, and execution modes. Success through a wrapper, extracted fragment, rewritten\n+copy, or additional flags does not establish success through the required interface unless the\n+task permits that substitution. For explicitly required multiple compilers, languages, or\n+consumers, require evidence for each against the same saved deliverable, including required behavior.\n Resolve every prior completion finding before accepting.\n When the task allows choosing among approaches and uses subjective superlatives such as \"fastest\",\n \"best\", or \"as efficient as possible\", require a credible measured improvement plus relevant",
+  "patch_sha256": "df02f3f800b882cfd721e263b0fa05a3724f0b84bbc3556da1e48ce5a7c76c99",
+  "prompt_sha256": "7c037a2451ab50b2b50f1deec497e0101b2128d61d2d9d7d9bf54665c90faae1",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "8f8abf383bc57737c4094991eb0e02d327c68b329810e1320aa59fa01ac85177",
+  "sample_id": "polyglot-rust-c__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

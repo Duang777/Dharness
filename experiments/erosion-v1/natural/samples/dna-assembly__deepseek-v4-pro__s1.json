@@ -1,0 +1,17 @@
+{
+  "index": 1,
+  "input_tokens": 27776,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 23111,
+  "patch": null,
+  "patch_sha256": null,
+  "prompt_sha256": "99f9c4e54788edbb724699d6266b15a752cbe2478ae865ddf97d2ce38e8c9570",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "1df382ef1386524c81b11193ee554ab87be087299f9d3245070b62bff42125e1",
+  "sample_id": "dna-assembly__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "unparseable",
+  "task": "dna-assembly",
+  "temperature": 1.0,
+  "touched_paths": []
+}

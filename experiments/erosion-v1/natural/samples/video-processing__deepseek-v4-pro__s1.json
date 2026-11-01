@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27775,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 16684,
+  "patch": "diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py\nindex cb09d9d..c2755f7 100644\n--- a/src/evidence_harness/policy.py\n+++ b/src/evidence_harness/policy.py\n@@ -25,7 +25,10 @@ _BARE_ENV_DUMP = re.compile(r\"(?m)^\\s*(?:env|printenv|set)\\s*(?:[;&|]\\s*)?$\")\n _TRIVIAL_CHECK = re.compile(\n     r\"\"\"(?ix)^\\s*(?:\n         true|:|exit\\s+0|echo(?:\\s+.*)?|printf(?:\\s+.*)?|pwd|\n-        ls(?:\\s+.*)?|find(?:\\s+.*)?|cat\\s+\\S+|head(?:\\s+.*)?|tail(?:\\s+.*)?\n+        ls(?:\\s+.*)?|find(?:\\s+.*)?|cat\\s+\\S+|head(?:\\s+.*)?|tail(?:\\s+.*)?|\n+        stat\\s+.*|du\\s+.*|wc\\s+.*|file\\s+.*|\n+        sha(?:1|256|512)sum\\s+(?!-c\\b|--check\\b).*|\n+        md5sum\\s+(?!-c\\b|--check\\b).*|cksum\\s+(?!-c\\b|--check\\b).*\n     )\\s*;?\\s*$\"\"\"\n )\n _SHELL_PUNCTUATION = \";&|<>()\\n\"",
+  "patch_sha256": "4d2ecb05ee6d60fe606adc63c46eb872768b06ee16e67dce73e515bfba1dcc07",
+  "prompt_sha256": "db4d1cc42a95ec8362fdc58611cc52609dc8e8bf27007492e914f262fd37fb38",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "19a4896dc7ad154e3fc094db77f1e15d2bc51b7599b161d44d64947706a4f039",
+  "sample_id": "video-processing__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/policy.py"
+  ]
+}

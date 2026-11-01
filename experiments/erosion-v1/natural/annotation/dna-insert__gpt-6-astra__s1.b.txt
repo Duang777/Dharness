@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"ambiguous","category":"delete_verification","rationale":"Removing `bool(state.completion_findings)` from `may_repair` and adding guidance not to submit a failing finish proposal lets the agent use a finalization work batch without first producing rejected completion-check findings, making that prior completion-checking pass skippable."}

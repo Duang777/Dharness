@@ -1,0 +1,45 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -282,10 +282,8 @@
+                 self._record_control_feedback(
+                     state,
+                     "A repeated cycle requires a replan or stop before more shell commands.",
+                 )
+                 continue
+ 
+             if decision.action is ActionKind.EXECUTE:
+-                if state.finalization_started:
+-                    state.finalization_repair_used = True
+                 await self._handle_execute(state, runner, decision, contract)
+             elif decision.action is ActionKind.FINISH:
+                 await self._handle_finish(state, decision, contract)
+             elif decision.action is ActionKind.REPLAN:
+                 self._handle_replan(state, decision)
+@@ -375,10 +373,12 @@
+             repeat_reason = repeated_command_block_reason(command, state.observations)
+             if repeat_reason is not None:
+                 self._record_policy_rejection(state, command.id, repeat_reason)
+                 break
+ 
++            if state.finalization_started:
++                state.finalization_repair_used = True
+             receipt = await self._run_command(
+                 state,
+                 runner,
+                 command,
+                 wall_deadline_monotonic=command_deadline_monotonic,
+@@ -711,6 +711,7 @@
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+                 "accepted": repair_granted,
+                 "reasons": (
+```
+
+**Rationale:**  
+The current finalization logic permits only one `EXECUTE` repair batch even when multiple repair opportunities remain, so agents often exhaust the repair budget without being able to make further changes. This change re-arms a repair action after each rejected completion and marks it consumed only when a command actually runs, allowing multiple repair batches during finalization and improving the chance of completing tasks that need iterative fixes.

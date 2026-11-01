@@ -1,0 +1,117 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -9,7 +9,6 @@
+ from evidence_harness.protocol import (
+     ActionKind,
+-    AgentDecision,
+     CommandReceipt,
+     CompletionIsolationEvidence,
+     LoopOptions,
+@@ -85,6 +84,92 @@
+ - Return exactly one JSON object matching the supplied schema. Do not wrap it in Markdown.
+""".strip()
+ 
++_EXECUTOR_RESPONSE_SCHEMA: dict[str, Any] = {
++    "type": "object",
++    "additionalProperties": False,
++    "properties": {
++        "action": {"type": "string", "enum": ["execute", "finish", "replan", "stop"]},
++        "rationale": {"type": "string", "minLength": 1},
++        "plan": {"type": "array", "items": {"type": "string"}, "maxItems": 8},
++        "commands": {
++            "type": "array",
++            "items": {"$ref": "#/$defs/command"},
++            "maxItems": 4,
++        },
++        "checks": {
++            "type": "array",
++            "items": {"$ref": "#/$defs/check"},
++            "maxItems": 3,
++        },
++        "coverage": {
++            "type": "array",
++            "items": {"$ref": "#/$defs/coverage"},
++            "maxItems": 20,
++        },
++        "summary": {"type": ["string", "null"]},
++        "stop_category": {
++            "type": ["string", "null"],
++            "enum": ["blocked", "unsafe", "impossible"],
++        },
++    },
++    "required": ["action", "rationale"],
++    "$defs": {
++        "command": {
++            "type": "object",
++            "additionalProperties": False,
++            "properties": {
++                "id": {"type": "string"},
++                "script": {"type": "string"},
++                "purpose": {"type": "string"},
++                "cwd": {"type": ["string", "null"]},
++                "timeout_sec": {
++                    "type": "integer",
++                    "minimum": 1,
++                    "maximum": 900,
++                    "default": 120,
++                },
++                "mode": {"type": "string", "enum": ["observe", "change"]},
++                "repeat_reason": {"type": ["string", "null"]},
++            },
++            "required": ["id", "script", "purpose", "mode"],
++        },
++        "check": {
++            "type": "object",
++            "additionalProperties": False,
++            "properties": {
++                "id": {"type": "string"},
++                "kind": {
++                    "type": "string",
++                    "enum": ["artifact", "behavior", "build", "data", "service"],
++                },
++                "script": {"type": "string"},
++                "proves": {"type": "string"},
++                "cwd": {"type": ["string", "null"]},
++                "timeout_sec": {
++                    "type": "integer",
++                    "minimum": 1,
++                    "maximum": 900,
++                    "default": 120,
++                },
++            },
++            "required": ["id", "kind", "script", "proves"],
++        },
++        "coverage": {
++            "type": "object",
++            "additionalProperties": False,
++            "properties": {
++                "requirement": {"type": "string"},
++                "check_ids": {
++                    "type": "array",
++                    "items": {"type": "string"},
++                    "minItems": 1,
++                    "maxItems": 3,
++                },
++            },
++            "required": ["requirement", "check_ids"],
++        },
++    },
++}
++
+ _REVIEW_RULES = """
+ You are a read-only completion reviewer. You cannot run commands and cannot mark the task complete.
+ Assess whether the executed completion receipts prove every explicit requirement in the ORIGINAL
+@@ -167,7 +252,7 @@
+     contract: CompletionContract,
+     allowed_actions: tuple[ActionKind, ...] | None = None,
+ ) -> str:
+-    schema = AgentDecision.model_json_schema()
++    schema = _EXECUTOR_RESPONSE_SCHEMA
+     recent_limit = min(options.recent_observation_count, len(state.observations))
+     detail_chars = min(6_000, max(1_000, options.output_inline_bytes // 2))
+     actions = allowed_actions or tuple(ActionKind)
+```
+
+Rationale:  
+The pydantic-generated schema for AgentDecision is very large and consumes a significant share of the 80k prompt budget, forcing earlier and more aggressive truncation of command observations. Replacing it with a compact but complete JSON schema leaves more room for task-relevant history, which should improve the agent's decisions without relaxing validation.

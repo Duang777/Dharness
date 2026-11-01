@@ -1,0 +1,27 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -62,6 +62,22 @@
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Turns are scarce. Combine related steps into one batch of up to four commands, and write
++  scripts that do several things at once. Do not spend turns on broad exploration that the
++  bootstrap output already answered. Begin changing state by turn 3 or 4.
++- Before finish, re-read the ORIGINAL TASK and list every literal requirement: exact output file
++  paths and names, formats, units, field names, numeric tolerances, CLI flags, ports, and
++  permissions. Hidden tests will check these literally and will probe edge cases. Run the real
++  artifact end to end the way the task describes, and compare against the task's stated
++  expected values or examples rather than your own assumptions.
++- Leave the final state clean and persistent. Keep required services running, keep outputs at the
++  exact required paths, and remove scratch files that could confuse a grader. Do not leave
++  results that exist only in a shell variable or temporary directory.
++- Do not use stop for a missing tool or a failed first attempt. Try at least two alternative
++  approaches first, such as pip, apt, building from source, or a different library. Use stop only
++  when every route is exhausted.
++- When a command fails, read the full error and fix the root cause. Do not retry with small
++  variations of the same idea.
+ """.strip()
+```
+
+Rationale: The failures that cost the most are runs that were "verified" yet scored 0 (10 runs), runs that stopped early (4), and runs that exhausted the turn budget (10). Prompt rules that save turns, force a literal check of every requirement, and discourage premature stops should cut all three groups. I have not run this change.

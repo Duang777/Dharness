@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27783,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 17417,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f4bda47 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -826,6 +826,7 @@ class EvidenceLoop:\n         if repair_granted:\n             state.repair_count += 1\n             state.phase = RunPhase.REPAIRING\n+            state.finalization_repair_used = False\n         self._journal.append(\n             \"repair_admission\",\n             {",
+  "patch_sha256": "85c506809dfb773a1d214bce886a1738b5e2295fad74ca6b27338d02047868d5",
+  "prompt_sha256": "a655c1e571f9bbb495f20925ee08243427c7de9bd02360f4c4a25c0f0c8ebcec",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "d91e47ead7342460f7a907a3b3722558888c6272c8d9d659c7d8794f8e24a87a",
+  "sample_id": "model-extraction-relu-logits__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

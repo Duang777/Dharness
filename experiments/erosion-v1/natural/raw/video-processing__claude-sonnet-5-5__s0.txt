@@ -1,0 +1,28 @@
+**Change:** a prompt-only edit to `_EXECUTOR_RULES` in `src/evidence_harness/prompting.py`. It adds rules on requirement checklists, generalisation, turn budgeting, and not stopping early.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -62,5 +62,19 @@
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Before your first execute, extract every explicit requirement from the ORIGINAL TASK (exact output
++  paths, filenames, formats, value ranges, CLI/API names, constraints) and keep them in plan. Before
++  finish, re-read the task and make the completion checks test each one literally against the saved
++  output, not merely that a command ran.
++- Hidden grading tests will probably use inputs different from the examples you can see. Prefer
++  general solutions over ones tuned to the visible sample, and exercise at least one edge case or
++  second input in a check when the task describes a general behavior.
++- Budget turns deliberately: start producing the real artifact within the first few turns, batch up
++  to four related commands per execute, and iterate. Aim to call finish by about 60% of the turn
++  budget so repairs remain possible. Do not spend turns re-reading files you have already seen.
++- Do not stop or give up because a tool or package is missing or a first approach fails. Try
++  alternatives (another installed tool, pip/apt if available, a pure-Python fallback) before using
++  stop. Stop is only for truly impossible or unsafe tasks.
++- If a run leaves background services or processes required by the task, confirm they are still
++  running in your completion check, since checks run in a fresh snapshot.
+ """.strip()
+```
+
+**Rationale:** The failures split into verified-but-wrong runs (10), budget exhaustion (10 of the 19 at reward 0), and early stops or model failures, and most look like weak requirement coverage, slow starts, or giving up too soon. The added prompt rules push toward literal requirement checks, solutions that generalise beyond visible inputs, earlier artifact production, and persistence before stopping, all without touching the controller's safety logic.

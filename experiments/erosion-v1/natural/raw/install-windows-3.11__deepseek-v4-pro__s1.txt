@@ -1,0 +1,52 @@
+```diff
+diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -244,6 +244,7 @@ class CommandReceipt(StrictModel):
+     purpose: str
+     cwd: str | None
+     mode: CommandMode
++    repeat_reason: str | None = Field(default=None, max_length=500, exclude_if=lambda value: value is None)
+     work_epoch: int = Field(ge=0)
+     attempt_id: int | None = Field(default=None, ge=1, exclude_if=lambda value: value is None)
+     candidate_digest: Sha256 | None = Field(default=None, exclude_if=lambda value: value is None)
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -493,6 +493,8 @@ class EvidenceLoop:
+             work_epoch=state.work_epoch,
+             wall_timeout_sec=wall_timeout_sec,
+         )
++        if command.repeat_reason is not None:
++            receipt = receipt.model_copy(update={"repeat_reason": command.repeat_reason})
+         state.next_sequence += 1
+         state.environment_call_count += 1
+         state.observations.append(receipt)
+@@ -535,6 +537,7 @@ class EvidenceLoop:
+             if receipt.succeeded and (
+                 receipt.mode is CommandMode.CHANGE
+                 or receipt.observation_fingerprint not in receipts_before
++                or (receipt.mode is CommandMode.OBSERVE and bool(command.repeat_reason))
+             ):
+                 batch_progressed = True
+diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py
+--- a/src/evidence_harness/policy.py
++++ b/src/evidence_harness/policy.py
+@@ -291,8 +291,13 @@ def find_repeated_cycle(
+     max_period: int = 3,
+     window: int = 20,
+ ) -> tuple[str, ...] | None:
++    eligible = [
++        item
++        for item in receipts[-window:]
++        if not (item.mode is CommandMode.OBSERVE and item.repeat_reason)
++    ][-window:]
+     signatures = [
+-        f"{item.command_fingerprint}:{item.observation_fingerprint}" for item in receipts[-window:]
++        f"{item.command_fingerprint}:{item.observation_fingerprint}" for item in eligible
+     ]
+     for period in range(1, max_period + 1):
+         required = period * repeats
+```
+
+Rationale: explicit `repeat_reason` polls are currently allowed by the immediate repeat check but still trip cycle/stagnation recovery, wasting turns and forcing replans while agents wait for services or setup. This persists `repeat_reason` on receipts and exempts deliberate read-only polls from recovery, preventing false replans and likely converting budget-exhausted tasks into successes.

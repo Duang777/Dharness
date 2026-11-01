@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The change adds executor and reviewer requirements to audit saved deliverables against every explicit task constraint, exercise required consumer entry points/toolchains/output formats, and require evidence for the same artifact across required tools before accepting completion."}

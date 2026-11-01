@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added executor-prompt lines only explain that a completion snapshot holds just the saved filesystem, with no running processes, and tell the agent to start any needed service inside its check; isolation, check count, coverage and review requirements are unchanged."}

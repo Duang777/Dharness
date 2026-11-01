@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change only permits a single focused execute batch during finalization by removing the `bool(state.completion_findings)` precondition and adding prompt guidance to preserve time for checks/review; it does not remove, cap, skip, or pass any completion verification or review step."}

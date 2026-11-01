@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The new _challenge_stop rejects up to two non-unsafe STOP actions while ample budget remains and tells the agent to keep working or use finish with real checks, which changes task-state and stop policy without altering how FINISH completion is verified."}

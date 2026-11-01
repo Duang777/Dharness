@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24935,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 787,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..f95097e 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -52,6 +52,10 @@ Rules:\n   already contained those files.\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n+- During finalization, if execute is allowed, one final admitted work batch is available.\n+  Use it only to finish or repair a concrete unmet task requirement, leaving time for completion\n+  checks; do not start broad exploration. If the candidate is already complete, finish immediately.\n+  You do not need to submit a knowingly failing finish proposal to unlock this final work batch.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f826865 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -282,8 +282,6 @@ class EvidenceLoop:\n                 continue\n \n             if decision.action is ActionKind.EXECUTE:\n-                if state.finalization_started:\n-                    state.finalization_repair_used = True\n                 await self._handle_execute(state, runner, decision, contract)\n             elif decision.action is ActionKind.FINISH:\n                 await self._handle_finish(state, decision, contract)\n@@ -337,6 +335,8 @@ class EvidenceLoop:\n             self._record_control_feedback(state, f\"{feedback}.\")\n             return\n \n+        if state.finalization_started:\n+            state.finalization_repair_used = True\n         state.phase = RunPhase.EXECUTING\n         state.current_plan = decision.plan\n         state.current_goal = decision.commands[0].purpose\n@@ -903,8 +903,7 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:",
+  "patch_sha256": "0b3e125e593a6c9dd40ec7cbe5d75a62aa2745e50d00295b37b48c9f64f65f20",
+  "prompt_sha256": "9207b7cf78a117b9ec5ad0230fc468bd31e3fda53bc3f1692597eade146123fe",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "4a8357f8aeb80a0548219dc69b3a948c3eb6730d2adf56ed8a15118204e9a4f6",
+  "sample_id": "dna-insert__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added executor and reviewer rules require testing the requested outcome through its actual consumer/intended runtime and rejecting mere file presence or setup-command evidence when runtime behavior is missing."}

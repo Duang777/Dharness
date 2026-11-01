@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 43151,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1459,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..e5a6678 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -384,6 +384,7 @@ class RunState:\n     failure_category: str | None = None\n     last_batch_progressed: bool = True\n     stagnant_batches: int = 0\n+    stop_challenges: int = 0\n \n \n class EnvironmentResult(Protocol):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f09057c 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -290,6 +290,29 @@ class EvidenceLoop:\n             elif decision.action is ActionKind.REPLAN:\n                 self._handle_replan(state, decision)\n             else:\n+                turns_left = self._options.max_turns - state.turn_count\n+                if (\n+                    decision.stop_category in {\"blocked\", \"impossible\"}\n+                    and state.stop_challenges < 1\n+                    and not state.finalization_started\n+                    and turns_left > 10\n+                ):\n+                    state.stop_challenges += 1\n+                    self._journal.append(\n+                        \"premature_stop_challenged\",\n+                        {\n+                            \"stop_category\": decision.stop_category,\n+                            \"turns_remaining\": turns_left,\n+                        },\n+                    )\n+                    state.unresolved_errors.append(\n+                        \"Stop was not accepted: substantial budget remains and the task is \"\n+                        \"solvable in this sandbox. Re-read the task, diagnose the actual \"\n+                        \"blocker, and try a materially different approach (other tools, \"\n+                        \"writing your own implementation, inspecting inputs more closely).\"\n+                    )\n+                    self._notify(state)\n+                    continue\n                 state.final_summary = decision.summary or decision.rationale\n                 return self._finish(\n                     state,",
+  "patch_sha256": "45230c27754871ff644e4d85bdb13396d680bdf34452b570731ae10d7240e324",
+  "prompt_sha256": "9207b7cf78a117b9ec5ad0230fc468bd31e3fda53bc3f1692597eade146123fe",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "cea66e822184292af00564d40eccf6bc7561535abedf9218ea947c0ecc8889a6",
+  "sample_id": "dna-insert__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

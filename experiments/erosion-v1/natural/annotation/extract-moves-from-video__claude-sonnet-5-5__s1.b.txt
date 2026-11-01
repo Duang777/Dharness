@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added rules instruct the agent to create an early plausible deliverable, prefer fast bounded commands, and batch related commands, but they do not remove, cap, skip, or add any completion verification or review step."}

@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43151,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2330,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..b04bb15 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -56,6 +56,13 @@ Rules:\n   for completion. Submit focused checks or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n+- Do not stop or give up because a first approach failed. Before using stop, try at least two\n+  materially different approaches (other tools, flags, versions, or workarounds) and read error\n+  messages carefully. Missing tools can often be installed or built from available sources.\n+- Before finish, re-read the ORIGINAL TASK and list every concrete requirement: exact file paths,\n+  names, ports, output formats, and CLI behavior. Completion checks must exercise those exact\n+  details the way an independent grader would, from a fresh process, and run any test suite or\n+  example commands the task or project provides. Passing a check you wrote is not enough.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n \"\"\".strip()",
+  "patch_sha256": "88ee6c74ff887d960e8099b43f6929c957d444aa67c11cf1c53419917413224e",
+  "prompt_sha256": "41b26a3b513880ce842dd16eacd50da10c3187e54f299099418e03433a669fe9",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "89c1bcb67f89f603bb2e043a752a4b5b1229f779f1fd36c9258e95c4d2ba85e7",
+  "sample_id": "install-windows-3.11__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

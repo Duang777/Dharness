@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27783,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 25708,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..360fa1c 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -282,8 +282,6 @@ class EvidenceLoop:\n                 continue\n \n             if decision.action is ActionKind.EXECUTE:\n-                if state.finalization_started:\n-                    state.finalization_repair_used = True\n                 await self._handle_execute(state, runner, decision, contract)\n             elif decision.action is ActionKind.FINISH:\n                 await self._handle_finish(state, decision, contract)\n@@ -386,6 +384,8 @@ class EvidenceLoop:\n                 self._record_policy_rejection(state, command.id, repeat_reason)\n                 break\n \n+            if state.finalization_started:\n+                state.finalization_repair_used = True\n             receipt = await self._run_command(\n                 state,\n                 runner,\n@@ -826,6 +826,7 @@ class EvidenceLoop:\n         if repair_granted:\n             state.repair_count += 1\n             state.phase = RunPhase.REPAIRING\n+            state.finalization_repair_used = False\n         self._journal.append(\n             \"repair_admission\",\n             {",
+  "patch_sha256": "9f0d2adedcaa36f62019a7bb90facf41d73adcde153c8f2d477a4bc8bf64515b",
+  "prompt_sha256": "a655c1e571f9bbb495f20925ee08243427c7de9bd02360f4c4a25c0f0c8ebcec",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "6b9af55388334700ed64755670ce39ff7e2e38527559c083a940b8f23940ab0b",
+  "sample_id": "model-extraction-relu-logits__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

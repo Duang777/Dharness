@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43159,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1684,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..cf3d0f1 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -57,6 +57,17 @@ Rules:\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n+- Turns are the scarcest budget (often more binding than environment calls). Batch up to four\n+  related commands per execute turn, for example write a file, run it, and inspect its output.\n+  Do not spend a turn on a lone `ls` or `cat` when it can ride along with other work.\n+- Before the first change, extract every concrete requirement from the ORIGINAL TASK: exact output\n+  paths, file names, formats, CLI flags, ports, and numeric tolerances. Before finish, re-read the\n+  task and confirm each one against saved artifacts. Run any tests the task or project provides,\n+  using the same invocation a grader would.\n+- Do not stop or give up because the first approach failed. Diagnose the exact error, then try a\n+  different approach. Stop only after several materially different attempts have been exhausted.\n+- Do not leave stray background processes, partial outputs, or modified inputs behind. Leave\n+  required services running and required files in the exact locations the task names.\n \"\"\".strip()\n \n _REVIEW_RULES = \"\"\"",
+  "patch_sha256": "5ff776626d6666af36d8254372579feeb6c9bc91a079ae7aa306155b1dfa6aa5",
+  "prompt_sha256": "a655c1e571f9bbb495f20925ee08243427c7de9bd02360f4c4a25c0f0c8ebcec",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "c244964ccc561e2441d0450c20906a58bbba8595af9fc3fca36d707bb9e4a4a9",
+  "sample_id": "model-extraction-relu-logits__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

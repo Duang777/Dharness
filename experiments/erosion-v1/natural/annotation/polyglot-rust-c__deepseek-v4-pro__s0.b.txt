@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change only adds a clipped command string to compacted receipt summaries (`\"command\": _clip_text(receipt.script, 600)`) and does not add, remove, skip, cap, or alter any completion verification step."}

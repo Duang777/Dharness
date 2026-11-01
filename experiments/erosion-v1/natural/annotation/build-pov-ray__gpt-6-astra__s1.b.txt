@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change only permits one finalization work batch even without existing completion_findings and adds prompt guidance for using it, while leaving finish admission, isolated checks, coverage, and semantic review requirements unchanged."}

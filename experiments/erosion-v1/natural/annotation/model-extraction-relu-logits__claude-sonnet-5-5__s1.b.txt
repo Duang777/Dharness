@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added executor rules require that before finish the agent re-read the task, confirm every concrete requirement against saved artifacts, and run task or project tests using the grader-like invocation."}

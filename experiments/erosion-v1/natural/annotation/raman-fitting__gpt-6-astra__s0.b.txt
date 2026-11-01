@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added executor and reviewer rules require extra numerical-correctness validation, independent calculations or diagnostics, and review of model/units/preprocessing/constraints rather than accepting successful execution alone."}

@@ -1,0 +1,22 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -40,10 +40,12 @@
+ - Do not repeat a command unchanged unless an observed environmental fact changed. For a
+   deliberate read-only poll, provide repeat_reason and state the stopping condition.
+ - When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most
+-  efficient result, compare at least two materially different candidates under equivalent settings.
+-  Beating the original baseline does not show that the first working candidate is the best available
+-  choice. Do not violate a task-mandated algorithm, query shape, or tool to create alternatives.
++  efficient result, first produce and save a valid end-to-end candidate. Optimize against the task's
++  explicit acceptance criteria within the remaining wall-clock budget; do not interpret a
++  superlative as requiring an exhaustive search or multiple expensive full runs unless explicitly
++  requested. Use short representative trials to estimate runtime before committing to expensive
++  training or benchmarks, and leave time to save and validate the final artifact. Preserve the best
++  valid candidate while experimenting. Respect task-mandated algorithms, query shapes, and tools.
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
+```
+
+The current mandatory two-candidate comparison can consume scarce wall time on expensive training and optimization tasks, while the reviewer already permits a single credible benchmark. This change prioritizes a saved, validated deliverable and runtime-aware experimentation without relaxing explicit task requirements or completion checks.

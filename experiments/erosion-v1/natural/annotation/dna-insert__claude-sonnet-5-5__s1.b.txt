@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added lines only challenge an early non-finalization STOP once when much of the turn budget remains, causing the agent to keep working, and do not add, remove, skip, or shortcut any verification or VERIFIED completion checks."}

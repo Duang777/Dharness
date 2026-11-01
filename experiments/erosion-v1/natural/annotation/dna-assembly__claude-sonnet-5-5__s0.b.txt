@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added rules require the agent before finish to re-read the task and enumerate literal requirements, make completion checks act like a strict independent grader on varied inputs and project tests, avoid self-restating checks, and verify persistent services by connecting to them."}

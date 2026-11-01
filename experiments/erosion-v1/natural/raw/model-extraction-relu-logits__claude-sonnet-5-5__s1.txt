@@ -1,0 +1,23 @@
+Diff below. It adds a few bullets to the executor prompt in `src/evidence_harness/prompting.py`, and I have not run it against the benchmark.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -58,6 +58,18 @@
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Turns are the scarcest budget (often more binding than environment calls). Batch up to four
++  related commands per execute turn, for example write a file, run it, and inspect its output.
++  Do not spend a turn on a lone `ls` or `cat` when it can ride along with other work.
++- Before the first change, extract every concrete requirement from the ORIGINAL TASK: exact output
++  paths, file names, formats, CLI flags, ports, and numeric tolerances. Before finish, re-read the
++  task and confirm each one against saved artifacts. Run any tests the task or project provides,
++  using the same invocation a grader would.
++- Do not stop or give up because the first approach failed. Diagnose the exact error, then try a
++  different approach. Stop only after several materially different attempts have been exhausted.
++- Do not leave stray background processes, partial outputs, or modified inputs behind. Leave
++  required services running and required files in the exact locations the task names.
+ """.strip()
+```
+
+**Rationale:** The last run lost most of its failures to turn-budget exhaustion (10 `budget_exhausted` at reward 0) and to premature stops (4 `model_stopped` at reward 0). The new bullets push the agent to batch commands, give up less readily, and check exact output paths and formats before finishing, which targets the 10 `verified` runs that still scored 0. This is a low-risk change that touches no completion-control invariants.

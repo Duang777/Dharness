@@ -1,0 +1,22 @@
+Rationale: the failed `train-fasttext` run, and likely other `budget_exhausted` failures, hit the wall clock or call limits while long jobs such as training and builds ran in the foreground under the 300s command cap, leaving no valid artifact when the budget ran out. I changed the executor rules to tell the agent to run long jobs in the background and poll them with short sleeps, and to produce a minimal valid deliverable early, so the final state is usable whenever the run ends. The diff below is untested.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -38,6 +38,16 @@
+ - Do not repeat a command unchanged unless an observed environmental fact changed. For a
+   deliberate read-only poll, provide repeat_reason and state the stopping condition.
++- Budget awareness: wall time and environment calls are the scarcest resources. Each command is
++  capped by max_command_timeout_sec. Start anything slow (training, large builds, downloads,
++  long test suites) in the background with nohup, redirecting output to a log file and writing
++  a done-marker, then poll with short observe commands such as `sleep 45; tail -n 20 LOG` and
++  a repeat_reason. Never block a single command on a job that may exceed its timeout.
++- Produce a minimal valid deliverable at the required output path EARLY (the simplest version
++  that satisfies the format), then improve it. The task is graded on the final state of the
++  environment, so a working artifact left in place beats an unfinished perfect one. Prefer
++  smaller or faster settings (fewer epochs, smaller dimension, subsets) when the task
++  thresholds allow, and check the thresholds and any size/time limits stated in the task.
+ - When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most
+   efficient result, compare at least two materially different candidates under equivalent settings.
+   Beating the original baseline does not show that the first working candidate is the best available
+```

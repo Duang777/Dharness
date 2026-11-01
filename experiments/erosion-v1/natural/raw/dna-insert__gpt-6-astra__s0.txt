@@ -1,0 +1,46 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -270,8 +270,6 @@
+                 continue
+ 
+             if decision.action is ActionKind.EXECUTE:
+-                if state.finalization_started:
+-                    state.finalization_repair_used = True
+                 await self._handle_execute(state, runner, decision, contract)
+             elif decision.action is ActionKind.FINISH:
+                 await self._handle_finish(state, decision, contract)
+@@ -331,6 +329,8 @@
+             self._record_control_feedback(state, f"{feedback}.")
+             return
+ 
++        if state.finalization_started:
++            state.finalization_repair_used = True
+         state.phase = RunPhase.EXECUTING
+         state.current_plan = decision.plan
+         state.current_goal = decision.commands[0].purpose
+@@ -872,8 +872,7 @@
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -48,6 +48,10 @@
+   already contained those files.
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, one final admitted work batch is available.
++  Use it only to finish or repair a concrete unmet task requirement, leaving time for completion
++  checks; do not start broad exploration. If the candidate is already complete, finish immediately.
++  You do not need to submit a knowingly failing finish proposal to unlock this final work batch.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+Finalization currently blocks useful work until a completion rejection exists, potentially wasting a reserved turn and verification calls merely to unlock a needed repair. Allowing one admitted final work batch without that prerequisite should help agents finish incomplete artifacts while preserving the existing verification-call reserve, completion gates, and a subsequent executor turn.

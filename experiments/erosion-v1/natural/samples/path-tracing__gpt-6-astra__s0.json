@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24936,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 656,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..b3a2187 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -52,6 +52,9 @@ Rules:\n   already contained those files.\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n+- During finalization, if execute is allowed, you have at most one final work batch. Use it only\n+  for a concrete remaining implementation step or repair, then submit completion checks.\n+  Do not submit a knowingly incomplete finish proposal merely to unlock a repair.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..a28082c 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -902,12 +902,11 @@ class EvidenceLoop:\n         if not state.finalization_started:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n-        may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+        may_finalize_work = (\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n-        if may_repair:\n+        if may_finalize_work:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n         return (ActionKind.FINISH, ActionKind.STOP)",
+  "patch_sha256": "e7a96fb08872b821f61d6b6d813cb23713673ee2579036c8073a2790b5fc820b",
+  "prompt_sha256": "7d0b3c5b4fdfb53bc22e3833f95b0ee5a55f51fff8f1cd7f4c656dab0a4333f1",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "b75f3622c6bb84e876ce3f3d1eb81506de2054e6f5831a58520a7683d1398291",
+  "sample_id": "path-tracing__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

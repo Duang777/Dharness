@@ -1,0 +1,22 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -41,6 +41,15 @@
+ - Do not repeat a command unchanged unless an observed environmental fact changed. For a
+   deliberate read-only poll, provide repeat_reason and state the stopping condition.
++- Wall-clock time is the scarcest budget; every model turn costs about a minute. Make each turn
++  count: batch up to four related commands per execute, and write complete scripts rather than
++  probing one fact at a time. Inspect the available tools and inputs once, then commit to an
++  implementation.
++- Start any job that may exceed about 200 seconds (large builds, training, video/audio/image
++  processing, long downloads) in the background with nohup, redirecting output to a log file and
++  writing a done-marker. Poll the log with short observe commands, and do other useful work in
++  the meantime. Never let one foreground command approach the command timeout.
++- Produce a first working version of the required output file early, then improve it. A
++  partial but correctly formatted artifact in the right location beats an unfinished perfect one.
+ - When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most
+   efficient result, compare at least two materially different candidates under equivalent settings.
+   Beating the original baseline does not show that the first working candidate is the best available
+```
+
+Rationale: Many failures end in `budget_exhausted` with turns and environment calls to spare (the sample task used 25 of 40 turns and 27 of 80 calls). That points to wall-clock exhaustion, which I did not confirm from the run logs. The prompt change should cut wasted turns and keep slow jobs from blocking the foreground, so more tasks reach a usable output before the deadline.

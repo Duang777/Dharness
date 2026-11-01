@@ -1,0 +1,74 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -529,6 +529,7 @@ class EvidenceLoop:
+                 isolation=isolated.isolation,
+                 supporting_observations=supporting_observations,
+                 prior_findings=state.completion_findings,
++                context_max_chars=self._options.context_max_chars,
+             )
+             model_timeout_sec = self._model_call_timeout_sec(state)
+             try:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -153,28 +153,46 @@ def build_review_prompt(
+     supporting_observations: list[CommandReceipt],
+     isolation: CompletionIsolationEvidence | None = None,
+     prior_findings: tuple[str, ...] = (),
++    context_max_chars: int = 80_000,
+ ) -> str:
+-    payload = {
+-        "original_task": instruction,
+-        "completion_contract": contract.model_dump(mode="json"),
+-        "proposed_checks": [item.model_dump(mode="json") for item in checks],
+-        "requirement_coverage": [item.model_dump(mode="json") for item in coverage],
+-        "prior_completion_findings": prior_findings,
+-        "executed_verification_receipts": [
+-            _receipt_view(item, 2_000) for item in verification_receipts
+-        ],
+-        "completion_isolation": (
+-            isolation.model_dump(mode="json") if isolation is not None else None
+-        ),
+-        "supporting_observations": [
+-            _receipt_view(item, 1_000) for item in supporting_observations[-6:]
+-        ],
+-    }
+-    return _render(_REVIEW_RULES, payload, ReviewDecision.model_json_schema())
++    detail_chars = 12_000
++    support_limit = min(6, len(supporting_observations))
++
++    while True:
++        supporting = (
++            supporting_observations[-support_limit:] if support_limit else []
++        )
++        payload = {
++            "original_task": instruction,
++            "completion_contract": contract.model_dump(mode="json"),
++            "proposed_checks": [item.model_dump(mode="json") for item in checks],
++            "requirement_coverage": [item.model_dump(mode="json") for item in coverage],
++            "prior_completion_findings": prior_findings,
++            "executed_verification_receipts": [
++                _receipt_view(item, detail_chars) for item in verification_receipts
++            ],
++            "completion_isolation": (
++                isolation.model_dump(mode="json") if isolation is not None else None
++            ),
++            "supporting_observations": [
++                _receipt_view(item, 1_000) for item in supporting
++            ],
++        }
++        prompt = _render(_REVIEW_RULES, payload, ReviewDecision.model_json_schema())
++
++        if len(prompt) <= context_max_chars:
++            return prompt
++        if detail_chars > 1_000:
++            detail_chars = max(1_000, detail_chars // 2)
++            continue
++        if support_limit > 1:
++            support_limit -= 1
++            detail_chars = 2_000
++            continue
++        return prompt
+```
+
+Rationale: The completion reviewer currently sees verification receipts clipped to a fixed 2,000 characters, which can hide the exact pass/fail evidence needed to catch false-success completions or accept valid ones. Making the review prompt context-aware and starting with much larger excerpts gives the reviewer substantially more signal while still compacting safely under the context limit.

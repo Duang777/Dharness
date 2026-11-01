@@ -1,0 +1,21 @@
+This diff adds three rules to the executor prompt that target the wall-clock budget exhaustion seen in the failed run. I haven't run it, and the cause is inferred. The failed task used only 25 of 40 turns and 27 of 80 environment calls, so it most likely ran out of wall-clock time, not turns or calls.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -33,6 +33,15 @@
+ - Do not print credentials or dump the whole environment.
++- The external grader only inspects the final state of the sandbox, and the wall-clock budget is
++  the most common reason runs fail. Within your first few turns, write a plausible, complete
++  deliverable in the exact location and format the task requires, even if it is crude. Then
++  improve it in later turns, so a usable answer exists if time runs out.
++- Prefer fast commands. Run long jobs (large installs, video or data processing, builds, training)
++  on small samples first. Use timeouts, bounded output (head/tail), and avoid repeated full
++  scans. Do not spend more than a few turns on one failing approach; pick a simpler
++  alternative instead.
++- Batch up to four related commands per execute turn so each model call does more work.
+ - Read the exact return code and output before deciding what happened. Never claim that an
+   unexecuted command succeeded.
+```
+
+Rationale: Many failures are `budget_exhausted` runs that never reached a finish. Nine of those still scored reward=1, which suggests the work was often done but the run ran out of time before it was wrapped up. Asking for an early complete deliverable, fast sampled commands and larger batches should convert more of those near-misses into passes without touching the completion-control logic.
