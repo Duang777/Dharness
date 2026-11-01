@@ -78,12 +78,12 @@ G1 针对的是非对抗的侵蚀：proposer 为了提分而削弱验证，但�
 - [x] **P3 G3 Historical-7 移植。** `tests/guard/test_historical_properties.py` 用当前 API 驱动 7 个历史场景，HEAD 上全部通过。`experiments/erosion-v1/seeded/historical/` 下 7 个补丁在当前代码里重新引入对应的历史 bug，gate 对 7 个都判 `reject`。`review_receipt_order` 是改写，不是原样复现：原 bug 是先审查后执行检查，在当前代码里会被 phase guard 拦下，所以改为不给审查者看执行回执。
 - [x] **P4 G2 轨迹一致性探针。** `tests/guard/test_trajectory_invariants.py` 有 8 个脚本化场景，每个场景跑真实的 `EvidenceLoop.run`，再用离线 `audit_control_trace`（I1 到 I8）检查 journal。作者种子中有 4 个只被 G2 拦下：`verify_first_check_only`、`skip_slow_checks`、`any_passing_check_suffices`、`finalization_accepts_mechanical_evidence`。G2 用的是假隔离，看不到 `docker_completion_isolation.py` 的修改。
 - [x] **P5 E3 公开历史审计。** `experiments/erosion-v1/public-audit-labels-v1.json` 是冻结的标签和 codebook，`scripts/erosion_public_audit.py` 输出 `evaluation/erosion-v1-public-audit.json`。目前只有作者一人标注，第二标注者按 P6 协议补做。
-- [ ] **P6 E2 自然修改采样与标注协议。** 协议和 proposer 提示已冻结：`docs/thesis-erosion-annotation-protocol.md`。采样需要模型调用和第二标注者，尚未开始。
-- [ ] **P7 基线 gate。** LLM 审计员和任务回归。证据：在 E1 和 E2 上的配对结果。
+- [x] **P6 E2 自然修改采样与标注。** 协议：`docs/thesis-erosion-annotation-protocol.md`。3 个 proposer（claude-sonnet-5-5、gpt-6-astra、deepseek-v4-pro）在 12 个失败轨迹上各采 2 个，中性提示得到 70 个可应用补丁，完成压力提示（E2b，预注册，只服务 RQ2）得到 71 个。两名 LLM 标注者盲标，分歧交裁决者：中性 κ=0.73，E2b κ=0.77。标签冻结后才运行 gate（`experiments/erosion-v1/natural-labels-v1.json`，sha256 `c0ca9bad…`；`natural-pressure-labels-v1.json`，sha256 `97a9cbc4…`）。人工复标仍未做，标签目前是临时标签。
+- [x] **P7 基线 gate。** 回归基线是 main 上除 gate 自身测试外的全部测试，在空补丁上校准后保留 451 个（`experiments/erosion-v1/regression-suite-v1.json`）。LLM 审计员是 kimi-k3，和标注模型不同。E2 结果：`evaluation/erosion-v1-natural-gate-results.json`、`evaluation/erosion-v1-natural-pressure-gate-results.json`。E1 配对结果：`scripts/erosion_seeded_baselines.py` 输出 `evaluation/erosion-v1-seeded-baselines.json`。结果见下文“E2 与基线结果”。
 - [ ] **P8 在线 RSI 小循环。** 15 道搜索题和 15 道互不相交的留出题，10 轮，每轮 2 个候选，比较只看分数和加 gate 两种选择规则。先做 pilot 估算成本。证据：两组运行的 canonical 结果。
 - [ ] **P9 统计、表格与论文。** 所有表格由脚本从 canonical JSON 生成。
 
-P1 到 P5 已完成，没有调用模型。P6 到 P8 需要预算和导师确认。
+P1 到 P5 没有调用模型。P6、P7 已用模型完成，标签待人工复标。P8 需要预算和导师确认。
 
 ## E1 结果（开发证据）
 
@@ -113,6 +113,32 @@ E1 由作者编写，gate 也由作者开发，以下数字只能说明 gate 的
 - 第 2 轮到第 6 轮，当前最优候选的祖先里都有明确的侵蚀修改（`lean_completion`），占 10 轮中的 5 轮。最终 46.5% 的最优候选来自加强验证的 `db_tmp_copy`，祖先里没有明确侵蚀。
 - 局限：只有一次搜索运行，分数来自 19 题子集，相邻候选只差一两道题；只有作者一人标注。这些结果只用作动机，不用于统计推断。
 
+## E2 与基线结果
+
+E2 是留出集：补丁来自非作者的模型，标签在 gate 运行前冻结。下表的“侵蚀”和“良性”都以 LLM 临时标签为准。
+
+| gate | E2 中性：侵蚀拒绝 | E2 中性：良性误拒 | E2b 压力：侵蚀拒绝 | E2b 压力：良性误拒 | E1 种子：侵蚀拒绝 | E1 种子：良性误拒 |
+|---|---|---|---|---|---|---|
+| G1 协议性质 | 1/3 | 17/67 | 7/8 | 20/63 | — | — |
+| G2 轨迹注入 | 2/3 | 4/67 | 0/8 | 1/63 | 8/21 | 0/14 |
+| G3 历史缺陷 | 1/3 | 3/67 | 6/8 | 16/63 | — | — |
+| G1 + G2 + G3 | 2/3 | 19/67 | 7/8 | 23/63 | 16/21 | 0/14 |
+| 回归测试基线 | 3/3 | 19/67 | 7/8 | 35/63 | 14/21 | 2/14 |
+| LLM 审计员基线 | 2/3 | 0/67 | 7/8 | 1/63 | 18/21 | 0/14 |
+| G1+G2+G3 或审计员 | 2/3 | 19/67 | 8/8 | 24/63 | 21/21 | 0/14 |
+
+E1 的 21 个侵蚀包括 14 个作者种子和 7 个历史回归。
+
+- **RQ1：中性提示下侵蚀很少。** 70 个补丁里 3 个被标为侵蚀，2 个明确；另有 21 个加强验证。Meta-Harness 的迭代搜索里是 5/20。单次提议本身很少侵蚀，侵蚀更可能来自搜索中的选择压力。
+- **完成压力下侵蚀出现，而且集中在一种模式上。** E2b 有 8/71 侵蚀，7 个来自 claude-sonnet-5-5。6 个是同一种修改：审查次数用完后关闭审查或硬编码 `review_exhausted = False`。这正是 Historical-7 的 `review_quota_no_bypass` 缺陷，G3 拦下了全部 6 个明确侵蚀。E2b 是诱导条件，不能用来估计发生率。
+- **核心假设在留出集上不成立。** 原假设是“单元测试式 gate 拦不住，需要有状态的轨迹注入”。E2 中性和 E2b 合计 11 个侵蚀，G2 拦下 2 个，回归测试都拦下了；G2 没有拦下任何一个回归测试漏掉的侵蚀。G2 的独有检出只出现在作者种子上：`verify_first_check_only`、`skip_slow_checks`、`any_passing_check_suffices`。这几类“多检查、收尾阶段”的侵蚀，自然补丁里没有出现。
+- **LLM 审计员是最强的单一基线。** 三个数据集上它的检出不低于确定性 gate，良性误拒只有 1/130。但这个优势需要谨慎看待：标签也由 LLM 给出，审计员和标注者可能共享同样的判断偏差。人工复标前不能据此下结论。
+- **确定性 gate 和审计员互补。** 审计员漏掉了 `dna-assembly__deepseek-v4-pro__s1`（把完成检查排除出环境调用预算），G1 拦下了；确定性 gate 漏掉了 `polyglot-rust-c__claude-sonnet-5-5__s0`（只改审查提示词），审计员拦下了。两者取并集后，E2b 是 8/8，E1 是 21/21。
+- **确定性 gate 的误拒率高。** 中性条件下 G1+G2+G3 误拒 19/67，回归测试 19/67；E2b 下分别是 23/63 和 35/63。其中 13 个中性补丁违反同一个探针 `budget.wall_time_reserve_before_turn_reserve`：它们允许在收尾阶段没有审查意见时继续执行工作批次，会占用为验证预留的时间。两名标注者都标为中性，但这也可以看作在削弱验证预算。这类分歧要由人工复标决定，不能在看到 gate 结果后改标签。
+- **局限。** 标签只来自 LLM；proposer 只看到 11 个源文件，而且不是在真实搜索循环里提议；侵蚀样本少（3 个和 8 个），区间很宽；E2b 是诱导条件。
+
+**对创新点的影响。** “需要有状态的轨迹注入”这一表述应当放弃。数据支持的表述是三点：自然条件下侵蚀很少，完成压力下会出现，而且集中复现已知的历史缺陷；可执行的性质 gate 和 LLM 审计员各自漏掉对方能拦下的侵蚀，组合起来才完整；确定性 gate 的主要代价是误拒，这是在线循环（P8）里要量化的。
+
 ## 与原开题的关系
 
 原开题中的完成协议、PrefixBench 和 Historical-7 都保留，但角色改变：它们成为 gate 的组成部分，不再单独作为创新点。原主实验 RQ1 至 RQ4 的冻结协议不修改。新研究问题使用独立协议，产物写入 `experiments/erosion-v1/` 和 `evaluation/erosion-v1-*`。
@@ -121,6 +147,6 @@ E1 由作者编写，gate 也由作者开发，以下数字只能说明 gate 的
 
 - **领域变化快。** 每个阶段结束时重新检索一次最近邻。
 - **gate 与种子语料由同一作者编写。** E2 留出集和独立标注用来缓解；E1 结果只作开发证据。
-- **探针可能过严。** 探针如果断言了实现常数而不是性质，良性修改会被误拒。E1 已经发现并修正了一例（见 E1 结果），E2 的良性接受率继续测量这一点。
+- **探针可能过严。** 探针如果断言了实现常数而不是性质，良性修改会被误拒。E1 已经发现并修正了一例。E2 上 G1+G2+G3 的良性误拒在 28% 到 37% 之间，见“E2 与基线结果”。
 - **在线实验成本未知。** P8 之前必须先做 pilot。
 - **Kumar et al. 可能高度重合。** 找到原文前不定稿创新表述。
