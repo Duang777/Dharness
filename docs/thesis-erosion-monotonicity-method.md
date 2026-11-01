@@ -100,7 +100,10 @@ $$\forall \tau,\ \forall a \in \mathrm{attempts}_{H'}(\tau):\ J_{H'}(a) = \mathr
 
 - 差分测试和回归验证是成熟思路。本文的贡献不在差分本身，而在三点：把“验证单调性”作为自改进的验收准则，在完成尝试层面定义并判定它，以及针对智能体完成逻辑的定向轨迹变异和提示词哨兵。
 - Falsifiable Release Gates 检查的是常驻不变量，是单个版本的性质；本文检查的是基线与候选之间的关系性质。
-- Auditing Harness Tampering 用 LLM 事后分类；本文在接受前判定，并给出可重放的反例。
+- Auditing Harness Tampering（2609.00069）读 diff 做静态分类与定位；本文运行候选，在接受前判定，并给出可重放的反例。
+- SEAL（2607.24300）用隐藏任务上的得分比较候选与当前版本；本文比较的是两个版本对同一份证据的完成判定。SEAL 的 “monotone” 条件指只允许加强自写测试，与本文的验证单调性不是同一概念，论文中需要明确区分。
+- Self-Harness（2606.09498）在任务上做回归验收。看分数的验收看不见同时提了分的侵蚀，`lean_completion` 就是这样的例子。
+- PROCTOR（2609.02246）用金丝雀样例约束 LLM 评审；本文的提示词哨兵借鉴这一思路，但比较的是基线与候选之间的翻转。
 - 不能声称“首个”。Kumar et al. 的 “Gate presence is not a safety invariant” 仍未读到原文，定稿前必须核对。
 
 ## 6. 评测设计

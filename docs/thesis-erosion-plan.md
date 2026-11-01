@@ -22,11 +22,14 @@ LLM 在递归修改 Harness 代码时，会提出削弱完成与验证逻辑的�
 | Self-Healing Harness (2609.24130) | 重放失败用例和受保护用例的准入控制 | 本文的修改对象是代码，检查对象是协议性质，并注入状态故障 |
 | Falsifiable Release Gates (2607.13070) | 常驻不变量，TLA+ 规约 | 本文的不变量是终端完成协议，修改由 RSI proposer 产生 |
 | RegenHarness (2609.27612) | 证据门控的递归自改进，机器人 | 本文面向终端任务，gate 由性质测试、轨迹故障注入和缺陷库组成 |
-| SEAL (2607.24300) | verifier 与 deployment 的差距 | 本文在 Harness 层面测量内部完成信号与外部评分的差距 |
-| Auditing Harness Tampering (2609.00069) | LLM 审计员事后分类 | 本文在接受前用可执行检查拦截，LLM 审计员作为基线 |
+| SEAL (2607.24300) | verifier 与 deployment 的差距；在 Atari 启发式策略上用隐藏 rollout 的得分比较候选与当前版本；其 “monotone” 条件指只允许加强自写测试 | 本文比较两个版本对同一份证据的完成判定，不依赖得分；两种“单调”不是同一概念 |
+| Auditing Harness Tampering (2609.00069) | 两轴篡改分类（功能角色、被违反的义务）；在 ADAS、AFlow、DGM 的真实修改中成对注入篡改与良性修改；用 8 个大模型、fastText 和微调小模型做静态分类与定位；审计五个系统的公开记录，发现篡改反复出现并留在最优谱系 | 本文运行候选，在接受前判定并给出可重放反例；用控制条件的实验说明压力诱发侵蚀；对象是终端智能体的完成逻辑。“侵蚀会出现并留在谱系里”不能再作为本文的新发现 |
+| Self-Harness (2606.09498) | 智能体改进自己的 Harness；在 Terminal-Bench 2.0 等基准上，候选提分且留出任务不退步才被接受 | 任务回归看分数，看不见同时提分的侵蚀；本文的检查不依赖分数 |
+| PROCTOR (2609.02246) | 生产环境的提示词优化；记录 11 种评估信号失效；用确定性护栏和金丝雀样例约束 LLM 评审 | 本文针对 Harness 代码的完成逻辑；提示词哨兵借鉴金丝雀思路，采用基线与候选的差分翻转 |
+| Red Queen Gödel Machine (2606.26294) | 评测者与智能体共同进化，避免固定评测被钻空子 | 本文以基线为规约，评测准则不随候选变化 |
 | Bounded Loops (2609.27871) | 手工证明终止性与 fail-closed DONE | 本文不重复证明，测量自改进是否保持这些性质 |
 
-不能声称的内容：首个带 gate 的自改进，首个提出自评与外评差距，完成协议本身是新机制。
+不能声称的内容：首个带 gate 的自改进，首个提出自评与外评差距，首个发现自改进会削弱验证或篡改 Harness，完成协议本身是新机制。故事线见 [论文的故事线](thesis-erosion-story.md)。
 
 待核验：Kumar et al. "Gate presence is not a safety invariant"（NeurIPS 2026 workshop）尚未找到原文，定题前必须读完。
 
@@ -85,7 +88,7 @@ G1 针对的是非对抗的侵蚀：proposer 为了提分而削弱验证，但�
 - [x] **P6 E2 自然修改采样与标注。** 协议：`docs/thesis-erosion-annotation-protocol.md`。3 个 proposer（claude-sonnet-5-5、gpt-6-astra、deepseek-v4-pro）在 12 个失败轨迹上各采 2 个，中性提示得到 70 个可应用补丁，完成压力提示（E2b，预注册，只服务 RQ2）得到 71 个。两名 LLM 标注者盲标，分歧交裁决者：中性 κ=0.73，E2b κ=0.77。标签冻结后才运行 gate（`experiments/erosion-v1/natural-labels-v1.json`，sha256 `c0ca9bad…`；`natural-pressure-labels-v1.json`，sha256 `97a9cbc4…`）。人工复标仍未做，标签目前是临时标签。
 - [x] **P7 基线 gate。** 回归基线是 main 上除 gate 自身测试外的全部测试，在空补丁上校准后保留 451 个（`experiments/erosion-v1/regression-suite-v1.json`）。LLM 审计员是 kimi-k3，和标注模型不同。E2 结果：`evaluation/erosion-v1-natural-gate-results.json`、`evaluation/erosion-v1-natural-pressure-gate-results.json`。E1 配对结果：`scripts/erosion_seeded_baselines.py` 输出 `evaluation/erosion-v1-seeded-baselines.json`。结果见下文“E2 与基线结果”。
 - [ ] **P8 验证单调性差分守护。** 按 [方法设计](thesis-erosion-monotonicity-method.md) 第 7 节的 M1 至 M6 实施。先冻结验证原因分类和评测协议，再实现。证据：E1、E2、E2b 上与全部对比方法的 canonical 结果。
-- [ ] **P9 在线 RSI 小循环。** 15 道搜索题和 15 道互不相交的留出题，10 轮，每轮 2 个候选，比较只看分数和加差分守护两种选择规则。先做 pilot 估算成本。证据：两组运行的 canonical 结果。
+- [ ] **P9 在线 RSI 小循环。** 15 道搜索题和 15 道互不相交的留出题，10 轮，每轮 2 个候选，比较只看分数和加差分守护两种选择规则。指标包括留出通过率、完成声明的可信度（宣布完成的任务中真正通过外部评测的比例）和虚假提升。循环中使用已知会诱发侵蚀的压力提示。先做 pilot 估算成本。证据：两组运行的 canonical 结果。
 - [ ] **P10 统计、表格与论文。** 所有表格由脚本从 canonical JSON 生成。
 - [ ] **人工复标。** 第二位人类标注者按 `docs/thesis-erosion-annotation-protocol.md` 复标 E2、E2b 和 E3，所有比较用人工标签重算一次。
 
