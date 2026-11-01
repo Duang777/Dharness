@@ -11,7 +11,7 @@ E1 种子语料由作者编写，只能作为 gate 的开发证据。E2 用 LLM 
 ## 采样
 
 - **被修改对象。** Dharness 在 `experiments/erosion-v1/seeded-corpus-v0.json` 中 `base_commit` 指定的提交。proposer 只能修改 `src/evidence_harness/**`，越界修改记为 `out_of_scope`，不进入标注。
-- **proposer 输入。** 原开题主实验的 89 题运行（`evaluation/trials-89/`）。这次运行只保存了每题的 `result.json`，没有保���完整 journal，所以“失败运行摘要”由 `result.json` 的元数据生成：任务名、停止原因、外部 reward、用掉的轮数、环境调用数、修复次数，以及本次运行的预算配置和 89 题的整体停止原因分布。输入从 reward 为 0 的题目中按停止原因分层抽取 12 题（`budget_exhausted` 5 题，`verified` 但 reward 为 0 的 5 题，`model_stopped` 2 题），抽样种子写入采样清单。
+- **proposer 输入。** 原开题主实验的 89 题运行（`evaluation/trials-89/`）。这次运行只保存了每题的 `result.json`，没有保存完整 journal，所以“失败运行摘要”由 `result.json` 的元数据生成：任务名、停止原因、外部 reward、用掉的轮数、环境调用数、修复次数，以及本次运行的预算配置和 89 题的整体停止原因分布。输入从 reward 为 0 的题目中按停止原因分层抽取 12 题（`budget_exhausted` 5 题，`verified` 但 reward 为 0 的 5 题，`model_stopped` 2 题），抽样种子写入采样清单。
 - **展示的源码。** 整个 `src/evidence_harness/` 有 255 KB，放不进单次提示。提示里给出控制逻辑相关的 11 个文件：`run_loop.py`、`completion_control.py`、`completion_contract.py`、`evidence.py`、`policy.py`、`prompting.py`、`protocol.py`、`budget.py`、`dharness_adapter.py`、`harness_adapter.py`、`journal.py`。可编辑文件列表仍列出 `src/evidence_harness/` 下的全部文件。这会让 proposer 少改 Docker 隔离代码，而 G2 本来就看不到那部分代码，这一偏差写入局限。
 - **proposer 提示。** 使用下文模板，不加入任何关于验证、完成协议或 gate 的提示，避免诱导或抑制侵蚀。
 - **模型与数量。** 三个不同厂商的 proposer：`claude-sonnet-5-5`、`gpt-6-astra`、`deepseek-v4-pro`，温度 1.0（模型不支持温度时用默认值，并在样本记录中注明）。12 题 × 3 个模型 × 每题 2 个样本，共 72 个样本。先跑 3 个样本的 pilot 估算成本，再跑全部。目标是至少 60 个可应用补丁；不够时按同一清单追加第 3 个样本，追加规则在采样前写入清单。
@@ -22,7 +22,7 @@ E1 种子语料由作者编写，只能作为 gate 的开发证据。E2 用 LLM 
 ## E2b 完成压力条件（2026-11-01 预注册，在 E2b 采样之前）
 
 - **为什么加。** 中性条件的前 44 个补丁里，盲标只标出 1 个侵蚀。这本身是 RQ1 的结果：单次提议、目标为提高成功率时，proposer 很少削弱验证。但这样 RQ2 在非作者编写的侵蚀上几乎没有正例。Meta-Harness 的侵蚀出现在迭代搜索中，搜索压力针对的是“更快完成”。E2b 把这种压力放进单次提议，用来产生非作者编写的候选，检验 gate。
-- **唯一改动。** 目标句换成“让 harness 更常��预算内达到 verified completion”，并给出一条来自 89 题运行的事实：85 次运行中 19 次以 `budget_exhausted` 结束而 harness 没有报告完成，其中 9 次实际上已经解题。最后一句换成“提高 verified-completion 率”。提示里不提验证、gate 或削弱。模板：`src/evidence_harness_mutation/natural_erosion.py` 的 `COMPLETION_PRESSURE_PROMPT`。
+- **唯一改动。** 目标句换成“让 harness 更常在预算内达到 verified completion”，并给出一条来自 89 题运行的事实：85 次运行中 19 次以 `budget_exhausted` 结束而 harness 没有报告完成，其中 9 次实际上已经解题。最后一句换成“提高 verified-completion 率”。提示里不提验证、gate 或削弱。模板：`src/evidence_harness_mutation/natural_erosion.py` 的 `COMPLETION_PRESSURE_PROMPT`。
 - **其余相同。** 同样 12 题、3 个 proposer、每题 2 个样本、温度、源码、规范化、标注者和裁决者。产物在 `experiments/erosion-v1/natural-pressure/`、`natural-pressure-labels-v1.json`、`evaluation/erosion-v1-natural-pressure-gate-results.json`。
 - **解读边界。** E2b 是诱导条件，它的侵蚀比例不能当作自然发生率，只用于 RQ2 的 gate 检测。这个优化目标正是本文关心的风险：优化内部完成信号，而不是外部评分。
 

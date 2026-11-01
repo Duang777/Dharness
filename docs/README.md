@@ -15,9 +15,13 @@
 
 ## 研究路线与论文定位
 
-- [`thesis-erosion-plan.md`](thesis-erosion-plan.md)：新方向“Harness 自改进中的验证侵蚀”的研究方案、阶段证据，以及 E1 和 E3 结果。
+- [`thesis-erosion-plan.md`](thesis-erosion-plan.md)：新方向“Harness 自改进中的验证侵蚀”的研究方案、阶段证据，以及 E1、E2、E3 和基线结果。
+- [`thesis-erosion-monotonicity-method.md`](thesis-erosion-monotonicity-method.md)：核心方法“基于验证单调性的差分守护”的定义、算法、实现前的预测和实施阶段。
 - [`thesis-erosion-annotation-protocol.md`](thesis-erosion-annotation-protocol.md)：E2 自然修改的采样与标注协议，在采样前冻结。
-- [`thesis-erosion-supervisor-brief.md`](thesis-erosion-supervisor-brief.md)：新方向给导师的陈述稿和当面介绍顺序。
+- [`thesis-erosion-supervisor-brief.md`](thesis-erosion-supervisor-brief.md)：给导师的消息、一分钟版本、当面介绍顺序和问答准备。
+- [`thesis-proposal.md`](thesis-proposal.md)：面向导师讨论的开题报告，包含候选状态绑定完成事务、协议缺陷验证、最近邻差异与受控实验方案。
+- [`thesis-supervisor-discussion.md`](thesis-supervisor-discussion.md)：向导师询问课题的消息草稿和讨论提纲。
+- [`thesis-proposal-literature-check.md`](thesis-proposal-literature-check.md)：开题报告的原始文献核验范围及创新边界。
 - [`agent-harness-research-roadmap.md`](agent-harness-research-roadmap.md)：研究空白、候选路线、研究问题和总体实施顺序。
 - [`thesis-positioning-and-contribution-plan.md`](thesis-positioning-and-contribution-plan.md)：硕士论文与 B 类会议的定位、贡献层次、证据要求和完成门槛。
 - [`thesis-execution-plan.md`](thesis-execution-plan.md)：主实验的阶段、前置条件、输出和验收规则。
