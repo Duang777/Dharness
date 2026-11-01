@@ -16,6 +16,7 @@
 ## 研究路线与论文定位
 
 - [`thesis-erosion-plan.md`](thesis-erosion-plan.md)：新方向“Harness 自改进中的验证侵蚀”的研究方案、阶段证据，以及 E1、E2、E3 和基线结果。
+- [`thesis-erosion-story.md`](thesis-erosion-story.md)：论文的完整故事线，包括背景、问题、现有守护的不足、方法、验证、贡献和讲述时的底线。
 - [`thesis-erosion-monotonicity-method.md`](thesis-erosion-monotonicity-method.md)：核心方法“基于验证单调性的差分守护”的定义、算法、实现前的预测和实施阶段。
 - [`thesis-erosion-annotation-protocol.md`](thesis-erosion-annotation-protocol.md)：E2 自然修改的采样与标注协议，在采样前冻结。
 - [`thesis-erosion-supervisor-brief.md`](thesis-erosion-supervisor-brief.md)：给导师的消息、一分钟版本、当面介绍顺序和问答准备。
