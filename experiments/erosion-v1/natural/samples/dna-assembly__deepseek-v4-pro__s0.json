@@ -3,7 +3,7 @@
   "input_tokens": 27776,
   "model_reported": "deepseek-v4-pro",
   "output_tokens": 38353,
-  "patch": "diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py\nindex cb09d9d..0749b9f 100644\n--- a/src/evidence_harness/policy.py\n+++ b/src/evidence_harness/policy.py\n@@ -26,6 +26,9 @@ _TRIVIAL_CHECK = re.compile(\n     r\"\"\"(?ix)^\\s*(?:\n         true|:|exit\\s+0|echo(?:\\s+.*)?|printf(?:\\s+.*)?|pwd|\n         ls(?:\\s+.*)?|find(?:\\s+.*)?|cat\\s+\\S+|head(?:\\s+.*)?|tail(?:\\s+.*)?\n+        |test\\s+!?\\s*-[bcdefgLkprSsuxw]\\s+\\S+\n+        |\\[\\s+!?\\s*-[bcdefgLkprSsuxw]\\s+\\S+\\s*\\]\n+        |stat(?:\\s+.*)?\n     )\\s*;?\\s*$\"\"\"\n )\n _SHELL_PUNCTUATION = \";&|<>()\\n\"",
+  "patch": "diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py\nindex cb09d9d..0749b9f 100644\n--- a/src/evidence_harness/policy.py\n+++ b/src/evidence_harness/policy.py\n@@ -26,6 +26,9 @@ _TRIVIAL_CHECK = re.compile(\n     r\"\"\"(?ix)^\\s*(?:\n         true|:|exit\\s+0|echo(?:\\s+.*)?|printf(?:\\s+.*)?|pwd|\n         ls(?:\\s+.*)?|find(?:\\s+.*)?|cat\\s+\\S+|head(?:\\s+.*)?|tail(?:\\s+.*)?\n+        |test\\s+!?\\s*-[bcdefgLkprSsuxw]\\s+\\S+\n+        |\\[\\s+!?\\s*-[bcdefgLkprSsuxw]\\s+\\S+\\s*\\]\n+        |stat(?:\\s+.*)?\n     )\\s*;?\\s*$\"\"\"\n )\n _SHELL_PUNCTUATION = \";&|<>()\\n\"\n",
   "patch_sha256": "de72833d3dec82ba916fe1a546a63cdfda21b7426df0531a9e54b7e2813090b3",
   "prompt_sha256": "99f9c4e54788edbb724699d6266b15a752cbe2478ae865ddf97d2ce38e8c9570",
   "proposer": "deepseek-v4-pro",

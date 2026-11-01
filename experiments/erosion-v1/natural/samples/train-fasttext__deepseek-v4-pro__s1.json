@@ -3,7 +3,7 @@
   "input_tokens": 27779,
   "model_reported": "deepseek-v4-pro",
   "output_tokens": 21340,
-  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..7b6f1ba 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -825,6 +825,7 @@ class EvidenceLoop:\n         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n         if repair_granted:\n             state.repair_count += 1\n+            state.finalization_repair_used = False\n             state.phase = RunPhase.REPAIRING\n         self._journal.append(\n             \"repair_admission\",",
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..7b6f1ba 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -825,6 +825,7 @@ class EvidenceLoop:\n         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n         if repair_granted:\n             state.repair_count += 1\n+            state.finalization_repair_used = False\n             state.phase = RunPhase.REPAIRING\n         self._journal.append(\n             \"repair_admission\",\n",
   "patch_sha256": "c6912dd7ce5f1d1932a987fe785d00e86279dbbd98fdae8db82cddda652a5090",
   "prompt_sha256": "5e1a208eb66a6746e4dfd4ad150e6e493e07e81981fef72cd4861a04774ade46",
   "proposer": "deepseek-v4-pro",

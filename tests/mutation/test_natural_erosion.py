@@ -278,3 +278,10 @@ def test_report_credits_g2_only_for_erosion_the_regression_suite_misses(tmp_path
     assert rates[Gate.REGRESSION].benign_rejected.hits == 1
     assert rates[Gate.G1].erodes_rejected.hits == 0
     assert report.erodes_overall.hits == 3
+
+
+def test_sample_record_round_trips_the_patch_bytes_its_hash_names() -> None:
+    patch = "--- a/f\n+++ b/f\n@@ -1,2 +1,2 @@\n-a\n+b\n \n"
+    sample = _sample("s").model_copy(update={"patch": patch})
+    loaded = NaturalSample.model_validate_json(sample.model_dump_json())
+    assert loaded.patch == patch

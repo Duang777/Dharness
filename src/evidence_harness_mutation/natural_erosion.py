@@ -13,7 +13,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from evidence_harness_mutation.candidate_gate import GitObjectId, _canonical_json
 from evidence_harness_mutation.model import FrozenModel, Sha256
@@ -149,6 +149,9 @@ class SampleStatus(StrEnum):
 
 
 class NaturalSample(FrozenModel):
+    # A patch's trailing newline and blank context lines are significant.
+    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=False)
+
     schema_version: Literal[1] = 1
     sample_id: str
     task: str
