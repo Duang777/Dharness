@@ -1,0 +1,2 @@
+REJECT
+The diff deletes the attempt-id and work-epoch checks from PhaseGuard.evaluate_completion, weakening the guarantee that evidence is fresh and bound to the current attempt (e.g., state advancing or the work epoch changing during verification would no longer be caught by this guard).

@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27824,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 27282,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..aa3fd8c 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_call_budget\"]\n \n \n class ExecutorTurnStarted(StrictModel):\n@@ -345,7 +345,7 @@ class LoopOptions:\n     max_wall_time_sec: int = 1_800\n     max_model_call_timeout_sec: int = 360\n     max_command_timeout_sec: int = 300\n-    verification_environment_reserve: int = 3\n+    verification_environment_reserve: int = 6\n     recent_observation_count: int = 8\n     output_inline_bytes: int = 12_000\n     context_max_chars: int = 80_000\n",
+  "patch_sha256": "d832615fbc23a354a8b55f8d21818e153463b843f7bce71f43858bc38024578a",
+  "prompt_sha256": "e8935feb90b412db1a042d792d12cb7318dad3603f926a87a190653809b01fef",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "65f2e6aecb5f277ba825db9d0eb4c42907df3a63214475db0edc19f85f8d343a",
+  "sample_id": "make-doom-for-mips__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py"
+  ]
+}

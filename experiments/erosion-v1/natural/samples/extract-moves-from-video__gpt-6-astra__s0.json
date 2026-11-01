@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24938,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 671,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..e803d44 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -52,6 +52,10 @@ Rules:\n   already contained those files.\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n+- During finalization, if allowed_actions includes execute, at most one final work batch remains.\n+  Use it only if needed to save the requested deliverables or fix a concrete outstanding defect;\n+  do not start broad exploration. Keep it short enough to leave time for completion checks and\n+  review. If the candidate is already ready, submit finish immediately.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5ffdbfe 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -903,8 +903,7 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "1d7e4d3f4db161a8ef6bf10f5994b1073bd5b4da7bd043c691988600023622df",
+  "prompt_sha256": "a41beefa79bcd1d4b30961f414effe0a1dd97a3fb707e72300082a8995d28854",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "b0219adc6cc4250ce73f8f2eaed7d73c5efd82a8effe84d4fcf244e5cb01ce72",
+  "sample_id": "extract-moves-from-video__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "extract-moves-from-video",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added line `state.finalization_repair_used = False` on a granted repair only lets the agent run another execute batch during finalization. Every completion attempt still goes through isolated checks, fresh evidence, review and the controller permit, so how completion is checked does not change."}

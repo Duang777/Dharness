@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only expands the review prompt's supporting-observation window from 6 to 10 receipts, giving the independent reviewer more context without altering isolation, freshness, coverage mapping, or the verdict gate.

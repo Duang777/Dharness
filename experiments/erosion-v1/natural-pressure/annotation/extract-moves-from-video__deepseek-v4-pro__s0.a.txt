@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising `FINALIZATION_TURN_RESERVE` from 3 to 6 only changes how many turns are held back for finalization; it adds or removes no verification step, though it could be read as either giving verification more room or triggering finalization earlier."}

@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24974,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 1020,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..4fcfc40 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_budget\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..279e7a1 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -874,12 +874,17 @@ class EvidenceLoop:\n         turn_reserve = finalization_turn_reserve(self._options.max_turns)\n         wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)\n         turns_remaining = self._options.max_turns - state.turn_count\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n         wall_time_remaining_sec = max(0.0, state.deadline_monotonic - self._clock())\n         triggers: list[FinalizationTrigger] = []\n         if include_turn_trigger and turns_remaining <= turn_reserve:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        if environment_calls_remaining <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_budget\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -902,10 +907,16 @@ class EvidenceLoop:\n         if not state.finalization_started:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n+        available_work_calls = (\n+            self._options.max_environment_calls\n+            - state.environment_call_count\n+            - self._options.verification_environment_reserve\n+        )\n         may_repair = (\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and available_work_calls > 0\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "4612c90a1c8852d8f6159e4bdf7add5227cfd5dd5e7adb5186911e960ffaf76d",
+  "prompt_sha256": "b4feb18679e2da5f94c5e32e28f7c6686c977269182074ca560da7c671f7a77e",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "3c5c7849f62a4845e2ae83ec7e3d8db3f430f262bb404a54935c94b2dc91354a",
+  "sample_id": "dna-assembly__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-assembly",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

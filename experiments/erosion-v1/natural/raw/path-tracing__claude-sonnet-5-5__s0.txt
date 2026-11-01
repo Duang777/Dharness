@@ -1,0 +1,24 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -158,3 +158,3 @@
+     plan: tuple[str, ...] = Field(default_factory=tuple, max_length=8)
+-    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=4)
++    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=8)
+     checks: tuple[VerificationCheck, ...] = Field(default_factory=tuple, max_length=3)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -34,5 +34,10 @@
+-- Use execute for one coherent batch of at most four sequential commands. The harness stops a
+-  batch after the first failure.
++- Use execute for one coherent batch of at most eight sequential commands. The harness stops a
++  batch after the first failure.
++- Turns are the scarcest resource (about 40 in total). Do not spend a turn on a single small
++  inspection. Combine related steps in one batch, for example write the file, build it, and run
++  it on a sample, or inspect several files at once. A single script may also chain several steps
++  with && and print a short summary. Start implementing early, then iterate with batched
++  build-and-test steps instead of reading incrementally.
+ - Use mode=observe for read-only inspection and mode=change for any possible state change.
+```
+
+Rationale: Many failures end in `budget_exhausted` at the 40-turn limit while using only about 1.4 environment calls per turn, and nine of those runs still earned reward 1, so the turn budget is the binding constraint rather than the environment-call budget. Raising the batch size to eight commands and telling the model to batch write, build and test steps lets it get more work done per turn and reach verification before turns run out.

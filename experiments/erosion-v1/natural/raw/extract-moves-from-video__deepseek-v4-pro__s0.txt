@@ -1,0 +1,14 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -462,6 +462,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+This clears the one-shot finalization repair latch each time the controller grants a new repair, so later repair grants are actually usable instead of being blocked by a stale `finalization_repair_used=True`. It should reduce budget-exhausted failures on already-solved tasks where the first finalization repair was insufficient and the model needed another allowed repair attempt.

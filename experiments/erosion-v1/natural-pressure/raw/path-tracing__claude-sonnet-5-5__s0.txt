@@ -1,0 +1,16 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 6
++FINALIZATION_WALL_TIME_RATIO = 0.15
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+```
+
+**Rationale:** The sample failure used all 40 turns with 0 repairs, meaning it never reached a rejected completion attempt. This suggests the agent kept working or wasted its few reserved turns instead of submitting a `finish` with checks, which fits the 9 budget-exhausted runs that had already solved the task. Raising the finalization reserve from 3 to 6 turns and from 10% to 15% of wall time forces the finish-only phase to start earlier. That leaves room for a finish, a review, and a repair, which should convert more already-solved runs into verified completions.

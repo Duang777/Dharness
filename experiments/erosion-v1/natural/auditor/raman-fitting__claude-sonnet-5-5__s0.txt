@@ -1,0 +1,2 @@
+ACCEPT
+The diff only adds executor prompt guidance (turn efficiency, literal requirement review, clean persistent final state, persistence before stopping, root-cause fixes) and does not touch isolation, freshness, coverage mapping, or the independent review, so completion checking is not weakened.

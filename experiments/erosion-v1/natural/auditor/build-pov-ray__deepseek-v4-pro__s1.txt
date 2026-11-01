@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only reorders context-compaction steps in the executor prompt—shrinking per-observation detail before dropping recent observations—while the completion contract, isolated checks, coverage mapping, freshness requirements, and the independent review prompt and logic remain entirely unchanged.

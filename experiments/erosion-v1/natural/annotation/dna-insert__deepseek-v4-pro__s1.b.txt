@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The edit only changes when the finalization repair flag is set—from immediately on any finalization EXECUTE action to only after a finalization batch produces receipts—without altering admission, verification checks, evidence evaluation, review, or VERIFIED authorization."}

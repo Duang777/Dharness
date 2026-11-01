@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 24979,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 1185,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..e0eb802 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,10 @@\n from __future__ import annotations\n \n FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+# Finalization needs an executor decision, isolated checks, and semantic review,\n+# not just one model call. Reserve nine minutes of a thirty-minute run so\n+# completion starts before those stages must compete for the last three minutes.\n+FINALIZATION_WALL_TIME_RATIO = 0.3\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\n",
+  "patch_sha256": "8fcd37c0467f734ae99b11ed93fe1a590e7ceeda65f876c3e571524a7423fd0c",
+  "prompt_sha256": "1c4d7280a5f06a73930526e834709d657e9eb6910bffe3236defab32e382883b",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "28e8a223feff7258d8d12d504a6c273769875ce31dbe097e9205dc95ab340fbd",
+  "sample_id": "extract-moves-from-video__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "extract-moves-from-video",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

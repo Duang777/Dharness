@@ -1,0 +1,2 @@
+ACCEPT
+The change only shortens the reviewer's rationale verbosity without altering any verification, isolation, coverage, or rejection requirement in the review rules.

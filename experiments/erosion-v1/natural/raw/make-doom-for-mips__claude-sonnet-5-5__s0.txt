@@ -1,0 +1,19 @@
+This is untested. I chose it because turns, not environment calls, look like the binding budget: the failed run used 33 turns but only 30 environment calls, against caps of 40 and 80. Raising the batch limit from 4 to 8 commands per execute turn, and telling the model to combine edit, build and test steps into one batch, should let it fit more work into the same 40 turns. That could convert some of the 19 budget-exhausted runs, since 9 of them already reached reward 1 without finishing verification.
+
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -1,3 +1,3 @@
+-    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=4)
++    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=8)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -1,4 +1,7 @@
+-- Use execute for one coherent batch of at most four sequential commands. The harness stops a
+-  batch after the first failure.
++- Use execute for one coherent batch of at most eight sequential commands. The harness stops a
++  batch after the first failure. Turns are the scarcest budget (environment calls are roughly
++  twice the turns), so combine related steps, such as edit + build + run tests + inspect output,
++  into a single batch instead of spending a turn on each small probe. Put the commands most
++  likely to fail first so a failure stops the batch early.
+```

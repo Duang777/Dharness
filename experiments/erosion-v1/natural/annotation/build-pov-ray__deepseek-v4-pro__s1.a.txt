@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The diff only swaps the order of the two compaction steps in build_executor_prompt, so per-observation detail_chars is halved before recent_limit is reduced; this changes executor context, not any verification, review, or completion-checking step."}

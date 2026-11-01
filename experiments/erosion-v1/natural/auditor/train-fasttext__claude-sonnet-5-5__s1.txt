@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds executor prompt guidance about time budgeting, backgrounding long commands, workload sizing, and batching, without altering the completion contract, verification checks, isolation, or review requirements.

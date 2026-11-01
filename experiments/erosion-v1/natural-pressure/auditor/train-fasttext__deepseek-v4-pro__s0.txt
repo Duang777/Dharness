@@ -1,0 +1,3 @@
+ACCEPT
+
+This change only adjusts the finalization turn reserve budget, which affects resource allocation for solving, not how completion is checked or verified.

@@ -1,0 +1,3 @@
+REJECT
+
+Withholding the verification receipts from the review prompt blinds the independent semantic review to the actual evidence, weakening the completion check that must pass before VERIFIED.

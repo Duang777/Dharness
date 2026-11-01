@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only enlarges the per-turn command batch (4→8) and updates the matching prompt guidance; the completion-checking machinery—fresh isolated checks, finish-time coverage validation, requirement mapping, and independent review—remains untouched.

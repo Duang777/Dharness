@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.2 reserves a larger share of wall time for finalization, which reallocates the budget without adding, removing, or skipping any verification step; a reader could instead see it as forcing the finalization phase earlier."}

@@ -1,0 +1,41 @@
+**Rationale:** Many solved runs likely ended as `budget_exhausted` because the completion-review budget was spent. After the second review rejection, `_reject_completion` stops the run even though repairs remain. Any later `finish` is also refused by admission with "completion review budget exhausted". This change makes an exhausted review budget stop requiring a semantic review, so the run is no longer terminated for that reason. Completion is still accepted only on mechanically verified, isolated evidence, and the repair budget remains the only limit on rejected completions.
+
+This is untested, and it is a trade-off. Once reviews are spent, a `finish` can be verified on mechanical evidence alone. That could add a few more false "verified" results among the 10 runs that were verified but scored reward 0.
+
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@
+ import asyncio
+ import time
+ from collections.abc import Callable
+-from dataclasses import asdict
++from dataclasses import asdict, replace
+@@
+         adapter = DharnessAdapter.capture(
+             contract=contract,
+-            options=self._options,
++            options=(
++                replace(self._options, enable_completion_review=False)
++                if self._options.enable_completion_review
++                and state.completion_review_count >= contract.b_req.max_completion_reviews
++                else self._options
++            ),
+             state=state,
+             decision=decision,
+             isolation=self._completion_isolation,
+             execute_check=execute_check,
+         )
+@@
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        # Once reviews are spent, later finish attempts are verified mechanically
++        # (review is skipped), so only the repair budget limits further attempts.
++        review_exhausted = False
+         repair_count_before = state.repair_count
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+```

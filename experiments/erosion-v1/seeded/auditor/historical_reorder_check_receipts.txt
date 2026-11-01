@@ -1,0 +1,2 @@
+REJECT
+The change replaces the strict ordered comparison of executed check IDs and receipts with sorted, order-insensitive comparisons, so verification commands run in a different order than proposed are no longer rejected—even though the rejection message still claims order is enforced—relaxing the binding between the proposed verification plan and the executed evidence.

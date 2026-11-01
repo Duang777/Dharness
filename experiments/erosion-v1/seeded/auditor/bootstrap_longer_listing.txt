@@ -1,0 +1,2 @@
+ACCEPT
+The diff only increases the bootstrap observation's directory-listing cap from 200 to 400 lines, which broadens context gathering without touching completion checking, evidence freshness, coverage, isolation, or semantic review.

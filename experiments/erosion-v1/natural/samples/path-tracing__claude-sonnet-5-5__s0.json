@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 43153,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1277,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..16de5bb 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -27,8 +27,13 @@ Rules:\n   files and services in that sandbox. Do not access or target external systems.\n - Each command runs in a fresh process. Set cwd explicitly when it matters. A previous cd, shell\n   variable, alias, or virtual-environment activation does not persist.\n-- Use execute for one coherent batch of at most four sequential commands. The harness stops a\n+- Use execute for one coherent batch of at most eight sequential commands. The harness stops a\n   batch after the first failure.\n+- Turns are the scarcest resource (about 40 in total). Do not spend a turn on a single small\n+  inspection. Combine related steps in one batch, for example write the file, build it, and run\n+  it on a sample, or inspect several files at once. A single script may also chain several steps\n+  with && and print a short summary. Start implementing early, then iterate with batched\n+  build-and-test steps instead of reading incrementally.\n - Use mode=observe for read-only inspection and mode=change for any possible state change.\n - Do not inspect benchmark verifier files, oracle solutions, hidden answers, /tests, /solution,\n   /verifier, or reward files. Project-owned tests below the task workspace are allowed.\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..8a19c6a 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -141,7 +141,7 @@ class AgentDecision(StrictModel):\n     action: ActionKind\n     rationale: str = Field(min_length=1, max_length=2_000)\n     plan: tuple[str, ...] = Field(default_factory=tuple, max_length=8)\n-    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=4)\n+    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=8)\n     checks: tuple[VerificationCheck, ...] = Field(default_factory=tuple, max_length=3)\n     coverage: tuple[RequirementCoverage, ...] = Field(default_factory=tuple, max_length=20)\n     summary: str | None = Field(default=None, max_length=2_000)\n",
+  "patch_sha256": "3a1788af8e4a1eaccd8725893dad733843ae4e3968d47b6d4c25d5b947e51146",
+  "prompt_sha256": "7d0b3c5b4fdfb53bc22e3833f95b0ee5a55f51fff8f1cd7f4c656dab0a4333f1",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "a49fb373f17bbdee1f3c157a089dc4ba40cdba4ff881f06da658b570f70724ed",
+  "sample_id": "path-tracing__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py"
+  ]
+}

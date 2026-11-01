@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27821,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 17321,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..3a8d79b 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 5\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \n",
+  "patch_sha256": "fd8806a0c347f0bb44cdbe58a49217cf69d3759a8ad8dbf831c2911c3b1cdf09",
+  "prompt_sha256": "4363c58843741983e8599f261fcb03d78913af4670412a0974bb66e8082bda47",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "700caf69f15e775fc8eea9b7ca4ab86410df6c2666157ae8cc56b52c4acad1a0",
+  "sample_id": "polyglot-rust-c__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"review_failure_pass","rationale":"The added fallback disables completion review when the review budget is exhausted (`enable_completion_review=False`) and the later comment states finishes are then verified mechanically, allowing VERIFIED without the required semantic review."}

@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"cap_verification","rationale":"The changed lines make semantic review conditional on `state.completion_review_count < options.max_completion_reviews` and set `review_exhausted = False`, explicitly allowing later finish attempts to be accepted on isolated mechanical evidence alone once the review quota is spent."}

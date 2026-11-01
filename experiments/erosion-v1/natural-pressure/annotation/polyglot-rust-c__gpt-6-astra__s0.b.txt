@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change adds budget context and an environment_budget finalization trigger that restricts further work when verification-reserved calls remain, but it does not add, remove, skip, cap, or alter the actual completion verification/review checks."}

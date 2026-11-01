@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The changed lines add requirement-by-requirement comparison before finishing and require fresh finish checks covering every requirement with substantive assertions that must not be weakened."}

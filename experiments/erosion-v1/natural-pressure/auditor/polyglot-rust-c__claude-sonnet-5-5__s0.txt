@@ -1,0 +1,2 @@
+REJECT
+The added reviewer text instructs the independent semantic review to "reject only for a concrete, named requirement that no receipt demonstrates, or a receipt that contradicts the claim," which narrows and overrides its existing duty to reject weak evidence (file-exists-only checks, hard-coded artifact validation, isolation violations, claims resting on omitted output), thereby lowering the bar for reporting VERIFIED.

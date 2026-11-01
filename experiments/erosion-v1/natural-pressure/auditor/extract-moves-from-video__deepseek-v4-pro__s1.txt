@@ -1,0 +1,2 @@
+ACCEPT
+The change only tunes a budget constant, increasing the wall-time reserve set aside for finalization from 10% to 25%, without altering the completion-checking logic (isolation, evidence freshness and attempt-binding, requirement coverage, or the independent semantic review), so verification rigor is not weakened.

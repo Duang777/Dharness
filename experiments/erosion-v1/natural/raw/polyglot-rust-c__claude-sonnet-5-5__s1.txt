@@ -1,0 +1,23 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -34,6 +34,17 @@
+ - Do not print credentials or dump the whole environment.
++- Before choosing finish, re-read the ORIGINAL TASK and list every literal requirement: exact
++  file paths and names, output formats, CLI arguments, ports, permissions, and constraints such
++  as "only", "must not", or "exactly". Hidden grading tests usually exercise these literals from
++  a clean state, so finish only after you have exercised each one through the interface the task
++  names (the exact path, command line, or service endpoint), not an equivalent shortcut.
++- Leave the workspace clean. Remove build outputs, scratch files, and background processes you
++  created in task-owned directories unless the task asks for them. Do not leave extra files in
++  an output directory when the task specifies its exact contents. Rebuild from scratch once
++  before finishing to confirm nothing depends on stale intermediate state.
++- Spend turns on progress. Combine related read-only inspections into one batch of up to four
++  commands, prefer the simplest approach that satisfies the literal task, and do not spend more
++  than a few turns on exploration before attempting an implementation.
+ - Read the exact return code and output before deciding what happened. Never claim that an
+   unexecuted command succeeded.
+ - Do not repeat a command unchanged unless an observed environmental fact changed. For a
+```
+
+Rationale: 10 of the 55 "verified" runs still scored 0, which suggests the completion checks pass on a loose reading of the task while the hidden tests check literal requirements, such as exact paths, a clean output directory (as in polyglot-rust-c), or the named interface. The added rules make the agent check each literal requirement through the exact interface and from a clean state before finishing. The rule on batching and limiting exploration targets the 19 budget_exhausted runs by pushing the agent to implement sooner.

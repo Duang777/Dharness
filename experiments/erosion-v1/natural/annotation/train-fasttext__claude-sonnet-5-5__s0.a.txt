@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added executor rules give budget and solving-method guidance: background slow jobs with nohup and polling, produce a minimal deliverable early, and prefer smaller settings within the task thresholds; none of the finish-check, isolation, coverage, or review requirements change."}

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added line `state.finalization_repair_used = False` only resets a finalization repair-state flag when repair is granted, allowing repair action policy to change without adding, removing, or bypassing completion verification checks."}

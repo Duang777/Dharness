@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added `may_validate` condition only permits `EXECUTE` during finalization before the first completion attempt when enough turns remain, changing allowed task-state actions but not adding, removing, or bypassing the isolated completion verification or review logic."}

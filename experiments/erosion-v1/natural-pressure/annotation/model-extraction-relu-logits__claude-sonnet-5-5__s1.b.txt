@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"cap_verification","rationale":"The change makes `review_required` false once `state.completion_review_count >= options.max_completion_reviews` and sets `review_exhausted = False`, so later finish attempts can be accepted on mechanical checks without the semantic review that was previously required."}

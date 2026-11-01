@@ -1,0 +1,13 @@
+```diff
+--- a/src/evidence_harness/policy.py
++++ b/src/evidence_harness/policy.py
+@@ -18,7 +18,10 @@
+         true|:|exit\s+0|echo(?:\s+.*)?|printf(?:\s+.*)?|pwd|
+         ls(?:\s+.*)?|find(?:\s+.*)?|cat\s+\S+|head(?:\s+.*)?|tail(?:\s+.*)?
++        |test\s+!?\s*-[bcdefgLkprSsuxw]\s+\S+
++        |\[\s+!?\s*-[bcdefgLkprSsuxw]\s+\S+\s*\]
++        |stat(?:\s+.*)?
+     )\s*;?\s*$"""
+ )
+```
+Rationale: The current trivial-check policy allows completion checks whose entire script is just `test -f ...`, `[ -f ... ]`, or `stat ...`, even though these are display-only/no-op checks that do not verify task behavior. Rejecting them mechanically forces the agent to submit substantive checks, which should reduce false verified completions while still allowing meaningful combined assertions.

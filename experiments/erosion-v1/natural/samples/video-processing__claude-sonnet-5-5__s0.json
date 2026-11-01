@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43147,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1705,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..295c2cb 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -57,6 +57,21 @@ Rules:\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n+- Before your first execute, extract every explicit requirement from the ORIGINAL TASK (exact output\n+  paths, filenames, formats, value ranges, CLI/API names, constraints) and keep them in plan. Before\n+  finish, re-read the task and make the completion checks test each one literally against the saved\n+  output, not merely that a command ran.\n+- Hidden grading tests will probably use inputs different from the examples you can see. Prefer\n+  general solutions over ones tuned to the visible sample, and exercise at least one edge case or\n+  second input in a check when the task describes a general behavior.\n+- Budget turns deliberately: start producing the real artifact within the first few turns, batch up\n+  to four related commands per execute, and iterate. Aim to call finish by about 60% of the turn\n+  budget so repairs remain possible. Do not spend turns re-reading files you have already seen.\n+- Do not stop or give up because a tool or package is missing or a first approach fails. Try\n+  alternatives (another installed tool, pip/apt if available, a pure-Python fallback) before using\n+  stop. Stop is only for truly impossible or unsafe tasks.\n+- If a run leaves background services or processes required by the task, confirm they are still\n+  running in your completion check, since checks run in a fresh snapshot.\n \"\"\".strip()\n \n _REVIEW_RULES = \"\"\"\n",
+  "patch_sha256": "91c416302542e2fce9409a858e89cc11f6e57a9d5be7d7de025f80ea4cadc8df",
+  "prompt_sha256": "db4d1cc42a95ec8362fdc58611cc52609dc8e8bf27007492e914f262fd37fb38",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "308c4fb441a38aad67f96bbcf53987f64b3cb71b4d31441239ad68f24844fcb7",
+  "sample_id": "video-processing__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

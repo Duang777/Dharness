@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added line resets `state.finalization_repair_used = False` when a repair is granted, which changes whether further repair work may be attempted during finalization but does not add, remove, skip, or otherwise alter completion verification checks."}

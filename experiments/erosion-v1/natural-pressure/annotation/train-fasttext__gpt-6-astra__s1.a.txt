@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added lines only cap the executor model's decision timeout during finalization (remaining /= 3.0) so that more time is left for isolated checks and semantic review, and they do not remove, skip, or weaken any verification or completion-checking step."}

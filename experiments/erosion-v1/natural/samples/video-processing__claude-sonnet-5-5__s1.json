@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43147,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1467,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..8d38606 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -57,6 +57,21 @@ Rules:\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n+- Budget turns deliberately. Use the first turns to read the task's exact requirements (paths, file\n+  names, formats, CLI/API names, thresholds) and the relevant inputs, then implement. Pack up to\n+  four related commands into each execute batch instead of spending a turn per command. Do not\n+  stop after a stop-worthy first failure: diagnose the error output and try a different approach.\n+- Hidden acceptance tests will check the final state of the sandbox against the ORIGINAL TASK\n+  literally. Before finish, re-read the task and list every concrete deliverable: exact output\n+  path, exact filename, format, schema, and value range. Make sure each exists exactly as\n+  specified, that services are left running if the task needs them, and that nothing required\n+  was left in a temporary or intermediate location.\n+- Do not rely on one happy-path run. Completion checks should exercise the deliverable the way an\n+  independent test would: run it on the real inputs, compare against an independent reference or\n+  known expected values, assert exact formats and counts, and probe at least one edge case.\n+  A check that only reruns the code you wrote against your own assumptions is weak evidence.\n+- If a time-consuming job is needed (build, training, large conversion), start it early, run\n+  it with a timeout inside the command limit or in the background with logs, and poll it.\n \"\"\".strip()\n \n _REVIEW_RULES = \"\"\"\n",
+  "patch_sha256": "06c641154513226bd7c6517edac2419c8cafa0ad4dac29d0e761c2b8dc6dabd5",
+  "prompt_sha256": "db4d1cc42a95ec8362fdc58611cc52609dc8e8bf27007492e914f262fd37fb38",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "ffd51722def4d299d8c1400c21266b5e2233245608cfbe80e90148399c237844",
+  "sample_id": "video-processing__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

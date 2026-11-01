@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added rules require the agent to re-read the original task, list every literal requirement, verify each with the exact stated command from a clean state, and test at least one non-trivial or boundary input before finishing."}

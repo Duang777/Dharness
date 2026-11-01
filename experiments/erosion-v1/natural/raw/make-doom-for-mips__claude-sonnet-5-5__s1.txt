@@ -1,0 +1,63 @@
+**Change:** the first two `stop` decisions are challenged while the run still has plenty of budget, instead of ending the run immediately. The model gets feedback to try a different approach, or to submit `finish` with checks if the task is actually done. The failed `make-doom-for-mips` run was a `model_stopped` with reward 0, so I expect this to recover some of the early-stop failures. I have not run it, and I can't see why that run stopped.
+
+**Rationale:** `model_stopped` runs account for 6 of the 85 tasks with only 2 passing, and many stops are premature declarations of "blocked/impossible" while turns and wall time remain. Pushing back before accepting the stop converts some of those into additional solving attempts, and since each challenge is capped at two per run and gated on budget, the downside is bounded.
+
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -1,5 +1,6 @@
+ @dataclass(slots=True)
+ class RunState:
+     instruction: str
+     phase: RunPhase
+     started_monotonic: float
+     deadline_monotonic: float
++    stop_challenges: int = 0
+     current_plan: tuple[str, ...] = ()
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -218,6 +218,8 @@
+             elif decision.action is ActionKind.REPLAN:
+                 self._handle_replan(state, decision)
++            elif decision.action is ActionKind.STOP and self._challenge_stop(state, decision):
++                pass
+             else:
+                 state.final_summary = decision.summary or decision.rationale
+                 return self._finish(
+@@ -229,6 +231,36 @@
+ 
+         return self._report(state)
+ 
++    def _challenge_stop(self, state: RunState, decision: AgentDecision) -> bool:
++        """Push back on premature stops while ample budget remains."""
++        if state.finalization_started or state.stop_challenges >= 2:
++            return False
++        if decision.stop_category == "unsafe":
++            return False
++        turns_remaining = self._options.max_turns - state.turn_count
++        wall_remaining = state.deadline_monotonic - self._clock()
++        if turns_remaining <= 10 or wall_remaining <= 0.25 * self._options.max_wall_time_sec:
++            return False
++        state.stop_challenges += 1
++        message = (
++            f"Stop rejected ({state.stop_challenges}/2): {turns_remaining} turns and "
++            f"{int(wall_remaining)}s remain. Do not give up. Re-read the task, inspect the "
++            "actual error output, and try a different approach (install/build missing tools, "
++            "simplify, or work around the blocker). If the task is already complete, use "
++            "finish with real verification checks instead of stop."
++        )
++        state.unresolved_errors.append(message)
++        self._journal.append(
++            "stop_challenged",
++            {
++                "challenge": state.stop_challenges,
++                "stop_category": decision.stop_category,
++                "turns_remaining": turns_remaining,
++            },
++        )
++        return True
++
+     async def _handle_execute(
+         self,
+         state: RunState,
+```

@@ -1,0 +1,30 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -47,6 +47,12 @@ Rules:
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
++- Before finishing, validate the deliverable through the interface the ORIGINAL TASK specifies:
++  exact paths, filenames, entry points, tool invocations, and required execution modes. When
++  multiple compilers, languages, or consumers are required, exercise each against the same saved
++  deliverable. Do not substitute a wrapper, extracted fragment, rewritten copy, or extra flags
++  unless the task permits them. Prefer these end-to-end checks over redundant smoke tests, and
++  assert the required outputs or behavior rather than merely successful execution.
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
+@@ -73,6 +79,11 @@ Assess whether the executed completion receipts prove every explicit requirement in the ORIGINAL
+ TASK. Check the actual return codes and output, not only the proposed command text. Reject checks
+ that only prove a file exists, restate model claims, contradict their receipts, or omit required
+ behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.
++Compare the tested interface with the task-required interface: paths, filenames, entry points,
++tool invocations, and execution modes. Success through a wrapper, extracted fragment, rewritten
++copy, or additional flags does not establish success through the required interface unless the
++task permits that substitution. For explicitly required multiple compilers, languages, or
++consumers, require evidence for each against the same saved deliverable, including required behavior.
+ Resolve every prior completion finding before accepting.
+ When the task allows choosing among approaches and uses subjective superlatives such as "fastest",
+```
+
+This change aligns execution and review around task-facing acceptance checks, targeting false verification caused by testing a convenient substitute rather than the requested deliverable. It should help multi-tool tasks such as polyglot compilation without increasing budgets or requiring additional checks beyond the existing completion batch.

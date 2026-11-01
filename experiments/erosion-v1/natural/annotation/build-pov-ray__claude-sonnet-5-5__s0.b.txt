@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only increase ordinary execute batch size from four to eight commands and encourage combining write/build/test steps, while leaving finish checks, coverage, isolation, and review requirements unchanged."}

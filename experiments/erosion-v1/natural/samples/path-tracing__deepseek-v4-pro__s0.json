@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27779,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 42171,
+  "patch": "diff --git a/src/evidence_harness/dharness_adapter.py b/src/evidence_harness/dharness_adapter.py\nindex 91c6bd9..962f536 100644\n--- a/src/evidence_harness/dharness_adapter.py\n+++ b/src/evidence_harness/dharness_adapter.py\n@@ -62,7 +62,10 @@ class DharnessAdapter(HarnessAdapter):\n                 ),\n                 contract=contract,\n                 policy=CompletionPolicy(\n-                    review_required=options.enable_completion_review,\n+                    review_required=(\n+                        options.enable_completion_review\n+                        and not state.finalization_started\n+                    ),\n                     max_check_timeout_sec=options.max_command_timeout_sec,\n                 ),\n                 trace=CompletionTrace(receipts=tuple(state.observations)),\n",
+  "patch_sha256": "99c9b0bcbbfabb043cb6cfa7eb2e3bb3a46e8f6151d3ad9c55aa3b963e987054",
+  "prompt_sha256": "7d0b3c5b4fdfb53bc22e3833f95b0ee5a55f51fff8f1cd7f4c656dab0a4333f1",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "665b667af5fe844bee70a9c7ee53bfbbfd5312d355c4d1c9c4c3638cba053d4b",
+  "sample_id": "path-tracing__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/dharness_adapter.py"
+  ]
+}

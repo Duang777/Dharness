@@ -1,0 +1,52 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -81,7 +81,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_calls"]
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -836,6 +836,11 @@
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        if (
++            self._options.max_environment_calls - state.environment_call_count
++            <= self._options.verification_environment_reserve
++        ):
++            triggers.append("environment_calls")
+         if not triggers:
+             return
+         state.finalization_started = True
+@@ -866,6 +871,8 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and self._options.max_environment_calls - state.environment_call_count
++            > self._options.verification_environment_reserve
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -201,6 +201,12 @@
+             "environment_calls_remaining": max(
+                 0, options.max_environment_calls - state.environment_call_count
+             ),
++            "environment_calls_available_for_work": max(
++                0,
++                options.max_environment_calls
++                - state.environment_call_count
++                - options.verification_environment_reserve,
++            ),
+             "repairs_remaining": max(0, options.max_repairs - state.repair_count),
+@@ -53,6 +53,9 @@
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- Never request more work commands than budget.environment_calls_available_for_work.
++  When this reaches zero, the remaining environment calls are reserved for verification:
++  submit finish if the candidate appears complete, otherwise stop with the blocker.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+```
+
+Work admission already protects verification calls, but exhausting the work-call allowance does not trigger finalization, allowing rejected execute requests to waste the remaining turns and wall time. This change makes that boundary explicit to both controller and executor, directing completed candidates toward fresh verification without weakening completion guards or increasing budgets.

@@ -1,0 +1,1 @@
+ACCEPT — The change only adds a budget-based finalization trigger that protects the verification environment-call reserve and gates repair actions on leaving enough calls for checks, while the completion-checking pipeline (isolation, freshness/attempt binding, coverage, and semantic review) is untouched.

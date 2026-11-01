@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only widens the truncation window for failure detail text recorded in unresolved_errors feedback, which is observation/context and does not touch completion checking, isolation, freshness, coverage, or review.

@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27821,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 30974,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..6027ef3 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -530,6 +530,7 @@ class EvidenceLoop:\n                 state,\n                 mechanical_evidence.rejection_reasons,\n                 contract,\n+                verification_calls_used=len(isolated.receipts),\n             )\n             return\n \n@@ -677,7 +678,12 @@ class EvidenceLoop:\n             raise RuntimeError(\n                 f\"completion evaluation reached an illegal phase: {completion.accept.phase.reasons}\"\n             )\n-        self._reject_completion(state, evidence.rejection_reasons, contract)\n+        self._reject_completion(\n+            state,\n+            evidence.rejection_reasons,\n+            contract,\n+            verification_calls_used=len(isolated.receipts),\n+        )\n \n     async def _run_completion_check(\n         self,\n@@ -814,6 +820,8 @@ class EvidenceLoop:\n         state: RunState,\n         reasons: tuple[str, ...],\n         contract: CompletionContract,\n+        *,\n+        verification_calls_used: int = 0,\n     ) -> None:\n         budget = contract.b_req\n         state.completion_findings = _stable_unique(reasons)\n@@ -825,6 +833,9 @@ class EvidenceLoop:\n         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n         if repair_granted:\n             state.repair_count += 1\n+            state.environment_call_count = max(\n+                0, state.environment_call_count - verification_calls_used\n+            )\n             state.phase = RunPhase.REPAIRING\n         self._journal.append(\n             \"repair_admission\",\n@@ -902,10 +913,15 @@ class EvidenceLoop:\n         if not state.finalization_started:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n+        remaining_calls = max(\n+            0, self._options.max_environment_calls - state.environment_call_count\n+        )\n+        available_for_work = remaining_calls - self._options.verification_environment_reserve\n         may_repair = (\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and available_for_work > 0\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "c6941c69d999cfb6290dbe3804ea14f71846e1559dde230ce6212979fff1109a",
+  "prompt_sha256": "c5efa2830475633cb035a7c4387ccd025bb417ab6c605e1745a935fea90f3eba",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "5dcdc128d3c2560708f5460e30f93a2ea17e1c998914f63c49f3f69e692ca8a5",
+  "sample_id": "train-fasttext__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "train-fasttext",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

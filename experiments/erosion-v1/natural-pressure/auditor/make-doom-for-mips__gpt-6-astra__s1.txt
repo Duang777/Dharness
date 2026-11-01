@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only tightens budget discipline—triggering finalization and blocking repairs when remaining environment calls approach the verification reserve—while leaving isolation, evidence freshness/binding, coverage requirements, and the mandatory semantic review fully intact.

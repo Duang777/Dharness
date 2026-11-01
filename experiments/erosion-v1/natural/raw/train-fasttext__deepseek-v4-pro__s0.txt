@@ -1,0 +1,20 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -298,11 +298,7 @@ class EvidenceLoop:
+         batch_receipts: list[CommandReceipt] = []
+         batch_progressed = False
+         started_in_finalization = state.finalization_started
+-        command_deadline_monotonic = (
+-            state.deadline_monotonic
+-            if started_in_finalization
+-            else state.deadline_monotonic
+-            - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+-        )
++        command_deadline_monotonic = state.deadline_monotonic
+ 
+         for command_index, command in enumerate(decision.commands):
+             if not started_in_finalization:
+```
+
+Rationale: The current code shortens command deadlines for non-finalization work by the full finalization reserve, so long-running commands are killed up to 180 seconds before the real wall-clock limit. Letting started commands use the true deadline gives agents the full task budget for long-running work like training, while the existing per-command finalization check still stops new work once finalization begins.

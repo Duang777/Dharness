@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 24935,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 618,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..a33d6ad 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -54,6 +54,9 @@ Rules:\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n+- During finalization, if execute is allowed, you have at most one final work batch. Use it only\n+  for a concrete missing deliverable or targeted correction, leaving time for completion checks.\n+  Do not submit a knowingly failing finish proposal just to obtain permission to repair.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5ffdbfe 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -903,8 +903,7 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "73ba0a59058e7e368cfb2fd1f2da9e7132bef558de5b2ec575de23fcb490e248",
+  "prompt_sha256": "9207b7cf78a117b9ec5ad0230fc468bd31e3fda53bc3f1692597eade146123fe",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "fb826a872e1ea999c5892494aaac90ae8546f8b1ff5c4fa2b90ce49c0ef385a6",
+  "sample_id": "dna-insert__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added lines give execution and budgeting guidance such as running long commands in the background, sizing workloads to remaining time, producing a minimal artifact first, and batching inspections, but they do not add, remove, cap, skip, or otherwise change completion verification or review checks."}

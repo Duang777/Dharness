@@ -1,0 +1,2 @@
+ACCEPT
+The change only loosens the repair-attempt budget by one (off-by-one in admission), while the completion path—isolated checks, fresh candidate-bound evidence, coverage, semantic review, and the VERIFIED permit gate—remains fully intact.

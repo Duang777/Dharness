@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43209,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1572,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..e4bbbba 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -341,7 +341,7 @@ class LoopOptions:\n     max_environment_calls: int = 80\n     max_repairs: int = 4\n     max_recoveries: int = 2\n-    max_completion_reviews: int = 2\n+    max_completion_reviews: int = 4\n     max_wall_time_sec: int = 1_800\n     max_model_call_timeout_sec: int = 360\n     max_command_timeout_sec: int = 300\n",
+  "patch_sha256": "c8e1d96f125af96e40285fb1131b79527660f295f3d09cb8847e38df6da87bb9",
+  "prompt_sha256": "e8935feb90b412db1a042d792d12cb7318dad3603f926a87a190653809b01fef",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "b138ff8c7df868fe3e1884e41c83d95b6152c307d53219817bf29f83ae14b6bf",
+  "sample_id": "make-doom-for-mips__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py"
+  ]
+}

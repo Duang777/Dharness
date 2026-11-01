@@ -1,0 +1,27 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -852,8 +852,7 @@ class EvidenceLoop:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -49,6 +49,9 @@ Rules:
+   already contained those files.
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, you have at most one final work batch.
++  Use it only for focused implementation, saving required artifacts, or correcting a known defect;
++  otherwise finish immediately. Leave time for completion checks and review.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+The current finalization gate prohibits saving or fixing an incomplete result until a completion rejection produces findings, wasting scarce remaining turns on a predictably unsuccessful finish attempt. Allowing one focused final work batch without that prerequisite preserves the existing verification-call reserve and a subsequent executor turn while giving unfinished tasks another opportunity to produce correct artifacts.

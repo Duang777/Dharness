@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call finalization trigger (and matching prompt/repair gating) at exactly the threshold where the work-admission guard already blocks new work, while the completion path—checks executed in isolation via `CompletionController.verify`, fresh per-attempt receipts bound to `attempt_id`/`candidate_digest`, mandatory requirement coverage, independent semantic review, and the VERIFIED permit check in `_finish`—remains completely untouched.

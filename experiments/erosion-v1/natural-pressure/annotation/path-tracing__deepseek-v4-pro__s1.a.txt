@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "The only change raises `FINALIZATION_TURN_RESERVE` from 3 to 4, which reallocates the turn budget between solving and finalization without adding, removing or skipping any completion check; a reader could instead see it as giving verification more room or as triggering finalization earlier."}

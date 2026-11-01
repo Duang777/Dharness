@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only increases budget reserves for finalization (more turns and wall time set aside), which affects resource allocation rather than weakening any completion-checking logic.

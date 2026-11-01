@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added lines give turn-budget and batching guidance, including aiming to call finish around 70% of turns, but they do not remove, cap, skip, or alter the required completion checks or review process."}

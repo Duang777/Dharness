@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only changes finalization-phase solving strategy and prompts—offering one admitted repair work batch without requiring prior completion findings and no longer consuming the repair flag when a batch is rejected by the BudgetGuard—while every completion-checking guarantee (isolated snapshot execution, fresh attempt-bound candidate digests that are still invalidated by new work, full requirement coverage enforcement, and the mandatory semantic review plus controller permit before VERIFIED) is left completely untouched.

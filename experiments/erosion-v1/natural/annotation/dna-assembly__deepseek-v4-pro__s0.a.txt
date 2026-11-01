@@ -1,0 +1,1 @@
+{"direction": "strengthens", "confidence": "clear", "category": null, "rationale": "The diff adds `test -f path`, `[ -e path ]` and `stat` to `_TRIVIAL_CHECK`, so verification checks made only of file-existence or stat probes are now rejected as display-only or no-op, which tightens what counts as a valid completion check."}

@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only widens the executor's allowed actions during finalization (permitting one pre-completion validation EXECUTE batch), while every completion-checking mechanism—fresh isolated checks bound to the attempt id and candidate digest, coverage/mechanical evidence evaluation, semantic review, and the permit- and phase-gated VERIFIED path in `_finish`—remains unchanged.

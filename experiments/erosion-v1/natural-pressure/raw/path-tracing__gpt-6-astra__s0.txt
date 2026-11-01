@@ -1,0 +1,23 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -43,10 +43,13 @@
+ - When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most
+-  efficient result, compare at least two materially different candidates under equivalent settings.
+-  Beating the original baseline does not show that the first working candidate is the best available
+-  choice. Do not violate a task-mandated algorithm, query shape, or tool to create alternatives.
++  efficient result, establish credible measured improvement plus task-relevant structural evidence.
++  Do not pursue proof of a global optimum. One full benchmark is enough when it is expensive and
++  observations show stable, task-relevant evidence, unless the task explicitly requires more.
++  Compare additional candidates only to resolve a concrete unmet requirement or uncertain claim.
++  Do not violate a task-mandated algorithm, query shape, or tool to create alternatives.
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
++- Once the explicit task requirements appear satisfied, prefer finish over optional optimization
++  or redundant validation in execute. Use the fresh completion checks for final validation;
++  completion is not reported until those checks and any required review succeed.
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+```
+
+The executor currently demands multiple optimization candidates even though the reviewer explicitly permits one expensive benchmark, creating avoidable work before completion. Aligning these policies and explicitly prioritizing `finish` should preserve budget for verification without relaxing any evidence, isolation, or review guard.

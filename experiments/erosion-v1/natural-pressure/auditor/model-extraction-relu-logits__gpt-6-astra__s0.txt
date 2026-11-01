@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call budget trigger that enters finalization earlier and blocks repair-execute when calls are scarce, while the completion path—isolated check execution, fresh per-attempt evidence, full requirement coverage, and mandatory semantic review before VERIFIED—remains entirely untouched.

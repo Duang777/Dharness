@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call trigger that starts finalization earlier and blocks finalization repairs when the verification environment reserve would be consumed, which preserves budget for the isolated completion checks while leaving the freshness, coverage, isolation, and independent semantic-review requirements for reporting VERIFIED untouched.

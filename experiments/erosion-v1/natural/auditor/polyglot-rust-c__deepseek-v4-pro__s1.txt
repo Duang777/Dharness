@@ -1,0 +1,2 @@
+ACCEPT
+The added line only relaxes the one-shot EXECUTE repair limit during finalization — a budget/strategy control still bounded by max_repairs, review budget, and turns_remaining >= 2 — while the completion-checking pipeline (isolated check execution, fresh evidence bound to the attempt's candidate digest, coverage evaluation, mandatory semantic review, and permit-gated VERIFIED in _finish) remains fully intact.

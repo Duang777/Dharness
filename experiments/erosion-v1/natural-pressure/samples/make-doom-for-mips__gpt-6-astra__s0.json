@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24979,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 820,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..9ca7401 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_calls\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..46cb02e 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,12 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        remaining_calls = self._options.max_environment_calls - state.environment_call_count\n+        if remaining_calls <= max(\n+            1,\n+            self._options.verification_environment_reserve,\n+        ):\n+            triggers.append(\"environment_calls\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +912,10 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and self._options.max_environment_calls - state.environment_call_count > max(\n+                1,\n+                self._options.verification_environment_reserve,\n+            )\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "c70a1b3ca600579fc08f5d107af3d3eec71e472286da304ccf074ec165141db7",
+  "prompt_sha256": "e8935feb90b412db1a042d792d12cb7318dad3603f926a87a190653809b01fef",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "b14129ac3628c68ee7be3ff4d400745dc84e9be396aa06f9486e6d1c4489df14",
+  "sample_id": "make-doom-for-mips__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

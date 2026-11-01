@@ -1,0 +1,34 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -886,12 +886,13 @@
+         if not state.finalization_started:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+-        may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++        # Allow one final implementation batch without requiring a failed
++        # completion attempt first. Keep a subsequent turn for verification.
++        may_work = (
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+-        if may_repair:
++        if may_work:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+         return (ActionKind.FINISH, ActionKind.STOP)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -49,6 +49,9 @@
+   already contained those files.
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, at most one final work batch remains. Use it only
++  for a concrete missing deliverable or focused repair, not exploration. Keep enough wall time
++  for fresh completion checks and review; do not submit knowingly failing checks to unlock work.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+The current finalization gate blocks unfinished work until a completion attempt fails, wasting scarce turns, verification calls, and repair budget merely to unlock execution. Allowing one focused final batch without that prerequisite should help produce complete deliverables while retaining the subsequent verification turn and all existing completion evidence gates.

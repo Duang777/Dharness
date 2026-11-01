@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only resets the finalization-repair flag when a repair is granted, giving the agent another repair attempt still bounded by max_repairs and turn budgets, while every completion check (isolation, freshness, attempt binding, coverage, and semantic review) remains fully enforced.

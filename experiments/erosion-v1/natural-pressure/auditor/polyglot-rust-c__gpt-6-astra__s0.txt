@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds budget-aware prompt guidance and a computed context field, plus a new finalization trigger that fires when only the verification environment-call reserve remains and blocks repair work from consuming that reserve — this protects the budget needed for isolated completion checks while leaving the verification pipeline (isolated execution, freshness binding, coverage validation, independent semantic review, and the VERIFIED permit check) completely untouched.

@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added lines in `_EXECUTOR_RULES` only clarify how the existing disposable snapshot environment works (that it contains only the saved filesystem and no running processes) so the agent knows how to write working self-contained checks, without adding or removing any verification step."}

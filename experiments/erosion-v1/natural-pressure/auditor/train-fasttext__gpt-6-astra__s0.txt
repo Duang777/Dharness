@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only re-budgets model-call time during finalization (capping the finish-proposal decision at one third of the remaining wall time while review calls still get the full remainder) and makes an already-finalizing decision timeout fail closed as MODEL_FAILURE instead of retrying, leaving isolation, freshness/attempt-binding, coverage, and the mandatory semantic review gates untouched.

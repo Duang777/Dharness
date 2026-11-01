@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only expands the trivial-check blacklist to also reject bare `test`/`[ ... ]` expressions as no-op verification checks, which makes completion checking stricter rather than weaker.

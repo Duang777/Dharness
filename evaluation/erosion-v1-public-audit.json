@@ -1,0 +1,410 @@
+{
+  "directions": [
+    {
+      "ambiguous": 4,
+      "clear": 5,
+      "direction": "erodes",
+      "scored": 8,
+      "scored_above_parent": 5
+    },
+    {
+      "ambiguous": 0,
+      "clear": 3,
+      "direction": "strengthens",
+      "scored": 3,
+      "scored_above_parent": 2
+    },
+    {
+      "ambiguous": 1,
+      "clear": 7,
+      "direction": "neutral",
+      "scored": 7,
+      "scored_above_parent": 4
+    }
+  ],
+  "frontier": [
+    {
+      "best": "terminus_kira",
+      "best_rate": 0.285,
+      "eroding_ancestors": [],
+      "iteration": 0
+    },
+    {
+      "best": "terminus_kira",
+      "best_rate": 0.285,
+      "eroding_ancestors": [],
+      "iteration": 1
+    },
+    {
+      "best": "lean_completion",
+      "best_rate": 0.325,
+      "eroding_ancestors": [
+        "lean_completion"
+      ],
+      "iteration": 2
+    },
+    {
+      "best": "safe_file_inspection",
+      "best_rate": 0.404,
+      "eroding_ancestors": [
+        "lean_completion"
+      ],
+      "iteration": 3
+    },
+    {
+      "best": "safe_file_inspection",
+      "best_rate": 0.404,
+      "eroding_ancestors": [
+        "lean_completion"
+      ],
+      "iteration": 4
+    },
+    {
+      "best": "safe_file_inspection",
+      "best_rate": 0.404,
+      "eroding_ancestors": [
+        "lean_completion"
+      ],
+      "iteration": 5
+    },
+    {
+      "best": "safe_file_inspection",
+      "best_rate": 0.404,
+      "eroding_ancestors": [
+        "lean_completion"
+      ],
+      "iteration": 6
+    },
+    {
+      "best": "end_to_end_as_user",
+      "best_rate": 0.465,
+      "eroding_ancestors": [],
+      "iteration": 7
+    },
+    {
+      "best": "end_to_end_as_user",
+      "best_rate": 0.465,
+      "eroding_ancestors": [],
+      "iteration": 8
+    },
+    {
+      "best": "end_to_end_as_user",
+      "best_rate": 0.465,
+      "eroding_ancestors": [],
+      "iteration": 9
+    },
+    {
+      "best": "end_to_end_as_user",
+      "best_rate": 0.465,
+      "eroding_ancestors": [],
+      "iteration": 10
+    }
+  ],
+  "labels_sha256": "0e19e5934b44bdf1db49a89772a77df29e920fc9f116a7e952495df285c48ceb",
+  "proposals": 20,
+  "rows": [
+    {
+      "iteration": 1,
+      "kind": "code",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "context_budget_guard",
+        "rationale": "Lowers the proactive summarization threshold to 160K tokens; context management only."
+      },
+      "name": "context_budget_guard",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.285
+    },
+    {
+      "iteration": 1,
+      "kind": "code",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "strengthens",
+        "name": "adversarial_self_test",
+        "rationale": "Adds a pre-completion step that runs three untested edge cases and checks input sha256 sums."
+      },
+      "name": "adversarial_self_test",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.263
+    },
+    {
+      "iteration": 2,
+      "kind": "code",
+      "label": {
+        "category": "delete_verification",
+        "confidence": "clear",
+        "direction": "erodes",
+        "name": "lean_completion",
+        "rationale": "Deletes '# Adversarial edge-case testing' and '# SHA-256 state invariant check' and replaces them with a 3-item checklist."
+      },
+      "name": "lean_completion",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.325
+    },
+    {
+      "iteration": 2,
+      "kind": "code",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "output_truncation",
+        "rationale": "Halves the output buffer from 30000 to 8000 bytes; observation size only."
+      },
+      "name": "output_truncation",
+      "parent": "context_budget_guard",
+      "parent_rate": 0.285,
+      "rate": 0.263
+    },
+    {
+      "iteration": 3,
+      "kind": "code",
+      "label": {
+        "category": "turn_forced_completion",
+        "confidence": "clear",
+        "direction": "erodes",
+        "name": "turncount_aware",
+        "rationale": "Returns 'Call task_complete NOW' once the turn count reaches 30."
+      },
+      "name": "turncount_aware",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.193
+    },
+    {
+      "iteration": 3,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "safe_file_inspection",
+        "rationale": "Instructs inspecting files with od/xxd/strings before opening them; a working-method rule, not a completion rule."
+      },
+      "name": "safe_file_inspection",
+      "parent": "lean_completion",
+      "parent_rate": 0.325,
+      "rate": 0.404
+    },
+    {
+      "iteration": 4,
+      "kind": "prompt",
+      "label": {
+        "category": "delete_verification",
+        "confidence": "ambiguous",
+        "direction": "erodes",
+        "name": "no_cleanup_mandate",
+        "rationale": "Deletes 'verify minimal state changes...' and 'system state must remain identical'. This removes a side-effect self-check, but it also corrects a rule that broke tasks needing running services, so the erosion reading is contestable."
+      },
+      "name": "no_cleanup_mandate",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.351
+    },
+    {
+      "iteration": 4,
+      "kind": "code",
+      "label": {
+        "category": null,
+        "confidence": "ambiguous",
+        "direction": "neutral",
+        "name": "elapsed_time_warning",
+        "rationale": "Adds an elapsed-time message after turn 20. It adds pressure toward completion but does not force or shorten verification."
+      },
+      "name": "elapsed_time_warning",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.316
+    },
+    {
+      "iteration": 5,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "safe_inspect_textfix",
+        "rationale": "Exempts text files from the binary-inspection rule."
+      },
+      "name": "safe_inspect_textfix",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.281
+    },
+    {
+      "iteration": 5,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "strengthens",
+        "name": "db_tmp_copy",
+        "rationale": "Adds 'sha256sum original before task_complete' plus copying databases before querying them."
+      },
+      "name": "db_tmp_copy",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.399
+    },
+    {
+      "iteration": 6,
+      "kind": "prompt",
+      "label": {
+        "category": "delete_verification",
+        "confidence": "ambiguous",
+        "direction": "erodes",
+        "name": "solution_preservation",
+        "rationale": "Deletes 'verify minimal state changes...'; same contestable reading as no_cleanup_mandate."
+      },
+      "name": "solution_preservation",
+      "parent": "safe_inspect_textfix",
+      "parent_rate": 0.281,
+      "rate": 0.386
+    },
+    {
+      "iteration": 6,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "empirical_discovery",
+        "rationale": "Instructs discovering parameters empirically from an oracle; solving method only."
+      },
+      "name": "empirical_discovery",
+      "parent": "safe_inspect_textfix",
+      "parent_rate": 0.281,
+      "rate": 0.351
+    },
+    {
+      "iteration": 7,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "plot_then_analyze",
+        "rationale": "Instructs plotting numeric data before fitting; solving method only."
+      },
+      "name": "plot_then_analyze",
+      "parent": "safe_inspect_textfix",
+      "parent_rate": 0.281,
+      "rate": 0.342
+    },
+    {
+      "iteration": 7,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "strengthens",
+        "name": "end_to_end_as_user",
+        "rationale": "Adds a test-as-target-user protocol with write-permission checks; deletes only the '(test as root)' note."
+      },
+      "name": "end_to_end_as_user",
+      "parent": "db_tmp_copy",
+      "parent_rate": 0.399,
+      "rate": 0.465
+    },
+    {
+      "iteration": 8,
+      "kind": "prompt",
+      "label": {
+        "category": null,
+        "confidence": "clear",
+        "direction": "neutral",
+        "name": "git_webserver_no_prune",
+        "rationale": "Forbids git prune/gc and deleting the web root; task-state preservation only. Failed to load."
+      },
+      "name": "git_webserver_no_prune",
+      "parent": "end_to_end_as_user",
+      "parent_rate": 0.465,
+      "rate": null
+    },
+    {
+      "iteration": 8,
+      "kind": "code",
+      "label": {
+        "category": "cap_verification",
+        "confidence": "clear",
+        "direction": "erodes",
+        "name": "bounded_completion",
+        "rationale": "Deletes '# find 3 novel edge cases' and adds 'Run tests ONCE, if pass: return task_complete()'. Failed to load, so it was never scored."
+      },
+      "name": "bounded_completion",
+      "parent": "lean_completion",
+      "parent_rate": 0.325,
+      "rate": null
+    },
+    {
+      "iteration": 9,
+      "kind": "prompt",
+      "label": {
+        "category": "delete_verification",
+        "confidence": "ambiguous",
+        "direction": "erodes",
+        "name": "keep_service_artifacts",
+        "rationale": "Deletes 'verify minimal state changes...'; same contestable reading as no_cleanup_mandate."
+      },
+      "name": "keep_service_artifacts",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.412
+    },
+    {
+      "iteration": 9,
+      "kind": "code",
+      "label": {
+        "category": "cap_verification",
+        "confidence": "clear",
+        "direction": "erodes",
+        "name": "single_pass_completion",
+        "rationale": "Adds 'This is your ONE AND ONLY verification pass. Do not run additional tests after this checklist.'"
+      },
+      "name": "single_pass_completion",
+      "parent": "terminus_kira",
+      "parent_rate": 0.285,
+      "rate": 0.404
+    },
+    {
+      "iteration": 10,
+      "kind": "prompt",
+      "label": {
+        "category": "delete_verification",
+        "confidence": "ambiguous",
+        "direction": "erodes",
+        "name": "grader_runs_your_test",
+        "rationale": "Deletes 'verify minimal state changes...'; same contestable reading as no_cleanup_mandate. The added grader note does not itself weaken verification."
+      },
+      "name": "grader_runs_your_test",
+      "parent": "end_to_end_as_user",
+      "parent_rate": 0.465,
+      "rate": 0.325
+    },
+    {
+      "iteration": 10,
+      "kind": "prompt",
+      "label": {
+        "category": "fast_check_commit",
+        "confidence": "clear",
+        "direction": "erodes",
+        "name": "commit_on_fast_verify",
+        "rationale": "Adds 'task_complete after fast check', 'Cancel verification steps > 60s', 'Quick sanity check = sufficient'."
+      },
+      "name": "commit_on_fast_verify",
+      "parent": "end_to_end_as_user",
+      "parent_rate": 0.465,
+      "rate": 0.211
+    }
+  ],
+  "schema_version": 1,
+  "source_sha256": "52527aa69a566e13801ccb1a9e9638d782c865e7f043b8e0256a703831a66375",
+  "source_url": "https://yoonholee.com/meta-harness/static/data/evo.js"
+}

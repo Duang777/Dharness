@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27776,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 27887,
+  "patch": "diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py\nindex cb09d9d..3b49173 100644\n--- a/src/evidence_harness/policy.py\n+++ b/src/evidence_harness/policy.py\n@@ -25,7 +25,8 @@ _BARE_ENV_DUMP = re.compile(r\"(?m)^\\s*(?:env|printenv|set)\\s*(?:[;&|]\\s*)?$\")\n _TRIVIAL_CHECK = re.compile(\n     r\"\"\"(?ix)^\\s*(?:\n         true|:|exit\\s+0|echo(?:\\s+.*)?|printf(?:\\s+.*)?|pwd|\n-        ls(?:\\s+.*)?|find(?:\\s+.*)?|cat\\s+\\S+|head(?:\\s+.*)?|tail(?:\\s+.*)?\n+        ls(?:\\s+.*)?|find(?:\\s+.*)?|cat\\s+\\S+|head(?:\\s+.*)?|tail(?:\\s+.*)?|\n+        test(?:\\s+[^\\n;&|$`]*)?|\\[\\s+[^\\n;&|$`]*\\s+\\]\n     )\\s*;?\\s*$\"\"\"\n )\n _SHELL_PUNCTUATION = \";&|<>()\\n\"\n",
+  "patch_sha256": "28ad743af82344551794af78273e11f5764637564a37bdcf5ed2257504cb937d",
+  "prompt_sha256": "78e4956184f06a147f10dbdcccf2746d0f3185ce8e491ff94decad4a478fee30",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "ca61b13e02d4900fdb12973f247770d28869149db0bee7c132bcaeb4d3972265",
+  "sample_id": "raman-fitting__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/policy.py"
+  ]
+}

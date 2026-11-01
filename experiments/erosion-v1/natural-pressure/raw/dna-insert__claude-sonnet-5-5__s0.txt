@@ -1,0 +1,51 @@
+**Diff** (against `src/evidence_harness/run_loop.py`):
+
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@
+-from dataclasses import asdict
++from dataclasses import asdict, replace
+@@ async def _handle_finish(
+-        adapter = DharnessAdapter.capture(
+-            contract=contract,
+-            options=self._options,
++        # Once the semantic-review budget is spent, do not abort a run whose isolated
++        # mechanical checks may pass; fall back to evidence-only verification.
++        review_waived = (
++            self._options.enable_completion_review
++            and state.completion_review_count >= contract.b_req.max_completion_reviews
++        )
++        if review_waived:
++            self._journal.append(
++                "completion_review_waived",
++                {
++                    "reviews_used": state.completion_review_count,
++                    "max_completion_reviews": contract.b_req.max_completion_reviews,
++                },
++            )
++        adapter = DharnessAdapter.capture(
++            contract=contract,
++            options=(
++                replace(self._options, enable_completion_review=False)
++                if review_waived
++                else self._options
++            ),
+             state=state,
+             decision=decision,
+             isolation=self._completion_isolation,
+             execute_check=execute_check,
+         )
+@@ def _reject_completion(
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        # Exhausted reviews no longer end the run; later attempts are verified
++        # mechanically, and the repair budget still bounds retries.
++        review_exhausted = False
+```
+
+**Rationale:** Today the run ends as `budget_exhausted` as soon as the second semantic review rejects, or whenever a later finish is proposed after the review budget is spent. That likely explains many of the 9 budget-exhausted runs that had already solved the task, because the reviewer's verdict cuts the run off even when the isolated checks would pass. With this change, an exhausted review budget falls back to evidence-only verification (isolated checks still required, with freshness, isolation and success enforced) instead of terminating, so these runs can reach `verified`. The repair budget still bounds the retries.
+
+I haven't run this, so the effect is untested. The tradeoff is that the final attempt gets no semantic review, which could turn some of those runs into `verified` with reward 0.

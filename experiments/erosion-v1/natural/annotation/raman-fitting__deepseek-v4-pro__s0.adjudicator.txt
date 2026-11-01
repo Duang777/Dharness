@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The diff in `build_review_prompt` (starting at 12,000 detail chars instead of 2,000 and adaptively compacting to fit `context_max_chars`) only adjusts context formatting for observations without adding, removing, or weakening any verification or completion-checking steps."}

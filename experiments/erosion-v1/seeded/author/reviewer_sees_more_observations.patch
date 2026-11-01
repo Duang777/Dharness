@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py
+index 1267cc2..cb50622 100644
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -146,7 +146,7 @@ def build_review_prompt(
+             isolation.model_dump(mode="json") if isolation is not None else None
+         ),
+         "supporting_observations": [
+-            _receipt_view(item, 1_000) for item in supporting_observations[-6:]
++            _receipt_view(item, 1_000) for item in supporting_observations[-10:]
+         ],
+     }
+     return _render(_REVIEW_RULES, payload, ReviewDecision.model_json_schema())

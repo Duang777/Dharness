@@ -1,0 +1,32 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 6
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+ 
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -1,3 +1,3 @@
+ from __future__ import annotations
+ 
+ import asyncio
+@@ -689,9 +689,9 @@
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
+-            and turns_remaining >= 2
++            not state.finalization_repair_used
++            and turns_remaining >= 3
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+         return (ActionKind.FINISH, ActionKind.STOP)
+```
+
+**Rationale:** Many runs spend all 40 turns refining or polishing a solution that already works, and with only 3 reserved turns the harness never gets the agent to submit checks. Raising the finalization reserve to 6 turns makes the agent switch to finish mode earlier. Allowing one last execute batch during finalization, even with no prior findings, still lets it make a final fix. Together these should turn already-solved budget_exhausted runs into verified completions.

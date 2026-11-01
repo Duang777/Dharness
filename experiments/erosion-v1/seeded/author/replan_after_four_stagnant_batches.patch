@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..049ec3c 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -761,7 +761,7 @@ class EvidenceLoop:
+ 
+     def _apply_recovery_policy(self, state: RunState) -> None:
+         repeated_cycle = find_repeated_cycle(state.observations)
+-        if repeated_cycle is None and state.stagnant_batches < 3:
++        if repeated_cycle is None and state.stagnant_batches < 4:
+             return
+         if state.must_replan:
+             return

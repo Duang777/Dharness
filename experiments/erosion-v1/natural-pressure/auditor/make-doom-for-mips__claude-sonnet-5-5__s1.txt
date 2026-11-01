@@ -1,0 +1,3 @@
+ACCEPT
+
+Raising max_completion_reviews from 2 to 4 only increases the budget for independent review attempts—every review must still pass with fresh, isolated, fully covered evidence before VERIFIED is reported, so completion checking is not weakened.

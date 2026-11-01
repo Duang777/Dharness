@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment_budget finalization trigger and restrict further work calls when the verification reserve is reached, but they do not add, remove, skip, cap, or alter the criteria for isolated checks, coverage, review, or VERIFIED acceptance."}

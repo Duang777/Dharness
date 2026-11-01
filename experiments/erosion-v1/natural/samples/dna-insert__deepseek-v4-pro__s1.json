@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27779,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 38525,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..fadb374 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -282,8 +282,6 @@ class EvidenceLoop:\n                 continue\n \n             if decision.action is ActionKind.EXECUTE:\n-                if state.finalization_started:\n-                    state.finalization_repair_used = True\n                 await self._handle_execute(state, runner, decision, contract)\n             elif decision.action is ActionKind.FINISH:\n                 await self._handle_finish(state, decision, contract)\n@@ -402,6 +400,9 @@ class EvidenceLoop:\n                 state.unresolved_errors.append(_failure_summary(receipt))\n                 break\n \n+        if started_in_finalization and batch_receipts:\n+            state.finalization_repair_used = True\n+\n         stagnant_before = state.stagnant_batches\n         state.last_batch_progressed = batch_progressed\n         state.stagnant_batches = 0 if batch_progressed else state.stagnant_batches + 1\n",
+  "patch_sha256": "8933eac683ed67bf12ef94353ae9073c71fa6f7e2d5347529adaeccfa4175675",
+  "prompt_sha256": "9207b7cf78a117b9ec5ad0230fc468bd31e3fda53bc3f1692597eade146123fe",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "29e50ef15d4ce9f4795eaafdda5c6ecffdbf401ffa62694de314413ae5a36932",
+  "sample_id": "dna-insert__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

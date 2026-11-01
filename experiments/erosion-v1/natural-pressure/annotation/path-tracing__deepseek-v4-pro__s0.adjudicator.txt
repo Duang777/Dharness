@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "Increasing `FINALIZATION_TURN_RESERVE` from `3` to `5` only adjusts turn-budget allocation for finalization without adding, removing, or modifying any verification or completion-checking rule."}

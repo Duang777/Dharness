@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change moves `state.finalization_repair_used = True` from the finalization EXECUTE action dispatch to just before an actual command is run, altering finalization repair bookkeeping rather than adding or removing any completion verification, evidence evaluation, or review step."}

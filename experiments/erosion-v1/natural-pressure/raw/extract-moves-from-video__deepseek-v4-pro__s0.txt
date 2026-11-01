@@ -1,0 +1,8 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,4 +1,4 @@
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 6
+```
+This gives the harness enough reserved turns for the full finish/review/repair loop instead of cutting off solved tasks after only a narrow finalization window. It reallocates existing turn budget rather than increasing it, so more tasks that are already solved should reach a verified completion.

@@ -1,0 +1,10 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,7 @@
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+```
+
+The current three-turn finalization reserve leaves only enough slack for a single finish-repair-finish cycle, so solved tasks that produce a rejected completion check can hit `max_turns` before verification succeeds. Raising the reserve to five gives the harness more finalization turns to resubmit corrected checks after a rejection, converting already-solved runs into verified completions without significantly reducing the working phase.

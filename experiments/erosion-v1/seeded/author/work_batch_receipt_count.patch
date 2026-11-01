@@ -1,0 +1,12 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..371e18e 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -427,6 +427,7 @@ class EvidenceLoop:
+                     and receipt.observation_fingerprint not in receipts_before
+                 ),
+                 "progressed": batch_progressed,
++                "receipt_count": len(batch_receipts),
+                 "stagnant_batches_before": stagnant_before,
+                 "stagnant_batches_after": state.stagnant_batches,
+             },

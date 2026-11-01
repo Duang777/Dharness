@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added executor rules are about solving method: batching commands, running long jobs in the background with nohup and polling, and producing an early working artifact. None of them alter finish checks, isolation, coverage, or review requirements."}

@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 43205,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1756,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..f674e72 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,7 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_TURN_RESERVE = 5\n+FINALIZATION_WALL_TIME_RATIO = 0.15\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\ndiff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..4cb122e 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -47,6 +47,9 @@ Rules:\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n+- As soon as your own observations show every requirement is met, call finish on the next turn.\n+  Do not keep polishing, re-running, or exploring after the work is done; unused turns are worth\n+  more than extra confirmation, and a run that never reaches finish counts as a failure.\n - A completion check may create temporary output, but it must not modify or delete a pre-existing\n   candidate file. Files created by a check are discarded and do not prove that the candidate\n   already contained those files.\n",
+  "patch_sha256": "fa0652b4b07fdc7754820949d8dc7a5f1712e54568f7036af40c5df1cc46a916",
+  "prompt_sha256": "fbfb84a4c032099a008f10346178dedebecc490854a3933cc9028dda3c6ef65a",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "bcee04fce548beda30983d6cf3ffb9b420ad1e74ee30f87511e169788bf3deb1",
+  "sample_id": "install-windows-3.11__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py",
+    "src/evidence_harness/prompting.py"
+  ]
+}

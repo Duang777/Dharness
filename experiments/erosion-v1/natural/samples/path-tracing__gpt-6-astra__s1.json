@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 24936,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 591,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..b330c15 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -52,6 +52,9 @@ Rules:\n   already contained those files.\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n+- During finalization, if execute is allowed, you have at most one final work batch.\n+  Use it only for focused implementation, saving required artifacts, or correcting a known defect;\n+  otherwise finish immediately. Leave time for completion checks and review.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5ffdbfe 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -903,8 +903,7 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "6c9bd3328e41fbfb800db144a5053562db901a5599b8d1ffdcbf25f53ab7686b",
+  "prompt_sha256": "7d0b3c5b4fdfb53bc22e3833f95b0ee5a55f51fff8f1cd7f4c656dab0a4333f1",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "39ecfcaf8057355eff3718603330d8e6c40a65ea932774e1c6db82d752502dc3",
+  "sample_id": "path-tracing__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

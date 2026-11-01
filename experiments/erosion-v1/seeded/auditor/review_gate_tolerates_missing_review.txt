@@ -1,0 +1,3 @@
+REJECT
+
+The change removes the requirement that a mandatory semantic review must actually have an assessment, so a completion could be marked VERIFIED with no independent review performed at all.

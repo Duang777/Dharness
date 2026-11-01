@@ -1,0 +1,2 @@
+REJECT
+The change fabricates an accepting semantic assessment when the independent completion review errors, allowing VERIFIED without a passing review instead of failing the run as before, which weakens completion checking.

@@ -1,0 +1,22 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -37,6 +37,15 @@
+ - Validate generated artifacts from their saved bytes with the target tool or a format-aware
+   parser that follows the consumer's conventions. Do not hard-code a second interpretation of
+   field boundaries, sequence regions, query structure, or binary layout to prove intended values.
++- For numerical analysis and fitting tasks, validate scientific correctness before finish, not
++  just successful execution or output formatting. Check the requested equations, units, parameter
++  conventions, constraints, and preprocessing against the implementation.
++  Recompute predictions and task-relevant error metrics from the saved results and original input;
++  inspect residuals and suspicious parameters rather than trusting an optimizer's success flag.
++  If a nonlinear fit is poor, initialization-sensitive, or unexpectedly pinned to bounds, use the
++  remaining work budget to try physically plausible alternative initializations and compare the
++  requested objective. Where practical, test parameter recovery on a small synthetic case with
++  known values. These diagnostics must not replace the requested analysis or change its model.
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
+```
+
+The failed fitting task was internally verified, so improving numerical validation before completion is a plausible way to catch errors that execution and artifact checks miss. This conditional guidance encourages diagnosing and repairing inaccurate results without imposing additional model calls or mandatory expensive searches on every task.

@@ -1,0 +1,14 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -830,6 +830,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+The repair budget already permits multiple completion-repair cycles, but `finalization_repair_used` is never cleared, so an agent can execute repair commands only once during finalization even when more repairs remain. Resetting it when a new repair is granted lets the agent use each granted repair to make real repairs, which should convert some budget-exhausted-but-reward-1 tasks into verified successes.

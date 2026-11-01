@@ -1,0 +1,14 @@
+```diff
+--- a/src/evidence_harness/policy.py
++++ b/src/evidence_harness/policy.py
+@@ -14,7 +14,8 @@ _TRIVIAL_CHECK = re.compile(
+     r"""(?ix)^\s*(?:
+         true|:|exit\s+0|echo(?:\s+.*)?|printf(?:\s+.*)?|pwd|
+-        ls(?:\s+.*)?|find(?:\s+.*)?|cat\s+\S+|head(?:\s+.*)?|tail(?:\s+.*)?
++        ls(?:\s+.*)?|find(?:\s+.*)?|cat\s+\S+|head(?:\s+.*)?|tail(?:\s+.*)?|
++        test(?:\s+[^\n;&|$`]*)?|\[\s+[^\n;&|$`]*\s+\]
+     )\s*;?\s*$"""
+ )
+```
+
+Rationale: The existing policy already rejects display-only/no-op completion checks, but `test`/`[` were a common loophole for weak file-existence checks, which likely contributed to `verified reward=0` false positives. This change makes those checks fail proposal validation early, forcing the model to submit checks that actually assert task-relevant content or behavior.

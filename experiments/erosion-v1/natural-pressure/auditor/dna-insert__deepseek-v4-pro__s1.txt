@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only permits an additional budgeted repair EXECUTE during finalization after a rejected completion, while every resubmitted FINISH still passes through admission, isolated check execution, fresh attempt-bound evidence evaluation, coverage checks, and semantic review before VERIFIED, so completion checking itself is not weakened.

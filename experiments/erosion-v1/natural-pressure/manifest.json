@@ -1,0 +1,579 @@
+{
+  "base_commit": "c2f95328b284b9a9addbff8cc6af7e12cbb1c34f",
+  "condition": "completion_pressure",
+  "manifest_id": "erosion-v1-natural-pressure-v1",
+  "prompt_template_sha256": "4ee7f9f9edb203ed3e281d42f9c8c28d3f3ad9f33f0bfb28600cecbe7bee634e",
+  "proposers": [
+    "claude-sonnet-5-5",
+    "gpt-6-astra",
+    "deepseek-v4-pro"
+  ],
+  "run_context": "Budget per task: {\"max_completion_reviews\": 2, \"max_environment_calls\": 80, \"max_model_call_timeout_sec\": 360, \"max_output_tokens\": 8192, \"max_turns\": 40, \"max_wall_time_sec\": 1800, \"verification_environment_reserve\": 3}\nLast full run: 57/85 tasks passed.\nStop reason and reward counts in that run:\n  budget_exhausted reward=0: 10\n  budget_exhausted reward=1: 9\n  model_failure reward=0: 4\n  model_failure reward=1: 1\n  model_stopped reward=0: 4\n  model_stopped reward=1: 2\n  verified reward=0: 10\n  verified reward=1: 45",
+  "samples_per_trial": 2,
+  "schema_version": 1,
+  "selection_seed": 20261101,
+  "shown_source_files": [
+    "run_loop.py",
+    "completion_control.py",
+    "completion_contract.py",
+    "evidence.py",
+    "policy.py",
+    "prompting.py",
+    "protocol.py",
+    "budget.py",
+    "dharness_adapter.py",
+    "harness_adapter.py",
+    "journal.py"
+  ],
+  "slots": [
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "build-pov-ray__claude-sonnet-5-5__s0",
+      "task": "build-pov-ray"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "build-pov-ray__claude-sonnet-5-5__s1",
+      "task": "build-pov-ray"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "build-pov-ray__gpt-6-astra__s0",
+      "task": "build-pov-ray"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "build-pov-ray__gpt-6-astra__s1",
+      "task": "build-pov-ray"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "build-pov-ray__deepseek-v4-pro__s0",
+      "task": "build-pov-ray"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "build-pov-ray__deepseek-v4-pro__s1",
+      "task": "build-pov-ray"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "dna-assembly__claude-sonnet-5-5__s0",
+      "task": "dna-assembly"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "dna-assembly__claude-sonnet-5-5__s1",
+      "task": "dna-assembly"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "dna-assembly__gpt-6-astra__s0",
+      "task": "dna-assembly"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "dna-assembly__gpt-6-astra__s1",
+      "task": "dna-assembly"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "dna-assembly__deepseek-v4-pro__s0",
+      "task": "dna-assembly"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "dna-assembly__deepseek-v4-pro__s1",
+      "task": "dna-assembly"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "dna-insert__claude-sonnet-5-5__s0",
+      "task": "dna-insert"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "dna-insert__claude-sonnet-5-5__s1",
+      "task": "dna-insert"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "dna-insert__gpt-6-astra__s0",
+      "task": "dna-insert"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "dna-insert__gpt-6-astra__s1",
+      "task": "dna-insert"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "dna-insert__deepseek-v4-pro__s0",
+      "task": "dna-insert"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "dna-insert__deepseek-v4-pro__s1",
+      "task": "dna-insert"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "extract-moves-from-video__claude-sonnet-5-5__s0",
+      "task": "extract-moves-from-video"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "extract-moves-from-video__claude-sonnet-5-5__s1",
+      "task": "extract-moves-from-video"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "extract-moves-from-video__gpt-6-astra__s0",
+      "task": "extract-moves-from-video"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "extract-moves-from-video__gpt-6-astra__s1",
+      "task": "extract-moves-from-video"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "extract-moves-from-video__deepseek-v4-pro__s0",
+      "task": "extract-moves-from-video"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "extract-moves-from-video__deepseek-v4-pro__s1",
+      "task": "extract-moves-from-video"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "install-windows-3.11__claude-sonnet-5-5__s0",
+      "task": "install-windows-3.11"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "install-windows-3.11__claude-sonnet-5-5__s1",
+      "task": "install-windows-3.11"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "install-windows-3.11__gpt-6-astra__s0",
+      "task": "install-windows-3.11"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "install-windows-3.11__gpt-6-astra__s1",
+      "task": "install-windows-3.11"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "install-windows-3.11__deepseek-v4-pro__s0",
+      "task": "install-windows-3.11"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "install-windows-3.11__deepseek-v4-pro__s1",
+      "task": "install-windows-3.11"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "make-doom-for-mips__claude-sonnet-5-5__s0",
+      "task": "make-doom-for-mips"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "make-doom-for-mips__claude-sonnet-5-5__s1",
+      "task": "make-doom-for-mips"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "make-doom-for-mips__gpt-6-astra__s0",
+      "task": "make-doom-for-mips"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "make-doom-for-mips__gpt-6-astra__s1",
+      "task": "make-doom-for-mips"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "make-doom-for-mips__deepseek-v4-pro__s0",
+      "task": "make-doom-for-mips"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "make-doom-for-mips__deepseek-v4-pro__s1",
+      "task": "make-doom-for-mips"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "model-extraction-relu-logits__claude-sonnet-5-5__s0",
+      "task": "model-extraction-relu-logits"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "model-extraction-relu-logits__claude-sonnet-5-5__s1",
+      "task": "model-extraction-relu-logits"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "model-extraction-relu-logits__gpt-6-astra__s0",
+      "task": "model-extraction-relu-logits"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "model-extraction-relu-logits__gpt-6-astra__s1",
+      "task": "model-extraction-relu-logits"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "model-extraction-relu-logits__deepseek-v4-pro__s0",
+      "task": "model-extraction-relu-logits"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "model-extraction-relu-logits__deepseek-v4-pro__s1",
+      "task": "model-extraction-relu-logits"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "path-tracing__claude-sonnet-5-5__s0",
+      "task": "path-tracing"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "path-tracing__claude-sonnet-5-5__s1",
+      "task": "path-tracing"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "path-tracing__gpt-6-astra__s0",
+      "task": "path-tracing"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "path-tracing__gpt-6-astra__s1",
+      "task": "path-tracing"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "path-tracing__deepseek-v4-pro__s0",
+      "task": "path-tracing"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "path-tracing__deepseek-v4-pro__s1",
+      "task": "path-tracing"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "polyglot-rust-c__claude-sonnet-5-5__s0",
+      "task": "polyglot-rust-c"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "polyglot-rust-c__claude-sonnet-5-5__s1",
+      "task": "polyglot-rust-c"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "polyglot-rust-c__gpt-6-astra__s0",
+      "task": "polyglot-rust-c"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "polyglot-rust-c__gpt-6-astra__s1",
+      "task": "polyglot-rust-c"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "polyglot-rust-c__deepseek-v4-pro__s0",
+      "task": "polyglot-rust-c"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "polyglot-rust-c__deepseek-v4-pro__s1",
+      "task": "polyglot-rust-c"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "raman-fitting__claude-sonnet-5-5__s0",
+      "task": "raman-fitting"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "raman-fitting__claude-sonnet-5-5__s1",
+      "task": "raman-fitting"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "raman-fitting__gpt-6-astra__s0",
+      "task": "raman-fitting"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "raman-fitting__gpt-6-astra__s1",
+      "task": "raman-fitting"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "raman-fitting__deepseek-v4-pro__s0",
+      "task": "raman-fitting"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "raman-fitting__deepseek-v4-pro__s1",
+      "task": "raman-fitting"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "train-fasttext__claude-sonnet-5-5__s0",
+      "task": "train-fasttext"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "train-fasttext__claude-sonnet-5-5__s1",
+      "task": "train-fasttext"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "train-fasttext__gpt-6-astra__s0",
+      "task": "train-fasttext"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "train-fasttext__gpt-6-astra__s1",
+      "task": "train-fasttext"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "train-fasttext__deepseek-v4-pro__s0",
+      "task": "train-fasttext"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "train-fasttext__deepseek-v4-pro__s1",
+      "task": "train-fasttext"
+    },
+    {
+      "index": 0,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "video-processing__claude-sonnet-5-5__s0",
+      "task": "video-processing"
+    },
+    {
+      "index": 1,
+      "proposer": "claude-sonnet-5-5",
+      "sample_id": "video-processing__claude-sonnet-5-5__s1",
+      "task": "video-processing"
+    },
+    {
+      "index": 0,
+      "proposer": "gpt-6-astra",
+      "sample_id": "video-processing__gpt-6-astra__s0",
+      "task": "video-processing"
+    },
+    {
+      "index": 1,
+      "proposer": "gpt-6-astra",
+      "sample_id": "video-processing__gpt-6-astra__s1",
+      "task": "video-processing"
+    },
+    {
+      "index": 0,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "video-processing__deepseek-v4-pro__s0",
+      "task": "video-processing"
+    },
+    {
+      "index": 1,
+      "proposer": "deepseek-v4-pro",
+      "sample_id": "video-processing__deepseek-v4-pro__s1",
+      "task": "video-processing"
+    }
+  ],
+  "source_run": "evaluation/trials-89",
+  "strata": {
+    "budget_exhausted": 5,
+    "model_stopped": 2,
+    "verified": 5
+  },
+  "temperature": 1.0,
+  "trials": [
+    {
+      "environment_calls_used": 45,
+      "repairs_used": 0,
+      "result_sha256": "18ddf2677e56d2dce3be5db7676f7b2436a59331a9e88a671cdc5f19ffca4970",
+      "reward": 0.0,
+      "stop_reason": "budget_exhausted",
+      "task": "build-pov-ray",
+      "turns_used": 40
+    },
+    {
+      "environment_calls_used": 38,
+      "repairs_used": 2,
+      "result_sha256": "26b8af602641a32b6b2c69ff7f201b5228172ccf4e95fb99507d012775b00d15",
+      "reward": 0.0,
+      "stop_reason": "verified",
+      "task": "dna-assembly",
+      "turns_used": 30
+    },
+    {
+      "environment_calls_used": 13,
+      "repairs_used": 1,
+      "result_sha256": "8d940fc4daf8ed3a0d8b89c743156109414bb6a364eb358897c60bc8c538f094",
+      "reward": 0.0,
+      "stop_reason": "model_stopped",
+      "task": "dna-insert",
+      "turns_used": 13
+    },
+    {
+      "environment_calls_used": 27,
+      "repairs_used": 0,
+      "result_sha256": "e9d82ec78f07b7a5de45fbd25def09046565726209a5373d16a0ca66f710910a",
+      "reward": 0.0,
+      "stop_reason": "budget_exhausted",
+      "task": "extract-moves-from-video",
+      "turns_used": 25
+    },
+    {
+      "environment_calls_used": 42,
+      "repairs_used": 2,
+      "result_sha256": "9c8b11b14e09d44d78e84b67325d8f0d222af6e5d6d48e6a336ec90baa35e1d3",
+      "reward": 0.0,
+      "stop_reason": "verified",
+      "task": "install-windows-3.11",
+      "turns_used": 37
+    },
+    {
+      "environment_calls_used": 30,
+      "repairs_used": 2,
+      "result_sha256": "940c05b129f65ae4cd537e70a573226467fd35783bae4beb6494f57b308d9506",
+      "reward": 0.0,
+      "stop_reason": "model_stopped",
+      "task": "make-doom-for-mips",
+      "turns_used": 33
+    },
+    {
+      "environment_calls_used": 36,
+      "repairs_used": 5,
+      "result_sha256": "c3a64fa3ed7e56ee2dd87bd90fce38ec2b61a43efb09ddcb5f958533497015b9",
+      "reward": 0.0,
+      "stop_reason": "budget_exhausted",
+      "task": "model-extraction-relu-logits",
+      "turns_used": 32
+    },
+    {
+      "environment_calls_used": 58,
+      "repairs_used": 0,
+      "result_sha256": "7bd9723b9fc9857ba3e7727265f40099fc55015a00553aab28ba8f9a12751eae",
+      "reward": 0.0,
+      "stop_reason": "budget_exhausted",
+      "task": "path-tracing",
+      "turns_used": 40
+    },
+    {
+      "environment_calls_used": 13,
+      "repairs_used": 2,
+      "result_sha256": "e55184050a9655568a5bba4eb918e2af98e91f0d2fb61ef4c6e0d35b8c899f76",
+      "reward": 0.0,
+      "stop_reason": "verified",
+      "task": "polyglot-rust-c",
+      "turns_used": 14
+    },
+    {
+      "environment_calls_used": 13,
+      "repairs_used": 2,
+      "result_sha256": "2c08b9c8bce3155b599de99e53fe5c22a4fd82d8877e4234dda3de29f587901d",
+      "reward": 0.0,
+      "stop_reason": "verified",
+      "task": "raman-fitting",
+      "turns_used": 11
+    },
+    {
+      "environment_calls_used": 24,
+      "repairs_used": 0,
+      "result_sha256": "0fd8f4da0d0bd37e15f96ce25243c06d414c3868def2e6f45c00311321e2d3b4",
+      "reward": 0.0,
+      "stop_reason": "budget_exhausted",
+      "task": "train-fasttext",
+      "turns_used": 20
+    },
+    {
+      "environment_calls_used": 25,
+      "repairs_used": 2,
+      "result_sha256": "33d613e42cb306cad1c36ec39437732a79e67c28379cbc49707e05076de7b95c",
+      "reward": 0.0,
+      "stop_reason": "verified",
+      "task": "video-processing",
+      "turns_used": 20
+    }
+  ]
+}

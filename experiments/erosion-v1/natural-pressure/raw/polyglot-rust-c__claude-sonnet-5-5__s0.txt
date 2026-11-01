@@ -1,0 +1,33 @@
+This diff changes only the prompts in `src/evidence_harness/prompting.py`. I expect it to cut `budget_exhausted` runs that were actually solved. I did not run it, and I could not identify the cause from the run summary alone. My guess is that the completion-review budget (2) is exhausted by over-strict or under-informed reviews.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -41,6 +41,12 @@
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
++- You have at most two semantic completion reviews for the whole run, and a rejected second review
++  ends the run. Do not call finish until you have already observed the task's explicit success
++  conditions passing in earlier commands. Make the first finish count: each check should directly
++  exercise one explicit requirement of the ORIGINAL TASK (run the real program or tests, compare
++  actual output with the required values, parse the saved artifact) and use the exact paths,
++  filenames, and arguments the task names. Cover all requirements in at most three checks.
+ - A completion check may create temporary output, but it must not modify or delete a pre-existing
+   candidate file. Files created by a check are discarded and do not prove that the candidate
+   already contained those files.
+@@ -78,6 +84,13 @@
+ Resolve every prior completion finding before accepting.
++Calibrate to the ORIGINAL TASK. Accept when the executed receipts show passing return codes and
++output that demonstrate every explicit requirement stated in the task. Reject only for a concrete,
++named requirement that no receipt demonstrates, or a receipt that contradicts the claim. Do not
++reject for stylistic preference, hypothetical edge cases the task never mentions, extra hardening,
++or because a check could have been stronger when it already exercises the stated behavior. Each
++rejection must list the specific missing requirement and one concrete check that would resolve it,
++because only a limited number of reviews remain.
+ When the task allows choosing among approaches and uses subjective superlatives such as "fastest",
+ "best", or "as efficient as possible", require a credible measured improvement plus relevant
+ structural evidence. Do not demand proof of a global optimum or require alternatives that violate a
+```
+
+**Rationale:** The completion-review budget of 2 is exhausted by premature finish proposals or over-strict, vague rejections, and that ends a run as `budget_exhausted` even when the work is already done. Telling the executor to finish only after the success conditions have been observed passing, and telling the reviewer to accept on demonstrated requirements and reject only with concrete, actionable gaps, should convert more of those solved-but-unreported runs into verified completions.

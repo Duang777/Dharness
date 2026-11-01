@@ -1,0 +1,33 @@
+**Diff**
+
+```diff
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@
+                 policy=CompletionPolicy(
+-                    review_required=options.enable_completion_review,
++                    # Once the semantic-review quota is spent, later finish attempts are
++                    # judged on mechanical isolated-evidence alone instead of dead-ending.
++                    review_required=(
++                        options.enable_completion_review
++                        and state.completion_review_count < options.max_completion_reviews
++                    ),
+                     max_check_timeout_sec=options.max_command_timeout_sec,
+                 ),
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ def _reject_completion(
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        # Review quota exhaustion no longer ends the run: later finish attempts are
++        # verified mechanically (see DharnessAdapter.capture), so repairs stay available.
++        review_exhausted = False
+         repair_count_before = state.repair_count
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+```
+
+**Rationale:** Currently the second semantic-review rejection (or any rejection after it) immediately ends the run as `budget_exhausted`, and any later finish is refused at admission. That terminates many runs whose work was already fine and still had repair turns, calls and wall time left. With this change, once the review quota is spent, a finish attempt is accepted only if it passes the full isolated mechanical evidence gate, and the run keeps repairing until the repair, turn or wall-clock budget runs out. The expected result is that more already-solved runs reach a verified completion.

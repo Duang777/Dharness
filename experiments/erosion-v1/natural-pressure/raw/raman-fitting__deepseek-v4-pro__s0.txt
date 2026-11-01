@@ -1,0 +1,24 @@
+Here is one focused harness change: reserve more finalization turns and allow the reserved finalization window to be used for more than one repair batch.
+
+```diff
+diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -3,3 +3,3 @@
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -773,6 +773,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+This gives solved-but-not-yet-verified tasks more controlled endgame turns to repair and resubmit completion evidence without starting finalization too late. It also resets the one-shot repair gate after each rejection so those extra finalization turns can actually be used for subsequent repair batches.

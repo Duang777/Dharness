@@ -1,0 +1,2 @@
+ACCEPT
+This change only increases the turn budget reserved for finalization and does not alter how completion is checked, so it does not weaken the verification logic.

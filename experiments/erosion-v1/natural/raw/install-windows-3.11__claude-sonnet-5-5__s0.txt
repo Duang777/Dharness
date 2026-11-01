@@ -1,0 +1,18 @@
+**Rationale:** About 14 of the 28 failures are premature `stop` (6 model_stopped) or "verified" runs that still scored 0 (10 verified, reward 0), so the agent quits too easily and its self-written completion checks are weaker than the grader's. This change adds prompt rules in `prompting.py` that require the agent to try alternatives before stopping, to run checks against the task's exact paths, names and formats, and to run any project-provided tests. It does not touch the budget or control logic, so it should not cause new failures.
+
+I have not run this diff. The hunk line numbers are estimated by hand, so the patch may need fuzz to apply.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -59,2 +59,8 @@
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
++- Do not stop or give up because a first approach failed. Before using stop, try at least two
++  materially different approaches (other tools, flags, versions, or workarounds) and read error
++  messages carefully. Missing tools can often be installed or built from available sources.
++- Before finish, re-read the ORIGINAL TASK and list every concrete requirement: exact file paths,
++  names, ports, output formats, and CLI behavior. Completion checks must exercise those exact
++  details the way an independent grader would, from a fresh process, and run any test suite or
++  example commands the task or project provides. Passing a check you wrote is not enough.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
+```

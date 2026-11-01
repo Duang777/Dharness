@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/dharness_adapter.py b/src/evidence_harness/dharness_adapter.py
+index 91c6bd9..a5addaf 100644
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@ -62,7 +62,7 @@ class DharnessAdapter(HarnessAdapter):
+                 ),
+                 contract=contract,
+                 policy=CompletionPolicy(
+-                    review_required=options.enable_completion_review,
++                    review_required=options.enable_completion_review and state.completion_review_count == 0,
+                     max_check_timeout_sec=options.max_command_timeout_sec,
+                 ),
+                 trace=CompletionTrace(receipts=tuple(state.observations)),

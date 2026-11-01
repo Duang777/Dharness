@@ -1,0 +1,1 @@
+ACCEPT — The change only adds prompt guidance and enforces the pre-existing verification_environment_reserve by triggering finalization and blocking repair-executes when environment calls run low, which protects the resources needed for isolated checks without altering isolation, freshness, coverage, or the independent review gate.

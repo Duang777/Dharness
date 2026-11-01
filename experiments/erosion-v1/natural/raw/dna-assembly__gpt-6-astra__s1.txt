@@ -1,0 +1,27 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -853,8 +853,7 @@ class EvidenceLoop:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -51,6 +51,9 @@ Rules:
+   already contained those files.
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, you have at most one remaining work batch.
++  Use it only to complete a known missing deliverable or make a focused repair, not to explore.
++  Keep it short enough to leave time for isolated checks and completion review; otherwise finish.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+Currently, finalization blocks all work until a completion attempt has been rejected, wasting scarce verification time and repair budget when the agent already knows what remains unfinished. Allowing one proactive completion batch retains the existing one-batch limit and reserved finish turn while giving near-complete tasks a chance to produce correct deliverables before verification.

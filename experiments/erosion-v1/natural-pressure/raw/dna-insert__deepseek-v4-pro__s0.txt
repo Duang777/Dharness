@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 6
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+```
+
+Rationale: The last run showed many solved tasks ending as `budget_exhausted`, and three reserved finalization turns are often consumed by one rejected completion plus one repair command before the model can submit a corrected finish. Reserving six turns gives the agent room for a repair/revise cycle while still forcing timely finalization.

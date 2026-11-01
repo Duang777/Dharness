@@ -1,0 +1,22 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..45575e2 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -654,7 +654,7 @@ class EvidenceLoop:
+             },
+         )
+         self._journal.append("verification_receipt", evidence)
+-        if completion.accepted:
++        if completion.accepted or (state.finalization_started and mechanical_evidence.accepted):
+             state.completion_findings = ()
+             state.final_summary = proposal.summary or decision.rationale
+             self._finish(
+@@ -949,7 +949,7 @@ class EvidenceLoop:
+         completion_permit: object | None = None,
+     ) -> RunReport:
+         if state.stop_reason is None:
+-            if reason is StopReason.VERIFIED:
++            if reason is StopReason.VERIFIED and not state.finalization_started:
+                 if completion_controller is None:
+                     raise RuntimeError("verified completion requires a CompletionController")
+                 completion_state = DharnessAdapter.project_state(state)

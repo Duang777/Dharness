@@ -1,0 +1,83 @@
+```diff
+--- a/src/evidence_harness/policy.py
++++ b/src/evidence_harness/policy.py
+@@ -40,6 +40,12 @@ _JWT = re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")
+ _SENSITIVE_FIELD_PARTS = frozenset(
+@@ -58,6 +64,12 @@ _SENSITIVE_FIELD_PARTS = frozenset(
+ )
+ 
++VERIFICATION_SCRIPT_PREAMBLE = (
++    "set -e\n"
++    "if [ -n \"${BASH_VERSION:-}\" ]; then set -o pipefail; fi\n"
++)
++
+ 
+ class PolicyViolation(ValueError):
+     pass
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -178,7 +178,7 @@ class ShellCommand(StrictModel):
+     id: str = Field(min_length=1, max_length=80)
+-    script: str = Field(min_length=1, max_length=20_000)
++    script: str = Field(min_length=1, max_length=20_100)
+     purpose: str = Field(min_length=1, max_length=500)
+     cwd: str | None = Field(default=None, max_length=1_000)
+     timeout_sec: int = Field(default=120, ge=1, le=900)
+--- a/src/evidence_harness/evidence.py
++++ b/src/evidence_harness/evidence.py
+@@ -1,7 +1,12 @@
+ from __future__ import annotations
+ 
+ from collections import Counter
+ 
+-from evidence_harness.policy import PolicyViolation, normalize_command, validate_check
++from evidence_harness.policy import (
++    PolicyViolation,
++    VERIFICATION_SCRIPT_PREAMBLE,
++    normalize_command,
++    validate_check,
++)
+ from evidence_harness.protocol import (
+     CommandReceipt,
+     CompletionIsolationEvidence,
+@@ -12,6 +17,13 @@ from evidence_harness.protocol import (
+ )
+ 
+ 
++def _strip_verification_preamble(script: str) -> str:
++    if script.startswith(VERIFICATION_SCRIPT_PREAMBLE):
++        return script[len(VERIFICATION_SCRIPT_PREAMBLE):]
++    return script
++
++
+ class EvidenceGate:
+@@ -123,9 +135,12 @@ class EvidenceGate:
+                 if (
+                     proposed.id != receipt.command_id
+-                    or proposed.script != receipt.script
++                    or (
++                        proposed.script != receipt.script
++                        and proposed.script != _strip_verification_preamble(receipt.script)
++                    )
+                     or proposed.proves != receipt.purpose
+                     or proposed.cwd != receipt.cwd
+                 ):
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -28,6 +28,7 @@ from evidence_harness.policy import (
+     PolicyViolation,
++    VERIFICATION_SCRIPT_PREAMBLE,
+     find_repeated_cycle,
+     repeated_command_block_reason,
+     validate_command,
+@@ -625,7 +626,7 @@ class EvidenceLoop:
+         command = ShellCommand(
+             id=check.id,
+-            script=check.script,
++            script=f"{VERIFICATION_SCRIPT_PREAMBLE}{check.script}",
+             purpose=check.proves,
+             cwd=check.cwd,
+             timeout_sec=check.timeout_sec,
+```
+
+Rationale: executing completion checks under `set -e` (and Bash `pipefail`) prevents a failing verification command from being masked by a subsequent successful final command such as `echo done`, while the evidence gate strips the harness preamble so receipts still match proposed checks. This should reduce false `verified` outcomes where weak or broken checks accidentally exit zero and are accepted by the harness.

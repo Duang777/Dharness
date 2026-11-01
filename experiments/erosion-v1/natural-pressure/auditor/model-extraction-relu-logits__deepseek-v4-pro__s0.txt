@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only makes the work-batch budget guard more conservative by reserving verification environment calls for every allowed repair attempt (reserve × (max_repairs + 1)), while leaving the completion-checking pipeline—isolated check execution, evidence freshness and attempt binding, coverage validation, and the mandatory semantic review gate—entirely unchanged.

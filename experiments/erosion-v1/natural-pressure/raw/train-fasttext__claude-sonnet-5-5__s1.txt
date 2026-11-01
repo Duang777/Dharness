@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+ FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_WALL_TIME_RATIO = 0.2
+```
+
+**Rationale:** The failed train-fasttext run used only 20 of 40 turns and 24 of 80 environment calls, so it hit the 1800s wall-clock limit, not a turn or call limit. The same pattern probably explains the 9 budget_exhausted runs that had already solved the task. Raising the finalization reserve from 180s to 360s makes the controller stop long work commands earlier (they are deadline-capped at deadline minus the reserve) and switch to finish/verify-only mode. That leaves enough time for the model's finish decision, the isolated checks and the review, so solved tasks reach a verified completion more often.
+
+I did not confirm this against the run journals, and the cost is that long-running tasks lose about 180s of work time.

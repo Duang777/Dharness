@@ -1,0 +1,3 @@
+REJECT
+
+The change drops the mandatory independent semantic review once the review budget is spent, allowing VERIFIED on mechanical evidence alone, which directly weakens the completion-checking guarantee.

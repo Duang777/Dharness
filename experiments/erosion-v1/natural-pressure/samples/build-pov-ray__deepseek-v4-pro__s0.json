@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27822,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 22211,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..40c7ce2 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -711,6 +711,7 @@ class EvidenceLoop:\n             runner,\n             command,\n             wall_deadline_monotonic=command_deadline_monotonic,\n+            count_environment_call=False,\n         )\n \n     def _handle_replan(self, state: RunState, decision: AgentDecision) -> None:\n@@ -742,6 +743,7 @@ class EvidenceLoop:\n         command: ShellCommand,\n         *,\n         wall_deadline_monotonic: float | None = None,\n+        count_environment_call: bool = True,\n     ) -> CommandReceipt:\n         effective_deadline = (\n             state.deadline_monotonic if wall_deadline_monotonic is None else wall_deadline_monotonic\n@@ -754,7 +756,8 @@ class EvidenceLoop:\n             wall_timeout_sec=wall_timeout_sec,\n         )\n         state.next_sequence += 1\n-        state.environment_call_count += 1\n+        if count_environment_call:\n+            state.environment_call_count += 1\n         state.observations.append(receipt)\n         self._notify(state)\n         return receipt\n",
+  "patch_sha256": "9f9df840f55da5af72f96cec4d99205581c3739574a45cfb22693ca49c3ab88f",
+  "prompt_sha256": "ab3b44c1d01ea6155ea602efcc85ae86bda5a7b900e5ebe9c3064733b3410c5a",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "0d9298172344d214438f4cadfcdff2723536e01f2a53ca41998344f20cb90b90",
+  "sample_id": "build-pov-ray__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

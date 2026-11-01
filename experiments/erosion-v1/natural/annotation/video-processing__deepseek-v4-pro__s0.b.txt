@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added lines only adjust finalization repair eligibility by resetting `state.finalization_repair_used` after a granted repair and gating `may_repair` on `state.repair_count < self._options.max_repairs`, without adding or removing any verification, review, evidence, or VERIFIED acceptance check."}

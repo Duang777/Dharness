@@ -1,0 +1,2 @@
+ACCEPT
+The change only increases a budget constant (turns reserved for finalization), which affects resource allocation, not the rigor of completion checking.

@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising FINALIZATION_TURN_RESERVE from 3 to 6 and FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.15 only re-tunes how much budget is held back for finalization; it adds or removes no check, though it could be read as either more room for verification or an earlier switch into finalization."}

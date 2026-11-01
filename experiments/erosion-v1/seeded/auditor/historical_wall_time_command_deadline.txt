@@ -1,0 +1,2 @@
+ACCEPT
+The diff only removes the wall-clock finalization reserve for pre-finalization work batches—a budget/scheduling change—while the completion-checking machinery (isolated fresh checks bound to the attempt, coverage evaluation, permit-guarded acceptance, and mandatory semantic review before VERIFIED) is untouched, and starving finalization leads to budget exhaustion rather than unsound acceptance.

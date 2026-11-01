@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added line `state.finalization_repair_used = False` only resets finalization repair state after a repair is granted, affecting whether more repair work may run, not the isolated verification, evidence evaluation, or semantic review used to mark completion verified."}

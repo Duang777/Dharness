@@ -1,0 +1,18 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..a707e06 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -355,12 +355,7 @@ class EvidenceLoop:
+         batch_receipts: list[CommandReceipt] = []
+         batch_progressed = False
+         started_in_finalization = state.finalization_started
+-        command_deadline_monotonic = (
+-            state.deadline_monotonic
+-            if started_in_finalization
+-            else state.deadline_monotonic
+-            - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+-        )
++        command_deadline_monotonic = state.deadline_monotonic
+ 
+         for command_index, command in enumerate(decision.commands):
+             if not started_in_finalization:

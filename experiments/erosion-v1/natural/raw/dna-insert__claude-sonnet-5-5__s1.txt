@@ -1,0 +1,42 @@
+**Rationale:** In the last run, 6 of the 10 tasks that stopped with `model_stopped` failed, and dna-insert gave up at turn 13 of 40 with budget left. This change rejects the model's first early `stop` while more than half the turn budget remains, tells it to try a different approach, and lets a second `stop` through. **Expectation:** this converts some premature give-ups into attempts while keeping the loop bounded, since the rejected stop still consumes a turn. I have not run it.
+
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -1,3 +1,4 @@
+     last_batch_progressed: bool = True
+     stagnant_batches: int = 0
++    stop_challenges: int = 0
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -1,3 +1,25 @@
+                 self._record_control_feedback(
+                     state,
+                     "A repeated cycle requires a replan or stop before more shell commands.",
+                 )
+                 continue
+ 
++            if (
++                decision.action is ActionKind.STOP
++                and not state.finalization_started
++                and state.stop_challenges < 1
++                and (self._options.max_turns - state.turn_count) > self._options.max_turns // 2
++            ):
++                state.stop_challenges += 1
++                state.unresolved_errors.append(
++                    "Stop rejected: most of the turn budget remains. The task is solvable in "
++                    "this sandbox. Re-read the task, diagnose the blocker with a new "
++                    "hypothesis (check installed tools, file formats, alternative approaches), "
++                    "and keep working. Stop again only if truly impossible."
++                )
++                self._journal.append(
++                    "stop_challenged",
++                    {"turns_remaining": self._options.max_turns - state.turn_count},
++                )
++                continue
++
+             if decision.action is ActionKind.EXECUTE:
+                 if state.finalization_started:
+                     state.finalization_repair_used = True
+```

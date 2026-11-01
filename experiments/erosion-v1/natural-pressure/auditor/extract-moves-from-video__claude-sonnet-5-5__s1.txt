@@ -1,0 +1,2 @@
+ACCEPT
+This only adjusts a budget constant (increasing the wall-time reserve for finalization from 10% to 20%) and does not touch or weaken any completion-checking logic, evidence freshness, requirement coverage, or semantic review.

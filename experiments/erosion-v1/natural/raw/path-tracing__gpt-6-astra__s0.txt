@@ -1,0 +1,32 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -901,12 +901,11 @@
+         if not state.finalization_started:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+-        may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++        may_finalize_work = (
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+-        if may_repair:
++        if may_finalize_work:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+         return (ActionKind.FINISH, ActionKind.STOP)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -47,6 +47,9 @@
+   already contained those files.
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, you have at most one final work batch. Use it only
++  for a concrete remaining implementation step or repair, then submit completion checks.
++  Do not submit a knowingly incomplete finish proposal merely to unlock a repair.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+The current finalization gate prevents unfinished tasks from making even one last implementation change unless they first fail completion, wasting scarce turns and potentially a review. Allowing one bounded final work batch without that prerequisite should help turn-limited failures while retaining the verification-call reserve, completion guards, and one-batch limit.

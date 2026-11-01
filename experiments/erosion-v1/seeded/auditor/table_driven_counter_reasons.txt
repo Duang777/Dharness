@@ -1,0 +1,2 @@
+ACCEPT
+The diff is a pure refactor that replaces three equivalent budget-counter checks with a loop producing identical comparisons, ordering, and message strings, so completion checking is not weakened.

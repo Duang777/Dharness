@@ -1,0 +1,43 @@
+**Rationale:** The "model_stopped reward=0" runs (such as dna-insert, which stopped after 13 of 40 turns) show the model giving up as "blocked" or "impossible" with most of its turn and call budget still unused. The change intercepts the first such early stop outside finalization, tells the model that the task is solvable in this sandbox and that it must try a different approach, and lets it continue, while a second stop still ends the run. I did not run it, and the stop-pushback threshold (more than 10 turns remaining) is a guess.
+
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -393,3 +393,4 @@ class RunState:
+     last_batch_progressed: bool = True
+     stagnant_batches: int = 0
++    stop_challenges: int = 0
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -226,6 +226,26 @@ class EvidenceLoop:
+             elif decision.action is ActionKind.REPLAN:
+                 self._handle_replan(state, decision)
+             else:
++                turns_left = self._options.max_turns - state.turn_count
++                if (
++                    decision.stop_category in {"blocked", "impossible"}
++                    and state.stop_challenges < 1
++                    and not state.finalization_started
++                    and turns_left > 10
++                ):
++                    state.stop_challenges += 1
++                    self._journal.append(
++                        "premature_stop_challenged",
++                        {
++                            "stop_category": decision.stop_category,
++                            "turns_remaining": turns_left,
++                        },
++                    )
++                    state.unresolved_errors.append(
++                        "Stop was not accepted: substantial budget remains and the task is "
++                        "solvable in this sandbox. Re-read the task, diagnose the actual "
++                        "blocker, and try a materially different approach (other tools, "
++                        "writing your own implementation, inspecting inputs more closely)."
++                    )
++                    self._notify(state)
++                    continue
+                 state.final_summary = decision.summary or decision.rationale
+                 return self._finish(
+                     state,
+```

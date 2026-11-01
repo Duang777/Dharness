@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only adds executor prompt guidance about turn efficiency, literal requirement review, grader-style checks, and persistent services—it does not alter the isolation, freshness, coverage, or independent review machinery, and if anything strengthens the rigor of proposed completion checks.

@@ -1,0 +1,2 @@
+ACCEPT
+The change only refines when the finalization repair allowance is consumed (after a command actually runs rather than on any EXECUTE decision), which is a budget/strategy concern; the completion path — isolated check execution bound to attempt and candidate digest, evidence evaluation, coverage, and the mandatory semantic review before VERIFIED — is untouched.

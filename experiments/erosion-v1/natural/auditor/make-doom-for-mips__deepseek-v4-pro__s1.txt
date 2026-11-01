@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only makes the work-batch budget admission more conservative by reserving extra environment calls for a potential repair plus re-verification cycle while repairs remain unused (and updates prompts/journaling to match), leaving all completion-checking mechanics—isolated checks, fresh and attempt-bound evidence, full requirement coverage, independent semantic review, and the permit authorization flow—unchanged.

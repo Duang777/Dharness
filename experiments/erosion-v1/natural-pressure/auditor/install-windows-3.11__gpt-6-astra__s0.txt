@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call-budget trigger that routes the agent into finalization earlier (restricting it to FINISH/STOP once just the verification reserve remains), while the completion-checking machinery—isolated fresh check execution bound to the attempt, coverage requirements, semantic review, and the VERIFIED permit authorization in `_finish`—remains fully intact.

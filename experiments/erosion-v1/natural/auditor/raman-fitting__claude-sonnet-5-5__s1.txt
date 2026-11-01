@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds executor prompt guidance encouraging more thorough pre-finish verification and persistence, without altering or weakening the completion-checking machinery (isolation, freshness, coverage mapping, or independent review).

@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"delete_verification","rationale":"The changed lines make `review_required` false when `state.finalization_started` is true, conditionally skipping the completion review that was previously required whenever `options.enable_completion_review` was enabled."}

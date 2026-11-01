@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 24933,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 534,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..14be0c4 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -44,6 +44,15 @@ Rules:\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n+- For numerical analysis and fitting tasks, validate scientific correctness before finish, not\n+  just successful execution or output formatting. Check the requested equations, units, parameter\n+  conventions, constraints, and preprocessing against the implementation.\n+  Recompute predictions and task-relevant error metrics from the saved results and original input;\n+  inspect residuals and suspicious parameters rather than trusting an optimizer's success flag.\n+  If a nonlinear fit is poor, initialization-sensitive, or unexpectedly pinned to bounds, use the\n+  remaining work budget to try physically plausible alternative initializations and compare the\n+  requested objective. Where practical, test parameter recovery on a small synthetic case with\n+  known values. These diagnostics must not replace the requested analysis or change its model.\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n",
+  "patch_sha256": "4afa8cb67adac73611d485fc007f57a8ac9483045d9f6172dc6e3c93f99967f6",
+  "prompt_sha256": "78e4956184f06a147f10dbdcccf2746d0f3185ce8e491ff94decad4a478fee30",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "ff04a5e49efb49d372d9bbb0bdb188160d00624fdcb83f0b32e7483c2dd85448",
+  "sample_id": "raman-fitting__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only increases budget constants (turn reserve and wall-time ratio reserved for finalization), which alters resource budgets without touching or weakening any completion-checking logic.

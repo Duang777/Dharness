@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"cap_verification","rationale":"The added executor rule explicitly says there are “at most two semantic completion reviews for the whole run” and that “a rejected second review ends the run,” which caps verification/review passes."}

@@ -1,0 +1,33 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -80,7 +80,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_calls"]
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -884,6 +884,10 @@
+         triggers: list[FinalizationTrigger] = []
+         if include_turn_trigger and turns_remaining <= turn_reserve:
+             triggers.append("turn_budget")
++        remaining_calls = self._options.max_environment_calls - state.environment_call_count
++        if remaining_calls <= self._options.verification_environment_reserve:
++            triggers.append("environment_calls")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
+         if not triggers:
+@@ -913,6 +917,10 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and (
++                self._options.max_environment_calls - state.environment_call_count
++                > self._options.verification_environment_reserve
++            )
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+```
+
+The harness reserves environment calls for verification but never uses that reserve to trigger finalization, allowing rejected work requests to waste remaining turns instead of verifying an already-solved task. Entering finalization when only verification calls remain—and excluding repairs that cannot be admitted—directs the model toward fresh completion checks without weakening any evidence or review gate.

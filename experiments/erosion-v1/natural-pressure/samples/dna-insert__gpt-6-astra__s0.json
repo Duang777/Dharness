@@ -1,0 +1,21 @@
+{
+  "index": 0,
+  "input_tokens": 24976,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 709,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..d0fd454 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -53,7 +53,8 @@ Rules:\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n-  for completion. Submit focused checks or stop; do not propose more exploration.\n+  or environment calls for completion. Submit focused checks within the remaining call budget\n+  or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..9ca7401 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_calls\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..143db21 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,9 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        calls_remaining = self._options.max_environment_calls - state.environment_call_count\n+        if calls_remaining <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_calls\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +909,8 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and self._options.max_environment_calls - state.environment_call_count\n+            > self._options.verification_environment_reserve\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "7309de58783a9de68f07e2016a9fb2ec06ab4c2a349b3e52f4647a5bf769e35b",
+  "prompt_sha256": "a501ae00f9603cfb4d87c4224dfcdd2e54ca644c4676c8c3a56556c82083f6ab",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "11586a90b6181c66ea8a3d661622d015f86b7d549207c50f68edd94dc50a8ea9",
+  "sample_id": "dna-insert__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

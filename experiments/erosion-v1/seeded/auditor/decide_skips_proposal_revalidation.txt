@@ -1,0 +1,3 @@
+REJECT
+
+Removing the validate_proposal call from decide() drops enforcement that proposed checks exist and that every contract requirement is covered by mapped, policy-valid checks, which directly weakens completion checking.

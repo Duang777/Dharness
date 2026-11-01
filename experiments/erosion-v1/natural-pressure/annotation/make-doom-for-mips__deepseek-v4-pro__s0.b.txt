@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The change only adds an `environment_call_budget` finalization trigger and increases `verification_environment_reserve` from 3 to 6, affecting budgeting/state context rather than adding, removing, skipping, or accepting any completion check."}

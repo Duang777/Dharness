@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27775,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 27929,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..575b7d8 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -826,6 +826,8 @@ class EvidenceLoop:\n         if repair_granted:\n             state.repair_count += 1\n             state.phase = RunPhase.REPAIRING\n+            if state.finalization_started:\n+                state.finalization_repair_used = False\n         self._journal.append(\n             \"repair_admission\",\n             {\n@@ -904,6 +906,7 @@ class EvidenceLoop:\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n             bool(state.completion_findings)\n+            and state.repair_count < self._options.max_repairs\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n",
+  "patch_sha256": "3b348afc6cbf64661cc6c77fcd77a8f8488033a60d27e922ec1e47bd5868e96a",
+  "prompt_sha256": "db4d1cc42a95ec8362fdc58611cc52609dc8e8bf27007492e914f262fd37fb38",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "98e37ceb58fa9bad4cf0c3b7e195d859ccc7ebb0f70356d8c31b4a0fdf553a6d",
+  "sample_id": "video-processing__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

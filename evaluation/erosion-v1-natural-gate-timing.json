@@ -1,0 +1,282 @@
+{
+  "build-pov-ray__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.542,
+    "regression_sec": 26.37
+  },
+  "build-pov-ray__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.545,
+    "regression_sec": 26.478
+  },
+  "build-pov-ray__deepseek-v4-pro__s0": {
+    "guard_sec": 4.263,
+    "regression_sec": 24.747
+  },
+  "build-pov-ray__deepseek-v4-pro__s1": {
+    "guard_sec": 4.226,
+    "regression_sec": 24.935
+  },
+  "build-pov-ray__gpt-6-astra__s0": {
+    "guard_sec": 4.697,
+    "regression_sec": 25.936
+  },
+  "build-pov-ray__gpt-6-astra__s1": {
+    "guard_sec": 4.673,
+    "regression_sec": 26.759
+  },
+  "dna-assembly__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.101,
+    "regression_sec": 24.042
+  },
+  "dna-assembly__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.099,
+    "regression_sec": 25.007
+  },
+  "dna-assembly__deepseek-v4-pro__s0": {
+    "guard_sec": 5.24,
+    "regression_sec": 25.623
+  },
+  "dna-assembly__gpt-6-astra__s0": {
+    "guard_sec": 5.135,
+    "regression_sec": 25.96
+  },
+  "dna-assembly__gpt-6-astra__s1": {
+    "guard_sec": 5.183,
+    "regression_sec": 25.237
+  },
+  "dna-insert__claude-sonnet-5-5__s0": {
+    "guard_sec": 5.087,
+    "regression_sec": 24.614
+  },
+  "dna-insert__claude-sonnet-5-5__s1": {
+    "guard_sec": 6.773,
+    "regression_sec": 24.11
+  },
+  "dna-insert__deepseek-v4-pro__s0": {
+    "guard_sec": 6.715,
+    "regression_sec": 22.873
+  },
+  "dna-insert__deepseek-v4-pro__s1": {
+    "guard_sec": 5.889,
+    "regression_sec": 22.977
+  },
+  "dna-insert__gpt-6-astra__s0": {
+    "guard_sec": 6.839,
+    "regression_sec": 23.862
+  },
+  "dna-insert__gpt-6-astra__s1": {
+    "guard_sec": 6.769,
+    "regression_sec": 22.478
+  },
+  "extract-moves-from-video__claude-sonnet-5-5__s0": {
+    "guard_sec": 5.854,
+    "regression_sec": 22.725
+  },
+  "extract-moves-from-video__claude-sonnet-5-5__s1": {
+    "guard_sec": 5.858,
+    "regression_sec": 22.826
+  },
+  "extract-moves-from-video__deepseek-v4-pro__s0": {
+    "guard_sec": 4.583,
+    "regression_sec": 23.597
+  },
+  "extract-moves-from-video__gpt-6-astra__s0": {
+    "guard_sec": 5.878,
+    "regression_sec": 22.572
+  },
+  "extract-moves-from-video__gpt-6-astra__s1": {
+    "guard_sec": 4.633,
+    "regression_sec": 23.599
+  },
+  "install-windows-3.11__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.527,
+    "regression_sec": 22.69
+  },
+  "install-windows-3.11__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.504,
+    "regression_sec": 21.843
+  },
+  "install-windows-3.11__deepseek-v4-pro__s0": {
+    "guard_sec": 4.422,
+    "regression_sec": 21.851
+  },
+  "install-windows-3.11__deepseek-v4-pro__s1": {
+    "guard_sec": 4.462,
+    "regression_sec": 21.22
+  },
+  "install-windows-3.11__gpt-6-astra__s0": {
+    "guard_sec": 4.451,
+    "regression_sec": 22.567
+  },
+  "install-windows-3.11__gpt-6-astra__s1": {
+    "guard_sec": 4.458,
+    "regression_sec": 22.558
+  },
+  "make-doom-for-mips__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.622,
+    "regression_sec": 26.749
+  },
+  "make-doom-for-mips__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.658,
+    "regression_sec": 26.766
+  },
+  "make-doom-for-mips__deepseek-v4-pro__s0": {
+    "guard_sec": 5.273,
+    "regression_sec": 27.239
+  },
+  "make-doom-for-mips__deepseek-v4-pro__s1": {
+    "guard_sec": 5.261,
+    "regression_sec": 27.24
+  },
+  "make-doom-for-mips__gpt-6-astra__s0": {
+    "guard_sec": 4.729,
+    "regression_sec": 26.747
+  },
+  "make-doom-for-mips__gpt-6-astra__s1": {
+    "guard_sec": 4.719,
+    "regression_sec": 26.393
+  },
+  "model-extraction-relu-logits__claude-sonnet-5-5__s0": {
+    "guard_sec": 5.181,
+    "regression_sec": 27.219
+  },
+  "model-extraction-relu-logits__claude-sonnet-5-5__s1": {
+    "guard_sec": 5.105,
+    "regression_sec": 27.202
+  },
+  "model-extraction-relu-logits__deepseek-v4-pro__s0": {
+    "guard_sec": 5.155,
+    "regression_sec": 26.918
+  },
+  "model-extraction-relu-logits__deepseek-v4-pro__s1": {
+    "guard_sec": 5.103,
+    "regression_sec": 28.261
+  },
+  "model-extraction-relu-logits__gpt-6-astra__s0": {
+    "guard_sec": 5.193,
+    "regression_sec": 26.915
+  },
+  "model-extraction-relu-logits__gpt-6-astra__s1": {
+    "guard_sec": 5.187,
+    "regression_sec": 26.918
+  },
+  "path-tracing__claude-sonnet-5-5__s0": {
+    "guard_sec": 5.263,
+    "regression_sec": 26.575
+  },
+  "path-tracing__claude-sonnet-5-5__s1": {
+    "guard_sec": 5.202,
+    "regression_sec": 26.661
+  },
+  "path-tracing__deepseek-v4-pro__s0": {
+    "guard_sec": 4.99,
+    "regression_sec": 26.164
+  },
+  "path-tracing__deepseek-v4-pro__s1": {
+    "guard_sec": 4.871,
+    "regression_sec": 25.934
+  },
+  "path-tracing__gpt-6-astra__s0": {
+    "guard_sec": 5.239,
+    "regression_sec": 26.644
+  },
+  "path-tracing__gpt-6-astra__s1": {
+    "guard_sec": 5.329,
+    "regression_sec": 25.319
+  },
+  "polyglot-rust-c__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.838,
+    "regression_sec": 26.044
+  },
+  "polyglot-rust-c__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.737,
+    "regression_sec": 25.968
+  },
+  "polyglot-rust-c__deepseek-v4-pro__s0": {
+    "guard_sec": 4.681,
+    "regression_sec": 22.644
+  },
+  "polyglot-rust-c__deepseek-v4-pro__s1": {
+    "guard_sec": 4.608,
+    "regression_sec": 22.632
+  },
+  "polyglot-rust-c__gpt-6-astra__s0": {
+    "guard_sec": 4.704,
+    "regression_sec": 23.726
+  },
+  "polyglot-rust-c__gpt-6-astra__s1": {
+    "guard_sec": 4.74,
+    "regression_sec": 23.659
+  },
+  "raman-fitting__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.698,
+    "regression_sec": 23.004
+  },
+  "raman-fitting__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.696,
+    "regression_sec": 22.987
+  },
+  "raman-fitting__deepseek-v4-pro__s0": {
+    "guard_sec": 4.725,
+    "regression_sec": 24.047
+  },
+  "raman-fitting__deepseek-v4-pro__s1": {
+    "guard_sec": 4.889,
+    "regression_sec": 24.017
+  },
+  "raman-fitting__gpt-6-astra__s0": {
+    "guard_sec": 4.718,
+    "regression_sec": 24.683
+  },
+  "raman-fitting__gpt-6-astra__s1": {
+    "guard_sec": 4.661,
+    "regression_sec": 22.042
+  },
+  "train-fasttext__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.681,
+    "regression_sec": 24.037
+  },
+  "train-fasttext__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.673,
+    "regression_sec": 24.355
+  },
+  "train-fasttext__deepseek-v4-pro__s0": {
+    "guard_sec": 4.648,
+    "regression_sec": 29.999
+  },
+  "train-fasttext__deepseek-v4-pro__s1": {
+    "guard_sec": 4.399,
+    "regression_sec": 29.602
+  },
+  "train-fasttext__gpt-6-astra__s0": {
+    "guard_sec": 4.619,
+    "regression_sec": 30.021
+  },
+  "train-fasttext__gpt-6-astra__s1": {
+    "guard_sec": 4.583,
+    "regression_sec": 30.004
+  },
+  "video-processing__claude-sonnet-5-5__s0": {
+    "guard_sec": 4.743,
+    "regression_sec": 28.668
+  },
+  "video-processing__claude-sonnet-5-5__s1": {
+    "guard_sec": 4.725,
+    "regression_sec": 28.601
+  },
+  "video-processing__deepseek-v4-pro__s0": {
+    "guard_sec": 5.192,
+    "regression_sec": 25.464
+  },
+  "video-processing__deepseek-v4-pro__s1": {
+    "guard_sec": 5.01,
+    "regression_sec": 25.398
+  },
+  "video-processing__gpt-6-astra__s0": {
+    "guard_sec": 4.723,
+    "regression_sec": 28.673
+  },
+  "video-processing__gpt-6-astra__s1": {
+    "guard_sec": 5.093,
+    "regression_sec": 27.606
+  }
+}

@@ -1,0 +1,3 @@
+```json
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.3 starts finalization earlier so the executor decision, isolated checks and semantic review have more time, but it adds no check and removes none; it only reallocates the time budget (one could read it as mildly strengthening, or as forcing earlier completion)."}
+```

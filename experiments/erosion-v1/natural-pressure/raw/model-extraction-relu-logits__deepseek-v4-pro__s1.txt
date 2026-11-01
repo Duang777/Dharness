@@ -1,0 +1,16 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -620,7 +620,7 @@ class EvidenceLoop:
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+             bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            and state.repair_count < self._options.max_repairs
+             and turns_remaining >= 2
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+```
+
+Rationale: The harness was granting multiple repair slots in its completion budget but `finalization_repair_used` only permitted one repair execution during finalization, so later rejected completions had no way to use the remaining repair budget before the run exhausted. Replacing that single-use flag with the actual remaining repair count lets the agent keep repairing during finalization, converting more already-solved tasks into verified completions.

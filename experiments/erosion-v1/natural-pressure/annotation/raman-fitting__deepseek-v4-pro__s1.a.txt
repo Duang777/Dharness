@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "`finalization_turn_reserve` now takes `max(FINALIZATION_TURN_RESERVE, max_repairs + 1)`, and run_loop passes `max_repairs`. This only changes how early finalization begins (turn-budget policy); FINISH still goes through isolated verification, evidence evaluation and review, none of which is touched."}

@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27822,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 30043,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..3a8d79b 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 5\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \n",
+  "patch_sha256": "fd8806a0c347f0bb44cdbe58a49217cf69d3759a8ad8dbf831c2911c3b1cdf09",
+  "prompt_sha256": "ab3b44c1d01ea6155ea602efcc85ae86bda5a7b900e5ebe9c3064733b3410c5a",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "494e30ce580a8b8f442e04953546fcd384c979843a1e16bf1ee3b272d00ba00c",
+  "sample_id": "build-pov-ray__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

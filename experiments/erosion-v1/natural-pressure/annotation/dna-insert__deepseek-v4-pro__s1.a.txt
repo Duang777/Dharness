@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added line `state.finalization_repair_used = False` in `_reject_completion` only re-enables an EXECUTE repair during finalization after a granted repair; completion still requires isolated checks, evidence evaluation, review and a controller permit, so how completion is checked is unchanged."}

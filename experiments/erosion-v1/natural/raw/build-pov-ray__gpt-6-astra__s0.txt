@@ -1,0 +1,26 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -824,8 +824,7 @@
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -44,6 +44,9 @@
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
++- During finalization, if execute is allowed, at most one final work batch remains. Use it only
++  for concrete remaining implementation, build, installation, or repair steps, then finish.
++  Do not submit a knowingly incomplete finish proposal merely to unlock a repair batch.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+Finalization currently prevents unfinished work from proceeding unless the agent first submits a rejected completion proposal, wasting scarce turns and potentially leaving required build or installation steps undone. Allowing one bounded final work batch without that prerequisite preserves the existing budget and verification guards while giving near-complete tasks a chance to finish.

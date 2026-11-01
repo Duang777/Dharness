@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only waives the repair-budget charge for proposals rejected at admission before any isolated checks or semantic review run; the completion gates themselves—admission coverage, fresh attempt-bound evidence from isolated checks, mandatory review, and permit authorization—are untouched, and turn/wall-clock budgets still bound retries.

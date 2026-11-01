@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "Raising FINALIZATION_TURN_RESERVE from 3 to 5 and dropping the `not state.finalization_repair_used` condition only changes when finalization starts and how many repair EXECUTE actions it permits; every FINISH still runs the full isolated-check, evidence, review and permit path."}

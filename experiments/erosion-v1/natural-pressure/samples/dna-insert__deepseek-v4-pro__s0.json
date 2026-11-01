@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27821,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 22434,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..d7d128e 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 6\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \n",
+  "patch_sha256": "ab8ba385cc4ee6a5814879723127faf96cc71f7deaa6164f5ba54ebebd77bb0d",
+  "prompt_sha256": "a501ae00f9603cfb4d87c4224dfcdd2e54ca644c4676c8c3a56556c82083f6ab",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "b12f32391b47ae9689f596a9306f5b0788d2951478679980c90572241bb80d9d",
+  "sample_id": "dna-insert__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

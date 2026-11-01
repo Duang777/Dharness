@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27782,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 16419,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..79ca86b 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -282,8 +282,6 @@ class EvidenceLoop:\n                 continue\n \n             if decision.action is ActionKind.EXECUTE:\n-                if state.finalization_started:\n-                    state.finalization_repair_used = True\n                 await self._handle_execute(state, runner, decision, contract)\n             elif decision.action is ActionKind.FINISH:\n                 await self._handle_finish(state, decision, contract)\n@@ -392,6 +390,8 @@ class EvidenceLoop:\n                 command,\n                 wall_deadline_monotonic=command_deadline_monotonic,\n             )\n+            if state.finalization_started:\n+                state.finalization_repair_used = True\n             batch_receipts.append(receipt)\n             if receipt.succeeded and (\n                 receipt.mode is CommandMode.CHANGE\n",
+  "patch_sha256": "d2e9aa3bbf5e52ec0e60b1d0e4bb78fadbac626052172e9f5e7ad9a12e925226",
+  "prompt_sha256": "72895d7cc7db56242744ad917ed2320879ed379c2912dad4670626d581b60e9a",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "c3db035eaf9d4437d79c709e69e9fe3db2789241fc18572d311aedf3ffad221e",
+  "sample_id": "make-doom-for-mips__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

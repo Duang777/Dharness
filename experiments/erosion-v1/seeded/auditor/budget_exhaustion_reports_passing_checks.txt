@@ -1,0 +1,3 @@
+REJECT
+
+The change reports VERIFIED based on stale, possibly review-failed `latest_evidence` without a current CompletionController permit, freshness/candidate binding, or a passing semantic review, directly bypassing the completion-checking guarantees.

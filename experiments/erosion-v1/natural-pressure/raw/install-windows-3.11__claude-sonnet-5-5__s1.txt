@@ -1,0 +1,28 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 5
++FINALIZATION_WALL_TIME_RATIO = 0.15
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -43,6 +43,9 @@
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
++- As soon as your own observations show every requirement is met, call finish on the next turn.
++  Do not keep polishing, re-running, or exploring after the work is done; unused turns are worth
++  more than extra confirmation, and a run that never reaches finish counts as a failure.
+ - A completion check may create temporary output, but it must not modify or delete a pre-existing
+   candidate file. Files created by a check are discarded and do not prove that the candidate
+   already contained those files.
+```
+
+Rationale: 9 of the 19 budget-exhausted runs had already solved the task but never reached a verified finish. Reserving 5 turns and 15% of wall time for finalization, plus an explicit "finish as soon as the work is done" rule, gives those runs room for a finish attempt, a rejection, a repair batch and a re-finish before the budget runs out. The 15% wall reserve also covers up to three isolated checks plus a review call. The cost is that tasks still unsolved near the end lose a few exploration turns, which I expect to be outweighed by the solved-but-unfinished runs recovered.

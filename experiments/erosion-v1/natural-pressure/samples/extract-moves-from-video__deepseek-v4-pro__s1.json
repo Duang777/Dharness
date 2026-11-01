@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27824,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 27842,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..7220b3d 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,7 @@\n from __future__ import annotations\n \n FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_WALL_TIME_RATIO = 0.25\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\n",
+  "patch_sha256": "5458d7e1f5fc0bd036224329dcc9fecd9364b63e4e05b186130d42ac8ab9c1a7",
+  "prompt_sha256": "1c4d7280a5f06a73930526e834709d657e9eb6910bffe3236defab32e382883b",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "67a3d89a75ecd2b95c97c891be86f42a87e135b7929e47a0d57dab280305bb10",
+  "sample_id": "extract-moves-from-video__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "extract-moves-from-video",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only enlarges the finalization turn reserve and lets the agent run one bounded work batch during finalization before any finish attempt, while the completion path is untouched—checks still run in isolation, evidence must be fresh and attempt-bound via candidate digest/attempt id, coverage is still enforced by the controller, the independent semantic review is still required, and VERIFIED still requires a valid CompletionController permit.

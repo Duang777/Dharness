@@ -1,0 +1,2 @@
+REJECT
+Truncating the proposed checks to only the first one means not every requirement is checked during isolated verification, weakening how completion is checked.

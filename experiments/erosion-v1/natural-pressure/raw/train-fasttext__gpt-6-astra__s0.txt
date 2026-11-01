@@ -1,0 +1,35 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -50,6 +50,7 @@
+ 
+ ProgressCallback = Callable[[RunState], None]
+ MODEL_CALL_SHUTDOWN_RESERVE_SEC = 5.0
++FINALIZATION_DECISION_TIME_SHARE = 1.0 / 3.0
+ 
+ _BOOTSTRAP = ShellCommand(
+     id="bootstrap-environment",
+@@ -199,7 +200,7 @@
+                 )
+             except TimeoutError:
+                 self._enter_finalization_if_needed(state, include_turn_trigger=False)
+-                if state.finalization_started:
++                if state.finalization_started and not finalization_started_before_decision:
+                     self._journal.append(
+                         "model_decision_interrupted_for_finalization",
+                         {
+@@ -813,6 +814,11 @@
+                 - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec),
+             )
+         remaining = effective_deadline - self._clock()
++        if preserve_finalization_reserve and state.finalization_started:
++            # Generating a finish proposal is only the first completion stage.
++            # Leave most of the remaining time for isolation, checks, and review.
++            # Review calls do not set preserve_finalization_reserve.
++            remaining *= FINALIZATION_DECISION_TIME_SHARE
+         return max(
+             0.001,
+             min(
+```
+
+Currently, a finalization decision can consume essentially the entire remaining wall budget; limiting proposal generation to one third leaves time for fresh isolated verification and semantic review without weakening either gate. Retry after a decision timeout only when entering finalization, preventing an already-finalizing run from repeatedly spending the time reserved for those downstream stages.

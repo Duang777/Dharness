@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added line `state.finalization_repair_used = False` in `_reject_completion` only resets whether another EXECUTE repair batch is allowed during finalization after a granted repair; it does not alter isolated checks, evidence evaluation, review, or the permit required for VERIFIED."}

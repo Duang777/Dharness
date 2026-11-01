@@ -1,0 +1,2 @@
+ACCEPT
+The change only refines when the finalization-repair flag is consumed (now only once a command actually passes validation and runs, rather than on any EXECUTE decision), which is repair-budget/solving-strategy accounting and leaves the completion-checking path—isolation, freshness, attempt binding, coverage, and the semantic review gate before VERIFIED—untouched.

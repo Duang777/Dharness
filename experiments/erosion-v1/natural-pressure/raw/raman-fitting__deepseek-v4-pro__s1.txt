@@ -1,0 +1,29 @@
+```diff
+diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -6,7 +6,8 @@ FINALIZATION_TURN_RESERVE = 3
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+ 
+ 
+-def finalization_turn_reserve(max_turns: int) -> int:
+-    return min(FINALIZATION_TURN_RESERVE, max(1, max_turns - 1))
++def finalization_turn_reserve(max_turns: int, max_repairs: int = 0) -> int:
++    reserve = max(FINALIZATION_TURN_RESERVE, max_repairs + 1)
++    return min(reserve, max(1, max_turns - 1))
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -780,7 +780,10 @@ class EvidenceLoop:
+     ) -> None:
+         if state.finalization_started:
+             return
+-        turn_reserve = finalization_turn_reserve(self._options.max_turns)
++        turn_reserve = finalization_turn_reserve(
++            self._options.max_turns,
++            self._options.max_repairs,
++        )
+         wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+```
+
+Rationale: The old 3-turn finalization reserve is too small for the default 4-repair budget, so already-solved tasks can hit turn budget exhaustion before a valid finish can be accepted. Tying the reserve to `max_repairs` keeps at least 3 reserved turns and gives the current default budget 5 finalization turns, enough to spend the repair budget the model is already allocated.

@@ -1,0 +1,46 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -325,18 +325,27 @@ class EvidenceLoop:
+         )
+         if not admission.accepted:
+             if not admission.budget.accepted:
+-                state.unresolved_errors.extend(admission.budget.reasons)
+-                category = (
+-                    "completion_review_budget"
+-                    if "completion review budget exhausted" in admission.budget.reasons
+-                    else "harness_control"
+-                )
+-                self._finish(
+-                    state,
+-                    StopReason.BUDGET_EXHAUSTED,
+-                    failure_category=category,
+-                )
++                soft_budget_reason = (
++                    "completion checks exceed the remaining environment-call budget"
++                )
++                terminal_budget_reasons = tuple(
++                    reason
++                    for reason in admission.budget.reasons
++                    if reason != soft_budget_reason
++                )
++                if terminal_budget_reasons:
++                    state.unresolved_errors.extend(terminal_budget_reasons)
++                    category = (
++                        "completion_review_budget"
++                        if "completion review budget exhausted" in terminal_budget_reasons
++                        else "harness_control"
++                    )
++                    self._finish(
++                        state,
++                        StopReason.BUDGET_EXHAUSTED,
++                        failure_category=category,
++                    )
++                else:
++                    self._reject_completion(state, admission.reasons, contract)
+             else:
+                 self._reject_completion(state, admission.reasons, contract)
+             return
+```
+
+Rationale: The harness currently treats every completion-proposal budget rejection as a terminal budget failure, even when the only problem is that the proposed checks exceed the remaining environment-call budget. That specific rejection should instead be sent through the normal repair path so the model can submit fewer checks; this should turn some already-solved tasks that previously hit `budget_exhausted` into verified completions.

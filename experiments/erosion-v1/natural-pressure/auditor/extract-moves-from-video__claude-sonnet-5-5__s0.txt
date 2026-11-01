@@ -1,0 +1,2 @@
+ACCEPT
+This change only increases the wall-time budget reserved for finalization and does not weaken isolation, freshness, coverage, or independent semantic review of completion evidence.

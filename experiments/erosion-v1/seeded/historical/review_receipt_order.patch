@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..b29c037 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -582,7 +582,7 @@ class EvidenceLoop:
+                 contract=controller.contract,
+                 checks=proposal.checks,
+                 coverage=proposal.coverage,
+-                verification_receipts=receipts,
++                verification_receipts=(),
+                 isolation=isolated.isolation,
+                 supporting_observations=supporting_observations,
+                 prior_findings=state.completion_findings,

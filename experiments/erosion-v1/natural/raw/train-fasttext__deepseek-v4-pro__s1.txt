@@ -1,0 +1,11 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -718,6 +718,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
++            state.finalization_repair_used = False
+             state.phase = RunPhase.REPAIRING
+```
+
+This clears the one-shot repair marker whenever the harness grants a new repair, so a wall-clock finalization with remaining turns can actually use its remaining repair budget. Without it, the model can be locked out of `execute` after one rejected completion and be forced into avoidable `budget_exhausted` failures.

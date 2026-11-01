@@ -1,0 +1,68 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -292,8 +292,6 @@
+                 continue
+ 
+             if decision.action is ActionKind.EXECUTE:
+-                if state.finalization_started:
+-                    state.finalization_repair_used = True
+                 await self._handle_execute(state, runner, decision, contract)
+             elif decision.action is ActionKind.FINISH:
+                 await self._handle_finish(state, decision, contract)
+@@ -353,6 +351,8 @@
+             self._record_control_feedback(state, f"{feedback}.")
+             return
+ 
++        if state.finalization_started:
++            state.finalization_repair_used = True
+         state.phase = RunPhase.EXECUTING
+         state.current_plan = decision.plan
+         state.current_goal = decision.commands[0].purpose
+@@ -371,13 +371,17 @@
+         batch_receipts: list[CommandReceipt] = []
+         batch_progressed = False
+         started_in_finalization = state.finalization_started
+-        command_deadline_monotonic = (
+-            state.deadline_monotonic
+-            if started_in_finalization
+-            else state.deadline_monotonic
+-            - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+-        )
++        if started_in_finalization:
++            # Allow one landing batch, but retain time for a finish decision
++            # and isolated verification.
++            now = self._clock()
++            command_deadline_monotonic = now + max(
++                0.0, state.deadline_monotonic - now
++            ) / 2
++        else:
++            command_deadline_monotonic = (
++                state.deadline_monotonic
++                - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
++            )
+ 
+         for command_index, command in enumerate(decision.commands):
+@@ -925,8 +929,7 @@
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -54,6 +54,10 @@
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
++- During finalization, if execute is allowed, you have at most one final work batch.
++  Use it only to save required deliverables or make a targeted fix, not for broad exploration.
++  This batch may use at most half the remaining wall time; keep it short enough to leave time
++  for finish and verification. You do not need a rejected finish proposal to use this batch.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+Allow one bounded final work batch without requiring a prior completion rejection, so reaching the finalization threshold does not prevent the agent from saving unfinished deliverables or applying an already-known fix. This preserves the verification-call reserve and completion gates while retaining half the remaining wall time for finishing, and rejected work admissions no longer consume the final batch allowance.

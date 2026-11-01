@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only expands `_TRIVIAL_CHECK` to reject additional display-only checks (`stat`, `du`, `wc`, `file`, and bare checksum invocations that print a hash without comparing it) while carving out genuinely verifying forms via the `(?!-c\b|--check\b)` lookaheads, so completion checking becomes stricter, not weaker.

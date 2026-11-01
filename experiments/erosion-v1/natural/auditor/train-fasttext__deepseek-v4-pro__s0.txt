@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only removes the wall-clock reserve cap on work-phase commands (letting them run up to the hard deadline instead of stopping early to protect finalization time), while every completion-checking mechanism—isolated check execution, freshness binding to attempt/candidate digest, coverage admission, the mandatory semantic review, and the VERIFIED permit/phase enforcement in `_finish`—remains fully intact, and no path to VERIFIED is made easier (starved finalization can only yield BUDGET_EXHAUSTED, never an unverified pass).

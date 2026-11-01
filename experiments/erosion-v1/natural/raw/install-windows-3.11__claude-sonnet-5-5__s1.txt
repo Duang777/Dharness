@@ -1,0 +1,21 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -60,5 +60,13 @@
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+-- Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
++- Use replan when the current approach is wrong. Use stop only when the task is provably blocked,
++  unsafe, or impossible. Never stop just because one approach failed: try a different tool,
++  version, flag, or implementation first.
++- Budget turns deliberately. Use the full four-command batch for related steps (inspect, edit,
++  build, and test together) instead of one command per turn. Start the finish action by about
++  turn 30. A correct but unfinished state is worth more than a perfect plan, so get a working
++  result early and refine it afterward.
++- Before finish, re-read the ORIGINAL TASK and list every concrete requirement: exact file paths,
++  names, output formats, ports, and services that must still be running. Write checks that
++  exercise those exact paths, formats, and services from a fresh process. Where a project test
++  suite exists, run it. Do not rely on your own earlier output as proof.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
+```
+
+Rationale: Many failures look like wasted turns or premature or weak endings. Ten verified-but-failed runs had weak checks, ten budget-exhausted runs hit the turn limit without a verified finish (nine of those still passed, so the work was often done), and four runs stopped early. The added prompt rules push the agent to batch related commands, start finishing before turns run out, avoid stopping after one failed approach, and write completion checks against the task's literal requirements.

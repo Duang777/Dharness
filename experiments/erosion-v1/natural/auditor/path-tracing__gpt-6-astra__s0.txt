@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only widens which actions are permitted during finalization (allowing one last work batch without prior findings) and adds prompt guidance; it leaves the completion-checking machinery—isolated fresh checks, requirement coverage, candidate binding, and mandatory semantic review before VERIFIED—fully intact.

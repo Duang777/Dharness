@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"review_failure_pass","rationale":"The exception handler for completion review errors now creates an accepted SemanticAssessment with rationale 'Completion review could not complete; accepting mechanical verification' instead of finishing with MODEL_FAILURE, so a failed or timed-out review is treated as passing."}

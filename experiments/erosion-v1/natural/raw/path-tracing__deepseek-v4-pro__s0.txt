@@ -1,0 +1,17 @@
+```diff
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@ -78,7 +78,10 @@ class DharnessAdapter(HarnessAdapter):
+                 contract=contract,
+                 policy=CompletionPolicy(
+-                    review_required=options.enable_completion_review,
++                    review_required=(
++                        options.enable_completion_review
++                        and not state.finalization_started
++                    ),
+                     max_check_timeout_sec=options.max_command_timeout_sec,
+                 ),
+                 trace=CompletionTrace(receipts=tuple(state.observations)),
+```
+
+During finalization there is little budget left for repair cycles, and the semantic reviewer can false-reject an externally correct completion, pushing the run into `budget_exhausted`. Skipping semantic review only during finalization still keeps isolated mechanical checks, while allowing near-complete correct candidates to finish successfully.

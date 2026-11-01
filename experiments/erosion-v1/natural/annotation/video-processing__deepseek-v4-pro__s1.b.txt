@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The changed lines add stat, du, wc, file, and non-checking checksum commands to _TRIVIAL_CHECK, causing validate_check to reject more display-only verification checks before completion can be accepted."}

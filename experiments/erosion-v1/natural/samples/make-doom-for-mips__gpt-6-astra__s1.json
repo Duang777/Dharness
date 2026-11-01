@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 24938,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 706,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..5cd0e20 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -52,6 +52,10 @@ Rules:\n   already contained those files.\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n+- During finalization, if execute is allowed, you have at most one final work batch.\n+  Use it only for a concrete remaining implementation step or repair, not broad exploration.\n+  You need not submit a knowingly incomplete finish proposal first. Keep command timeouts short\n+  enough to leave time for a finish decision, isolated verification, and completion review.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5ffdbfe 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -903,8 +903,7 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "0d8427cf17ced5fac4b41c593aea0ae4aaf851d7001949657c9866dd50a8bcd1",
+  "prompt_sha256": "72895d7cc7db56242744ad917ed2320879ed379c2912dad4670626d581b60e9a",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "fab37b46eb8b44fe70608b62bd7e6e73c2f21d0f7f50a010ad3e58ec04118003",
+  "sample_id": "make-doom-for-mips__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

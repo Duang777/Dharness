@@ -1,0 +1,25 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 6
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ def _allowed_actions(self, state: RunState) -> tuple[ActionKind, ...]:
+         turns_remaining = self._options.max_turns - state.turn_count
+-        may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
+-            and turns_remaining >= 2
+-        )
++        # One last work/repair batch stays available even before any finish attempt,
++        # so a larger finalization reserve does not remove needed work turns.
++        may_repair = not state.finalization_repair_used and turns_remaining >= 2
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+         return (ActionKind.FINISH, ActionKind.STOP)
+```
+
+**Rationale:** Many runs, including build-pov-ray, spend all 40 turns on work and never reach a finish/verify cycle. A 3-turn reserve is too small for a finish, a rejection, a repair batch and a second finish, so even runs that had already solved the task ran out of turns. Starting finalization at 6 turns remaining forces a finish attempt earlier, and allowing one last execute batch during finalization (even with no prior findings) keeps unfinished tasks from losing their final work step.

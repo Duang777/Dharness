@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added lines advise batching commands, using background jobs, and producing an early partial artifact, but they do not remove, cap, skip, or add any completion verification or review step."}

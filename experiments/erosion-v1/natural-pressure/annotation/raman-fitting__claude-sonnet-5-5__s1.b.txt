@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines increase finalization budget reserves and add a budget-short 'completion_nudge' telling the agent to finish with focused self-contained checks if the task appears solved, but they do not add, remove, cap, skip, or alter any verification requirement or review pass."}

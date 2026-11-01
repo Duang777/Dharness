@@ -1,0 +1,2 @@
+ACCEPT
+The change only increases a wall-clock safety reserve constant, slightly tightening the time budget for model calls without altering any completion-checking logic.

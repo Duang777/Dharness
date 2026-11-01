@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only refines when the finalization repair flag is consumed (now only after a command actually produces a receipt, rather than on any EXECUTE decision), which affects repair-attempt budgeting/strategy; the completion-checking pipeline—isolated execution, per-attempt freshness binding via candidate digest, coverage evaluation, semantic review, and the permit/phase guards in `_finish`—is untouched.

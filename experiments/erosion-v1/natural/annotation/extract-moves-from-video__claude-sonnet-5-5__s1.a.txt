@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added executor rules (write a crude deliverable early and refine it later, prefer fast commands and small samples, batch up to four commands) only steer solving method and time management; they leave the finish requirements, isolated checks, coverage mapping and review untouched."}

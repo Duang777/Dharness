@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added lines give budget-aware execution and artifact-production guidance, such as running slow jobs in the background and producing a minimal deliverable early, but they do not add, remove, cap, skip, or otherwise alter the completion verification or review steps."}

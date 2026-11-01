@@ -1,0 +1,32 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -432,6 +432,7 @@ class EvidenceLoop:
+         command: ShellCommand,
+         *,
+         wall_deadline_monotonic: float | None = None,
++        count_environment_call: bool = True,
+     ) -> CommandReceipt:
+         effective_deadline = (
+             state.deadline_monotonic if wall_deadline_monotonic is None else wall_deadline_monotonic
+@@ -447,7 +448,8 @@ class EvidenceLoop:
+             wall_timeout_sec=wall_timeout_sec,
+         )
+         state.next_sequence += 1
+-        state.environment_call_count += 1
++        if count_environment_call:
++            state.environment_call_count += 1
+         state.observations.append(receipt)
+         self._notify(state)
+         return receipt
+@@ -529,6 +531,7 @@ class EvidenceLoop:
+         return await self._run_command(
+             state,
+             runner,
+             command,
+             wall_deadline_monotonic=command_deadline_monotonic,
++            count_environment_call=False,
+         )
+```
+
+Rationale: Completion verification checks run in isolated snapshots and are already bounded by the repair/completion-attempt limits, so counting them against the main `environment_call_count` currently lets one rejected `FINISH` consume the reserved verification calls and force `budget_exhausted` before better checks can be submitted. Excluding isolated verification calls from that counter keeps the verification reserve available for each permitted completion attempt, allowing solved tasks to certify after a rejected first proposal.

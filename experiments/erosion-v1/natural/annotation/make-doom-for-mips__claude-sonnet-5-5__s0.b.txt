@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only raise the maximum number of ordinary execute commands from four to eight and encourage batching related work, while leaving finish checks, coverage, isolation, and review requirements unchanged."}

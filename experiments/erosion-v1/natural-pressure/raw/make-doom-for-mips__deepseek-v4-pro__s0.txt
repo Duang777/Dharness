@@ -1,0 +1,32 @@
+```diff
+diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -50,7 +50,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_call_budget"]
+@@ -261,7 +261,7 @@
+-    verification_environment_reserve: int = 3
++    verification_environment_reserve: int = 6
+```
+
+```diff
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -738,6 +738,14 @@
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_call_threshold = max(
++            0,
++            self._options.max_environment_calls
++            - self._options.verification_environment_reserve,
++        )
++        if state.environment_call_count >= environment_call_threshold:
++            triggers.append("environment_call_budget")
+         if not triggers:
+             return
+```
+
+Rationale:  
+The old reserve of three environment calls allowed only one three-check completion attempt, even though `max_completion_reviews=2` permits a retry after a rejected verification. This change reserves six calls and forces finalization as soon as only verification calls remain, preventing wasted turns on work commands that the budget guard would reject and giving solved tasks a second chance to be verified.

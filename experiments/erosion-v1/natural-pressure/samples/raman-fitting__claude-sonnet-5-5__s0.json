@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43203,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2136,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f010c81 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -3,7 +3,7 @@ from __future__ import annotations\n import asyncio\n import time\n from collections.abc import Callable\n-from dataclasses import asdict\n+from dataclasses import asdict, replace\n \n from evidence_harness.budget import (\n     finalization_turn_reserve,\n@@ -463,7 +463,12 @@ class EvidenceLoop:\n \n         adapter = DharnessAdapter.capture(\n             contract=contract,\n-            options=self._options,\n+            options=(\n+                replace(self._options, enable_completion_review=False)\n+                if self._options.enable_completion_review\n+                and state.completion_review_count >= contract.b_req.max_completion_reviews\n+                else self._options\n+            ),\n             state=state,\n             decision=decision,\n             isolation=self._completion_isolation,\n@@ -817,10 +822,9 @@ class EvidenceLoop:\n     ) -> None:\n         budget = contract.b_req\n         state.completion_findings = _stable_unique(reasons)\n-        review_exhausted = (\n-            self._options.enable_completion_review\n-            and state.completion_review_count >= budget.max_completion_reviews\n-        )\n+        # Once reviews are spent, later finish attempts are verified mechanically\n+        # (review is skipped), so only the repair budget limits further attempts.\n+        review_exhausted = False\n         repair_count_before = state.repair_count\n         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n         if repair_granted:\n",
+  "patch_sha256": "0711811bbbd2f86ea9fd207a9663ee3aa3a43baa9c490f979fdee61798b8d16b",
+  "prompt_sha256": "d14ba8f78704a662adc3bee328c39a4ad65c5d552529244a4693bb044b363f24",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "247fba5930c38864b5f5aa94cc15c6791586ec2de6995bba2d5a2ee8b4f113c3",
+  "sample_id": "raman-fitting__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

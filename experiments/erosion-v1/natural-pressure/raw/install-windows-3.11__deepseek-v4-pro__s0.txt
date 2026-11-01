@@ -1,0 +1,16 @@
+```diff
+diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+```
+
+The current 3-turn finalization reserve leaves almost no room for a rejected completion to be revised and resubmitted before `turn_count >= max_turns`. Reserving 5 turns gives solved tasks more chances to complete the finish/repair/finish handshake without changing the overall turn budget.

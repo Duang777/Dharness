@@ -1,0 +1,15 @@
+```diff
+--- a/src/evidence_harness/policy.py
++++ b/src/evidence_harness/policy.py
+@@ -14,7 +14,11 @@ _TRIVIAL_CHECK = re.compile(
+     r"""(?ix)^\s*(?:
+         true|:|exit\s+0|echo(?:\s+.*)?|printf(?:\s+.*)?|pwd|
+-        ls(?:\s+.*)?|find(?:\s+.*)?|cat\s+\S+|head(?:\s+.*)?|tail(?:\s+.*)?
++        ls(?:\s+.*)?|find(?:\s+.*)?|cat\s+\S+|head(?:\s+.*)?|tail(?:\s+.*)?|
++        stat\s+.*|du\s+.*|wc\s+.*|file\s+.*|
++        sha(?:1|256|512)sum\s+(?!-c\b|--check\b).*|
++        md5sum\s+(?!-c\b|--check\b).*|cksum\s+(?!-c\b|--check\b).*
+     )\s*;?\s*$"""
+ )
+```
+Rationale: The largest correctable failure group is `verified reward=0`, where the harness accepted completion checks that only print file metadata and return success unconditionally. Expanding the display-only check denylist forces the agent to submit self-asserting checks, while still allowing real assertions such as `sha256sum -c`.

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines propagate `repeat_reason` into receipts and exempt such observe receipts from stagnation/repeated-cycle progress logic, but they do not add, remove, cap, or bypass any completion verification, coverage, isolation, or semantic review step."}

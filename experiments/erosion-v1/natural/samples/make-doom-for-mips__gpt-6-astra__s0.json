@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24938,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 700,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..13f092d 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -54,6 +54,9 @@ Rules:\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n+- During finalization, if execute is allowed, at most one final work batch remains. Use it only\n+  for a necessary, focused fix or missing deliverable, not exploration. Keep it short enough\n+  to leave time for fresh completion checks and review; finish directly if already ready.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..4caeb21 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -902,9 +902,10 @@ class EvidenceLoop:\n         if not state.finalization_started:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n+        # Allow one final work batch without requiring a failed completion\n+        # attempt first; retain a subsequent turn for fresh verification.\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "1a146b7b0b8ab1660978ea8d88036460b9bb01d9ae4edbc4a1e1f0d22063a1a7",
+  "prompt_sha256": "72895d7cc7db56242744ad917ed2320879ed379c2912dad4670626d581b60e9a",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "57ff2b5dc3bbad54b51642c272dab78fbef060596be7ddd6d95cc3a1bbda70e6",
+  "sample_id": "make-doom-for-mips__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

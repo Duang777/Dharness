@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only relaxes which actions are permitted during finalization (allowing one repair work batch even before any finish attempt) and adds prompt guidance; the completion-checking machinery—fresh isolated checks bound to the attempt, full requirement coverage, mechanical evidence evaluation, and the independent semantic review gating VERIFIED—remains unchanged, and any new work still resets `latest_evidence`/`candidate_digest` so stale evidence cannot be reused.

@@ -1,0 +1,21 @@
+{
+  "index": 1,
+  "input_tokens": 27780,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 25435,
+  "patch": "diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py\nindex cb09d9d..63f39c3 100644\n--- a/src/evidence_harness/policy.py\n+++ b/src/evidence_harness/policy.py\n@@ -268,8 +268,13 @@ def find_repeated_cycle(\n     max_period: int = 3,\n     window: int = 20,\n ) -> tuple[str, ...] | None:\n+    eligible = [\n+        item\n+        for item in receipts[-window:]\n+        if not (item.mode is CommandMode.OBSERVE and item.repeat_reason)\n+    ][-window:]\n     signatures = [\n-        f\"{item.command_fingerprint}:{item.observation_fingerprint}\" for item in receipts[-window:]\n+        f\"{item.command_fingerprint}:{item.observation_fingerprint}\" for item in eligible\n     ]\n     for period in range(1, max_period + 1):\n         required = period * repeats\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..2fcb188 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -235,6 +235,7 @@ class CommandReceipt(StrictModel):\n     purpose: str\n     cwd: str | None\n     mode: CommandMode\n+    repeat_reason: str | None = Field(default=None, max_length=500, exclude_if=lambda value: value is None)\n     work_epoch: int = Field(ge=0)\n     attempt_id: int | None = Field(default=None, ge=1, exclude_if=lambda value: value is None)\n     candidate_digest: Sha256 | None = Field(default=None, exclude_if=lambda value: value is None)\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..986a08d 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -396,6 +396,7 @@ class EvidenceLoop:\n             if receipt.succeeded and (\n                 receipt.mode is CommandMode.CHANGE\n                 or receipt.observation_fingerprint not in receipts_before\n+                or (receipt.mode is CommandMode.OBSERVE and bool(command.repeat_reason))\n             ):\n                 batch_progressed = True\n             if not receipt.succeeded:\n@@ -753,6 +754,8 @@ class EvidenceLoop:\n             work_epoch=state.work_epoch,\n             wall_timeout_sec=wall_timeout_sec,\n         )\n+        if command.repeat_reason is not None:\n+            receipt = receipt.model_copy(update={\"repeat_reason\": command.repeat_reason})\n         state.next_sequence += 1\n         state.environment_call_count += 1\n         state.observations.append(receipt)\n",
+  "patch_sha256": "0273c8ff0ce50c0c6d57cb24315e338bf4fef2ab544c5524b2ec1227a579f2ae",
+  "prompt_sha256": "41b26a3b513880ce842dd16eacd50da10c3187e54f299099418e03433a669fe9",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "5bf458ce4388814e06076840d2ba9ef2ed12ad0b6c5956e2526ba29ac19b1e77",
+  "sample_id": "install-windows-3.11__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/policy.py",
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

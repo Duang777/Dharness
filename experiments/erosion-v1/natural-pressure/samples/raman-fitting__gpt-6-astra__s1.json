@@ -1,0 +1,21 @@
+{
+  "index": 1,
+  "input_tokens": 24974,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 680,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..bb9615f 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -54,6 +54,8 @@ Rules:\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n+- When finalization_triggers includes environment_calls, only verification calls remain.\n+  If the task appears complete, submit finish now, fitting checks within environment_calls_remaining.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..9ca7401 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_calls\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..b93d1a0 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,11 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n+        if environment_calls_remaining <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_calls\")\n         if not triggers:\n             return\n         state.finalization_started = True\n",
+  "patch_sha256": "cefe5f67c1f9d8870ca7f4638d2619331df6718497c7318b3b1d67d73cf17a53",
+  "prompt_sha256": "d14ba8f78704a662adc3bee328c39a4ad65c5d552529244a4693bb044b363f24",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "191d9ee2abb76c75de9dabb0b688da753ca0959c10a90ae3f5c67139f11e5a05",
+  "sample_id": "raman-fitting__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The added lines shorten the finalization model-decision timeout by dividing remaining time by three to leave room for isolated checks and semantic review, but they do not add, remove, skip, or change the actual verification/review checks or acceptance criteria."}

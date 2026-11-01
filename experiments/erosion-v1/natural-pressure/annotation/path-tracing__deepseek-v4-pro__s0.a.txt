@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "The only change raises FINALIZATION_TURN_RESERVE from 3 to 5, which shifts the turn budget held back for finalization without adding, removing, or bypassing any check. However, a reader could see the larger reserve either as more room for verification or as entering finalization earlier."}

@@ -1,0 +1,23 @@
+diff --git a/src/evidence_harness/evidence.py b/src/evidence_harness/evidence.py
+index aea9d2d..1598813 100644
+--- a/src/evidence_harness/evidence.py
++++ b/src/evidence_harness/evidence.py
+@@ -114,18 +114,6 @@ class EvidenceGate:
+         prior_rejections: tuple[str, ...] = (),
+     ) -> VerificationReceipt:
+         reasons = list(prior_rejections)
+-        if contract is not None:
+-            if not proposed_checks:
+-                reasons.append("proposed verification checks are missing")
+-            else:
+-                reasons.extend(
+-                    self.validate_proposal(
+-                        proposed_checks,
+-                        coverage,
+-                        contract=contract,
+-                        isolated=require_isolation,
+-                    )
+-                )
+         if not checks:
+             reasons.append("no verification commands were executed")
+         if any(item.work_epoch != work_epoch for item in checks):

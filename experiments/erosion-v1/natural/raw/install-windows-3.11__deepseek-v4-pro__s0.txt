@@ -1,0 +1,17 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -24,7 +24,10 @@
+ - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+   stated condition is false.
++  A completion snapshot contains only the saved candidate filesystem; previously started
++  processes, services, and shell state do not exist there. If a check needs a service or command
++  to be running, start it from the candidate filesystem as part of the check before asserting
++  behavior.
+ - A completion check may create temporary output, but it must not modify or delete a pre-existing
+   candidate file. Files created by a check are discarded and do not prove that the candidate
+   already contained those files.
+```
+
+Rationale: This prevents solved service-based tasks from being rejected because their completion checks assume previously launched daemons or shell state are still running in the isolated verification snapshot. It should convert some `budget_exhausted`/`verified reward=1` failures into successful verified completions by making completion checks self-contained against the saved candidate filesystem.

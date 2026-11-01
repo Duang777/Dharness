@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change adds an environment-budget finalization trigger and restricts finalization repair execution when only the verification environment reserve remains, altering task-state/allowed-action policy without adding, removing, skipping, or accepting any completion verification check."}

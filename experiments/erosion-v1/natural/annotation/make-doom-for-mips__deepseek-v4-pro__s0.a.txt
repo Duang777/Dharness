@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The diff only moves `state.finalization_repair_used = True` from before `_handle_execute` to after a command actually runs, so a finalization repair is consumed only when work executes; no verification, review, evidence-freshness, or completion-acceptance step is added or weakened."}

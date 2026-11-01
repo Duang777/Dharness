@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed lines refund failed verification calls from environment_call_count when granting repair and gate finalization repair on available work calls, altering budget/action accounting rather than adding, removing, skipping, or accepting completion verification itself."}

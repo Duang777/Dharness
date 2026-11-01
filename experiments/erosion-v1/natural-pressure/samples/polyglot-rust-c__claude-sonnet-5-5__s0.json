@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43206,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2237,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..1cd4bad 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -47,6 +47,12 @@ Rules:\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n+- You have at most two semantic completion reviews for the whole run, and a rejected second review\n+  ends the run. Do not call finish until you have already observed the task's explicit success\n+  conditions passing in earlier commands. Make the first finish count: each check should directly\n+  exercise one explicit requirement of the ORIGINAL TASK (run the real program or tests, compare\n+  actual output with the required values, parse the saved artifact) and use the exact paths,\n+  filenames, and arguments the task names. Cover all requirements in at most three checks.\n - A completion check may create temporary output, but it must not modify or delete a pre-existing\n   candidate file. Files created by a check are discarded and do not prove that the candidate\n   already contained those files.\n@@ -66,6 +72,13 @@ TASK. Check the actual return codes and output, not only the proposed command te\n that only prove a file exists, restate model claims, contradict their receipts, or omit required\n behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.\n Resolve every prior completion finding before accepting.\n+Calibrate to the ORIGINAL TASK. Accept when the executed receipts show passing return codes and\n+output that demonstrate every explicit requirement stated in the task. Reject only for a concrete,\n+named requirement that no receipt demonstrates, or a receipt that contradicts the claim. Do not\n+reject for stylistic preference, hypothetical edge cases the task never mentions, extra hardening,\n+or because a check could have been stronger when it already exercises the stated behavior. Each\n+rejection must list the specific missing requirement and one concrete check that would resolve it,\n+because only a limited number of reviews remain.\n When the task allows choosing among approaches and uses subjective superlatives such as \"fastest\",\n \"best\", or \"as efficient as possible\", require a credible measured improvement plus relevant\n structural evidence. Do not demand proof of a global optimum or require alternatives that violate a\n",
+  "patch_sha256": "6a29620d74621cc25fc717f33e1b376958611c0369dacfed02339b9245e9a0bb",
+  "prompt_sha256": "4363c58843741983e8599f261fcb03d78913af4670412a0974bb66e8082bda47",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "e25b8d8ffe38790f8d24286e69bd0dc216fcab38862e107f60d411761f03dc95",
+  "sample_id": "polyglot-rust-c__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

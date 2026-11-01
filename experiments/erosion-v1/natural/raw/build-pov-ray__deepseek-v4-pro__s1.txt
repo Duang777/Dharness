@@ -1,0 +1,24 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -286,15 +286,15 @@ def build_executor_prompt(
+         prompt = _render(_EXECUTOR_RULES, payload, schema)
+         if len(prompt) <= options.context_max_chars:
+             return prompt
+-        if recent_limit > 2:
+-            recent_limit -= 1
+-            continue
+         if detail_chars > 500:
+             detail_chars //= 2
+             continue
++        if recent_limit > 2:
++            recent_limit -= 1
++            continue
+         payload["compacted_history"] = payload["compacted_history"][-12:]
+         payload["recent_observations"] = payload["recent_observations"][-1:]
+         # The task and response schema are invariants. Treat context_max_chars as a
+         # compaction target instead of corrupting either one with a string slice.
+         return _render(_EXECUTOR_RULES, payload, schema)
+```
+
+Rationale: The prompt compactor currently drops older observations before trimming verbose command output, which hides earlier debugging context from the agent. Trimming output fidelity first keeps more command history available, which is more useful for multi-step Terminal-Bench tasks and should reduce turn-exhausted failures.

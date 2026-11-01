@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed line only increases FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.2, altering a time-budget constant without adding, removing, skipping, or forcing any completion verification step."}

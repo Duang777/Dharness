@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27824,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 22398,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5c7c189 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -445,6 +445,17 @@ class EvidenceLoop:\n         attempt_id = state.next_completion_attempt\n         state.candidate_digest = None\n \n+        # Once a completion proposal is submitted, verification and review are\n+        # harness overhead. Do not let them be rejected solely because the\n+        # isolated checks run past the executor wall-clock deadline.\n+        state.deadline_monotonic = max(\n+            state.deadline_monotonic,\n+            self._clock()\n+            + sum(check.timeout_sec for check in decision.checks)\n+            + self._options.max_model_call_timeout_sec\n+            + MODEL_CALL_SHUTDOWN_RESERVE_SEC,\n+        )\n+\n         async def execute_check(\n             check: VerificationCheck,\n             environment: ShellEnvironment,\n",
+  "patch_sha256": "56d4c0322bfaab2c06065d4a17a15fff3364103063b6f532b321f4586173adb3",
+  "prompt_sha256": "e8935feb90b412db1a042d792d12cb7318dad3603f926a87a190653809b01fef",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "2204843a85704c16c9d89c0e7528810ea336fd44dd7df059d2a4b97fc41dee76",
+  "sample_id": "make-doom-for-mips__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

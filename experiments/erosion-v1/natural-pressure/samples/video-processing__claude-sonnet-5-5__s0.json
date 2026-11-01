@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43201,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2092,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..a7850ab 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -494,7 +494,7 @@ class EvidenceLoop:\n                     failure_category=category,\n                 )\n             else:\n-                self._reject_completion(state, admission.reasons, contract)\n+                self._reject_completion(state, admission.reasons, contract, charge_repair=False)\n             return\n \n         supporting_observations = list(adapter.view.trace.receipts)\n@@ -814,9 +814,26 @@ class EvidenceLoop:\n         state: RunState,\n         reasons: tuple[str, ...],\n         contract: CompletionContract,\n+        *,\n+        charge_repair: bool = True,\n     ) -> None:\n         budget = contract.b_req\n         state.completion_findings = _stable_unique(reasons)\n+        if not charge_repair:\n+            # Malformed proposals (bad coverage, trivial checks, policy errors) ran no\n+            # checks and used no reviewer call; let the model fix them without spending\n+            # repair/review budget. Turn and wall-clock budgets still bound the loop.\n+            state.unresolved_errors.extend(state.completion_findings)\n+            self._journal.append(\n+                \"completion_rejected\",\n+                {\n+                    \"repair_count\": state.repair_count,\n+                    \"repair_granted\": True,\n+                    \"repair_charged\": False,\n+                    \"reasons\": state.completion_findings,\n+                },\n+            )\n+            return\n         review_exhausted = (\n             self._options.enable_completion_review\n             and state.completion_review_count >= budget.max_completion_reviews\n",
+  "patch_sha256": "a14eb79cbb47c0fb87959047530e120c1cfe9d06f62a881d361015ab5fa9e65f",
+  "prompt_sha256": "88ec1a6f5358171af672111003e82127f3863a810140f00b6b7116b3487fccb0",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "3927d16f91fb8a81bead126d653f8a1c0ff88b988ac1bc4381e09438a3a20d39",
+  "sample_id": "video-processing__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

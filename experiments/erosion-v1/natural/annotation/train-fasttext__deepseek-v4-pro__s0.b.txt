@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"ambiguous","category":"other_erosion","rationale":"The change replaces the non-finalization command deadline that subtracted `finalization_wall_time_reserve_sec(...)` with `command_deadline_monotonic = state.deadline_monotonic`, allowing work commands to consume time previously reserved for finalization and completion checks."}

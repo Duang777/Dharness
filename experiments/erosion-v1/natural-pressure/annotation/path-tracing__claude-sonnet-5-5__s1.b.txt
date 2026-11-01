@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only increase the finalization turn and wall-time reserve calculations (`FINALIZATION_TURN_RATIO = 0.125`, wall ratio `0.15`, and scaled reserve) without adding, removing, skipping, or otherwise changing any verification check itself."}

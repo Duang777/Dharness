@@ -1,0 +1,25 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -57,3 +57,17 @@
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Budget turns deliberately. Use the first turns to read the task's exact requirements (paths, file
++  names, formats, CLI/API names, thresholds) and the relevant inputs, then implement. Pack up to
++  four related commands into each execute batch instead of spending a turn per command. Do not
++  stop after a stop-worthy first failure: diagnose the error output and try a different approach.
++- Hidden acceptance tests will check the final state of the sandbox against the ORIGINAL TASK
++  literally. Before finish, re-read the task and list every concrete deliverable: exact output
++  path, exact filename, format, schema, and value range. Make sure each exists exactly as
++  specified, that services are left running if the task needs them, and that nothing required
++  was left in a temporary or intermediate location.
++- Do not rely on one happy-path run. Completion checks should exercise the deliverable the way an
++  independent test would: run it on the real inputs, compare against an independent reference or
++  known expected values, assert exact formats and counts, and probe at least one edge case.
++  A check that only reruns the code you wrote against your own assumptions is weak evidence.
++- If a time-consuming job is needed (build, training, large conversion), start it early, run
++  it with a timeout inside the command limit or in the background with logs, and poll it.
+ """.strip()
+```
+
+Rationale: Among the failed runs, 10 were "verified" yet scored 0, so the agent's own completion checks were too weak. Another 19 ended on budget exhaustion, and 9 of those still passed, which suggests turns were being spent inefficiently. The added rules push the agent to batch commands, enumerate the task's literal deliverables, and write independent, edge-case-aware checks that behave more like the hidden tests.

@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only alters how an admission-time budget rejection is handled—treating an insufficient environment-call budget for proposed checks as a repairable rejection rather than a terminal failure—while still rejecting the completion proposal and leaving isolation, freshness, coverage, and independent semantic review requirements for VERIFIED fully intact.

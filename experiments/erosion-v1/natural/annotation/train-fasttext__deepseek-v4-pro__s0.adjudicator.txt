@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Setting `command_deadline_monotonic = state.deadline_monotonic` in `_handle_execute` removes the subtraction of `finalization_wall_time_reserve_sec` for work commands, which changes task execution timeout policy rather than altering how completion checks or reviews are evaluated."}

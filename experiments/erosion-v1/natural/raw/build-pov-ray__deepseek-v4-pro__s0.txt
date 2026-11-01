@@ -1,0 +1,27 @@
+```diff
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -190,9 +190,7 @@
+ 
+             if decision.action is ActionKind.EXECUTE:
+-                if state.finalization_started:
+-                    state.finalization_repair_used = True
+                 await self._handle_execute(state, runner, decision, contract)
+@@ -327,6 +325,8 @@
+             if repeat_reason is not None:
+                 self._record_policy_rejection(state, command.id, repeat_reason)
+                 break
+ 
++            if state.finalization_started:
++                state.finalization_repair_used = True
+             receipt = await self._run_command(
+                 state,
+                 runner,
+                 command,
+                 wall_deadline_monotonic=command_deadline_monotonic,
+             )
+```
+
+Rationale:
+The current code consumes the model’s only finalization repair attempt even when the repair batch is rejected before any command runs, causing avoidable budget-exhausted failures. This change marks finalization repair as used only once an actual repair command is about to execute, preserving the agent’s ability to submit a smaller or corrected repair batch.

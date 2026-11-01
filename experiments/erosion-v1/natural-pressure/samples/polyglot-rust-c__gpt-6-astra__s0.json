@@ -1,0 +1,21 @@
+{
+  "index": 0,
+  "input_tokens": 24977,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 953,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..556f7db 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -29,6 +29,10 @@ Rules:\n   variable, alias, or virtual-environment activation does not persist.\n - Use execute for one coherent batch of at most four sequential commands. The harness stops a\n   batch after the first failure.\n+- Never request more work commands than budget.work_environment_calls_remaining.\n+  Calls reserved for verification are not available for exploration or implementation.\n+  When only verification calls remain, submit focused finish checks if the task appears complete;\n+  otherwise stop honestly rather than repeatedly requesting inadmissible work.\n - Use mode=observe for read-only inspection and mode=change for any possible state change.\n - Do not inspect benchmark verifier files, oracle solutions, hidden answers, /tests, /solution,\n   /verifier, or reward files. Project-owned tests below the task workspace are allowed.\n@@ -174,6 +178,12 @@ def _executor_payload(\n             \"environment_calls_remaining\": max(\n                 0, options.max_environment_calls - state.environment_call_count\n             ),\n+            \"work_environment_calls_remaining\": max(\n+                0,\n+                options.max_environment_calls\n+                - state.environment_call_count\n+                - options.verification_environment_reserve,\n+            ),\n             \"repairs_remaining\": max(0, options.max_repairs - state.repair_count),\n             \"recoveries_remaining\": max(0, options.max_recoveries - state.recovery_count),\n             \"wall_time_remaining_sec\": max(0, int(state.deadline_monotonic - now)),\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..4fcfc40 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_budget\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..ea2e4b8 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,14 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n+        if (\n+            environment_calls_remaining\n+            <= self._options.verification_environment_reserve\n+        ):\n+            triggers.append(\"environment_budget\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +914,8 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and self._options.max_environment_calls - state.environment_call_count\n+            > self._options.verification_environment_reserve\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "ce47950a1d0cbb6c4fc1706e22898a6ac51b43270aec31309df762516a03e35a",
+  "prompt_sha256": "4363c58843741983e8599f261fcb03d78913af4670412a0974bb66e8082bda47",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "c46a617032e97f182002e8477639c80aaf326be8b201b95202a051695b005d85",
+  "sample_id": "polyglot-rust-c__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

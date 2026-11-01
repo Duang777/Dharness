@@ -1,0 +1,2 @@
+ACCEPT
+The change only adjusts budget constants (turn reserve and wall-time ratio for finalization) and does not touch or weaken any completion-checking logic.

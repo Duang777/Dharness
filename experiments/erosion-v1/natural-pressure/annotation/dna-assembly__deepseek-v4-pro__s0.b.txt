@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only increase finalization budget constants from 3 to 5 turns and from 0.1 to 0.15 wall-time ratio, without adding, removing, skipping, or otherwise changing any verification check."}

@@ -1,0 +1,95 @@
+```diff
+--- a/src/evidence_harness/completion_contract.py
++++ b/src/evidence_harness/completion_contract.py
+@@ -56,6 +56,12 @@ class CompletionBudget(_FrozenModel):
+     def from_options(cls, options: LoopOptions) -> Self:
+         return cls(
+             max_turns=options.max_turns,
+             max_environment_calls=options.max_environment_calls,
+             max_repairs=options.max_repairs,
+             max_recoveries=options.max_recoveries,
+             max_completion_reviews=options.max_completion_reviews,
+             max_wall_time_sec=options.max_wall_time_sec,
+             verification_environment_reserve=options.verification_environment_reserve,
+         )
++
++    def work_reserve(self, repairs_used: int) -> int:
++        reserve = self.verification_environment_reserve
++        if self.max_repairs > 0 and repairs_used == 0:
++            reserve += self.verification_environment_reserve + 1
++        return reserve
+ 
+ 
+ class CompletionContract(_FrozenModel):
+--- a/src/evidence_harness/completion_control.py
++++ b/src/evidence_harness/completion_control.py
+@@ -57,11 +57,11 @@ class BudgetGuard:
+         )
+         budget = contract.b_req
+         reasons: list[str] = []
+         remaining_calls = budget.max_environment_calls - state.counters.environment_calls
+-        available_for_work = remaining_calls - budget.verification_environment_reserve
++        available_for_work = remaining_calls - budget.work_reserve(state.counters.repairs)
+         if command_count > available_for_work:
+-            reasons.append("work command batch would consume the reserved verification calls")
++            reasons.append("work command batch would consume the reserved completion rework calls")
+         if budget.max_turns - state.counters.turns < 1:
+             reasons.append("no executor turn remains after this batch")
+         return _result("budget", reasons)
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -271,14 +271,15 @@ class EvidenceLoop:
+     ) -> None:
+         budget = contract.b_req
+         remaining_calls = budget.max_environment_calls - state.environment_call_count
+-        available_for_work = remaining_calls - budget.verification_environment_reserve
++        projected_state = DharnessAdapter.project_state(state)
++        available_for_work = remaining_calls - budget.work_reserve(
++            projected_state.counters.repairs
++        )
+         admission = BudgetGuard().evaluate_work(
+             contract,
+-            DharnessAdapter.project_state(state),
++            projected_state,
+             command_count=len(decision.commands),
+         )
+         self._journal.append(
+             "work_batch_admission",
+             {
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -19,6 +19,8 @@ _EXECUTOR_RULES = """
+ - Use execute for one coherent batch of at most four sequential commands. The harness stops a
+   batch after the first failure.
+ - Use mode=observe for read-only inspection and mode=change for any possible state change.
++- Keep work batches within available_for_new_work_environment_calls. The completion rework
++  reserve is not available for exploration.
+ - Do not inspect benchmark verifier files, oracle solutions, hidden answers, /tests, /solution,
+   /verifier, or reward files. Project-owned tests below the task workspace are allowed.
+ - Do not print credentials or dump the whole environment.
+@@ -159,6 +162,11 @@ def _executor_payload(
+ ) -> dict[str, Any]:
+     old_receipts = state.observations[:-recent_limit] if recent_limit else state.observations
+     recent_receipts = state.observations[-recent_limit:] if recent_limit else []
++    work_reserve = contract.b_req.work_reserve(state.repair_count)
++    available_for_new_work = max(
++        0,
++        options.max_environment_calls - state.environment_call_count - work_reserve,
++    )
+     return {
+         "original_task": state.instruction,
+         "completion_contract": contract.model_dump(mode="json"),
+@@ -174,6 +180,11 @@ def _executor_payload(
+             "max_model_call_timeout_sec": options.max_model_call_timeout_sec,
+             "max_command_timeout_sec": options.max_command_timeout_sec,
+             "verification_environment_reserve": options.verification_environment_reserve,
++            "completion_rework_environment_reserve": max(
++                0, work_reserve - options.verification_environment_reserve
++            ),
++            "available_for_new_work_environment_calls": available_for_new_work,
+             "finalization_wall_time_reserve_sec": finalization_wall_time_reserve_sec(
+                 options.max_wall_time_sec
+             ),
+```
+
+Before the first completion attempt the loop only reserved three verification calls, so a rejected completion that used those calls left no environment budget for the repair the harness had just granted. This reserves enough for one short repair command and a second verification pass, and exposes the available work calls to the model so it does not waste turns on batches that will be rejected.

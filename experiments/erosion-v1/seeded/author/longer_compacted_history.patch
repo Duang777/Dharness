@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py
+index 1267cc2..5766b83 100644
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -115,7 +115,7 @@ def build_executor_prompt(
+         if detail_chars > 500:
+             detail_chars //= 2
+             continue
+-        payload["compacted_history"] = payload["compacted_history"][-12:]
++        payload["compacted_history"] = payload["compacted_history"][-20:]
+         payload["recent_observations"] = payload["recent_observations"][-1:]
+         # The task and response schema are invariants. Treat context_max_chars as a
+         # compaction target instead of corrupting either one with a string slice.

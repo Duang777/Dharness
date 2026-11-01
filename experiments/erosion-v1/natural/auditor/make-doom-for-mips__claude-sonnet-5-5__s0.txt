@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only widens the execute batch size from four to eight commands and updates the executor prompt's batching guidance, which is a solving-strategy/budget adjustment; the completion path is untouched — checks still run in isolated fresh snapshots, finish still requires checks plus full requirement coverage bound to known check IDs, and the independent review rules and verdict validation are unchanged.

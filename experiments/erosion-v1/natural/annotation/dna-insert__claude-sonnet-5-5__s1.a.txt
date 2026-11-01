@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added block rejects a STOP decision once, before finalization when more than half the turn budget remains, and tells the agent to keep working; this is task-persistence policy that leaves the checks, review, evidence binding and VERIFIED path unchanged."}

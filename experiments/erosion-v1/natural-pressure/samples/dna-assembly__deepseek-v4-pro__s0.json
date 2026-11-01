@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27818,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 35340,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..f674e72 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,7 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_TURN_RESERVE = 5\n+FINALIZATION_WALL_TIME_RATIO = 0.15\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\n",
+  "patch_sha256": "e176123a97104426e7d37540e64623df6f7c565437afe53ac3efb5daf39eb9c6",
+  "prompt_sha256": "b4feb18679e2da5f94c5e32e28f7c6686c977269182074ca560da7c671f7a77e",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "945c1210b5a5c4d1992c79264e2965a454e2a4e2499da5cd2d0efddd30f1f171",
+  "sample_id": "dna-assembly__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-assembly",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

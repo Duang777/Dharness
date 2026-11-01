@@ -1,0 +1,56 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -75,7 +75,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -835,6 +835,13 @@
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        if (
++            environment_calls_remaining
++            <= self._options.verification_environment_reserve
++        ):
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+@@ -865,6 +872,9 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and self._options.max_environment_calls - state.environment_call_count
++            > self._options.verification_environment_reserve
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -29,6 +29,10 @@
+ - Use execute for one coherent batch of at most four sequential commands. The harness stops a
+   batch after the first failure.
++- Never request more work commands than budget.work_environment_calls_remaining.
++  Calls reserved for verification are not available for exploration or implementation.
++  When only verification calls remain, submit focused finish checks if the task appears complete;
++  otherwise stop honestly rather than repeatedly requesting inadmissible work.
+ - Use mode=observe for read-only inspection and mode=change for any possible state change.
+@@ -211,6 +215,12 @@
+             "environment_calls_remaining": max(
+                 0, options.max_environment_calls - state.environment_call_count
+             ),
++            "work_environment_calls_remaining": max(
++                0,
++                options.max_environment_calls
++                - state.environment_call_count
++                - options.verification_environment_reserve,
++            ),
+             "repairs_remaining": max(0, options.max_repairs - state.repair_count),
+```
+
+The harness reserves verification calls but currently does not enter finalization when work exhausts the unreserved calls, allowing rejected execution requests to waste the remaining turns or wall time. Making finalization environment-budget-aware redirects those runs toward fresh verification while preserving all existing evidence, isolation, review, and budget gates.

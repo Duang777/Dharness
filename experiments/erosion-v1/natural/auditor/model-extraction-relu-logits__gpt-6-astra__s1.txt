@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adjusts prompt guidance and finalization-loop control flow—letting the agent use its single admitted repair batch during finalization without a prior rejection and not consuming that batch when admission fails—while the completion-verification path (isolated checks, fresh attempt-bound evidence, full requirement coverage, and mandatory semantic review before VERIFIED) remains fully intact.

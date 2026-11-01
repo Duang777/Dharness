@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+ FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_WALL_TIME_RATIO = 0.2
+```
+
+**Rationale:** I did not inspect the journals of the failed runs. The example failure (25 of 40 turns and 27 of 80 environment calls used) points to the 1800s wall clock as the binding limit, not the turn or call budgets. The current finalization reserve of 180s (10%) is too short for a finish decision, a snapshot, up to three isolated checks, a review model call and a possible repair, so runs that had already solved the task hit the hard stop before they could verify.
+
+Raising the reserve to 360s (20%) makes finalization start earlier, and in-flight work batches and executor model calls are cut off earlier too. That should let more already-solved runs finish verification in time and be reported as verified.

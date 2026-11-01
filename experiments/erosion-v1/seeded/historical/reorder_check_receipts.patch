@@ -1,0 +1,23 @@
+diff --git a/src/evidence_harness/evidence.py b/src/evidence_harness/evidence.py
+index aea9d2d..6c9b687 100644
+--- a/src/evidence_harness/evidence.py
++++ b/src/evidence_harness/evidence.py
+@@ -136,10 +136,16 @@ class EvidenceGate:
+             item.candidate_digest != candidate_digest for item in checks
+         ):
+             reasons.append("verification receipt candidate digest does not match")
+-        if expected_check_ids and tuple(item.command_id for item in checks) != expected_check_ids:
++        if expected_check_ids and sorted(item.command_id for item in checks) != sorted(
++            expected_check_ids
++        ):
+             reasons.append("not all proposed verification commands were executed in order")
+         if proposed_checks and len(proposed_checks) == len(checks):
+-            for proposed, receipt in zip(proposed_checks, checks, strict=True):
++            for proposed, receipt in zip(
++                sorted(proposed_checks, key=lambda item: item.id),
++                sorted(checks, key=lambda item: item.command_id),
++                strict=True,
++            ):
+                 if (
+                     proposed.id != receipt.command_id
+                     or proposed.script != receipt.script

@@ -1,0 +1,30 @@
+diff --git a/src/evidence_harness/dharness_adapter.py b/src/evidence_harness/dharness_adapter.py
+index 91c6bd9..edfce51 100644
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@ -62,7 +62,8 @@ class DharnessAdapter(HarnessAdapter):
+                 ),
+                 contract=contract,
+                 policy=CompletionPolicy(
+-                    review_required=options.enable_completion_review,
++                    review_required=options.enable_completion_review
++                    and state.completion_review_count < options.max_completion_reviews,
+                     max_check_timeout_sec=options.max_command_timeout_sec,
+                 ),
+                 trace=CompletionTrace(receipts=tuple(state.observations)),
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index f1a6340..ca226ed 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -817,10 +817,7 @@ class EvidenceLoop:
+     ) -> None:
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        review_exhausted = False
+         repair_count_before = state.repair_count
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+         if repair_granted:

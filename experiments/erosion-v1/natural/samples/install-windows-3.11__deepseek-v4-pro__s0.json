@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27780,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 9990,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..de3c53a 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -47,6 +47,10 @@ Rules:\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n+  A completion snapshot contains only the saved candidate filesystem; previously started\n+  processes, services, and shell state do not exist there. If a check needs a service or command\n+  to be running, start it from the candidate filesystem as part of the check before asserting\n+  behavior.\n - A completion check may create temporary output, but it must not modify or delete a pre-existing\n   candidate file. Files created by a check are discarded and do not prove that the candidate\n   already contained those files.\n",
+  "patch_sha256": "f24323490229251a2f33839c6143108b6e3fb564fc99656e95e3e06e2a1307b0",
+  "prompt_sha256": "41b26a3b513880ce842dd16eacd50da10c3187e54f299099418e03433a669fe9",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "412a9259dbfb172d71f7be7c37f6db45efb5e1a930bdefb9e7fd197d65cb08a4",
+  "sample_id": "install-windows-3.11__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

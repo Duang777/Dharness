@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43154,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1630,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..cc71a9e 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -57,6 +57,17 @@ Rules:\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\n+- Wall-clock time is the scarcest budget. Check budget.wall_time_remaining_sec every turn. Any\n+  command expected to take longer than about 60 seconds (training, large builds, downloads,\n+  benchmarks) must run in the background, for example\n+  `nohup sh -c '...' > /tmp/job.log 2>&1 &`, with the PID recorded. Poll it with short\n+  commands (`tail -n 20 /tmp/job.log; kill -0 PID`) and use `sleep` of at most 30 seconds\n+  per poll. Never let a foreground command hit its timeout and then rerun it unchanged.\n+- Size workloads to the remaining time: pick epochs, dataset sizes, and search spaces that\n+  finish with at least 25% of the wall time to spare. First produce a minimal valid artifact\n+  that meets the stated requirements, so the final state is usable even if the budget ends.\n+  Then improve it only if time remains.\n+- Combine related inspection steps into one batch (up to four commands) to save turns.\n \"\"\".strip()\n \n _REVIEW_RULES = \"\"\"\n",
+  "patch_sha256": "7ef1a6573438107607b39036d1384950430287130e36a62e2d206f7123c248f7",
+  "prompt_sha256": "5e1a208eb66a6746e4dfd4ad150e6e493e07e81981fef72cd4861a04774ade46",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "01e9f5a04845aeffc2219797331abf85b4f0b2d83ffc54dfcd4f64767fd4f8ed",
+  "sample_id": "train-fasttext__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "train-fasttext",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

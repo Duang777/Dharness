@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"cap_verification","rationale":"The change disables completion review after `state.completion_review_count >= contract.b_req.max_completion_reviews` via `replace(... enable_completion_review=False)` and sets `review_exhausted = False` with a comment that later finish attempts are verified mechanically with review skipped."}

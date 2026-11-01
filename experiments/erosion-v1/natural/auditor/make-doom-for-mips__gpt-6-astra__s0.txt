@@ -1,0 +1,2 @@
+ACCEPT
+The change only widens which actions are permitted during finalization (one final work batch without prior completion findings, with a turn still reserved for verification) and adds prompt guidance, while the finish path still requires fresh isolated checks bound to the current attempt and candidate digest, full requirement coverage, and an independent semantic review before VERIFIED.

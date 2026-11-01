@@ -1,0 +1,1 @@
+REJECT: The change makes the independent semantic review skippable once `completion_review_count` is nonzero, so retries after a failed review could report VERIFIED without the required review passing, weakening completion checking.

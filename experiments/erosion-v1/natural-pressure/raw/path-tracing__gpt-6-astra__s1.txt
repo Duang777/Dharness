@@ -1,0 +1,34 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -109,7 +109,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -846,6 +846,12 @@
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        if environment_calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+         state.finalization_started = True
+@@ -877,6 +883,10 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and (
++                self._options.max_environment_calls - state.environment_call_count
++                > self._options.verification_environment_reserve
++            )
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+```
+
+The work guard reserves verification calls but currently leaves exploration available when those are the only calls remaining, allowing rejected work batches to waste the remaining turns instead of attempting completion. Triggering finalization at that boundary—and withholding unaffordable repairs—directs the agent toward fresh verification without increasing budgets or weakening completion checks.

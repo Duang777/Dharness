@@ -1,0 +1,19 @@
+**Change:** Raise the per-turn command batch limit from 4 to 8, and tell the executor to pack related steps (write, build, test) into one turn.
+
+**Rationale:** In the failed run, turns were the binding constraint. `build-pov-ray` used all 40 turns but only 45 of the 80 environment calls, and 19 tasks ended in `budget_exhausted`, 9 of them with reward=1 before they could be verified. Larger batches convert the unused environment-call budget into more progress per turn, and the harness still stops a batch at the first failure, so the risk is limited.
+
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -1,3 +1,3 @@
+-    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=4)
++    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=8)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -1,3 +1,4 @@
+-- Use execute for one coherent batch of at most four sequential commands. The harness stops a
+-  batch after the first failure.
++- Use execute for one coherent batch of at most eight sequential commands. The harness stops a
++  batch after the first failure. Turns are scarce: combine related steps (write, build, test) into
++  one batch instead of spending a turn on each.
+```

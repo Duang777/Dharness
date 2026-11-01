@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added rules require the agent before finish to re-read the task, enumerate literal requirements, exercise each through the named interface, clean the workspace, and rebuild from scratch once before finishing."}

@@ -1,0 +1,18 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,10 @@
+ from __future__ import annotations
+ 
+ FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++# Finalization needs an executor decision, isolated checks, and semantic review,
++# not just one model call. Reserve nine minutes of a thirty-minute run so
++# completion starts before those stages must compete for the last three minutes.
++FINALIZATION_WALL_TIME_RATIO = 0.3
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+```
+
+The reported failure exhausted its budget after only 25 turns and 27 environment calls, pointing to wall-clock pressure; currently, completion receives just 180 seconds for a finish decision, isolated verification, and review. Increasing that reserve to 540 seconds should help already-solved candidates reach verified completion while retaining the same hard deadline and all evidence requirements, though it trades away some implementation time.

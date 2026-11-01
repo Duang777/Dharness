@@ -1,0 +1,3 @@
+ACCEPT
+
+This only increases the wall-time budget reserved for finalization, giving the isolated checks and semantic review more room to run without weakening any completion-checking requirement.

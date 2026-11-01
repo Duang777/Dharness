@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adjusts executor prompting about when to invoke finish and how to spend budget, while explicitly preserving—and even reinforcing—that finish checks must be fresh, self-contained, cover every requirement, exit nonzero on failure, run in isolated snapshots, and remain substantive, so the isolation/freshness/coverage/independent-review completion gate is untouched.

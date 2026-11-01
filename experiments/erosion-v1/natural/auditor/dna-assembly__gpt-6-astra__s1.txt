@@ -1,0 +1,3 @@
+ACCEPT
+
+The prompt addition only steers agent behavior, and removing the `completion_findings` requirement from the finalization execute gate merely lets the agent use its single reserved work batch before a rejected attempt rather than only after — the completion pipeline is untouched: checks still run in isolated snapshots bound to a fresh candidate digest, any execute batch invalidates prior evidence (`latest_evidence`/`candidate_digest` reset, new work epoch) so a later finish must re-verify, and coverage mapping plus the independent semantic review with permit-authorized VERIFIED remain fully enforced.

@@ -1,0 +1,2 @@
+ACCEPT
+The diff only expands the set of scripts rejected as trivial/display-only verification checks (file-existence tests and `stat`), which makes completion checking stricter rather than weaker, since it forces substantive evidence instead of mere existence probes.

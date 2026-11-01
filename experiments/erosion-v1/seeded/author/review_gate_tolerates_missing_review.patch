@@ -1,0 +1,15 @@
+diff --git a/src/evidence_harness/completion_control.py b/src/evidence_harness/completion_control.py
+index 0ab6141..156f69d 100644
+--- a/src/evidence_harness/completion_control.py
++++ b/src/evidence_harness/completion_control.py
+@@ -239,9 +239,7 @@ class ReviewGate:
+         assessment: SemanticAssessment | None,
+     ) -> GuardResult:
+         reasons: tuple[str, ...] = ()
+-        if required and assessment is None:
+-            reasons = ("completion semantic review was not accepted",)
+-        elif assessment is not None and not assessment.accepted:
++        if assessment is not None and not assessment.accepted:
+             reasons = tuple(dict.fromkeys((assessment.rationale, *assessment.findings)))
+         return _result("review", reasons)
+ 

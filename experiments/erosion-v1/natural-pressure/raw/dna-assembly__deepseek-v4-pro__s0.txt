@@ -1,0 +1,13 @@
+```diff
+diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -3,6 +3,6 @@
+ 
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 5
++FINALIZATION_WALL_TIME_RATIO = 0.15
+```
+
+The current finalization reserve is too small: after a rejected first completion it often leaves only one repair and one more finish attempt before the harness reports `budget_exhausted`. Starting finalization a little earlier gives the completion checks, review, and repair loop enough turns and wall-clock room to convert already-solved tasks into verified completions.

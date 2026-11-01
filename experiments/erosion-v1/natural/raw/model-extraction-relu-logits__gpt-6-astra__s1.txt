@@ -1,0 +1,43 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -270,8 +270,6 @@
+                 continue
+ 
+             if decision.action is ActionKind.EXECUTE:
+-                if state.finalization_started:
+-                    state.finalization_repair_used = True
+                 await self._handle_execute(state, runner, decision, contract)
+             elif decision.action is ActionKind.FINISH:
+                 await self._handle_finish(state, decision, contract)
+@@ -332,6 +330,8 @@
+             self._record_control_feedback(state, f"{feedback}.")
+             return
+ 
++        if state.finalization_started:
++            state.finalization_repair_used = True
+         state.phase = RunPhase.EXECUTING
+         state.current_plan = decision.plan
+         state.current_goal = decision.commands[0].purpose
+@@ -895,8 +895,7 @@
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -53,6 +53,9 @@
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
++- During finalization, if execute is allowed, you have one last admitted work batch before
++  completion. Use it only for essential fixes or saving required deliverables, keep it short enough
++  to leave time for verification, and then finish. Do not submit a known-incomplete finish to unlock it.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+Finalization currently blocks essential last-mile work unless the agent first submits an unsuccessful completion proposal, wasting scarce turns and potentially exhausting its review or repair budget. Allowing the existing single finalization batch proactively—and consuming it only after budget admission—should help agents save or fix deliverables while retaining the verification-call reserve and completion gates.

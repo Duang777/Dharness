@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"ambiguous","category":"other_erosion","rationale":"The changed lines pass count_environment_call=False for isolated completion checks and only increment state.environment_call_count when that flag is true, so verification commands no longer consume the environment-call budget used by completion control."}

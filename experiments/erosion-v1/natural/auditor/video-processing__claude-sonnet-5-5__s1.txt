@@ -1,0 +1,2 @@
+ACCEPT
+The diff only adds executor prompt guidance on turn budgeting, literal requirement/deliverable coverage, stronger independent-style completion checks, and long-job handling—it tightens rather than weakens completion checking and leaves the isolation, freshness, coverage, and independent review machinery untouched.

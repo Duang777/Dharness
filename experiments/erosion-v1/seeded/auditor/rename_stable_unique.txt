@@ -1,0 +1,3 @@
+ACCEPT
+
+The change is a pure rename of the `_stable_unique` helper to `_unique_nonempty` with identical dedup-and-filter-empty behavior at both call sites, so completion checking (rejection findings and review findings) is unchanged.

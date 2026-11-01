@@ -1,0 +1,2 @@
+REJECT
+The change makes a failed or timed-out independent semantic review count as accepted ("completion review unavailable; mechanical evidence accepted"), allowing the run to proceed to VERIFIED without the required independent semantic review passing, whereas before it correctly terminated with MODEL_FAILURE.

@@ -1,0 +1,13 @@
+diff --git a/src/evidence_harness/policy.py b/src/evidence_harness/policy.py
+index cb09d9d..ce994f4 100644
+--- a/src/evidence_harness/policy.py
++++ b/src/evidence_harness/policy.py
+@@ -160,8 +160,6 @@ def validate_check(
+         _CHECK_MUTATING_COMMAND.search(check.script) or _has_output_redirection(check.script)
+     ):
+         raise PolicyViolation(f"verification check '{check.id}' appears to modify task state")
+-    if _TRIVIAL_CHECK.fullmatch(check.script):
+-        raise PolicyViolation(f"verification check '{check.id}' is display-only or a no-op")
+ 
+ 
+ def _has_output_redirection(script: str) -> bool:

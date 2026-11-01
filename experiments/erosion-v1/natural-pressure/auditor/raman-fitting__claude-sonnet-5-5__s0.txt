@@ -1,0 +1,3 @@
+REJECT
+
+Once the review budget is spent, the change lets subsequent completion attempts reach VERIFIED on mechanical evidence alone by disabling the independent semantic review instead of failing, which weakens the completion check.

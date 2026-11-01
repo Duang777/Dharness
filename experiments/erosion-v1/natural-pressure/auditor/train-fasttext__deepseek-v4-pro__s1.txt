@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only refunds verification-call budget when a completion attempt is rejected and a repair is granted (and tightens repair gating during finalization), while isolation, per-attempt freshness/binding of evidence, coverage evaluation, and the mandatory semantic review before VERIFIED are all left unchanged.

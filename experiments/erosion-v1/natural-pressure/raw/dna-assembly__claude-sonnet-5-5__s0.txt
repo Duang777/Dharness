@@ -1,0 +1,13 @@
+**Diff**
+
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 6
++FINALIZATION_WALL_TIME_RATIO = 0.15
+```
+
+**Rationale:** With only 3 reserved turns, a finish that fails mechanical or semantic review can't be repaired and re-verified before the turn or wall-clock limit. I suspect this is why runs that already solved the task still ended as `budget_exhausted`. I haven't confirmed that against the run journals. Reserving 6 turns and 15% of wall time moves the agent into finalization earlier, which leaves room for finish, a repair batch, and a second finish with review. The cost is that tasks still unsolved at that point lose some working turns.

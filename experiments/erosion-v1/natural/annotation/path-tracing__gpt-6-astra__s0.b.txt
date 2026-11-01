@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change only alters finalization action policy by allowing one execute work batch when `not state.finalization_repair_used and turns_remaining >= 2` and adds prompt guidance on using that batch, without removing or shortening completion checks, isolation, coverage, or review."}

@@ -1,0 +1,3 @@
+ACCEPT
+
+This only adds context-size compaction to the review prompt (mirroring the existing executor-prompt pattern) while always preserving the contract, checks, coverage, isolation record, prior findings, and receipts — and since the review rules direct the reviewer to reject whenever visible excerpts don't prove a claim, any shrinking of receipt detail or supporting observations biases toward rejection rather than a false VERIFIED, so the completion gate is not weakened.

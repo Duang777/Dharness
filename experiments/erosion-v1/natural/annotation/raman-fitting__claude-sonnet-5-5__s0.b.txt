@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The added executor rules require that before finish the agent re-read the original task, list every literal requirement, run the real artifact end to end, and compare against stated expected values, which adds pre-completion verification guidance."}

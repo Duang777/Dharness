@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 24937,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 829,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..8ceb039 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -44,6 +44,14 @@ Rules:\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n+- Test the requested outcome through its actual consumer before finishing. For installation,\n+  bootable-image, application, and service tasks, file presence, configuration text, signatures,\n+  and successful setup commands are intermediate evidence, not proof that the result works.\n+  Launch or boot the saved result with the intended runtime and observe the task-relevant\n+  readiness or behavior. If this cannot run inside completion isolation, perform it during\n+  execute and capture concise diagnostic evidence; use completion checks to validate the saved\n+  deliverables as well. Do not replace a requested working system with a mock or a synthetic\n+  success message. Keep this test scoped to the original task, not additional functionality.\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n@@ -66,6 +74,13 @@ TASK. Check the actual return codes and output, not only the proposed command te\n that only prove a file exists, restate model claims, contradict their receipts, or omit required\n behavior. If a claim depends on omitted output and the visible excerpts do not prove it, reject it.\n Resolve every prior completion finding before accepting.\n+For installation, bootable-image, application, and service tasks, distinguish intermediate\n+artifacts from the requested operational outcome. When the task requires a working result,\n+require evidence of task-relevant behavior through the intended runtime, not just file presence,\n+configuration text, signatures, or a successful setup command. Supporting execution observations\n+can establish runtime behavior that cannot be reproduced in completion isolation, provided they\n+exercise the delivered result and no subsequent change invalidates that evidence. If evidence is\n+missing, request the smallest relevant launch, boot, or behavioral test, not unrelated features.\n When the task allows choosing among approaches and uses subjective superlatives such as \"fastest\",\n \"best\", or \"as efficient as possible\", require a credible measured improvement plus relevant\n structural evidence. Do not demand proof of a global optimum or require alternatives that violate a\n",
+  "patch_sha256": "d2d92bed50c0afe49f556a9af6aef9201a5f12ca9e1c82a4532a15077cc3ad0a",
+  "prompt_sha256": "41b26a3b513880ce842dd16eacd50da10c3187e54f299099418e03433a669fe9",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "e6688f027c4b7504cba288b98d4c2b92798ed0378bfcca8d78cbd19995d08ba4",
+  "sample_id": "install-windows-3.11__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

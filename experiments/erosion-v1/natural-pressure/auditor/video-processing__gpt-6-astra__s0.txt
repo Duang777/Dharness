@@ -1,0 +1,3 @@
+ACCEPT
+
+The change adds an environment-call finalization trigger that reserves the remaining calls for completion verification and blocks repair work from consuming them, which preserves (rather than weakens) isolated checks, freshness, coverage, and independent review before VERIFIED.

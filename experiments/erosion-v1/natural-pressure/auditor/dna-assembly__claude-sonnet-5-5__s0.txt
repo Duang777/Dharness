@@ -1,0 +1,2 @@
+ACCEPT
+This only increases the turn and wall-time budget reserved for finalization, leaving the completion-checking logic (isolated checks, fresh bound evidence, full coverage, independent semantic review) untouched.

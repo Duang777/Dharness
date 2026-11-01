@@ -1,0 +1,3 @@
+REJECT
+
+The change silently drops proposed checks based on their timeout (or reduces them to just the first), which weakens completion checking by allowing completion without every requirement being covered by executed checks.

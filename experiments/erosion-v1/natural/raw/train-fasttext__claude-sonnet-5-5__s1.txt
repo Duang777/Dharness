@@ -1,0 +1,23 @@
+**Rationale:** Many failures end in `budget_exhausted` well before the 40-turn limit (train-fasttext used only 20 turns and 24 environment calls). That points to wall-clock time lost to long foreground commands, such as training runs that hit the 300s command timeout, being retried, or being followed by slow polling. The change adds executor guidance to run long jobs in the background with a log file, poll briefly, size workloads to the remaining wall time, and leave a working artifact in place early, so the final state is usable even if the budget runs out.
+
+I have not run this change, and the diff below touches only the prompt rules.
+
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -59,6 +59,17 @@
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Wall-clock time is the scarcest budget. Check budget.wall_time_remaining_sec every turn. Any
++  command expected to take longer than about 60 seconds (training, large builds, downloads,
++  benchmarks) must run in the background, for example
++  `nohup sh -c '...' > /tmp/job.log 2>&1 &`, with the PID recorded. Poll it with short
++  commands (`tail -n 20 /tmp/job.log; kill -0 PID`) and use `sleep` of at most 30 seconds
++  per poll. Never let a foreground command hit its timeout and then rerun it unchanged.
++- Size workloads to the remaining time: pick epochs, dataset sizes, and search spaces that
++  finish with at least 25% of the wall time to spare. First produce a minimal valid artifact
++  that meets the stated requirements, so the final state is usable even if the budget ends.
++  Then improve it only if time remains.
++- Combine related inspection steps into one batch (up to four commands) to save turns.
+ """.strip()
+```

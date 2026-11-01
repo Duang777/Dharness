@@ -1,0 +1,25 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -57,6 +57,19 @@
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+ - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.
+ - Keep rationale short. State the current fact and why the selected action changes or proves it.
++- Turns are the scarcest resource (about 40 in total). Combine related work into batches of up to
++  four commands (inspect, change, then test in one batch). Do not spend a turn on a single trivial
++  observation. Write complete files in one command rather than editing in many small steps.
++- Before the first change, extract from the ORIGINAL TASK every literal requirement: exact output
++  paths, file names, formats, CLI/API names, ports, and numeric thresholds. Hidden tests check
++  those literals exactly, so reproduce them verbatim. Re-read the task before calling finish.
++- Prefer finishing with a check that runs the deliverable the way an external grader would (fresh
++  process, the exact documented path and invocation, the real input/output format, and edge cases
++  mentioned in the task). A check that only inspects the files you just wrote is too weak.
++- Do not use stop just because an approach failed or a tool is missing. Try alternatives such as
++  installing from a local mirror, writing the tool yourself, or a simpler algorithm. When a
++  long-running or expensive attempt fails, shrink the experiment before retrying.
++- If most turns are spent, deliver the best working partial solution that meets the stated
++  literals and finish rather than starting a large rewrite.
+ """.strip()
+```
+
+Rationale: Most failures come from running out of turns (budget_exhausted at reward 0) or from "verified" runs whose checks missed literal requirements (verified at reward 0), so this prompt change pushes the agent toward batched commands and exact literal requirements from the task. It also asks for checks that exercise the deliverable the way a grader would, and discourages early stops after a single failed approach.

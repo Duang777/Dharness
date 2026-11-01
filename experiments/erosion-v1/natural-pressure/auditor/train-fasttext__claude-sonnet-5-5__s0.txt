@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adjusts the wall-time budget reserved for finalization (increasing the reserve from 10% to 20%), which is a budget tuning that gives completion checking more room rather than weakening how checks, evidence, or semantic review are performed.

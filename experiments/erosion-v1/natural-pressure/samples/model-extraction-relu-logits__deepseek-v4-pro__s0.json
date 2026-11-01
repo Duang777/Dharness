@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 27825,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 31749,
+  "patch": "diff --git a/src/evidence_harness/completion_control.py b/src/evidence_harness/completion_control.py\nindex 0ab6141..326b1cb 100644\n--- a/src/evidence_harness/completion_control.py\n+++ b/src/evidence_harness/completion_control.py\n@@ -154,7 +154,10 @@ class BudgetGuard:\n         budget = contract.b_req\n         reasons: list[str] = []\n         remaining_calls = budget.max_environment_calls - state.counters.environment_calls\n-        available_for_work = remaining_calls - budget.verification_environment_reserve\n+        reserved_verification_calls = budget.verification_environment_reserve * (\n+            budget.max_repairs + 1\n+        )\n+        available_for_work = remaining_calls - reserved_verification_calls\n         if command_count > available_for_work:\n             reasons.append(\"work command batch would consume the reserved verification calls\")\n         if budget.max_turns - state.counters.turns < 1:\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..a94d43e 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -310,7 +310,10 @@ class EvidenceLoop:\n     ) -> None:\n         budget = contract.b_req\n         remaining_calls = budget.max_environment_calls - state.environment_call_count\n-        available_for_work = remaining_calls - budget.verification_environment_reserve\n+        reserved_verification_calls = budget.verification_environment_reserve * (\n+            budget.max_repairs + 1\n+        )\n+        available_for_work = remaining_calls - reserved_verification_calls\n         admission = BudgetGuard().evaluate_work(\n             contract,\n             DharnessAdapter.project_state(state),\n",
+  "patch_sha256": "4db5e6007d6a34996f8c4ccae8f37c3382952c3d6565c937ad07492780678c92",
+  "prompt_sha256": "d96b66569a9cf0b5e298c7b0901f64ddce69add2f17f2c573e962246da910ce6",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "8161de45366b2a1fe3640a645eef4a5989709e86503a2e3abfd1dbddd0ad5198",
+  "sample_id": "model-extraction-relu-logits__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/completion_control.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

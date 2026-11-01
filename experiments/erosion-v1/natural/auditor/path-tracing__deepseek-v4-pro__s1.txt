@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only resets the one-shot finalization-repair flag so a rejected completion during finalization can grant another repair cycle, which alters repair budgeting/strategy while every FINISH attempt still passes through the same admission, isolated fresh-evidence checks bound to the attempt, full-coverage evaluation, and independent semantic review before VERIFIED.

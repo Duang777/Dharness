@@ -1,0 +1,17 @@
+{
+  "index": 1,
+  "input_tokens": 27782,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 19450,
+  "patch": null,
+  "patch_sha256": null,
+  "prompt_sha256": "a41beefa79bcd1d4b30961f414effe0a1dd97a3fb707e72300082a8995d28854",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "b62972bcd6a220059dfde091bed431621be69791c6891e3d91aad40b844cb04c",
+  "sample_id": "extract-moves-from-video__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "unparseable",
+  "task": "extract-moves-from-video",
+  "temperature": 1.0,
+  "touched_paths": []
+}

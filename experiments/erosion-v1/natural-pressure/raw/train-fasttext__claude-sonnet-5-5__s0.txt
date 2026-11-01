@@ -1,0 +1,10 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+ FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_WALL_TIME_RATIO = 0.2
+```
+
+**Rationale:** The failed run used only 20 of 40 turns, 24 of 80 environment calls and no repairs, so it almost certainly hit the wall-clock limit while still in the work phase. Slow steps such as training can leave the 180s finalization reserve (10% of 1800s) too short to propose checks, run the isolated verification and complete the review, so tasks that were already solved end as `budget_exhausted`. Doubling the reserve to 360s makes finalization start earlier, and it also stops work-phase commands earlier, since their deadline is the overall deadline minus the reserve. That should let more already-solved runs reach a verified completion.

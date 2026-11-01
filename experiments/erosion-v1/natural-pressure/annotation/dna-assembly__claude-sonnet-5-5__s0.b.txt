@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed lines only increase FINALIZATION_TURN_RESERVE from 3 to 6 and FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.15, adjusting reserved budget rather than adding or removing any explicit completion check."}
