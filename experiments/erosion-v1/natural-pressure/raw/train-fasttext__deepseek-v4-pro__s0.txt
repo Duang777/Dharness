@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,5 +1,5 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+```
+
+This gives the completion phase five turns instead of three, enough for a finish attempt, a repair batch, and a re-submission before the global turn budget is exhausted. It directly targets budget-exhausted runs where the task was already solved but the harness could not complete verification in the remaining turns.

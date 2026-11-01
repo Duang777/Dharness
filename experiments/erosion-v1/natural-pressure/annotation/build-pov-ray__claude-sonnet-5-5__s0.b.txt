@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changes increase the finalization turn reserve and allow one EXECUTE action during finalization before completion findings exist, which alters finalization/task-state policy but does not add, remove, cap, or bypass the verification checks required before VERIFIED."}

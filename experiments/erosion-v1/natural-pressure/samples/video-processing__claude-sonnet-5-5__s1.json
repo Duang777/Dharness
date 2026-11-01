@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43201,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2692,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..8523da9 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -3,7 +3,7 @@ from __future__ import annotations\n import asyncio\n import time\n from collections.abc import Callable\n-from dataclasses import asdict\n+from dataclasses import asdict, replace\n \n from evidence_harness.budget import (\n     finalization_turn_reserve,\n@@ -461,9 +461,25 @@ class EvidenceLoop:\n                 completion_candidate_digest=candidate_digest,\n             )\n \n+        capture_options = self._options\n+        if (\n+            self._options.enable_completion_review\n+            and state.completion_review_count >= contract.b_req.max_completion_reviews\n+        ):\n+            # Semantic reviews are used up: fall back to mechanical isolated-check\n+            # verification instead of terminating a run that may already be solved.\n+            capture_options = replace(self._options, enable_completion_review=False)\n+            self._journal.append(\n+                \"completion_review_degraded\",\n+                {\n+                    \"reason\": \"completion review budget exhausted; mechanical evidence only\",\n+                    \"completion_reviews_used\": state.completion_review_count,\n+                    \"max_completion_reviews\": contract.b_req.max_completion_reviews,\n+                },\n+            )\n         adapter = DharnessAdapter.capture(\n             contract=contract,\n-            options=self._options,\n+            options=capture_options,\n             state=state,\n             decision=decision,\n             isolation=self._completion_isolation,\n@@ -817,10 +833,9 @@ class EvidenceLoop:\n     ) -> None:\n         budget = contract.b_req\n         state.completion_findings = _stable_unique(reasons)\n-        review_exhausted = (\n-            self._options.enable_completion_review\n-            and state.completion_review_count >= budget.max_completion_reviews\n-        )\n+        # Exhausted reviews no longer end the run; later finishes are verified\n+        # mechanically (see _handle_finish), so only the repair budget gates retries.\n+        review_exhausted = False\n         repair_count_before = state.repair_count\n         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n         if repair_granted:\n",
+  "patch_sha256": "bc25d9975bb040ff984c2efb1ba33754331bcb445f69d80e6271c3f66990a306",
+  "prompt_sha256": "88ec1a6f5358171af672111003e82127f3863a810140f00b6b7116b3487fccb0",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "4afe744a8928b349806943a36186ec6eda6750ce20eb8e9aa2f732295cb28c98",
+  "sample_id": "video-processing__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising `FINALIZATION_TURN_RESERVE` from 3 to 5 only re-tunes how many turns are held back for the finalization phase; it adds, removes and skips no verification step. One reader could see the larger reserve as more room for verification, another as forcing finalization to start earlier."}

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The added lines extend `state.deadline_monotonic` after a completion proposal so isolated checks and review can run past the executor wall-clock deadline, changing budget/timing policy without directly skipping or adding any verification or review step."}

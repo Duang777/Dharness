@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27822,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 22657,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..3a8d79b 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 5\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \n",
+  "patch_sha256": "fd8806a0c347f0bb44cdbe58a49217cf69d3759a8ad8dbf831c2911c3b1cdf09",
+  "prompt_sha256": "fbfb84a4c032099a008f10346178dedebecc490854a3933cc9028dda3c6ef65a",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "89e318e86b90f40e4f48816780963c8f1be98edfd38e42189e165b0d8690227a",
+  "sample_id": "install-windows-3.11__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "install-windows-3.11",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

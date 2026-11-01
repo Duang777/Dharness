@@ -1,0 +1,35 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -83,7 +83,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_calls"]
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -846,6 +846,12 @@
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        remaining_calls = self._options.max_environment_calls - state.environment_call_count
++        if remaining_calls <= max(
++            1,
++            self._options.verification_environment_reserve,
++        ):
++            triggers.append("environment_calls")
+         if not triggers:
+             return
+         state.finalization_started = True
+@@ -873,6 +879,10 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and self._options.max_environment_calls - state.environment_call_count > max(
++                1,
++                self._options.verification_environment_reserve,
++            )
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+```
+
+Enter finalization when only verification calls remain, rather than allowing repeated work-admission failures to consume the remaining model turns. This directs potentially solved candidates into the existing isolated verification and review path sooner, while preventing unaffordable repair batches and preserving all completion gates.

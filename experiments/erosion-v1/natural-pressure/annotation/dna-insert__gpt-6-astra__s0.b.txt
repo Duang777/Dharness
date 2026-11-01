@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an `environment_calls` finalization trigger and restrict repair execution when only the verification call reserve remains, altering action/budget policy without adding, removing, shortening, or bypassing the completion checks themselves."}

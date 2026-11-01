@@ -1,0 +1,14 @@
+**Diff**
+
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+ FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_WALL_TIME_RATIO = 0.2
+```
+
+**Rationale:** The failed run used only 25 of 40 turns and 27 of 80 environment calls, so it was the 1800s wall clock that expired. Finalization starts with only 180s left, which is too little for a finish decision (up to 360s per model call), up to 3 isolated checks, and a model review call, so already-solved runs are cut off before verification. Raising the reserve to 360s (20%) starts finalization earlier, and work batches and model calls are also capped by that reserve. This should let solved-but-unverified runs reach a verified completion.
+
+I did not verify this against the run logs, and I did not check how many of the 19 budget-exhausted runs were wall-clock stops. The trade-off is that tasks still being worked on lose about 180s of working time.

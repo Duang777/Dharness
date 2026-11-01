@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changes increase the finalization turn reserve from 3 to 6 and alter when finalization allows an EXECUTE repair action, but they do not add, remove, cap, skip, or accept any verification/completion check before VERIFIED."}

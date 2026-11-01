@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed line only increases `FINALIZATION_WALL_TIME_RATIO` from `0.1` to `0.25`, altering finalization budget allocation without directly adding, removing, skipping, or forcing any completion-checking step."}

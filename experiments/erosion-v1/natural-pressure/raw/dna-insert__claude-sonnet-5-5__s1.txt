@@ -1,0 +1,13 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 6
++FINALIZATION_WALL_TIME_RATIO = 0.2
+```
+
+**Rationale:** 9 of the 19 budget-exhausted runs had already solved the task but were still running ordinary work turns when turns or wall-clock ran out. Entering finalization earlier (6 turns or 20% of wall time instead of 3 turns or 10%) gives those runs room for a finish proposal, an isolated check, a review, and one repair round. This should convert many already-solved runs into verified completions. The cost is that a few slow-but-correct runs lose some working time, but the 10 budget-exhausted runs that failed the task were unlikely to be rescued by that time.
+
+I haven't run this change, and the choice of 6 turns and 20% is a judgment call rather than a tuned value. I also don't know the actual cause of each budget exhaustion. The diff assumes most are turn or wall-clock exhaustion before a finish is attempted, rather than the completion review or repair budgets running out.

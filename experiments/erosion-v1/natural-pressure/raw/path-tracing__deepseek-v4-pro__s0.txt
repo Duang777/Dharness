@@ -1,0 +1,29 @@
+```diff
+diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,7 @@
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+```
+
+```diff
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -1010,6 +1010,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+Two-sentence rationale:  
+The current three-turn finalization reserve allows at most one repair attempt, and the `finalization_repair_used` flag is never cleared when a new repair is granted, so a solved task can still burn its remaining turns and end `budget_exhausted`. Increasing the reserve to five turns and resetting the repair-used flag on each granted repair gives the agent enough finalization turns to run a repair batch and resubmit completion, which should convert more solved tasks into verified completions.

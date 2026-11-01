@@ -1,0 +1,26 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -77,7 +77,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -800,6 +800,14 @@
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        remaining_calls = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        # Once only verification calls remain, further work cannot be admitted.
++        # Route the next decision to completion instead of wasting turns on
++        # rejected work batches and recovery.
++        if remaining_calls <= self._options.verification_environment_reserve:
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+         state.finalization_started = True
+```
+
+The harness already reserves verification calls but does not enter finalization when work exhausts its share, allowing rejected execution batches and replans to waste the remaining turns or wall time. This change directs the agent toward completion while verification calls remain, without weakening evidence, isolation, review, or budget requirements.

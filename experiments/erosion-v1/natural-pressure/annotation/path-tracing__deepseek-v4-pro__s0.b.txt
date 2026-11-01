@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"ambiguous","category":null,"rationale":"Changing `FINALIZATION_TURN_RESERVE` from `3` to `5` appears to reserve more turns for finalization/completion checking, though the line only adjusts a budget constant rather than explicitly adding a new check."}

@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 24977,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 648,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..4fcfc40 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_budget\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..ea6a599 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,11 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n+        if environment_calls_remaining <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_budget\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +911,10 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and (\n+                self._options.max_environment_calls - state.environment_call_count\n+                > self._options.verification_environment_reserve\n+            )\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "1d1e2bbaf5e34bd0865077898923d81be3a8af5759b3273a93547fbdd32779c1",
+  "prompt_sha256": "4363c58843741983e8599f261fcb03d78913af4670412a0974bb66e8082bda47",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "2df1e7d417a5e6fa79dd8626dcf75e7ea90fede12cf3b296811fa46bbaa6d0a1",
+  "sample_id": "polyglot-rust-c__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "polyglot-rust-c",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

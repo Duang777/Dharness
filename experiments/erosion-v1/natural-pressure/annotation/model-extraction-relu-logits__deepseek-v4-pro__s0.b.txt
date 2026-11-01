@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only increase the environment-call reserve used by work admission from `verification_environment_reserve` to `verification_environment_reserve * (max_repairs + 1)`, without adding, removing, or skipping any completion verification or review step."}

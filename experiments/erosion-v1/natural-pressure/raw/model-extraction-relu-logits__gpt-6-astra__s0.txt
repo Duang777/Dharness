@@ -1,0 +1,49 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -79,7 +79,7 @@ class RunPhase(StrEnum):
+     TERMINATED = "terminated"
+ 
+ 
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+ 
+ 
+ class ExecutorTurnStarted(StrictModel):
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -855,6 +855,12 @@ class EvidenceLoop:
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        if environment_calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+         state.finalization_started = True
+@@ -884,6 +890,9 @@ class EvidenceLoop:
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and self._options.max_environment_calls - state.environment_call_count
++            > self._options.verification_environment_reserve
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -51,8 +51,10 @@ Rules:
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+-  for completion. Submit focused checks or stop; do not propose more exploration.
++  or environment calls for completion. Submit focused checks or stop; do not propose more exploration.
++  When finalization_triggers includes environment_budget, work calls are unavailable. Use the
++  remaining calls for checks covering every requirement, not for additional work.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+The harness reserves verification calls but does not enter finalization when only those calls remain, allowing repeated rejected work requests to waste the remaining turns or wall time. Triggering finalization at that boundary—and excluding unaffordable repair batches—directs the agent toward fresh verification while preserving all existing evidence, review, and budget guards.

@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+```
+
+The current 3-turn finalization reserve allows at most one rejected completion/repair cycle before the turn budget is exhausted, so solved tasks that need a second corrected finish never report verified. Raising the reserve to 5 gives the model room for two repair/retry cycles while still reserving only a small fraction of the 40-turn budget.

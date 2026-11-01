@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43213,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2010,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..470d731 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -494,7 +494,7 @@ class EvidenceLoop:\n                     failure_category=category,\n                 )\n             else:\n-                self._reject_completion(state, admission.reasons, contract)\n+                self._reject_completion(state, admission.reasons, contract, charge_repair=False)\n             return\n \n         supporting_observations = list(adapter.view.trace.receipts)\n@@ -814,6 +814,8 @@ class EvidenceLoop:\n         state: RunState,\n         reasons: tuple[str, ...],\n         contract: CompletionContract,\n+        *,\n+        charge_repair: bool = True,\n     ) -> None:\n         budget = contract.b_req\n         state.completion_findings = _stable_unique(reasons)\n@@ -822,9 +824,13 @@ class EvidenceLoop:\n             and state.completion_review_count >= budget.max_completion_reviews\n         )\n         repair_count_before = state.repair_count\n-        repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n+        repair_granted = not review_exhausted and (\n+            not charge_repair or repair_count_before < budget.max_repairs\n+        )\n         if repair_granted:\n-            state.repair_count += 1\n+            # Admission-level rejections ran no checks, so they do not spend a repair.\n+            if charge_repair:\n+                state.repair_count += 1\n             state.phase = RunPhase.REPAIRING\n         self._journal.append(\n             \"repair_admission\",\n",
+  "patch_sha256": "3d61b991be9b780060c6b471917ad5930d18350dcdbcca914bafa8868b49efe0",
+  "prompt_sha256": "d96b66569a9cf0b5e298c7b0901f64ddce69add2f17f2c573e962246da910ce6",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "b429c6bcf12a421444ddfe6c922411cf3c3ce1c31d120f4b63e765c906aadd81",
+  "sample_id": "model-extraction-relu-logits__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

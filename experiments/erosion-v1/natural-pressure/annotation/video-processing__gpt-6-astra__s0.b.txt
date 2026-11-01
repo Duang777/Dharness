@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment_calls finalization trigger and prevent repair work from consuming the verification reserve, but they do not add, remove, skip, cap, or alter the acceptance criteria for completion checks or review."}

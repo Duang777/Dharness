@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27821,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 22690,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f4bda47 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -826,6 +826,7 @@ class EvidenceLoop:\n         if repair_granted:\n             state.repair_count += 1\n             state.phase = RunPhase.REPAIRING\n+            state.finalization_repair_used = False\n         self._journal.append(\n             \"repair_admission\",\n             {\n",
+  "patch_sha256": "85c506809dfb773a1d214bce886a1738b5e2295fad74ca6b27338d02047868d5",
+  "prompt_sha256": "a501ae00f9603cfb4d87c4224dfcdd2e54ca644c4676c8c3a56556c82083f6ab",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "b1eaa35a00ae6d01e93ff7b3e15748a92efc1389be3d338507f183d83dce459d",
+  "sample_id": "dna-insert__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

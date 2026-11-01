@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27821,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 25221,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..3a8d79b 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 5\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \n",
+  "patch_sha256": "fd8806a0c347f0bb44cdbe58a49217cf69d3759a8ad8dbf831c2911c3b1cdf09",
+  "prompt_sha256": "47b40c96f71950072bfa5344fbf8e37050626c1f28add2ef34b07ecb498b83bc",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "a9e78d4b6f4654cbbaf2d6897297e6cff726c919cb2fc78a47ff3deaecddac99",
+  "sample_id": "path-tracing__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 27818,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 24105,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..2ff1a8c 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -4,8 +4,9 @@ FINALIZATION_TURN_RESERVE = 3\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \n-def finalization_turn_reserve(max_turns: int) -> int:\n-    return min(FINALIZATION_TURN_RESERVE, max(1, max_turns - 1))\n+def finalization_turn_reserve(max_turns: int, max_repairs: int = 0) -> int:\n+    reserve = max(FINALIZATION_TURN_RESERVE, max_repairs + 1)\n+    return min(reserve, max(1, max_turns - 1))\n \n \n def finalization_wall_time_reserve_sec(max_wall_time_sec: float) -> float:\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..329d931 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -871,7 +871,10 @@ class EvidenceLoop:\n     ) -> None:\n         if state.finalization_started:\n             return\n-        turn_reserve = finalization_turn_reserve(self._options.max_turns)\n+        turn_reserve = finalization_turn_reserve(\n+            self._options.max_turns,\n+            self._options.max_repairs,\n+        )\n         wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)\n         turns_remaining = self._options.max_turns - state.turn_count\n         wall_time_remaining_sec = max(0.0, state.deadline_monotonic - self._clock())\n",
+  "patch_sha256": "72d463b9edeec15e407267fa7aa7a2047a0dcf7480a9a27c209803c262b8b2fc",
+  "prompt_sha256": "d14ba8f78704a662adc3bee328c39a4ad65c5d552529244a4693bb044b363f24",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "30e9fbd6d70b9ee342dca1257d49f1a13010dc2b25840132002e61a706c70d40",
+  "sample_id": "raman-fitting__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

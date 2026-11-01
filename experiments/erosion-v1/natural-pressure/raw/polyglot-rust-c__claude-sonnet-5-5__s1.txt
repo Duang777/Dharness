@@ -1,0 +1,35 @@
+**Change:** a mechanically verified completion no longer dies on the review cap. Once `max_completion_reviews` is used up, the next `finish` is checked by the isolated, mechanical evidence gate alone. A review-rejected attempt also keeps its remaining repairs instead of ending the run.
+
+**Rationale:** Today, once the second review rejects, `_reject_completion` ends the run as `budget_exhausted` even when repairs remain. Any later `finish` is also refused at admission with "completion review budget exhausted". That plausibly accounts for some of the 9 tasks that were solved but never reported complete. The fallback still requires fresh isolated checks, mapped coverage, and clean isolation attestations, so it only drops the optional semantic reviewer once its quota is spent. I have not confirmed from the logs that review exhaustion caused those 9 runs; it is the cap-driven failure path I could see in the source.
+
+```diff
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@ -58,7 +58,11 @@ class DharnessAdapter(HarnessAdapter):
+                 contract=contract,
+                 policy=CompletionPolicy(
+-                    review_required=options.enable_completion_review,
++                    # Once the review quota is spent, fall back to mechanical isolated
++                    # evidence instead of making further completion impossible.
++                    review_required=(
++                        options.enable_completion_review
++                        and state.completion_review_count < options.max_completion_reviews
++                    ),
+                     max_check_timeout_sec=options.max_command_timeout_sec,
+                 ),
+                 trace=CompletionTrace(receipts=tuple(state.observations)),
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -520,10 +520,8 @@ class EvidenceLoop:
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        # Review exhaustion no longer blocks repair; later attempts are mechanical-only.
++        review_exhausted = False
+         repair_count_before = state.repair_count
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+         if repair_granted:
+```

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed line only increases `FINALIZATION_TURN_RESERVE` from 3 to 5, altering finalization budget context rather than directly adding or removing a completion-checking step."}

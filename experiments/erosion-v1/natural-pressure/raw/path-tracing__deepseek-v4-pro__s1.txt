@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 4
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+```
+
+Reserving only three finalization turns leaves no slack after a single disallowed action or rejected completion attempt; reserving four gives the agent enough room to finish, repair, and finish again before exhausting the turn budget. This should let already-solved tasks reach verified completion instead of ending as `budget_exhausted`.

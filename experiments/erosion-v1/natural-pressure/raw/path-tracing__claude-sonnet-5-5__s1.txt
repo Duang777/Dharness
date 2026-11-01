@@ -1,0 +1,18 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RATIO = 0.125
++FINALIZATION_WALL_TIME_RATIO = 0.15
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+-    return min(FINALIZATION_TURN_RESERVE, max(1, max_turns - 1))
++    scaled = max(FINALIZATION_TURN_RESERVE, int(max_turns * FINALIZATION_TURN_RATIO))
++    return min(scaled, max(1, max_turns - 1))
+```
+
+Rationale: Many budget_exhausted runs, including path-tracing, which used all 40 turns with 0 repairs, probably spent their turns on work or polish and never reached a finish proposal. A 3-turn finalization reserve leaves too little room for a finish, a rejected review, and a repair. Raising the turn reserve to 5 of 40 and the wall-clock reserve to 15% (270s) makes the controller restrict the model to finish or stop earlier, so already-solved tasks get verified and a rejected finish still has a repair turn.

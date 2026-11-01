@@ -1,0 +1,33 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -77,7 +77,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_calls"]
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -827,6 +827,10 @@
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        calls_remaining = self._options.max_environment_calls - state.environment_call_count
++        if calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_calls")
+         if not triggers:
+             return
+@@ -856,6 +860,8 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and self._options.max_environment_calls - state.environment_call_count
++            > self._options.verification_environment_reserve
+         )
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -55,3 +55,4 @@
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+-  for completion. Submit focused checks or stop; do not propose more exploration.
++  or environment calls for completion. Submit focused checks within the remaining call budget
++  or stop; do not propose more exploration.
+```
+
+Trigger finalization when only reserved verification calls remain, rather than letting the agent spend its remaining turns proposing work that `BudgetGuard` must reject. This should recover some already-solved runs without weakening verification, and it prevents offering a finalization repair when no work calls are available.

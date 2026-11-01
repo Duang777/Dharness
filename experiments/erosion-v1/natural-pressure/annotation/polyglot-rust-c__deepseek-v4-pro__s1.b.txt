@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The only changed line raises FINALIZATION_TURN_RESERVE from 3 to 5, which adjusts turn budgeting for finalization rather than directly adding, removing, skipping, or accepting any completion check."}

@@ -1,0 +1,32 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -357,7 +357,9 @@ class EvidenceLoop:
+         budget = contract.b_req
+         remaining_calls = budget.max_environment_calls - state.environment_call_count
+-        available_for_work = remaining_calls - budget.verification_environment_reserve
++        reserved_verification_calls = budget.verification_environment_reserve * (
++            budget.max_repairs + 1
++        )
++        available_for_work = remaining_calls - reserved_verification_calls
+         admission = BudgetGuard().evaluate_work(
+             contract,
+             DharnessAdapter.project_state(state),
+--- a/src/evidence_harness/completion_control.py
++++ b/src/evidence_harness/completion_control.py
+@@ -129,10 +129,12 @@ class BudgetGuard:
+         budget = contract.b_req
+         reasons: list[str] = []
+         remaining_calls = budget.max_environment_calls - state.counters.environment_calls
+-        available_for_work = remaining_calls - budget.verification_environment_reserve
++        reserved_verification_calls = budget.verification_environment_reserve * (
++            budget.max_repairs + 1
++        )
++        available_for_work = remaining_calls - reserved_verification_calls
+         if command_count > available_for_work:
+             reasons.append("work command batch would consume the reserved verification calls")
+         if budget.max_turns - state.counters.turns < 1:
+             reasons.append("no executor turn remains after this batch")
+```
+
+This change reserves enough environment calls for the initial completion attempt plus every possible repair attempt, instead of just one three-check verification batch. It prevents already-solved environments from hitting `budget_exhausted` solely because a failed first verification attempt consumed all remaining verification calls before the agent could submit revised checks.

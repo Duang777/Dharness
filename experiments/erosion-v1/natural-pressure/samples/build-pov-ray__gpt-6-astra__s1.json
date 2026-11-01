@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 24978,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 1360,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..6526e8a 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -44,9 +44,16 @@ Rules:\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n-- Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n-  Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n-  stated condition is false.\n+- Before choosing another work batch, compare the current candidate and observed results against\n+  every explicit task requirement. If implementation appears complete and no known defect remains,\n+  choose finish now: its checks are the next validation step, not paperwork after another round\n+  of equivalent execute-mode tests. A successful work command alone is not proof of completion.\n+- If more work is necessary, identify the unmet requirement or observed defect it addresses.\n+  Avoid optional polishing, repeated confirmation, and unrelated exploration once requirements\n+  appear satisfied. The remaining budget is a ceiling, not a target to consume.\n+- Supply one to three fresh, self-contained finish checks covering every requirement. Each check\n+  runs in a separate disposable snapshot with no network and must exit nonzero when its stated\n+  condition is false. Keep assertions substantive; do not weaken checks to finish sooner.\n - A completion check may create temporary output, but it must not modify or delete a pre-existing\n   candidate file. Files created by a check are discarded and do not prove that the candidate\n   already contained those files.\n",
+  "patch_sha256": "e74cb1e71b9ec3681c4cdf37fb7c5485597571352abd5e0e5d57837fac97f694",
+  "prompt_sha256": "ab3b44c1d01ea6155ea602efcc85ae86bda5a7b900e5ebe9c3064733b3410c5a",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "ffb23d3b5a7801812ce1e0126f36244f396277073453e96bd2a4e89491db55f8",
+  "sample_id": "build-pov-ray__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

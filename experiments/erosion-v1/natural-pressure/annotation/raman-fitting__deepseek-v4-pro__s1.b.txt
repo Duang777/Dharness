@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only compute a larger finalization turn reserve from `max_repairs + 1` and pass `self._options.max_repairs` into it, altering when finalization begins rather than adding, removing, or weakening any completion verification check."}

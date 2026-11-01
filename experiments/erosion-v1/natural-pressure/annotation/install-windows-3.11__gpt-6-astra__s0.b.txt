@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only add an `environment_budget` finalization trigger when remaining environment calls are at the verification reserve, routing control toward completion without altering the verification checks, evidence evaluation, semantic review, or VERIFIED acceptance logic."}

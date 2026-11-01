@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add a `count_environment_call` flag and pass `False` only for `_run_completion_check`, altering environment-call accounting for completion checks without adding, removing, skipping, or accepting any verification/review step."}

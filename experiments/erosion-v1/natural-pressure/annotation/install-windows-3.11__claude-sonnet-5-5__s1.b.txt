@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed lines increase finalization reserves and instruct the executor to call finish once its observations show requirements are met, but they do not remove the existing requirement to supply fresh isolated completion checks or alter the reviewer’s verification criteria."}

@@ -1,0 +1,36 @@
+```diff
+diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -82,7 +82,7 @@ class RunPhase(StrEnum):
+     TERMINATED = "terminated"
+ 
+ 
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+ 
+ 
+ class ExecutorTurnStarted(StrictModel):
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -807,6 +807,15 @@ class EvidenceLoop:
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        # Work admission preserves these calls, but without finalization the
++        # executor can waste its remaining turns proposing inadmissible work.
++        if (
++            environment_calls_remaining
++            <= self._options.verification_environment_reserve
++        ):
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+         state.finalization_started = True
+```
+
+The harness reserves environment calls for verification but does not enter finalization when only those calls remain, allowing rejected work proposals to consume the remaining turns or wall time. Adding this trigger directs the executor toward completion checks while verification capacity remains, without weakening evidence, isolation, review, or budget requirements.

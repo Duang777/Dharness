@@ -1,0 +1,51 @@
+This change makes the agent submit its finish checks earlier, and it leaves enough budget for a repair if the first finish is rejected. Edits are to `budget.py` and `prompting.py`.
+
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 6
++FINALIZATION_WALL_TIME_RATIO = 0.15
+ 
+ 
+ def finalization_turn_reserve(max_turns: int) -> int:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -139,6 +139,7 @@
+             "active_findings": state.completion_findings,
+             "finalization_started": state.finalization_started,
+             "finalization_triggers": state.finalization_triggers,
+             "repair_batch_used": state.finalization_repair_used,
++            "completion_nudge": _completion_nudge(state, options, now),
+         },
+         "recovery_directive": state.recovery_directive,
+         "unresolved_errors": state.unresolved_errors[-12:],
+@@ -165,6 +166,24 @@
+     }
+ 
+ 
++def _completion_nudge(state: RunState, options: LoopOptions, now: float) -> str | None:
++    if state.finalization_started:
++        return None
++    turns_left = options.max_turns - state.turn_count
++    wall_left = state.deadline_monotonic - now
++    if turns_left > options.max_turns * 0.4 and wall_left > options.max_wall_time_sec * 0.4:
++        return None
++    return (
++        "Budget is getting short. If the task already appears solved, stop exploring or "
++        "polishing and use finish now with one to three focused, self-contained checks that "
++        "exercise the real deliverable. A rejected finish needs spare turns for repair, so do "
++        "not wait until the last turns."
++    )
++
++
+ def _receipt_summary(receipt: CommandReceipt) -> dict[str, Any]:
+     excerpt = receipt.stderr.head or receipt.stdout.head
+     return {
+```
+
+**Rationale:** Many budget-exhausted runs had already solved the task but kept exploring, or entered finalization with too few turns to survive a rejected finish and its repair. Raising the finalization reserve (3→6 turns, 10%→15% wall time) and adding a "finish now if solved" nudge once less than 40% of turns or time remain should turn those near-misses into verified completions.

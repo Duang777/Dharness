@@ -1,0 +1,38 @@
+This diff targets the cases where a task was already solved but the run ended `budget_exhausted` because the completion-review cap fired. I haven't run it, and I haven't checked that the 9 solved-but-exhausted runs actually hit this path.
+
+```diff
+--- a/src/evidence_harness/dharness_adapter.py
++++ b/src/evidence_harness/dharness_adapter.py
+@@ -62,7 +62,13 @@ class DharnessAdapter(HarnessAdapter):
+                 contract=contract,
+                 policy=CompletionPolicy(
+-                    review_required=options.enable_completion_review,
++                    # Once the semantic-review quota is spent, fall back to the
++                    # mechanical isolated-evidence gate instead of aborting a
++                    # run whose checks may already pass.
++                    review_required=(
++                        options.enable_completion_review
++                        and state.completion_review_count < options.max_completion_reviews
++                    ),
+                     max_check_timeout_sec=options.max_command_timeout_sec,
+                 ),
+                 trace=CompletionTrace(receipts=tuple(state.observations)),
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -520,10 +520,9 @@ class EvidenceLoop:
+     ) -> None:
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        # An exhausted review quota no longer terminates the run; later finish
++        # attempts are judged on isolated mechanical evidence alone.
++        review_exhausted = False
+         repair_count_before = state.repair_count
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+         if repair_granted:
+```
+
+**Rationale:** Today, once two semantic reviews have run, the loop ends the run with `budget_exhausted` ("completion review budget exhausted") on the next rejection or finish attempt. That happens even when repairs remain and the isolated checks would pass. With the change, an exhausted review quota drops the semantic review for later finish attempts and relies on the fresh isolated mechanical evidence gate, so runs that are already solved can reach `verified` instead of timing out on the review cap.

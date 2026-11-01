@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 43213,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2211,
+  "patch": "diff --git a/src/evidence_harness/dharness_adapter.py b/src/evidence_harness/dharness_adapter.py\nindex 91c6bd9..77501df 100644\n--- a/src/evidence_harness/dharness_adapter.py\n+++ b/src/evidence_harness/dharness_adapter.py\n@@ -62,7 +62,12 @@ class DharnessAdapter(HarnessAdapter):\n                 ),\n                 contract=contract,\n                 policy=CompletionPolicy(\n-                    review_required=options.enable_completion_review,\n+                    # Once the semantic-review quota is spent, later finish attempts are\n+                    # judged on mechanical isolated-evidence alone instead of dead-ending.\n+                    review_required=(\n+                        options.enable_completion_review\n+                        and state.completion_review_count < options.max_completion_reviews\n+                    ),\n                     max_check_timeout_sec=options.max_command_timeout_sec,\n                 ),\n                 trace=CompletionTrace(receipts=tuple(state.observations)),\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..6009656 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -817,10 +817,9 @@ class EvidenceLoop:\n     ) -> None:\n         budget = contract.b_req\n         state.completion_findings = _stable_unique(reasons)\n-        review_exhausted = (\n-            self._options.enable_completion_review\n-            and state.completion_review_count >= budget.max_completion_reviews\n-        )\n+        # Review quota exhaustion no longer ends the run: later finish attempts are\n+        # verified mechanically (see DharnessAdapter.capture), so repairs stay available.\n+        review_exhausted = False\n         repair_count_before = state.repair_count\n         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs\n         if repair_granted:\n",
+  "patch_sha256": "6ce43b30e66ce0cee3e940de986b90f3d7e2ff4ef474bc286c54834c1a03f779",
+  "prompt_sha256": "d96b66569a9cf0b5e298c7b0901f64ddce69add2f17f2c573e962246da910ce6",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "97c24af53d43db03d356be997c34eda7412b1acc69ec1a6f1c66feadceb9b276",
+  "sample_id": "model-extraction-relu-logits__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/dharness_adapter.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

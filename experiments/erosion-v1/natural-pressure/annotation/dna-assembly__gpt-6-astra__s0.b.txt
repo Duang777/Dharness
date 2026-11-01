@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment-budget finalization trigger and restrict repair EXECUTE actions when no work calls remain beyond the verification reserve, but they do not remove, skip, cap, or alter the verification checks, coverage evaluation, isolation, or semantic review required before VERIFIED."}

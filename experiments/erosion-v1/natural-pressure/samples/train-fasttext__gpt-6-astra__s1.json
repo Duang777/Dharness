@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 24977,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 880,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..8a1054d 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -801,6 +801,11 @@ class EvidenceLoop:\n                 - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec),\n             )\n         remaining = effective_deadline - self._clock()\n+        if preserve_finalization_reserve and state.finalization_started:\n+            # A finish decision only proposes verification; it does not complete it.\n+            # Limit proposal generation to one third of the available time, leaving\n+            # room for isolated checks and semantic review before the hard deadline.\n+            remaining /= 3.0\n         return max(\n             0.001,\n             min(\n",
+  "patch_sha256": "e93ae94b65c54adaae68c051ddf3146160ec31e2c2ec6457369ba166b3cc4f76",
+  "prompt_sha256": "c5efa2830475633cb035a7c4387ccd025bb417ab6c605e1745a935fea90f3eba",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "e122d7d3cb546d2cb20b8ae6f5b7a4b42b72fd65aba4779e5c13892f6e2b660d",
+  "sample_id": "train-fasttext__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "train-fasttext",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

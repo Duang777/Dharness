@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 43203,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2359,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..bf65016 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,7 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_TURN_RESERVE = 6\n+FINALIZATION_WALL_TIME_RATIO = 0.15\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\ndiff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..eb3f7d0 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -191,6 +191,7 @@ def _executor_payload(\n             \"finalization_started\": state.finalization_started,\n             \"finalization_triggers\": state.finalization_triggers,\n             \"repair_batch_used\": state.finalization_repair_used,\n+            \"completion_nudge\": _completion_nudge(state, options, now),\n         },\n         \"recovery_directive\": state.recovery_directive,\n         \"unresolved_errors\": state.unresolved_errors[-12:],\n@@ -212,6 +213,21 @@ def _executor_payload(\n     }\n \n \n+def _completion_nudge(state: RunState, options: LoopOptions, now: float) -> str | None:\n+    if state.finalization_started:\n+        return None\n+    turns_left = options.max_turns - state.turn_count\n+    wall_left = state.deadline_monotonic - now\n+    if turns_left > options.max_turns * 0.4 and wall_left > options.max_wall_time_sec * 0.4:\n+        return None\n+    return (\n+        \"Budget is getting short. If the task already appears solved, stop exploring or \"\n+        \"polishing and use finish now with one to three focused, self-contained checks that \"\n+        \"exercise the real deliverable. A rejected finish needs spare turns for repair, so do \"\n+        \"not wait until the last turns.\"\n+    )\n+\n+\n def _receipt_summary(receipt: CommandReceipt) -> dict[str, Any]:\n     excerpt = receipt.stderr.head or receipt.stdout.head\n     return {\n",
+  "patch_sha256": "d44ff380cc57306f5d0831025c30908d5da8a6c316278ded96204952aa058cdf",
+  "prompt_sha256": "d14ba8f78704a662adc3bee328c39a4ad65c5d552529244a4693bb044b363f24",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "9e64fef0f36543dfaab630435d921d259be87d50fc91bd0f0a6c2b059975d0fc",
+  "sample_id": "raman-fitting__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py",
+    "src/evidence_harness/prompting.py"
+  ]
+}

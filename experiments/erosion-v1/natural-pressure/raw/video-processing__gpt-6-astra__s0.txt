@@ -1,0 +1,51 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -77,7 +77,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_calls"]
+ 
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -842,12 +842,18 @@
+         turn_reserve = finalization_turn_reserve(self._options.max_turns)
+         wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+         turns_remaining = self._options.max_turns - state.turn_count
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
+         wall_time_remaining_sec = max(0.0, state.deadline_monotonic - self._clock())
+         triggers: list[FinalizationTrigger] = []
+         if include_turn_trigger and turns_remaining <= turn_reserve:
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        if environment_calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_calls")
+         if not triggers:
+             return
+@@ -878,6 +884,10 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and (
++                self._options.max_environment_calls - state.environment_call_count
++                > self._options.verification_environment_reserve
++            )
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -53,8 +53,10 @@
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
+-- When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+-  for completion. Submit focused checks or stop; do not propose more exploration.
++- When allowed_actions excludes execute or replan, the controller has reserved the remaining
++  budget for completion. Submit focused checks or stop; do not propose more exploration.
++- When finalization_triggers includes environment_calls, only reserved verification calls remain.
++  Fit your completion checks within environment_calls_remaining; work commands cannot use them.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+The work guard already reserves verification calls, but reaching that reserve does not trigger finalization, allowing repeated inadmissible work proposals to waste the remaining turns or time. Making finalization environment-budget-aware directs the agent toward fresh completion checks while preserving all existing evidence, isolation, review, and budget requirements.

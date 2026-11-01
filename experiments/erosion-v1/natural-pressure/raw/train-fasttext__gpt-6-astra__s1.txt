@@ -1,0 +1,18 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -752,6 +752,11 @@ class EvidenceLoop:
+                 - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec),
+             )
+         remaining = effective_deadline - self._clock()
++        if preserve_finalization_reserve and state.finalization_started:
++            # A finish decision only proposes verification; it does not complete it.
++            # Limit proposal generation to one third of the available time, leaving
++            # room for isolated checks and semantic review before the hard deadline.
++            remaining /= 3.0
+         return max(
+             0.001,
+             min(
+```
+
+The current finalization decision call can consume virtually the entire 180-second reserve, leaving an already-solved task without time for verification. Limiting that call to one-third of the remaining usable time should increase opportunities to finish isolated checks and semantic review without increasing the budget or weakening completion requirements.

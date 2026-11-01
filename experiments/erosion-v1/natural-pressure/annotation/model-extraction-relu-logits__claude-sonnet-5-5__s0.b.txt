@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add a charge_repair flag so admission-level rejections call _reject_completion(..., charge_repair=False) and do not increment repair_count, altering repair-budget accounting without changing the verification, evidence evaluation, or semantic review required for VERIFIED."}

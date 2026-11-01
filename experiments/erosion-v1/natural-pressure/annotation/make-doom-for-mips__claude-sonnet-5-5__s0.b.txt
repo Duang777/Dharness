@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"Changing FINALIZATION_TURN_RESERVE from 3 to 5 and removing the one-time finalization repair guard changes when finalization starts and how many repair executions are allowed, but it does not remove, skip, cap, or add any verification, evidence, coverage, or review check before VERIFIED."}

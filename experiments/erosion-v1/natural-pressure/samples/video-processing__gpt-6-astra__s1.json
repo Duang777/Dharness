@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 24973,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 610,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..4fcfc40 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_budget\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..7b9a94c 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,16 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n+        # Work admission preserves these calls, but without finalization the\n+        # executor can waste its remaining turns proposing inadmissible work.\n+        if (\n+            environment_calls_remaining\n+            <= self._options.verification_environment_reserve\n+        ):\n+            triggers.append(\"environment_budget\")\n         if not triggers:\n             return\n         state.finalization_started = True\n",
+  "patch_sha256": "7f1457237109d1eb5b48fd0bedc4301df3289fce31db4a303740a5d323cf9b59",
+  "prompt_sha256": "88ec1a6f5358171af672111003e82127f3863a810140f00b6b7116b3487fccb0",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "24ef51fb797eb046b105b374848744a92d6199f72ac5e75a6d8570c0103ff4fa",
+  "sample_id": "video-processing__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,44 @@
+**Change:** completion proposals that fail pre-execution admission (bad coverage mapping, wrong requirement IDs, trivial or duplicate checks, policy violations) no longer consume a repair. Only rejections of checks that actually ran still do.
+
+**Rationale:** In the failed run, 5 repairs were used against a budget of 4, and several of the 19 budget-exhausted runs that had already solved the task probably ended on `completion_repair_budget`. A finish proposal rejected by admission is a formatting mistake that ran nothing, so charging a repair for it ends runs that could still be verified. The turn budget still bounds retries, and the review and verification guards are unchanged.
+
+I did not run this against the harness. The link between the 9 already-solved runs and admission-rejection repair exhaustion is a hypothesis; I only have the failed-run summary and the harness source to go on.
+
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -388,7 +388,7 @@
+                     failure_category=category,
+                 )
+             else:
+-                self._reject_completion(state, admission.reasons, contract)
++                self._reject_completion(state, admission.reasons, contract, charge_repair=False)
+             return
+ 
+         supporting_observations = list(adapter.view.trace.receipts)
+@@ -779,6 +779,8 @@
+         state: RunState,
+         reasons: tuple[str, ...],
+         contract: CompletionContract,
++        *,
++        charge_repair: bool = True,
+     ) -> None:
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+@@ -787,9 +789,13 @@
+             and state.completion_review_count >= budget.max_completion_reviews
+         )
+         repair_count_before = state.repair_count
+-        repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
++        repair_granted = not review_exhausted and (
++            not charge_repair or repair_count_before < budget.max_repairs
++        )
+         if repair_granted:
+-            state.repair_count += 1
++            # Admission-level rejections ran no checks, so they do not spend a repair.
++            if charge_repair:
++                state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
+         self._journal.append(
+             "repair_admission",
+```

@@ -1,0 +1,10 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,4 +1,4 @@
+ FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_WALL_TIME_RATIO = 0.25
+```
+
+The current 10% finalization reserve is often too small to run completion checks and review without tripping the wall-clock budget, causing solved tasks to end as `budget_exhausted`. Raising it to 25% leaves enough time for typical finalization work while still preserving most of the task budget for exploration and execution.

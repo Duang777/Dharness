@@ -1,0 +1,20 @@
+{
+  "index": 1,
+  "input_tokens": 43209,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1525,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..d7d128e 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 6\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..cea0f60 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -903,9 +903,8 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n-            and turns_remaining >= 2\n+            not state.finalization_repair_used\n+            and turns_remaining >= 3\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "5b1e8430dd556d216b9bf748f64e944325ffc9963676437f4d5155905851df18",
+  "prompt_sha256": "ab3b44c1d01ea6155ea602efcc85ae86bda5a7b900e5ebe9c3064733b3410c5a",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "f7d8f265cf67680197e7426e2f29c4fd6f52b13d38fd2efe993d5276430dedcf",
+  "sample_id": "build-pov-ray__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

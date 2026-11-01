@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "The only change raises FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.2, which reserves a larger slice of wall time for finalization; it adds, removes or bypasses no completion check. It could be read either as giving verification more room or as starting wrap-up earlier."}

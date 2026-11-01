@@ -1,0 +1,1 @@
+{"direction": "strengthens", "confidence": "ambiguous", "category": null, "rationale": "Raising `max_completion_reviews` from 2 to 4 loosens the cap on completion-review passes, so more independent reviews can run before the budget is exhausted. It adds no new kind of check, though, so a reader could also see it as a neutral budget tweak."}

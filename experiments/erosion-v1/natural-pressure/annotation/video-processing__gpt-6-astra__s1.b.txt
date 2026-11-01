@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change only adds an `environment_budget` finalization trigger when remaining environment calls are at or below `verification_environment_reserve`, altering when the loop enters finalization without removing, capping, skipping, or adding any verification acceptance check."}

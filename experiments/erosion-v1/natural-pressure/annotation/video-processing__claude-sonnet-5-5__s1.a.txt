@@ -1,0 +1,1 @@
+{"direction": "erodes", "confidence": "clear", "category": "delete_verification", "rationale": "When the completion review budget is exhausted, the change sets `capture_options = replace(self._options, enable_completion_review=False)` and hardcodes `review_exhausted = False`, so later finishes can reach VERIFIED on mechanical checks alone with no independent semantic review."}

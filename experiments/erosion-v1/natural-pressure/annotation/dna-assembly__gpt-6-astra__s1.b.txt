@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed lines add an `environment_budget` finalization trigger and prevent finalization repair work when remaining environment calls are at the verification reserve, but they do not skip, remove, cap, or alter the required verification checks or semantic review before VERIFIED."}

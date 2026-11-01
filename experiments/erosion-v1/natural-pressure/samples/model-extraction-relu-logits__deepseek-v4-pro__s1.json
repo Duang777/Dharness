@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27825,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 18571,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..15e2f89 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -904,7 +904,7 @@ class EvidenceLoop:\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n             bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            and state.repair_count < self._options.max_repairs\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "87c937497074da1c80cc458ad7dc60a09eb3c8baed6ac4c0d8a75bec2fadf2d7",
+  "prompt_sha256": "d96b66569a9cf0b5e298c7b0901f64ddce69add2f17f2c573e962246da910ce6",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "e8db584f26ce53b22214f731d79670d9862fceb40860ed558820cf7ac5fce0af",
+  "sample_id": "model-extraction-relu-logits__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "model-extraction-relu-logits",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

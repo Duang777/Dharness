@@ -1,0 +1,65 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -398,6 +398,7 @@
+             self._reject_completion(
+                 state,
+                 mechanical_evidence.rejection_reasons,
+                 contract,
++                verification_calls_used=len(isolated.receipts),
+             )
+             return
+ 
+@@ -531,7 +532,12 @@
+         if not completion.accept.phase.accepted:
+             raise RuntimeError(
+                 f"completion evaluation reached an illegal phase: {completion.accept.phase.reasons}"
+             )
+-        self._reject_completion(state, evidence.rejection_reasons, contract)
++        self._reject_completion(
++            state,
++            evidence.rejection_reasons,
++            contract,
++            verification_calls_used=len(isolated.receipts),
++        )
+@@ -585,6 +591,10 @@
+     def _reject_completion(
+         self,
+         state: RunState,
+         reasons: tuple[str, ...],
+         contract: CompletionContract,
++        *,
++        verification_calls_used: int = 0,
+     ) -> None:
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
+@@ -596,6 +606,9 @@
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+         if repair_granted:
+             state.repair_count += 1
++            state.environment_call_count = max(
++                0, state.environment_call_count - verification_calls_used
++            )
+             state.phase = RunPhase.REPAIRING
+         self._journal.append(
+             "repair_admission",
+@@ -668,9 +681,12 @@
+         if not state.finalization_started:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
++        remaining_calls = max(
++            0, self._options.max_environment_calls - state.environment_call_count
++        )
++        available_for_work = remaining_calls - self._options.verification_environment_reserve
+         may_repair = (
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and available_for_work > 0
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+```
+
+Rationale:
+Rejected completion attempts currently consume the environment-call reserve, so the loop often starts the next iteration already over budget and reports `budget_exhausted` before a repair can be attempted. Refunding only the failed verification calls when a repair is granted, and hiding repair execution when no work capacity remains, lets already-solved tasks submit a fresh completion check set instead of being cut off.

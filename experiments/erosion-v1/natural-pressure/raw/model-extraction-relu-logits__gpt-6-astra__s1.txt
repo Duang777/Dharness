@@ -1,0 +1,54 @@
+```diff
+diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -76,7 +76,7 @@ class RunPhase(StrEnum):
+     TERMINATED = "terminated"
+ 
+ 
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+ 
+ 
+ class ExecutorTurnStarted(StrictModel):
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -860,6 +860,12 @@ class EvidenceLoop:
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        if environment_calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+         state.finalization_started = True
+@@ -889,6 +895,10 @@ class EvidenceLoop:
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and (
++                self._options.max_environment_calls - state.environment_call_count
++                > self._options.verification_environment_reserve
++            )
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -53,8 +53,8 @@ Rules:
+   already contained those files.
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
+-- When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+-  for completion. Submit focused checks or stop; do not propose more exploration.
++- When allowed_actions excludes execute or replan, the controller has reserved the remaining
++  budget for completion. Submit focused checks or stop; do not propose more exploration.
+ - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.
+```
+
+The harness already reserves environment calls for verification, but reaching that reserve does not trigger finalization, allowing rejected work proposals to waste remaining turns instead of verifying an already-solved candidate. This change makes environment-call pressure trigger the existing completion-only path and prevents unaffordable repair batches, without increasing budgets or weakening verification.

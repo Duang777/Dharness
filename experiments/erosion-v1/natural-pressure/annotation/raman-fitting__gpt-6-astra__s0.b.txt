@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment-call finalization trigger and restrict finalization repair EXECUTE when only the verification reserve remains, but they do not add, remove, skip, or alter the actual verification/review acceptance checks."}

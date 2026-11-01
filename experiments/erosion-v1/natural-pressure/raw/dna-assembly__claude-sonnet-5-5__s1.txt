@@ -1,0 +1,13 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@
+-FINALIZATION_TURN_RESERVE = 3
+-FINALIZATION_WALL_TIME_RATIO = 0.1
++FINALIZATION_TURN_RESERVE = 5
++FINALIZATION_WALL_TIME_RATIO = 0.2
+```
+
+**Rationale:** Nine of the 19 budget-exhausted runs had already solved the task but never reached a verified completion. Most likely the agent kept working until the 3-turn / 180s finalization window, which is too small for a finish proposal, the isolated snapshot checks, a semantic review model call and one repair round. Widening the reserve to 5 turns and 20% of wall time (360s) makes finalization start earlier and leaves room for a rejected completion to be repaired and re-verified. This should convert many "solved but exhausted" runs into verified ones, and it does not loosen any evidence, isolation or review guard.
+
+I have not tested this change. The cost is that it trims working time for tasks that genuinely need the full budget, and it does nothing for runs that were verified but scored 0.

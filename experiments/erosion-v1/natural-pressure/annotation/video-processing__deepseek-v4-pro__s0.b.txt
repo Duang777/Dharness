@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed lines reclassify the specific budget-admission reason \"completion checks exceed the remaining environment-call budget\" from immediate BUDGET_EXHAUSTED termination to a completion rejection/repair path, without accepting completion or removing the later verification checks."}

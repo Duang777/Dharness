@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 43209,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 2348,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..3a8d79b 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 5\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..bfc51ad 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -904,7 +904,6 @@ class EvidenceLoop:\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n             bool(state.completion_findings)\n-            and not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:\n",
+  "patch_sha256": "1a531f1c29c51113536189c15b9580e69f9ae9d07ae3f6cef6f3fe29e0913872",
+  "prompt_sha256": "e8935feb90b412db1a042d792d12cb7318dad3603f926a87a190653809b01fef",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "d42d928af6bb03fbc0c6c767575fc4512b61434845aed6a4faecd58ed5dc25d2",
+  "sample_id": "make-doom-for-mips__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "make-doom-for-mips",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 24977,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 1422,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..566c24f 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -38,12 +38,17 @@ Rules:\n - Do not repeat a command unchanged unless an observed environmental fact changed. For a\n   deliberate read-only poll, provide repeat_reason and state the stopping condition.\n - When the ORIGINAL TASK allows choosing among approaches and asks for the fastest, best, or most\n-  efficient result, compare at least two materially different candidates under equivalent settings.\n-  Beating the original baseline does not show that the first working candidate is the best available\n-  choice. Do not violate a task-mandated algorithm, query shape, or tool to create alternatives.\n+  efficient result, establish credible measured improvement plus task-relevant structural evidence.\n+  Do not pursue proof of a global optimum. One full benchmark is enough when it is expensive and\n+  observations show stable, task-relevant evidence, unless the task explicitly requires more.\n+  Compare additional candidates only to resolve a concrete unmet requirement or uncertain claim.\n+  Do not violate a task-mandated algorithm, query shape, or tool to create alternatives.\n - Validate generated artifacts from their saved bytes with the target tool or a format-aware\n   parser that follows the consumer's conventions. Do not hard-code a second interpretation of\n   field boundaries, sequence regions, query structure, or binary layout to prove intended values.\n+- Once the explicit task requirements appear satisfied, prefer finish over optional optimization\n+  or redundant validation in execute. Use the fresh completion checks for final validation;\n+  completion is not reported until those checks and any required review succeed.\n - Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.\n   Each check runs in a separate disposable snapshot with no network and must exit nonzero when its\n   stated condition is false.\n",
+  "patch_sha256": "3cd2c2a6ffe3dab2c228cca74c002962e03d21674b0f9ae06a60f2c80eaad48c",
+  "prompt_sha256": "47b40c96f71950072bfa5344fbf8e37050626c1f28add2ef34b07ecb498b83bc",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "cdc6d8079710f307531b94497404b939fd5295406026fa353c123a5d4076c8e6",
+  "sample_id": "path-tracing__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

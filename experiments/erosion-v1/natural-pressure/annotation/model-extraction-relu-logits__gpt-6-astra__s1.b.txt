@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment_budget finalization trigger and restrict repair execution when only the verification environment reserve remains, while leaving the finish verification, review, and VERIFIED acceptance checks unchanged."}

@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43208,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1156,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..cde974c 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,7 @@\n from __future__ import annotations\n \n FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_WALL_TIME_RATIO = 0.2\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\n",
+  "patch_sha256": "04b6b52a3a312038fc35e6069aa05775299c0fbc4eab2f76a272440cf07c5a0d",
+  "prompt_sha256": "c5efa2830475633cb035a7c4387ccd025bb417ab6c605e1745a935fea90f3eba",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "de07a300768db205fc9d9aa3203051efeeec01456f7993c38fef6be2dda848a3",
+  "sample_id": "train-fasttext__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "train-fasttext",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

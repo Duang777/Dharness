@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27817,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 35774,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..64ec238 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -482,17 +482,28 @@ class EvidenceLoop:\n         )\n         if not admission.accepted:\n             if not admission.budget.accepted:\n-                state.unresolved_errors.extend(admission.budget.reasons)\n-                category = (\n-                    \"completion_review_budget\"\n-                    if \"completion review budget exhausted\" in admission.budget.reasons\n-                    else \"harness_control\"\n+                soft_budget_reason = (\n+                    \"completion checks exceed the remaining environment-call budget\"\n                 )\n-                self._finish(\n-                    state,\n-                    StopReason.BUDGET_EXHAUSTED,\n-                    failure_category=category,\n+                terminal_budget_reasons = tuple(\n+                    reason\n+                    for reason in admission.budget.reasons\n+                    if reason != soft_budget_reason\n                 )\n+                if terminal_budget_reasons:\n+                    state.unresolved_errors.extend(terminal_budget_reasons)\n+                    category = (\n+                        \"completion_review_budget\"\n+                        if \"completion review budget exhausted\" in terminal_budget_reasons\n+                        else \"harness_control\"\n+                    )\n+                    self._finish(\n+                        state,\n+                        StopReason.BUDGET_EXHAUSTED,\n+                        failure_category=category,\n+                    )\n+                else:\n+                    self._reject_completion(state, admission.reasons, contract)\n             else:\n                 self._reject_completion(state, admission.reasons, contract)\n             return\n",
+  "patch_sha256": "34c32140a675a36c1be7b89c2b2d3519506ca08d16aa12df453825cb32c9c224",
+  "prompt_sha256": "88ec1a6f5358171af672111003e82127f3863a810140f00b6b7116b3487fccb0",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "8afa91c6019981db889e18dd85ab013b0f7bf6bcff01606b2e788495f052a0b0",
+  "sample_id": "video-processing__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

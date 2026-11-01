@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24978,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 891,
+  "patch": "diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..9ca7401 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_calls\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..a8537a8 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,11 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        remaining_calls = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n+        if remaining_calls <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_calls\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +911,8 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and self._options.max_environment_calls - state.environment_call_count\n+            > self._options.verification_environment_reserve\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "78428893312da53e73041f02e4cfe5e785fe2a8e7a9d7f266074284728309402",
+  "prompt_sha256": "ab3b44c1d01ea6155ea602efcc85ae86bda5a7b900e5ebe9c3064733b3410c5a",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "b95415b68c2fa05bbc59640cbe1d4b35fe439615e6947c824c6755dfc2956d26",
+  "sample_id": "build-pov-ray__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

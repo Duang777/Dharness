@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 24977,
+  "model_reported": "gpt-6-astra",
+  "output_tokens": 1623,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..ee528d7 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -53,6 +53,7 @@ from evidence_harness.shell import CommandRunner\n \n ProgressCallback = Callable[[RunState], None]\n MODEL_CALL_SHUTDOWN_RESERVE_SEC = 5.0\n+FINALIZATION_DECISION_TIME_SHARE = 1.0 / 3.0\n \n _BOOTSTRAP = ShellCommand(\n     id=\"bootstrap-environment\",\n@@ -211,7 +212,7 @@ class EvidenceLoop:\n                 )\n             except TimeoutError:\n                 self._enter_finalization_if_needed(state, include_turn_trigger=False)\n-                if state.finalization_started:\n+                if state.finalization_started and not finalization_started_before_decision:\n                     self._journal.append(\n                         \"model_decision_interrupted_for_finalization\",\n                         {\n@@ -801,6 +802,11 @@ class EvidenceLoop:\n                 - finalization_wall_time_reserve_sec(self._options.max_wall_time_sec),\n             )\n         remaining = effective_deadline - self._clock()\n+        if preserve_finalization_reserve and state.finalization_started:\n+            # Generating a finish proposal is only the first completion stage.\n+            # Leave most of the remaining time for isolation, checks, and review.\n+            # Review calls do not set preserve_finalization_reserve.\n+            remaining *= FINALIZATION_DECISION_TIME_SHARE\n         return max(\n             0.001,\n             min(\n",
+  "patch_sha256": "d7d8c1b0feeb15d1b9ff3c75b5f7c670c1b76ed4e227e4c525caebbcc2d9634f",
+  "prompt_sha256": "c5efa2830475633cb035a7c4387ccd025bb417ab6c605e1745a935fea90f3eba",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "58dc98c8569c0316684ee805746f91f74374ad062b707b27746111db2da2a5fb",
+  "sample_id": "train-fasttext__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "train-fasttext",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

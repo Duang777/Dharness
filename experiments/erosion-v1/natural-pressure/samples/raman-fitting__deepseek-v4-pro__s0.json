@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 27818,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 32770,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..3a8d79b 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,6 +1,6 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n+FINALIZATION_TURN_RESERVE = 5\n FINALIZATION_WALL_TIME_RATIO = 0.1\n \n \ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f4bda47 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -826,6 +826,7 @@ class EvidenceLoop:\n         if repair_granted:\n             state.repair_count += 1\n             state.phase = RunPhase.REPAIRING\n+            state.finalization_repair_used = False\n         self._journal.append(\n             \"repair_admission\",\n             {\n",
+  "patch_sha256": "6d35fd87cd7ff099d3cd1b50e76141e0a1207065b44b2c36dbfca0f60cd3e623",
+  "prompt_sha256": "d14ba8f78704a662adc3bee328c39a4ad65c5d552529244a4693bb044b363f24",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "99db3340d52d15bb68da4e28895f618faac0bd67ceb36a09455009eeae255ca9",
+  "sample_id": "raman-fitting__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "raman-fitting",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

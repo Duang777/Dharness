@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27818,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 21243,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..40c7ce2 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -711,6 +711,7 @@ class EvidenceLoop:\n             runner,\n             command,\n             wall_deadline_monotonic=command_deadline_monotonic,\n+            count_environment_call=False,\n         )\n \n     def _handle_replan(self, state: RunState, decision: AgentDecision) -> None:\n@@ -742,6 +743,7 @@ class EvidenceLoop:\n         command: ShellCommand,\n         *,\n         wall_deadline_monotonic: float | None = None,\n+        count_environment_call: bool = True,\n     ) -> CommandReceipt:\n         effective_deadline = (\n             state.deadline_monotonic if wall_deadline_monotonic is None else wall_deadline_monotonic\n@@ -754,7 +756,8 @@ class EvidenceLoop:\n             wall_timeout_sec=wall_timeout_sec,\n         )\n         state.next_sequence += 1\n-        state.environment_call_count += 1\n+        if count_environment_call:\n+            state.environment_call_count += 1\n         state.observations.append(receipt)\n         self._notify(state)\n         return receipt\n",
+  "patch_sha256": "9f9df840f55da5af72f96cec4d99205581c3739574a45cfb22693ca49c3ab88f",
+  "prompt_sha256": "b4feb18679e2da5f94c5e32e28f7c6686c977269182074ca560da7c671f7a77e",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "c0b78f3da3d5b88d424a34f7fc6775f90e32cfe1ea9d1ec0ab595ee4e66654d0",
+  "sample_id": "dna-assembly__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-assembly",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

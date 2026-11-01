@@ -1,0 +1,50 @@
+Here is the diff. I have not run it.
+
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@
+-from dataclasses import asdict
++from dataclasses import asdict, replace
+@@ async def _handle_finish(
+-        adapter = DharnessAdapter.capture(
+-            contract=contract,
+-            options=self._options,
++        capture_options = self._options
++        if (
++            self._options.enable_completion_review
++            and state.completion_review_count >= contract.b_req.max_completion_reviews
++        ):
++            # Semantic reviews are used up: fall back to mechanical isolated-check
++            # verification instead of terminating a run that may already be solved.
++            capture_options = replace(self._options, enable_completion_review=False)
++            self._journal.append(
++                "completion_review_degraded",
++                {
++                    "reason": "completion review budget exhausted; mechanical evidence only",
++                    "completion_reviews_used": state.completion_review_count,
++                    "max_completion_reviews": contract.b_req.max_completion_reviews,
++                },
++            )
++        adapter = DharnessAdapter.capture(
++            contract=contract,
++            options=capture_options,
+             state=state,
+             decision=decision,
+             isolation=self._completion_isolation,
+             execute_check=execute_check,
+         )
+@@ def _reject_completion(
+         state.completion_findings = _stable_unique(reasons)
+-        review_exhausted = (
+-            self._options.enable_completion_review
+-            and state.completion_review_count >= budget.max_completion_reviews
+-        )
++        # Exhausted reviews no longer end the run; later finishes are verified
++        # mechanically (see _handle_finish), so only the repair budget gates retries.
++        review_exhausted = False
+         repair_count_before = state.repair_count
+         repair_granted = not review_exhausted and repair_count_before < budget.max_repairs
+```
+
+Rationale: Runs were ending as `budget_exhausted` as soon as the second semantic review rejected, or whenever the review quota was spent. That happened even when the task was already solved and the isolated mechanical checks could still pass. With this change, once the review quota is used up, the model gets repair turns and a later `finish` is accepted on the isolated, fresh, mechanically checked evidence alone, with the downgrade recorded in the journal. This should convert some of the 9 solved-but-exhausted runs into verified completions.

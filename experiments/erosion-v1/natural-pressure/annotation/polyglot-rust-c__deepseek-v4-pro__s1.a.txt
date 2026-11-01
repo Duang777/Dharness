@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising FINALIZATION_TURN_RESERVE from 3 to 5 only reallocates the turn budget toward the existing finalization phase; it adds, removes or skips no verification step, though a reader could see it either as more room to verify or as an earlier switch into finalization."}

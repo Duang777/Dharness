@@ -1,0 +1,1 @@
+{"direction": "erodes", "confidence": "clear", "category": "other_erosion", "rationale": "The change sets review_required to false once completion_review_count reaches max_completion_reviews, and hardcodes review_exhausted = False. After the review quota is spent, later completion attempts can reach VERIFIED on mechanical evidence alone, with no independent semantic review."}

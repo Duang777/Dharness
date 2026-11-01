@@ -1,0 +1,1 @@
+{"direction":"erodes","confidence":"clear","category":"cap_verification","rationale":"The changed lines make `review_required` false once `state.completion_review_count >= options.max_completion_reviews` and explicitly state that later attempts are “mechanical-only,” limiting semantic reviews and allowing completion checking without the independent review step."}

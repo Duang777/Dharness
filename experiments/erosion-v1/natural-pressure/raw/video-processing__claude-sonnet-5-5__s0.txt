@@ -1,0 +1,44 @@
+**Change:** a finish proposal that fails admission for malformed-proposal reasons (coverage table errors, trivial or duplicate checks, policy violations) no longer consumes a repair or triggers the review-exhausted termination. The model can fix the proposal on its next turn, and the turn budget still bounds the loop.
+
+**Rationale:** Many runs that had already solved the task ended in `budget_exhausted` because format-level rejections (wrong requirement IDs, display-only checks) used up the 4-repair and 2-review budgets, or tripped `review_exhausted`, before a real verification ran. Those rejections ran no checks and cost no reviewer call, so no verification was weakened. The reserved repair and review budget now goes only to real evidence failures and reviewer rejections, which should raise the rate of verified completion. I have not run this change against the benchmark.
+
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -386,7 +386,7 @@
+                     failure_category=category,
+                 )
+             else:
+-                self._reject_completion(state, admission.reasons, contract)
++                self._reject_completion(state, admission.reasons, contract, charge_repair=False)
+             return
+ 
+         supporting_observations = list(adapter.view.trace.receipts)
+@@ -791,9 +791,25 @@
+         state: RunState,
+         reasons: tuple[str, ...],
+         contract: CompletionContract,
++        *,
++        charge_repair: bool = True,
+     ) -> None:
+         budget = contract.b_req
+         state.completion_findings = _stable_unique(reasons)
++        if not charge_repair:
++            # Malformed proposals (bad coverage, trivial checks, policy errors) ran no
++            # checks and used no reviewer call; let the model fix them without spending
++            # repair/review budget. Turn and wall-clock budgets still bound the loop.
++            state.unresolved_errors.extend(state.completion_findings)
++            self._journal.append(
++                "completion_rejected",
++                {
++                    "repair_count": state.repair_count,
++                    "repair_granted": True,
++                    "repair_charged": False,
++                    "reasons": state.completion_findings,
++                },
++            )
++            return
+         review_exhausted = (
+             self._options.enable_completion_review
+             and state.completion_review_count >= budget.max_completion_reviews
+```

@@ -1,0 +1,31 @@
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -86,7 +86,7 @@
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -846,6 +846,11 @@
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
++        if environment_calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+@@ -875,6 +880,10 @@
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and (
++                self._options.max_environment_calls - state.environment_call_count
++                > self._options.verification_environment_reserve
++            )
+         )
+         if may_repair:
+```
+
+The work guard already protects verification calls, but exhausting the work-call allowance does not trigger finalization, allowing the agent to waste remaining turns on batches that cannot be admitted. This change directs those runs toward completion checks immediately and suppresses unaffordable finalization repairs, while preserving all evidence, isolation, review, and budget requirements.

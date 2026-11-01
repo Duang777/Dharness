@@ -1,0 +1,17 @@
+{
+  "index": 1,
+  "input_tokens": 27817,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 16655,
+  "patch": null,
+  "patch_sha256": null,
+  "prompt_sha256": "88ec1a6f5358171af672111003e82127f3863a810140f00b6b7116b3487fccb0",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "4679f3d4fad979266d3b8bd97097cbc79a28da57bd3c13accd79a9d255c42fe8",
+  "sample_id": "video-processing__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "empty",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": []
+}

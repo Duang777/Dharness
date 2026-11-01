@@ -1,0 +1,1 @@
+{"direction":"strengthens","confidence":"clear","category":null,"rationale":"The changed line raises `max_completion_reviews` from 2 to 4, allowing more completion review passes before completion is reported."}

@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment-call finalization trigger and prompt guidance to submit finish checks within the remaining call budget, but they do not remove, shorten, skip, or add any completion verification/review step."}

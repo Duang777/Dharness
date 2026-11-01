@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The added `environment_budget` finalization trigger and extra `may_repair` environment-call condition change when repair/finalization actions are allowed, but they do not add, remove, cap, skip, or accept any verification/completion-checking step."}

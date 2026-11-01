@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines only increase FINALIZATION_TURN_RESERVE from 3 to 5 and FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.2, without adding, removing, skipping, or altering any verification/completion-checking step."}

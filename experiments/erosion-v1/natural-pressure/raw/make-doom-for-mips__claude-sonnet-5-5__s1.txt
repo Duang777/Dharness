@@ -1,0 +1,18 @@
+Raising the default completion-review budget from 2 to 4 should convert some of the `budget_exhausted` runs that had already solved the task into verified completions. I could not see where `harbor_agent.py` builds `LoopOptions`, so if it overrides this value from the run config, the same number would need changing there.
+
+**Rationale:** When the second semantic review rejects, `_reject_completion` immediately ends the run as `BUDGET_EXHAUSTED` (`completion_review_budget`). That outcome plausibly accounts for many of the 9 already-solved runs that were never reported as complete, because a reviewer-driven repair cycle needs a third review to be accepted. Allowing 4 reviews gives the agent room for the extra repair-and-review cycles, and the existing turn, wall-clock and environment-call guards still bound the run.
+
+```diff
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -1,7 +1,7 @@
+ class LoopOptions:
+     max_turns: int = 40
+     max_environment_calls: int = 80
+     max_repairs: int = 4
+     max_recoveries: int = 2
+-    max_completion_reviews: int = 2
++    max_completion_reviews: int = 4
+     max_wall_time_sec: int = 1_800
+     max_model_call_timeout_sec: int = 360
+```

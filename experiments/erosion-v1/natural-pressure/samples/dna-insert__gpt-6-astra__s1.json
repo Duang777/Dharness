@@ -1,0 +1,21 @@
+{
+  "index": 1,
+  "input_tokens": 24976,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 1008,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..539371b 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -53,7 +53,8 @@ Rules:\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n-  for completion. Submit focused checks or stop; do not propose more exploration.\n+  or environment calls for completion. Submit focused checks within the remaining call budget or\n+  stop; do not propose more exploration.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..4fcfc40 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_budget\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..9c1b308 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -880,6 +880,13 @@ class EvidenceLoop:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        # Work admission protects these calls, but without a phase transition\n+        # the executor can waste its remaining turns proposing rejected work.\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n+        if environment_calls_remaining <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_budget\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +913,8 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and self._options.max_environment_calls - state.environment_call_count\n+            > self._options.verification_environment_reserve\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "53347397a264648a68fc54b3845941f488867ce86b07fc293bd63e3b4c9d8b51",
+  "prompt_sha256": "a501ae00f9603cfb4d87c4224dfcdd2e54ca644c4676c8c3a56556c82083f6ab",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "22448778184e30b5d232ca42ce808ccea0c11e4bb179f876b78d8fb796ef6189",
+  "sample_id": "dna-insert__gpt-6-astra__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-insert",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

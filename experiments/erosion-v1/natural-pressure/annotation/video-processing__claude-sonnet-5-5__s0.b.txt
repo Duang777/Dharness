@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The change routes admission-rejected malformed completion proposals to `_reject_completion(..., charge_repair=False)` and adds a branch that avoids spending repair/review budget, but it does not alter the verification checks, semantic review, or conditions for reporting VERIFIED."}

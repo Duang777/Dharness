@@ -1,0 +1,279 @@
+
+
+<system_reminder>
+You are an AI assistant working in a codebase. You have been asked to propose one change to improve a harness. 
+Your response must be a unified diff against the files above and a two-sentence rationale.
+</system_reminder>
+
+We need inspect missing file maybe not provided: src/evidence_harness/completion_isolation.py. We can infer. But maybe one change can be in run_loop.py only. We need produce a unified diff. Need choose change.
+
+Let's think deeply about run_loop code and possible failure modes leading to budget_exhausted reward=1. The last run stats:
+- verified reward=0: 10. So false positives not affected by completion? 
+- verified reward=1: 45.
+- budget_exhausted reward=1: 9. 
+- budget_exhausted reward=0: 10.
+- model_failure reward=0/1, model_stopped.
+Goal: "make harness reach a verified completion within its budget more often." "19 of 85 runs ended budget_exhausted ... 9 of those 19 had in fact already solved the task." So focus on 9 solved but budget exhausted. Need propose one change.
+
+Potential change: In `_budget_exhaustion`, return None when `state.latest_evidence is not None and state.latest_evidence.accepted`? But no, if latest_evidence accepted, _handle_finish would have already _finish VERIFIED. So no.
+
+Potential change: When a completion proposal is rejected but budget is about to exhaust, if task is solved? Hard.
+
+Maybe change finalization wall time reserve from 10% to a larger value (e.g., 20% / 300s). This would give finalization more time and reduce budget_exhausted with reward=1. The prompt says "while state.phase is THINKING ... _budget_exhaustion" maybe finalization starts too late. Last run budget tasks max_wall_time 1800, finalization reserve 180s. Perhaps verification can take >180s. Increasing reserve may reduce verified completion? But if agent has less work time, may reduce solved tasks. But goal "reach verified completion within budget more often" for already solved tasks? One simple change: `FINALIZATION_WALL_TIME_RATIO = 0.1` to `0.25` maybe? But budget.py editable. However only one change; could be more effective? Need compare.
+
+Candidate: budget.py `FINALIZATION_WALL_TIME_RATIO = 0.1` -> `0.2` or `0.25`. The 9 budget_exhausted reward=1 likely because finalization/verification didn't fit in 180s. More reserve may help. But verification mostly iso checks time could be command time? The finalization wall time reserve is used to stop work and allow 180s for completion. If completion review prompt/review takes time. 180 seconds might not be enough for some tasks with slow verification. Increasing to 300s could help.
+
+But there is also `finalization_turn_reserve` = 3. The last run budget_exhausted reward=1 maybe due to turns, not wall time. Could increase turn reserve to 5? But max_turns 40, reserving more turns for finalization may reduce work turns, maybe not good. Nine tasks solved but no completion maybe because agent used all turns before finish; a larger finalization turn reserve would force it to finish earlier. But could also reduce work. Need infer from turn counts? No per-task details. Let's reason: finalization starts when turns_remaining <= 3, so at most 3 turns reserved. If the model needs 3 turns for finalization due to rejected bad checks, repair? But _allowed_actions in finalization only FINISH/STOP unless repair_granted with completion_findings. On first finish, checks may be rejected mechanically/semantic, repair granted, `_allowed_actions` then EXECUTE/FINISH/STOP if turns_remaining>=2. If turns_remaining=1, no repair; maybe _reject_completion if repair not granted -> budget exhausted. So with only 3 reserve, a rejected completion can leave insufficient turns for repair. Increasing finalization_turn_reserve to 4 or 5 might allow one or two repairs. The 9 reward=1 may be tasks where finalization was triggered too late due to turn reserve 3; model submitted bad checks, was rejected, then out of turns before a valid finish. The code already has max_repairs=4, but finalization turn reserve 3 may be insufficient to use them. The `finalization_turn_reserve(max_turns)` returns `min(FINALIZATION_TURN_RESERVE, max(1, max_turns-1))`, so 3. In finalization allowed_actions, may_repair requires `turns_remaining >= 2` (for an execute repair + finish). With 3 reserved turns: after first finish (turn 1), turns_remaining=2, repair allowed. Then after repair execute (turn 2), turns_remaining=1, only finish/stop. If that finish rejected again, no repair -> budget exhausted. With 4 or 5 reserve, more repair cycles. Since max_repairs=4 and max_completion_reviews=2, likely need more than 3 finalization turns. So turning finalization turn reserve up is promising. But `max_turns` is 40, and finalization reserve 3 equals `min(FINALIZATION_TURN_RESERVE, max(1, max_turns-1))`. We can change `FINALIZATION_TURN_RESERVE = 5` or maybe 6. This one-line change likely raises verified completion for tasks already solved but failing completion by giving agent more turns in finalization to get verification checks right. It doesn't affect environment calls? It may reduce work turns by 2, but still 34 work turns; possibly acceptable. Also finalization wall time reserve is unaffected. 
+
+Which one is more likely? The problem states "9 of those 19 had in fact already solved the task" meaning they were solved, but budget_exhausted without reporting completion. It might be because completion checks failed (not verified) and then no budget to repair. So more finalization turn reserve could help. The issue may be specifically turn budget exhaustion, because if it was wall-clock, they likely could have enough wall time if finalization started at 10%; but maybe not.
+
+Let's inspect budget.py: `FINALIZATION_TURN_RESERVE = 3` and `finalization_turn_reserve(max_turns): return min(FINALIZATION_TURN_RESERVE, max(1, max_turns - 1))`. With max_turns=40, 3. That's tiny compared to max_repairs=4 and max_completion_reviews=2. The completion protocol can require multiple attempts: initial finish + (repair + finish) per repair? But allowed_actions includes EXECUTE during finalization if findings and turns_remaining>=2. Each repair cycle uses 2 turns: one EXECUTE for repair batch, one FINISH. So with reserve 3, at most 1 repair (first finish turn, repair execute turn, second finish turn). But max_repairs=4. So indeed finalization turn reserve is insufficient to fully use repair budget. The harness reserves too few turns for completion, causing budget exhausted on solvable tasks. That seems likely. Change to maybe `FINALIZATION_TURN_RESERVE = 8`? But we only have 40 turns; max_repairs=4, each repair 2 turns + initial finish + maybe stop? To allow up to 4 repairs, need initial finish + 4*(repair execute + finish) = 9 finalization turns. So reserve 9. But too large reducing work turns from 37 to 31 (minus bootstrap? Hmm turn_count doesn't count bootstrap? Actually bootstrap is a command not model turn; max_turns=40 model decisions. Work turns 31 still maybe okay. Could change to 8? If we want use all 4 repairs need 9. But max_completion_reviews=2 maybe review only on finish with review required; each finish attempt can trigger review. `_reject_completion` can reject due review and grant repairs. Need up to 4 repairs, 2 reviews maybe. So 9. But finalization turn reserve is just 3. Changing to 9 may be too big. But maybe one repair enough? Hmm.
+
+Could choose a smaller reserve = 5 or 6. The prompt says propose one change to raise verified-completion rate. We want a reasonable one-line.
+
+Let's examine finalization trigger based on wall time first: If wall time remaining <=180s, finalization starts regardless of turn reserve. If turn reserve is 3, it starts when turns_remaining <=3. With 9 reserve, starts at 31 turns used. That's much earlier, leaving 9 turns for completion. It may reduce exploration but for agents that already solve tasks by then? The 9 solved tasks had used maybe near 40 turns? If we force earlier finalization, they may not have solved yet, and would fail. But the goal is overall verified completion more often. We need balance. More finalization turns can help those already solved at turn 31 but maybe reduce work turns for tasks that need longer. The agent may solve before turn 31? Hard.
+
+Alternative: Don't change when finalization starts; instead allow finalization to continue past max_turns. That is, in `_budget_exhaustion`, if `state.finalization_started`, don't return for turn budget, and maybe environment call? But then finalization could use unlimited? We could allow turns beyond max_turns only for finalization. This would let the agent finish even if it exceeded max_turns due to initial work. It doesn't reduce work turns. This seems better! The agent can use all 40 turns for work, and finalization can take extra turns. But wait finalization turn reserve is supposed to reserve turns, but if model doesn't finish before max_turns, we currently kill it. Changing `_budget_exhaustion` to not enforce `max_turns` when finalization_started would allow repair/finish cycles beyond max_turns. But if finalization started at 37, 38, 39, then at 40 top budget won't kill. The model can continue finalization. However `_allowed_actions` uses `turns_remaining = max_turns - state.turn_count`. Once turn_count exceeds max_turns, turns_remaining negative. In `_allowed_actions`:
+```
+turns_remaining = self._options.max_turns - state.turn_count
+may_repair = ... and turns_remaining >= 2
+if may_repair return (EXECUTE, FINISH, STOP)
+return (FINISH, STOP)
+```
+With negative turns_remaining, may_repair false, only finish/stop. So no more repair. That still might be okay: beyond max_turns you can submit finish/stop. But Build prompt includes `turns_remaining` max(0, options.max_turns - state.turn_count) so 0. Good. So if the task is solved and finalization_started, allowing extra turns for FINISH/STOP may allow verification, but if repair is needed, no repair beyond max_turns. However if finalization uses all 3 reserve and first finish rejected, turn_count=39? Let's simulate with finalization_started at turn 37. At turn 37 model finish attempt, count=37, turns_rem 3. Rejected repair granted. Turn 38 execute repair, count=38, turns_rem 2. Turn 39 finish, count=39, turns_rem 1. Rejected repair not granted because turns_rem<2. `_reject_completion` returns budget? Actually repair_granted = not review_exhausted and repair_count_before < max_repairs. It doesn't consider turns_remaining! So repair_granted True (if repair_count<max). It sets phase REPAIRING. Then `_reject_completion` if not repair_granted? no. It does not finish. Returns to loop. Next top loop state.turn_count=39, budget_reason? state.turn_count >= max_turns? 39>=40 false. _enter_finalization already. allowed_actions: turns_remaining=1, may_repair false => (FINISH, STOP). State.phase set FINALIZING. But state.completion_findings nonempty and finalization_repair_used? It is false? Wait finalization_repair_used set true in `_handle_execute` if state.finalization_started. At turn 38 repair execute, `_handle_execute` sets `state.finalization_repair_used = True` because `if state.finalization_started: state.finalization_repair_used = True`. Then at turn 39 finish rejected, may_repair in allowed_actions next loop requires `not state.finalization_repair_used` false. So even with turns_remaining, only one repair batch allowed in finalization. Hmm.
+
+Thus finalization_repair_used restricts to one repair batch total. So too many finalization turns might not help unless we also allow repair more than once. The code only allows `finalization_repair_used` false for repair, so one repair. But max_repairs=4 contradictory? Maybe after first repair, further repairs still possible? Let's trace: `_handle_finish` rejection -> `_reject_completion` gives repair_granted but does not check `finalization_repair_used`. It increments repair_count and phase REPAIRING. Next loop `_allowed_actions` may_repair = completion_findings and not finalization_repair_used and turns_remaining>=2. Since finalization_repair_used is true, may_repair false. So only FINISH/STOP. Thus after any repair execute, no further executes. So max_repairs effectively 1 in finalization. If more repairs needed after second rejection, `_reject_completion` may grant repair but next loop allowed only FINISH/STOP. The model cannot execute; if it submits FINISH again, loops. Eventually maybe budget_exhausted if turn_count reaches max or review budget. This is a bug. Wait `finalization_repair_used` seems intended to allow only one repair batch during finalization. But max_repairs max 4 for before finalization? Repairs are completion repairs only, so at most one? The protocol says max_repairs perhaps should allow multiple repair batches. The code's `_allowed_actions` allows `EXECUTE` during finalization only if `not state.finalization_repair_used`. So one repair. Could be intentional to limit finalization to one repair batch. But then max_repairs=4 not fully usable. Could be a bug. Perhaps a one change to allow more finalization repairs? The user wants one change; maybe change `_allowed_actions` to allow more repair turns during finalization rather than `not finalization_repair_used`. But the particular 9 solved but budget_exhausted might have had a first repair fail. But one change to allow additional repair maybe.
+
+Let's inspect `_reject_completion` semantics: It decides `repair_granted` based solely on `review_exhausted` and `repair_count_before < budget.max_repairs`. It doesn't check `finalization_repair_used` or turns remaining. Then `_allowed_actions` denies execute if finalization_repair_used true. That mismatch can cause "completion repair budget exhausted" only if repair_count >= max_repairs. But model cannot use repairs after first. So tasks may get stuck.
+
+Potential one change: In `_allowed_actions`, replace `not state.finalization_repair_used` with something like `state.repair_count < budget.max_repairs`? Need consider. Since `_allowed_actions` doesn't have contract. It only has self._options. Could use `state.repair_count < self._options.max_repairs` and `turns_remaining >= 2`. Then during finalization after a rejected finish, may_repair remains true until max_repairs reached. That would allow more repair cycles. But is there a risk of using too many turns? It already checks turns_remaining. This seems a good bug fix.
+
+But maybe `finalization_repair_used` is intended to enforce only one repair batch to conserve turns. The prompt "In the last full run, 19 ... budget_exhausted ... 9 of those had in fact already solved." If we allow more repair cycles, some may reach verified. However risk: more repairs may consume turns and still fail.
+
+Let's examine all places where `finalization_repair_used` used: only allowed_actions and field in RunState/prompt. It is set true when EXECUTE during finalization. `_allowed_actions` uses `not state.finalization_repair_used`. So indeed only one finalization repair batch allowed. If we want to use all max_repairs, this flag should probably be removed or interpreted as "a repair batch has been used"? But why named `finalization_repair_used`? It might be a design to permit a single repair batch during finalization only. But max_repairs=4 might be for non-finalization? There are no completion repairs before finalization. So it's inconsistent.
+
+Let's think about the 9 tasks. The harness already reported budget_exhausted, not model_stopped. For budget_exhausted, it could be due to `_reject_completion` finishing with BUDGET_EXHAUSTED when repair_count_before >= max_repairs or review_exhausted. In that path, if reward=1 and task solved, the model had been submitting completions but all rejected until repair/review budget exhausted. If the issue is too few repairs, allowing more repairs could help. But `_reject_completion` already grants based on max_repairs; after one repair batch the model cannot repair due to `finalization_repair_used`, then it can only finish/stop. If subsequent finish rejected, `_reject_completion` would grant repair again (repair_count still 1 < 4) and set phase REPAIRING; but next loop allowed actions excludes execute, so model can only finish/stop. If model decides FINISH again, same. This could continue until turn budget. So budget_exhausted due to turn budget. The fix to allow repair after first would enable model to actually use granted repair.
+
+What would the unified diff be? In run_loop.py `_allowed_actions`:
+```
+        may_repair = (
+            bool(state.completion_findings)
+            and not state.finalization_repair_used
+            and turns_remaining >= 2
+        )
+```
+Change to:
+```
+        may_repair = (
+            bool(state.completion_findings)
+            and state.repair_count < self._options.max_repairs
+            and turns_remaining >= 2
+        )
+```
+But note during finalization, `finalization_repair_used` is still set and prompt shows `repair_batch_used: true`; but allowed_actions would allow execute after findings. Is that safe? It could cause repeated finalization repairs, but max_repairs and turns limit. It aligns with `_reject_completion`'s repair_granted. But if `finalization_repair_used` remains true, prompt tells model `repair_batch_used: true` even though may_repair true. That might confuse. Could instead remove the flag entirely and change set? But one change.
+
+Alternatively change `_reject_completion` repair_granted to include `and not state.finalization_repair_used`? That would formalize one repair; not help.
+
+Another idea: `_reject_completion` doesn't check `turns_remaining` before granting repair. If no turns, it sets REPAIRING but next loop top budget_exhausted. In that case maybe budget_exhausted reward=1. Changing `_reject_completion` to finish BUDGET_EXHAUSTED? Already. Not help.
+
+Actually let's trace if max_turns=40 and finalization_started at turn 37. More repair cycles beyond first with may_repair true could use:
+turn 37 finish (count 37)
+turn 38 repair execute (count 38)
+turn 39 finish (count 39)
+if rejected, repair_granted true (repair_count 1 ->2? Wait repair_count increments in reject_completion each time, not _handle_execute. At turn 38 execute, repair_count remains 1 from previous rejection? Let's track. Initial finish rejection at turn 37: reward? `_reject_completion`: repair_count_before=0, repair_granted true, state.repair_count +=1 => 1. Then at turn 38 execute. At turn 39 finish rejection: repair_count_before=1 < max_repairs, repair_granted true, state.repair_count=2. Next loop turn_count=39, turns_remaining=1, may_repair false due to turns_remaining>=2 false. So no execute. Thus with finalization reserve 3, only one repair batch possible. Even if we allow multiple, need more turns. To allow multiple, also need to increase finalization turn reserve or not enforce max_turns. So one change to allow multiple repairs alone might not help much for max_turns=40 because turns_remaining may be too low.
+
+If we change `_budget_exhaustion` to not enforce turn budget when finalization_started, then with `_allowed_actions` not fixed, after turn 39 may_repair false due to turns_remaining (max_turns - turn_count >=2). If turn_count becomes 39, turns_remaining=1; no repair. If turn_count >40, turns_remaining negative, no repair. So will still not allow repair beyond first if reached max. To fully support multiple finalization repair cycles, need both changes. But we can one change to `finalization_turn_reserve` from 3 to e.g. 8, which gives more turns and with current one-repair limit maybe not help beyond first. Hmm.
+
+Maybe the bug is simpler: `_allowed_actions` may_repair requires `not finalization_repair_used`, so after a repair batch, no further repair. But the tasks had reward=1, so the model may have solved task after first repair? It still could submit finish on turn 39. If that finish rejected, no budget. If that second finish had valid checks, it would verified. The 9 not verified, so second finish was bad. More repair cycles may be needed. 
+
+Let's consider another one-change: in `_allowed_actions`, during finalization, always allow `(EXECUTE, FINISH, STOP)` (while `turns_remaining >=2` and findings), without `finalization_repair_used`. That may allow second repair if turns left. But as above, with max_turns 40 and finalization reserve 3, at most one repair batch because after initial finish and repair execute, only one turn left. Wait after first repair execute, turns_remaining may be 2? Let's recalc finalization trigger turns_remaining <=3. At start of finalization before the finish decision, turn_count could be 37? Depending when finalization started. Let's assume finalization_started at turn_count=37 (after decision at end? Actually `_enter_finalization_if_needed` called before model decide. If turn_count=37, turns_remaining=3 triggers finalization. Then model FINISH increments to 38. Wait state.turn_count increments after decision. So first finish uses turn 38. Then repair execute uses turn 39; then second finish uses turn 40. At top next loop turn_count=40: budget_exhausted before allowed_actions? Wait top loop at turn_count=40 checks budget_reason -> >= max_turns returns BUDGET_EXHAUSTED before allowing third finish? Let's track precisely.
+
+Initial state at top of loop iteration A: turn_count=37, budget no, enter_finalization starts, phase FINALIZING. Model decides FINISH. After decision, state.turn_count +=1 => 38. Then handle_finish. If rejected, _reject_completion sets phase REPAIRING, returns. Loop ends. Next iteration B: top budget_reason: turn_count=38 <40, no. enter_finalization (already started). phase = FINALIZING? The code before decision: `state.phase = RunPhase.FINALIZING if state.finalization_started else RunPhase.THINKING` so yes. _allowed_actions at that point: turns_remaining=2, completion_findings nonempty, finalization_repair_used false, may_repair true -> (EXECUTE, FINISH, STOP). Model decides EXECUTE repair. After decision, state.turn_count +=1 =>39. `_handle_execute`: if state.finalization_started sets finalization_repair_used = True. Returns. Iteration C: top turn_count=39 <40. _allowed_actions: turns_remaining=1, finalization_repair_used true => may_repair false. Model decides FINISH. After decision, turn_count=40. handle_finish. If rejected, _reject_completion sets REPAIRING, returns. Iteration D: top turn_count=40 => BUDGET_EXHAUSTED before allowed_actions/finish. So only one repair batch and two finish attempts before turn budget. If second finish bad, budget exhausted. So finalization turn reserve 3 is too low for even two finish attempts? It allows two finish attempts but not third.
+
+If we change `_budget_exhaustion` to not enforce turn budget when finalization_started, iteration D would proceed with turn_count=40. allowed_actions: turns_remaining=0, finalization_repair_used true -> (FINISH, STOP). It could submit a third finish without repair. If that's bad, etc. But no repair. If we also allowed repair, maybe. One change in _budget_exhaustion to allow finalization beyond max_turns could enable the model to submit a third/fourth FINISH after repairing? Wait if no repair allowed after first, it can only finish/stop; if the earlier finish was bad, maybe the model can fix by writing a correct check? But without executing, it can't change candidate? It can submit a different self-contained check in FINISH; if task already solved, maybe it just needs a better check. A third finish could be valid. So this could help. And no reduction in work turns. 
+
+But is it safe? If finalization_started, allowing extra turns until wall clock? Need preserve wall deadline. Could simply in `_budget_exhaustion` not return for `max_turns` if `state.finalization_started`:
+```
+if state.turn_count >= self._options.max_turns and not state.finalization_started:
+    return "model turn budget exhausted"
+```
+But if finalization_started, _allowed_actions only FINISH/STOP after some point, so not much risk. Could also allow env call budget? Environment calls likely needed for checks, but `_run_command` increments env count. If finalization_started and env_call_count >= max_environment_calls, top would budget exhaust. Should we allow env call budget too? Completion checks consume env calls; maybe finalization could exceed max. But `_allowed_actions` only FINISH/STOP (or repair) and finish checks are env calls. If top env budget kills finish before admission, bad. The `_budget_exhaustion` checks `state.environment_call_count >= max_environment_calls`. If finalization started and needs to run verification checks, we should not kill due to env count because the completion check admission has its own budget accounting. In fact, top-level env call budget should not apply to verification checks? They are environment calls but maybe max env calls is total. The budget guard in completion proposal checks `environment_calls + requested_environment_calls > max_environment_calls` and rejects. If already at max, no finish. But if exact max after a repair? Hmm.
+
+Could modify `_budget_exhaustion` to:
+```
+if state.turn_count >= self._options.max_turns and not state.finalization_started:
+    return "model turn budget exhausted"
+if state.environment_call_count >= self._options.max_environment_calls and not state.finalization_started:
+    return "environment call budget exhausted"
+```
+This would let finalization proceed beyond turn/env budgets, but still wall clock. It might be the best one change: allow finalization to finish even if the original turn/env budgets are exhausted. However, if finalization isn't started, we still reserve turns/wall. But the 9 were already solved; likely they reached max_turns/env calls before finish. If finalization wasn't started, no. But finalization should have started. 
+
+Alternatively change `_budget_exhaustion` to:
+```
+if state.turn_count >= self._options.max_turns and not state.finalization_started:
+    ...
+if state.environment_call_count >= self._options.max_environment_calls and not state.finalization_started:
+    ...
+```
+But note in finalization, if `allowed_actions` permits EXECUTE repair and state.env calls > max, could run more work commands? `_handle_execute` admission `BudgetGuard.evaluate_work` uses budget.max_environment_calls and reserve; if env_call_count already >= max, available_for_work negative, rejects. So safe.
+
+Which one? The user wants "one change". I'd like to propose modifying `_budget_exhaustion` to not stop finalization for turn or environment-call exhaustion. Rationale: once finalization has begun, the harness should let the agent submit/repair completion until wall-clock deadline; currently a solved task can be killed at max_turns/env calls before verified.
+
+Let's see if that would raise verified-completion rate in the 9 budget_exhausted reward=1 cases. Those were solved but harness didn't report completion. They may have been in finalization but ran out of turns/env calls. Let's examine likely `budget_exhausted` path. The harness gives stop_reason budget_exhausted from:
+1. top loop `_budget_exhaustion` (wall/turn/env)
+2. `_handle_finish` when admission budget rejected -> `_finish` BUDGET_EXHAUSTED category completion_review_budget/harness_control.
+3. `_reject_completion` when review_exhausted or repair budget exhausted -> BUDGET_EXHAUSTED.
+4. finalization_action_rejected when turn_count >= max_turns -> BUDGET_EXHAUSTED.
+5. Work admission rejection? No.
+In last full run, the specific `failure_category` not given. But if budget_exhausted reward=1, category could be completion_review_budget, completion_repair_budget, harness_control. We don't know.
+
+Maybe the most impactful one change could be in `_reject_completion`: when review_exhausted or repair_granted false, instead of immediately finishing BUDGET_EXHAUSTED, if `DharnessAdapter.project_state` maybe candidate solved? But harness can't know reward. Could allow final acceptance without review? No.
+
+Let's examine `_reject_completion`: If `review_exhausted` due to completion_review_count >= budget.max_completion_reviews (2). If a task had actually been solved but reviewer rejected twice, harness budgets exhausted. Could relax by not treating review budget exhaustion as fatal if mechanical checks were accepted but semantic review rejects? Hmm the reviewer is model. If reviews reject, maybe bad. But external reward=1; maybe reviewer is too strict and killed. Could change to allow more reviews? `max_completion_reviews=2` fixed in budget; maybe too low. But user said "one change" not adding config. Could change `budget.py`? Not not the budget context max_completion_reviews from options. The budget per task has max_completion_reviews=2. Could increase to 3 or 4? That might help but also not from code? LoopOptions default 2. We could change default to 3. But the run context budget says 2. The harness source uses LoopOptions default `max_completion_reviews: int = 2`. But actual context has 2. Changing default in LoopOptions would only affect new runs not provided? The budget per task is provided externally, so options used are 2. If we change code default, external config still passes 2? The run context says Budget per task = 2. We cannot change external. But we can change logic.
+
+Maybe change `_reject_completion` to not finish on review_exhausted if review rejected but mechanical evidence accepted? Currently:
+```
+review_exhausted = enable_review and review_count >= max_reviews
+repair_granted = not review_exhausted and repair_count_before < max_repairs
+...
+if review_exhausted:
+    finish BUDGET_EXHAUSTED
+```
+This means after two reviews, no more repair and budget exhausted. Perhaps if the review is wrong but task actually solved, we could allow another review or accept mechanical evidence. But one change could be to increase max reviews by one (in `_reject_completion`, use `max_completion_reviews + 1`? not).
+Maybe more directly: For reward=1 solved but budget_exhausted, semantic review rejects due to strictness. But the harness already has "budget_exhausted reward=1: 9" with verified reward=0:10 false positives. If we loosen review, maybe increase verified reward=1 but also increase false positives. The user wants verified-completion rate. Need balance.
+
+Let's inspect `_handle_finish` review error path: On review model error, it calls `evaluate_complete` with assessment=None; if review required, ReviewGate rejects. Then `_finish` MODEL_FAILURE. Not budget. Not target.
+
+Maybe a known issue: The `_budget_exhaustion` wall clock check uses `>= deadline - 5s` at top, before `_enter_finalization_if_needed`. This creates a 5-second shutdown reserve that treats the task as budget exhausted before the actual deadline. If the model has already solved and `latest_evidence` accepted? No. But if model just finished at last second? However finalization wall reserve 180s. But maybe when the model decides FINISH, `_handle_finish` can take long and reach deadline-5. But _finish VERIFIED is called before top. Not issue.
+
+Let's reason about completion isolation time. Verification checks may each have timeout_sec up to 300. The wall time reserve 180 sec can be less than a single verification command timeout. In `_handle_finish`, if a check times out at 300, wall time passes. But `_run_completion_check` receives `command_deadline_monotonic`, maybe set to state.deadline? Need see completion_isolation. Let's inspect from file likely not given; maybe `CompletionIsolation.verify` sets `deadline_monotonic` for each check to request deadline. It might call execute_check with `command_deadline_monotonic = request.deadline_monotonic`. If so a check can run until actual deadline, exceeding finalization reserve. But if finalization starts at 180s before deadline and a check timeout 300, it could run past deadline and then `_run_command` effective_deadline state.deadline, wall_timeout_sec remaining. If it uses full 300 but only 180 remaining, command times out maybe. But not _budget? top not reached.
+
+Potential one change in finalization_wall_time_reserve: increase from 10% to e.g. 20% to account for long verification checks. That seems plausible and simple. Let's think about how "verified completion within its budget more often" phrase. The harness controls budget. Last run 19 budget exhausted, 9 solved. The finalization reserve is a natural knob: if you reserve more wall time/turns for finalization, solved tasks more likely verify. Which budget dimension is more likely? The numbers: finalization wall reserve is 180 seconds; finalization turn reserve is 3. Completion can require multiple verification checks with timeouts up to 300 seconds? But check timeouts are likely chosen by model (up to command timeout 300). Verification checks can be expensive. 180 seconds may be too short. However if a verification check times out at 300, finalization with 180s cannot run it. So the model might avoid long checks, but for some tasks verification requires running tests/benchmarks that take >180s. Thus increasing wall reserve may help.
+
+But the run context says max_wall_time_sec=1800, max_command_timeout_sec=300. Verification check timeout max 300. A completion attempt with 2 or 3 checks can take up to 900 seconds sequentially? The harness runs checks sequentially in isolated child? Likely. 180s reserve is insufficient for many tasks. The agent may need to run tests/verification as part of completion; if they're already solved, the harness could verify if more time. But increasing finalization wall reserve reduces work time from 1620s to maybe 1440s; still 24 mins work. Could improve. 10% seems arbitrary.
+
+Maybe a better one: `FINALIZATION_WALL_TIME_RATIO = 0.1` to `0.2` (or 0.25). The tasks max_wall_time 1800, 0.2 gives 360s for finalization. That would still allow 1440s for work. Could raise verified completion. But would it reduce tasks that need the extra 180s work? Possibly last run had 57/85 passed; we want more. If we sacrifice some solve time, but 9 solved at budget exhausted might still be solved with less work time? Uncertain.
+
+Another alternative: Do not start finalization based on wall clock when turn budget is not close; but that's different.
+
+Let's search code for "budget_exhausted reward=1" scenarios. The run report's stop_reason budget_exhausted could happen even if `_handle_finish` completion accepted? No accepted would be VERIFIED. So the harness stopped before verified. The task was solved as per external reward. The model had been able to solve within max env calls/turns? Actually external reward=1 means final state of workspace matches solution. The agent must have made the necessary changes. The harness didn't report completion. The agent might still have been doing extra checks, and the harness killed it at budget exhaustion before FINISH. That suggests finalization didn't happen early enough? But finalization triggers by turn/wall. If the agent solves at turn 38 after finalization started? It could still execute commands only if repair finalization? No finalization allowed actions initially FINISH/STOP only unless completion_findings. If finalization started at turn 37 before solve, allowed actions only FINISH/STOP; it cannot continue to solve. So solved at turn <=37 maybe. Then finalization available. It didn't finish because maybe model kept stopping? Or validation failed.
+
+If finalization turn reserve was 3, it starts at turn 37. Many tasks might need 37 turns to solve, so they solve before finalization. But if finalization turn reserve too small, starting at 37 means model has only 3 turns to complete. Could be insufficient. If reserve larger, finalization starts earlier (e.g., 35) leaving 5 turns; model may not have solved yet. Hmm.
+
+Wait finalization start based on turns: when turns_remaining <=3. At time of finalization, allowed actions change to FINISH/STOP. The agent might not be done and might STOP, leading to model_stopped reward=0? In last run model_stopped reward=0 4 and reward=1 2. But not our focus. If reserve larger, more tasks may be forced to finish too early. But maybe model can still use FINISH? Not if not solved. So increasing turn reserve may reduce solved tasks.
+
+Maybe the real issue is `finalization_repair_used` bug. Let's examine `_allowed_actions` and `_reject_completion` interaction. The agent can only repair once during finalization. If that repair is used, any subsequent rejection leaves the agent unable to act on granted repairs, causing budget exhaustion. This seems clearly a harness bug and one-change fix to `finalization_repair_used` could raise verified completions. We can propose changing `_allowed_actions` to permit repairs after the first as long as repair budget remains and turns remain. But as noted, with reserve 3 only one repair cycle; maybe still needs more turns. However some of the 9 may have failed after second finish with one turn left; impossible. But if we also inadvertently allow repair when turns_remaining 1? `may_repair` requires >=2. No.
+
+Wait after a repair execute and second finish bad, top turn_count=40 -> budget exhausted. If we increase finalization turn reserve to 5, there would be turns for another repair. So maybe the one change should be `FINALIZATION_TURN_RESERVE = 5` or 6. It directly addresses limited finalization turns. But the `finalization_repair_used` still only one repair; not helpful beyond one repair. But maybe most tasks only need one repair. The 9 solved but budget_exhausted could be caused by not enough finalization turns for a single repair + a final finish? Let's see with reserve 3, you can do initial finish + one repair + final finish. That's enough for one repair. If task needed one repair, it would pass. If it needed two, fail. Is one repair enough for many? Maybe not.
+
+We need determine which single change has highest impact. Let's read code around `finalization_repair_used`:
+- It is set true in `_handle_execute` whenever `state.finalization_started`, including if EXECUTE after completion rejection. There is no reset when new completion attempt starts? It remains true. So only one repair batch allowed per run. 
+- `repair_count` increments on every rejection; `max_repairs=4`. So the harness says up to 4 repairs but the model can only execute one repair batch during finalization. If it tries another repair, `_allowed_actions` won't include EXECUTE. But `_reject_completion` still grants repair and increments repair_count, leading to "phantom" repairs. This is a bug.
+
+Could the 9 budget_exhausted reward=1 be due to this? The model may have made two or more repair attempts; after one, further repairs were rejected. The final failure category might be "harness_control" from top budget, or "completion_repair_budget" after max_repairs reached via phantom grants. If repair_count increments each rejection, after max_repairs rejections, `_reject_completion` finishes with completion_repair_budget. That path may occur even though only one repair batch executed. It would report BUDGET_EXHAUSTED. So yes.
+
+What one change fixes this? We can change `_allowed_actions` to permit multiple finalization repairs until `repair_count >= max_repairs`. But as noted, with turn reserve 3 there may not be enough turns. However in cases where finalization started due to wall time not turn reserve, turns_remaining may be large. Wait finalization starts when wall_time_remaining <=180 even if many turns remain. In that case, `turns_remaining` may be large (e.g., 15) and `finalization_started` true. Then with current `not finalization_repair_used`, after first repair, no further repairs even though many turns remain. That is definitely a bug. Some tasks may solve quickly but verification/review repeats and run out of repair budget due to one-repair limit despite many turns left. The 9 reward=1 might be in this category. Changing `_allowed_actions` to allow more repairs would help. It doesn't need turn reserve increase if wall-time finalization has many turns left. But for tasks finalizing due turn budget, still limited.
+
+Maybe a better one change: In `_allowed_actions`, replace `not state.finalization_repair_used` with `state.repair_count < self._options.max_repairs`. Then `finalization_repair_used` remains only as informational. This allows the model to execute repair batches after each rejection as long as repair budget remains. It is one line. It also aligns with the stated max_repairs. I like this.
+
+But the may_repair check also `turns_remaining >= 2`. Once turn_count exceeds max_turns, no repair. But finalization due wall time may have many turns. Good.
+
+Could there be risk of model alternating finish/execute too much and wasting turns? It will eventually run out of repair budget or turns; that's intended. Last run budget_exhausted reward=1 could improve because actual repair budget used.
+
+Let's compare with another one-line change: In `_reject_completion`, set `state.finalization_repair_used = False` after granting repair? Then allowed_actions would permit another repair. But it would still count? It would allow multiple repairs. Could be simpler? In `_reject_completion` after `if repair_granted: state.repair_count += 1; state.phase = REPAIRING; state.finalization_repair_used = False`. That would reset flag after each rejection, allowing another repair. But semantically `finalization_repair_used` means a repair batch was used; maybe should reset when new repair granted. This also allows multiple repairs. But `_reject_completion` is more code; `_allowed_actions` change is simpler.
+
+One issue with changing `_allowed_actions` to use `repair_count < max_repairs`: `repair_count` increases after a rejection, so before any repair, repair_count=0; if findings exist, may_repair true. After first repair execute, repair_count still 1 (from previous rejection). Next allowed_actions sees repair_count=1 < max_repairs, so may_repair true. Good. After second rejection, repair_count becomes 2; still true until max. If max_repairs reached, false. This matches `_reject_completion`.
+
+But what if `_handle_finish` rejection occurs and `_reject_completion` sets phase REPAIRING and returns, but `repair_count` increments. If the model decides EXECUTE, `finalization_repair_used` remains true, but now doesn't block. Good.
+
+Maybe `may_repair` should also require `state.finalization_repair_used`? No.
+
+Let's think of side effects: During finalization without completion_findings (first finalization), may_repair false. Good. After a rejection, may_repair true if repair_count<max. The model can execute a repair batch of up to 4 commands. However when state.finalization_started, `_handle_execute` sets `state.finalization_repair_used = True`, and also `work_epoch += 1`? Wait `_handle_execute` increments `state.work_epoch += 1`. During finalization repairs, work_epoch increases. Completion evaluation checks `work_epoch` not changed during verification. After a repair execution, work_epoch changed, so future completion uses new work_epoch. That's fine. But `_allowed_actions` in finalization may repair with `turns_remaining>=2`. After repair batch, if no finish, next loop may_repair true if findings and repair_count<max. The model could execute multiple repair batches without a finish attempt in between? It can choose EXECUTE again; `_reject_completion` only increments repair_count on completion rejection, not on repair execute. So `repair_count` remains same, and `finalization_repair_used` doesn't block, so it could execute unlimited repair batches until it decides FINISH? But `_allowed_actions` includes EXECUTE as long as findings and turns_remaining>=2. There is no "one repair batch per rejection" tracking. The model could keep executing changes without ever finishing. Could this hurt? The intended finalization_repair_used may have been to allow only one repair batch; removing it may allow too much. But the repair budget `max_repairs` is supposed to limit completion repairs, but it increments only on rejection, not on repair execute. If the model executes multiple batches after one rejection, it won't consume repair budget. Could be bad, but the model is trying to fix findings. Also `_handle_execute` `BudgetGuard.evaluate_work` may reject if env calls. There is turn limit. But maybe this can lead to doom loops. However the recovery policy? `_apply_recovery_policy` is called only if not finalization_started, so no. The existing one repair batch guard prevented endless finalization work. 
+
+We could instead change `_reject_completion` to increment `repair_count` when granting repair? It already does. If the model executes multiple repair batches without new rejection, repair_count not increment; not ideal. But the model's prompt may not know; it will probably finish. Risk acceptable? Maybe not.
+
+Alternative one-change: In `_handle_execute`, only set `finalization_repair_used = True`? Actually block repeated repairs. To allow multiple repairs but still one per rejection, we could set `state.finalization_repair_used = False` in `_reject_completion` when granting repair. That would re-allow an execute after each rejection, but after an execute, flag becomes true; to execute another repair batch before another rejection, _allowed_actions false. That enforces one repair batch per granted repair. This is more semantically sound. The diff:
+```
+        if repair_granted:
+            state.repair_count += 1
+            state.phase = RunPhase.REPAIRING
+            state.finalization_repair_used = False
+```
+But note if finalization_repair_used false already? Fine. This ensures after a rejection with repair granted, the model gets exactly one repair batch (because after it uses execute, flag true). If the model instead submits FINISH without repair, `_reject_completion` will again set false. This matches intent. The current `_allowed_actions` remains `not state.finalization_repair_used`. This might be the minimal fix allowing multiple repair cycles while preserving one batch per rejection. It doesn't allow multiple executes in a row because after execute flag true. I like this better.
+
+But does it help if `finalization_repair_used` is true from a previous repair and then a new rejection occurs? We reset to false when repair granted. Yes. Then the next loop may_repair true (if turns_remaining>=2). Good.
+
+Let's test sequence:
+- First finish rejected: repair_granted true, repair_count=1, phase REPAIRING, finalization_repair_used=False (was false).
+- Next loop after rejection? Actually `_reject_completion` returns to run loop. The top of next loop enters finalization; `_enter_finalization_if_needed` no. state.phase set FINALIZING (overwrites REPAIRING? Wait in loop before model decision, `state.phase = RunPhase.FINALIZING if state.finalization_started else RunPhase.THINKING`. It does **not** preserve REPAIRING. So repair phase is overwritten. That's another weirdness. `_reject_completion` sets phase REPAIRING but run_loop sets phase FINALIZING at top before model decision. So phase in prompt during repair is FINALIZING, not REPAIRING. This may not matter.
+- allowed_actions: completion_findings true, finalization_repair_used false => may_repair true. Model can execute repair batch.
+- In `_handle_execute`, state.finalization_started true -> finalization_repair_used=True.
+- Next loop: may_repair false until another finish rejection.
+- If model chooses FINISH after repair and rejected: repair_granted true, repair_count=2, finalization_repair_used=False. Then can repair again. Good.
+
+This is a clean bug fix. But finalization turn reserve of 3 still may not allow a second repair, but if wall time finalization with many turns remaining, it will. Also if finalization was triggered by turns at 37, after first repair and second finish, turn_count=40 -> top budget_exhausted, no chance for second repair. But maybe the 9 solved had wall-time finalization or enough turns? Could also combine with allowing finalization beyond max_turns? But only one change.
+
+Perhaps better single change: In `_budget_exhaustion`, don't enforce turn budget if finalization_started. This would allow the sequence even with turn reserve 3 to continue to second repair etc. But it doesn't fix one-repair guard. With current one-repair guard, after first repair, second rejection, finalization_repair_used true, so allowed_actions only FINISH/STOP. Even if extra turns, no repair. But it would allow more finish attempts. If third check is valid, pass. If it needs repair, fail. So less complete.
+
+What about changing `_allowed_actions` to permit repairs after first and also `_budget_exhaustion` to not kill finalization for turn/env. That's two changes. User asked one. We can choose one.
+
+Let's inspect `_reject_completion` more: It may finish BUDGET_EXHAUSTED on `review_exhausted` when `completion_review_count >= budget.max_completion_reviews`. If completion reviews are 2, after two rejected reviews, no repair. Many solved tasks might be killed because reviewer too strict. A one-line change could be to treat `review_exhausted` as not fatal and allow one more repair? But budget max_completion_reviews is a control. Maybe increase max reviews by changing `max_completion_reviews`? Not allowed externally. Could change `_reject_completion` to allow repair even when review exhausted if `state.latest_evidence` mechanical accepted? That's complex.
+
+Given the instruction "Propose one change to the harness that you expect to raise the verified-completion rate." It doesn't have to fix all. The best one change likely is the `_reject_completion` reset of `finalization_repair_used`. It's a clear harness bug: the harness advertises up to max_repairs completion repairs, but the flag prevents more than one repair batch. Fixing it will likely improve verified completions in exactly the scenario where the first repair wasn't enough but the task was already solved. It's a single-line diff. Rationale: allows subsequent repair grants to actually authorize a repair batch.
+
+Need produce unified diff against files. We can edit run_loop.py. Show diff around `_reject_completion`.
+
+Let's craft rational: "This resets the one-shot finalization repair guard whenever a new completion repair is granted, so the agent can actually use the repair budget for a second repair cycle after another rejected finish. Without it, `_allowed_actions` continues to exclude `EXECUTE` after the first repair, causing solved tasks to exhaust their turn budget instead of converging to verification."
+
+Let's ensure diff is correct:
+```
+@@ -816,6 +816,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+```
+
+Could this be enough? Let's check the actual line in source. In `_reject_completion`:
+```
+        if repair_granted:
+            state.repair_count += 1
+            state.phase = RunPhase.REPAIRING
+```
+Add reset. Yes.
+
+But wait `finalization_repair_used` is set to True when `decision.action is EXECUTE` before `_handle_execute`. In run_loop:
+```
+if decision.action is ActionKind.EXECUTE:
+    if state.finalization_started:
+        state.finalization_repair_used = True
+    await self._handle_execute(...)
+```
+So the flag indicates whether a repair batch has been used since last rejection. On its own, resetting in `_reject_completion` is exactly paired. Good.
+
+Let's consider if `state.finalization_repair_used` also used in prompt as `"repair_batch_used": state.finalization_repair_used`. After a new repair is granted, prompt will display false. Good. After repair execute, prompt displays true until next rejection; then false after grant. Nice.
+
+Potential side effect: If there are no completion_findings? `_reject_completion` always sets `state.completion_findings = _stable_unique(reasons)` before repair; so there are findings. Good.
+
+This likely raises verified completion. Let's final.
+
+But we might want to mention "one change". The answer format: unified diff and two-sentence rationale. We'll provide.
+
+Let's ensure no need to include import etc.
+
+Let's produce.```diff
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+index 1f8b7e9..c2f2a91 100644
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -798,6 +798,7 @@ class EvidenceLoop:
+         if repair_granted:
+             state.repair_count += 1
+             state.phase = RunPhase.REPAIRING
++            state.finalization_repair_used = False
+         self._journal.append(
+             "repair_admission",
+             {
+```
+
+Rationale: This clears the one-shot finalization repair flag whenever a new repair is granted, so the harness actually lets the agent use a second repair cycle instead of blocking `EXECUTE` after the first repair. That prevents already-solved tasks from looping through rejected finishes until the turn budget expires.

@@ -1,0 +1,21 @@
+{
+  "index": 0,
+  "input_tokens": 24973,
+  "model_reported": "gpt-6-astra",
+  "output_tokens": 878,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..694749a 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -52,8 +52,10 @@ Rules:\n   already contained those files.\n - A finish response must map every completion_contract requirement ID to one or more check IDs.\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n-- When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n-  for completion. Submit focused checks or stop; do not propose more exploration.\n+- When allowed_actions excludes execute or replan, the controller has reserved the remaining\n+  budget for completion. Submit focused checks or stop; do not propose more exploration.\n+- When finalization_triggers includes environment_calls, only reserved verification calls remain.\n+  Fit your completion checks within environment_calls_remaining; work commands cannot use them.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..9ca7401 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -75,7 +75,7 @@ class RunPhase(StrEnum):\n     TERMINATED = \"terminated\"\n \n \n-FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\"]\n+FinalizationTrigger = Literal[\"turn_budget\", \"wall_clock\", \"environment_calls\"]\n \n \n class ExecutorTurnStarted(StrictModel):\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..f2536de 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -874,12 +874,17 @@ class EvidenceLoop:\n         turn_reserve = finalization_turn_reserve(self._options.max_turns)\n         wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)\n         turns_remaining = self._options.max_turns - state.turn_count\n+        environment_calls_remaining = (\n+            self._options.max_environment_calls - state.environment_call_count\n+        )\n         wall_time_remaining_sec = max(0.0, state.deadline_monotonic - self._clock())\n         triggers: list[FinalizationTrigger] = []\n         if include_turn_trigger and turns_remaining <= turn_reserve:\n             triggers.append(\"turn_budget\")\n         if wall_time_remaining_sec <= wall_time_reserve_sec:\n             triggers.append(\"wall_clock\")\n+        if environment_calls_remaining <= self._options.verification_environment_reserve:\n+            triggers.append(\"environment_calls\")\n         if not triggers:\n             return\n         state.finalization_started = True\n@@ -906,6 +911,10 @@ class EvidenceLoop:\n             bool(state.completion_findings)\n             and not state.finalization_repair_used\n             and turns_remaining >= 2\n+            and (\n+                self._options.max_environment_calls - state.environment_call_count\n+                > self._options.verification_environment_reserve\n+            )\n         )\n         if may_repair:\n             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)\n",
+  "patch_sha256": "2042c265743e84f3af6d91d4bf3f7ac0f13a692914a4a164d45f0901a234d769",
+  "prompt_sha256": "88ec1a6f5358171af672111003e82127f3863a810140f00b6b7116b3487fccb0",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "99403c6c5ca25d7444c3087005a82048b3d37de82014a256eb58d40a1a5657a4",
+  "sample_id": "video-processing__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "video-processing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

@@ -1,0 +1,12 @@
+```diff
+--- a/src/evidence_harness/budget.py
++++ b/src/evidence_harness/budget.py
+@@ -1,6 +1,6 @@
+ from __future__ import annotations
+ 
+-FINALIZATION_TURN_RESERVE = 3
++FINALIZATION_TURN_RESERVE = 5
+ FINALIZATION_WALL_TIME_RATIO = 0.1
+```
+
+This reserves five executor turns for finalization instead of three, giving runs that have already solved the task but are still converging on acceptable completion checks two extra attempts before `budget_exhausted`. It keeps the same hard model-turn budget while shifting more of it from late work to verification.

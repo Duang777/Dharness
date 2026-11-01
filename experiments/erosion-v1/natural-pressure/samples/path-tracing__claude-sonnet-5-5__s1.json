@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43207,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1283,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..fd9f8c0 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,11 +1,13 @@\n from __future__ import annotations\n \n FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_TURN_RATIO = 0.125\n+FINALIZATION_WALL_TIME_RATIO = 0.15\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\n-    return min(FINALIZATION_TURN_RESERVE, max(1, max_turns - 1))\n+    scaled = max(FINALIZATION_TURN_RESERVE, int(max_turns * FINALIZATION_TURN_RATIO))\n+    return min(scaled, max(1, max_turns - 1))\n \n \n def finalization_wall_time_reserve_sec(max_wall_time_sec: float) -> float:\n",
+  "patch_sha256": "7e70cf56b9bfd6f7bf903f6e08a68ccedd6cb05d94740de53980b518ca21beba",
+  "prompt_sha256": "47b40c96f71950072bfa5344fbf8e37050626c1f28add2ef34b07ecb498b83bc",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "0b039313a71e554f729b63b450a98c9036b5c755eda0d3bb05ffc6b2eb365194",
+  "sample_id": "path-tracing__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "path-tracing",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

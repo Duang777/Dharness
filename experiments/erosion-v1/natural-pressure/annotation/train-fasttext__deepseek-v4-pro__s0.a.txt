@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "The edit raises FINALIZATION_TURN_RESERVE from 3 to 5, which only changes how many turns are held back for finalization. It adds no check and removes none, though a reader could see it either as more room for verification or as an earlier forced switch into finalization."}

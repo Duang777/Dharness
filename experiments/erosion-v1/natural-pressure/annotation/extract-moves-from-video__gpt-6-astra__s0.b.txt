@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an environment-call reserve signal, trigger finalization when only verification-reserved calls remain, and restrict further repair work at that threshold, but they do not add, remove, cap, skip, or alter the actual completion verification/review checks required before VERIFIED."}

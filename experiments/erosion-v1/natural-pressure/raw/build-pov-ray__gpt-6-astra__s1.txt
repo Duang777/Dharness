@@ -1,0 +1,20 @@
+```diff
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -49,3 +49,10 @@
+-- Use finish only after the task appears complete. Supply one to three fresh, self-contained checks.
+-  Each check runs in a separate disposable snapshot with no network and must exit nonzero when its
+-  stated condition is false.
++- Before choosing another work batch, compare the current candidate and observed results against
++  every explicit task requirement. If implementation appears complete and no known defect remains,
++  choose finish now: its checks are the next validation step, not paperwork after another round
++  of equivalent execute-mode tests. A successful work command alone is not proof of completion.
++- If more work is necessary, identify the unmet requirement or observed defect it addresses.
++  Avoid optional polishing, repeated confirmation, and unrelated exploration once requirements
++  appear satisfied. The remaining budget is a ceiling, not a target to consume.
++- Supply one to three fresh, self-contained finish checks covering every requirement. Each check
++  runs in a separate disposable snapshot with no network and must exit nonzero when its stated
++  condition is false. Keep assertions substantive; do not weaken checks to finish sooner.
+```
+
+This makes completion verification the next step for an apparently finished candidate, targeting the nine budget-exhausted runs that had already solved their tasks without prematurely restricting necessary implementation work. It reduces redundant pre-verification turns while preserving all existing evidence, isolation, review, and budget guards.

@@ -1,0 +1,31 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -366,6 +366,7 @@ class EvidenceLoop:
+             state,
+             runner,
+             command,
+             wall_deadline_monotonic=command_deadline_monotonic,
++            count_environment_call=False,
+         )
+@@ -590,11 +591,13 @@ class EvidenceLoop:
+         command: ShellCommand,
+         *,
+         wall_deadline_monotonic: float | None = None,
++        count_environment_call: bool = True,
+     ) -> CommandReceipt:
+         effective_deadline = (
+             state.deadline_monotonic if wall_deadline_monotonic is None else wall_deadline_monotonic
+         )
+@@ -610,7 +613,8 @@ class EvidenceLoop:
+         )
+         state.next_sequence += 1
+-        state.environment_call_count += 1
++        if count_environment_call:
++            state.environment_call_count += 1
+         state.observations.append(receipt)
+         self._notify(state)
+         return receipt
+```
+
+This prevents isolated completion checks from consuming the same `environment_call_count` budget as live work, so a rejected completion no longer immediately trips `BUDGET_EXHAUSTED` and blocks a retry when the task was already solved. Completion attempts remain bounded by the repair/review budgets, but they stop prematurely draining the live environment budget.

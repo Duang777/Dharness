@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed lines add an `environment_calls` finalization trigger and prevent repair execution when only the verification reserve remains, but they do not add, remove, skip, or alter the required isolated checks, coverage evaluation, or semantic review used to accept completion."}

@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The added \"environment_budget\" finalization trigger and the extra may_repair condition only steer the agent toward FINISH/STOP once environment calls fall to the verification reserve; FINISH still runs the full isolated checks, coverage, and review path, so how completion is checked is unchanged."}

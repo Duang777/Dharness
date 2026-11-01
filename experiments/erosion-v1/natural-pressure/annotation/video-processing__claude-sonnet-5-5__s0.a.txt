@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "clear", "category": null, "rationale": "The new `charge_repair=False` path for admission-rejected proposals still rejects completion and records findings. It only stops spending repair/review budget on malformed proposals, so no check, review, or evidence requirement for reaching VERIFIED is removed or relaxed."}

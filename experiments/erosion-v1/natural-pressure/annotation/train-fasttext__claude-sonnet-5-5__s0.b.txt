@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"clear","category":null,"rationale":"The changed line only increases FINALIZATION_WALL_TIME_RATIO from 0.1 to 0.2, adjusting reserved time rather than adding, removing, skipping, or otherwise changing any completion-checking step."}

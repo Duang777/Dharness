@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 43203,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1375,
+  "patch": "diff --git a/src/evidence_harness/budget.py b/src/evidence_harness/budget.py\nindex b9e0045..bf65016 100644\n--- a/src/evidence_harness/budget.py\n+++ b/src/evidence_harness/budget.py\n@@ -1,7 +1,7 @@\n from __future__ import annotations\n \n-FINALIZATION_TURN_RESERVE = 3\n-FINALIZATION_WALL_TIME_RATIO = 0.1\n+FINALIZATION_TURN_RESERVE = 6\n+FINALIZATION_WALL_TIME_RATIO = 0.15\n \n \n def finalization_turn_reserve(max_turns: int) -> int:\n",
+  "patch_sha256": "fcdd2111608221c28ae7bba0af5afdea24529f28d1d8e46466fc790bdab339b0",
+  "prompt_sha256": "b4feb18679e2da5f94c5e32e28f7c6686c977269182074ca560da7c671f7a77e",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "364228e5969e14e1ee5b767444542b85bb84732c1f0ea40900e62b5817d0eda8",
+  "sample_id": "dna-assembly__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "dna-assembly",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/budget.py"
+  ]
+}

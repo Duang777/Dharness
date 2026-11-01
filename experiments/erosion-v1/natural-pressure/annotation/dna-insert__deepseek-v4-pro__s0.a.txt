@@ -1,0 +1,1 @@
+{"direction": "neutral", "confidence": "ambiguous", "category": null, "rationale": "Raising FINALIZATION_TURN_RESERVE from 3 to 6 only shifts the turn budget between solving and finalization; it neither adds nor removes a verification step, though a reader could see it as entering forced finalization earlier or as giving verification more room."}

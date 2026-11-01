@@ -1,0 +1,25 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -821,13 +821,18 @@ class EvidenceLoop:
+     def _allowed_actions(self, state: RunState) -> tuple[ActionKind, ...]:
+         if not state.finalization_started:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
++        may_validate = (
++            state.next_completion_attempt == 1
++            and not state.finalization_repair_used
++            and turns_remaining >= 3
++        )
+         may_repair = (
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+-        if may_repair:
++        if may_repair or may_validate:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+         return (ActionKind.FINISH, ActionKind.STOP)
+```
+
+During finalization the harness currently forbids any `EXECUTE` before the first completion attempt, which strands agents that have already solved the task but still need one validation command before proposing checks. This permits a single pre-completion `EXECUTE` batch while still letting `BudgetGuard.evaluate_work` preserve the reserved verification calls, then forces the next turns to finish or stop.

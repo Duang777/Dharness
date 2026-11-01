@@ -1,0 +1,1 @@
+{"direction":"neutral","confidence":"ambiguous","category":null,"rationale":"The changed line only increases FINALIZATION_TURN_RESERVE from 3 to 6, adjusting turn budgeting rather than directly adding, removing, skipping, or accepting any completion check."}

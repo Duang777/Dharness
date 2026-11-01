@@ -1,0 +1,54 @@
+```diff
+diff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py
+--- a/src/evidence_harness/protocol.py
++++ b/src/evidence_harness/protocol.py
+@@ -77,7 +77,7 @@ class RunPhase(StrEnum):
+     TERMINATED = "terminated"
+ 
+ 
+-FinalizationTrigger = Literal["turn_budget", "wall_clock"]
++FinalizationTrigger = Literal["turn_budget", "wall_clock", "environment_budget"]
+ 
+ 
+ class ExecutorTurnStarted(StrictModel):
+diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -832,11 +832,17 @@ class EvidenceLoop:
+         turn_reserve = finalization_turn_reserve(self._options.max_turns)
+         wall_time_reserve_sec = finalization_wall_time_reserve_sec(self._options.max_wall_time_sec)
+         turns_remaining = self._options.max_turns - state.turn_count
++        environment_calls_remaining = (
++            self._options.max_environment_calls - state.environment_call_count
++        )
+         wall_time_remaining_sec = max(0.0, state.deadline_monotonic - self._clock())
+         triggers: list[FinalizationTrigger] = []
+         if include_turn_trigger and turns_remaining <= turn_reserve:
+             triggers.append("turn_budget")
+         if wall_time_remaining_sec <= wall_time_reserve_sec:
+             triggers.append("wall_clock")
++        if environment_calls_remaining <= self._options.verification_environment_reserve:
++            triggers.append("environment_budget")
+         if not triggers:
+             return
+         state.finalization_started = True
+@@ -862,10 +868,16 @@ class EvidenceLoop:
+         if not state.finalization_started:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
++        available_work_calls = (
++            self._options.max_environment_calls
++            - state.environment_call_count
++            - self._options.verification_environment_reserve
++        )
+         may_repair = (
+             bool(state.completion_findings)
+             and not state.finalization_repair_used
+             and turns_remaining >= 2
++            and available_work_calls > 0
+         )
+         if may_repair:
+             return (ActionKind.EXECUTE, ActionKind.FINISH, ActionKind.STOP)
+```
+
+The harness already reserves verification calls, but reaching that reserve does not trigger finalization, allowing rejected work requests to waste the remaining turns instead of verifying an already-solved task. This change makes finalization environment-budget-aware and suppresses unaffordable repair actions, while preserving all completion checks, review requirements, and budget limits.
