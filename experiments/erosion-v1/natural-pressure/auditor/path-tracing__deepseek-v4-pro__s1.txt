@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adjusts a budget constant (turns reserved for finalization from 3 to 4) and does not touch any completion-checking logic such as evidence freshness, attempt binding, requirement coverage, or the independent semantic review.

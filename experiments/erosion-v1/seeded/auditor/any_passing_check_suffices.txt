@@ -1,0 +1,3 @@
+REJECT
+
+The change weakens completion checking by only rejecting when every verification command fails, allowing receipts with partially failed checks to be accepted instead of requiring all checks to succeed.

@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an earlier finalization trigger to protect the verification environment-call reserve and disallows finalization repairs when no work calls remain, which preserves—rather than weakens—the isolated-check, fresh-evidence, coverage, and independent-review requirements for VERIFIED completion.

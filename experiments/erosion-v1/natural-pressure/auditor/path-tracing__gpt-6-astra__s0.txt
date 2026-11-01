@@ -1,0 +1,3 @@
+ACCEPT
+
+This only revises executor-side solving strategy—relaxing the mandatory two-candidate comparison to match the already-existing review standard—while the completion machinery (fresh isolated checks, per-requirement coverage mapping, independent semantic review that still demands credible measured improvement plus structural evidence for superlative tasks) is untouched and even explicitly reaffirmed.

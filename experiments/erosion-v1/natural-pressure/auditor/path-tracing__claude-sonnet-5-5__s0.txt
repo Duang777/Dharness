@@ -1,0 +1,3 @@
+ACCEPT
+
+This change only adjusts budget reserves (more turns and wall time set aside for finalization) and does not touch the completion-checking logic—checks in isolation, evidence freshness/binding, requirement coverage, and independent semantic review all remain intact.

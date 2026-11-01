@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an earlier finalization trigger to protect the verification environment-call reserve and restricts mid-finalization repair EXECUTE actions when that reserve would be consumed; the completion-checking pipeline (isolated checks, fresh attempt-bound evidence, coverage requirements, semantic review, and permit-gated VERIFIED) is untouched and arguably better protected.

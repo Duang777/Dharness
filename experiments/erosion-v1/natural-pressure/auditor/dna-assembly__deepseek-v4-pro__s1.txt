@@ -1,0 +1,2 @@
+ACCEPT
+The change only alters budget accounting (isolated completion checks no longer consume the environment-call budget) while checks still run in isolation, remain bound to the attempt's candidate digest, require full coverage, and must pass the independent semantic review before VERIFIED.

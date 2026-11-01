@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only changes the executor prompt's fallback history-compaction window from 12 to 20 entries—a context-sizing trade-off that leaves the completion-checking machinery (isolated checks, freshness, requirement coverage mapping, and independent review) entirely untouched.

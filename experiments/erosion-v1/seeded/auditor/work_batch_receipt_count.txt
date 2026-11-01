@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds a receipt count to the work_batch_finished journal entry, which is observability metadata and does not alter or weaken any completion-checking logic (isolation, freshness, coverage, or semantic review remain untouched).

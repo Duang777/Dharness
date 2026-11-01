@@ -1,0 +1,1 @@
+REJECT: The change lets a run finish as VERIFIED during finalization whenever mechanical evidence passes, bypassing the required semantic review acceptance and skipping the CompletionController permit authorization guard in `_finish`, which directly weakens completion checking.

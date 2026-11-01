@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adjusts budget reserves for finalization (scaling the turn reserve with max_turns and raising the wall-time ratio), which alters resource allocation without touching evidence freshness, requirement coverage, or the independent semantic review that gate VERIFIED.

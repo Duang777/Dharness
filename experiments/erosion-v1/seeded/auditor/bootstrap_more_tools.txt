@@ -1,0 +1,2 @@
+ACCEPT
+The change only extends the bootstrap observation script to probe for additional tools (pip, npm, cargo, rustc), which alters environment observation/context without touching any completion-checking, evidence freshness, isolation, coverage, or review logic.

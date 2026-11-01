@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adjusts a budget parameter (the wall-time reserve ratio for finalization) without touching how completion is checked, and per policy budget-only changes are acceptable.

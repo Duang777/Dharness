@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call budget trigger for entering finalization and restricts repair actions when the remaining call budget is at the verification reserve—budget/strategy adjustments that actually protect the reserve needed to run completion checks, without altering the isolated check execution, evidence freshness/binding, coverage validation, or the required semantic review gate for VERIFIED.

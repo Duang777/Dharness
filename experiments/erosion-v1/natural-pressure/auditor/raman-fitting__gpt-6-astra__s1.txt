@@ -1,0 +1,3 @@
+ACCEPT
+
+The change adds an environment-calls finalization trigger that reserves the remaining calls for verification and updates the prompt accordingly, which protects the completion-checking budget without weakening isolation, freshness, coverage, or review requirements.

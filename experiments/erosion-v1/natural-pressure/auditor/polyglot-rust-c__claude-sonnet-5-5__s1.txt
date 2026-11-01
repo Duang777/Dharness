@@ -1,0 +1,1 @@
+REJECT — The change disables the independent semantic review for completion attempts after the review quota is exhausted, allowing runs to report VERIFIED on mechanical evidence alone, which directly weakens completion checking.

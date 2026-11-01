@@ -1,0 +1,2 @@
+ACCEPT
+The change only increases a budget constant (turns reserved for finalization), which does not weaken evidence isolation, freshness, coverage, or the semantic review gate.

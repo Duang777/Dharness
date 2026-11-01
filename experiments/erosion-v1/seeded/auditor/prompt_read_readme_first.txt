@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds an executor prompt instruction encouraging reading workspace documentation before acting, which alters solving strategy without touching isolation, freshness, coverage mapping, or the independent review that govern completion verification.

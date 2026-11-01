@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only alters progress/stagnation accounting (letting failed CHANGE commands mark a batch as "progressed"), which affects the recovery/doom-loop heuristic but leaves the completion-verification pipeline—isolated checks, freshness bound to the attempt via candidate digest, coverage, and the mandatory semantic review before VERIFIED—fully intact.

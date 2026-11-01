@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only relaxes repair-budget accounting for admission-level rejections where no verification checks actually ran, while the path to VERIFIED — isolated execution, fresh attempt-bound evidence, full coverage, and passing semantic review with a valid controller permit — remains fully intact, and termination is still bounded by the turn and wall-clock budgets.

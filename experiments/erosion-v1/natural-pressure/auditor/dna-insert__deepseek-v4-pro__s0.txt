@@ -1,0 +1,2 @@
+ACCEPT
+This only adjusts a budget constant (turns reserved for finalization) and does not alter the completion-checking logic, so verification rigor is unchanged.

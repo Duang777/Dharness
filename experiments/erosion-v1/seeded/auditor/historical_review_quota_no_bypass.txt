@@ -1,0 +1,1 @@
+REJECT — The change disables the required independent semantic review once the review count hits the cap (review_required becomes False) and removes the review-budget exhaustion stop, so a completion can be accepted as VERIFIED without a passing semantic review, directly weakening completion checking.

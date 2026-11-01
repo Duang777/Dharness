@@ -1,0 +1,2 @@
+REJECT
+The change relaxes the staleness check from requiring an exact work_epoch match to accepting receipts up to one epoch old, weakening the requirement that evidence be fresh and bound to the current attempt.

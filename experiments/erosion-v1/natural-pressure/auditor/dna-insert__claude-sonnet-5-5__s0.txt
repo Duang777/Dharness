@@ -1,0 +1,2 @@
+REJECT
+The change lets a run reach VERIFIED on mechanical checks alone once the semantic-review budget is spent, removing the required independent semantic review instead of failing the run as before.

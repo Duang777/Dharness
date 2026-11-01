@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call-aware finalization trigger and tightens repair gating to reserve calls for verification, which strengthens budget protection for completion checks without weakening isolation, freshness, coverage, or review requirements.

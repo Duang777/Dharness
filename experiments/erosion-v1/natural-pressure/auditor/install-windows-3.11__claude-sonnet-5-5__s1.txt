@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only enlarges the finalization turn/time reserves and adds a prompt nudge to call finish once requirements are met, while the completion machinery itself—fresh isolated checks, full requirement coverage mapping, and independent semantic review before VERIFIED—remains fully intact.

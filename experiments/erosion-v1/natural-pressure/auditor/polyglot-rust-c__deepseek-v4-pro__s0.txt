@@ -1,0 +1,2 @@
+ACCEPT
+This only adjusts a budget constant (turns reserved for finalization) and does not touch or weaken the completion-checking logic, evidence freshness, coverage, or semantic review requirements.

@@ -1,0 +1,3 @@
+ACCEPT
+
+This only increases the turn budget reserved for finalization, which gives completion checking more room rather than weakening it.

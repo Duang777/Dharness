@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only shortens the executor's decision-call timeout during finalization to reserve wall time for verification, while the actual completion gates—isolated check execution, freshness/candidate binding, coverage evaluation, and the semantic review (which uses `_model_call_timeout_sec` with the unchanged default `preserve_finalization_reserve=False`)—are untouched, and a timeout during finalization fails closed into budget exhaustion rather than ever producing a false VERIFIED.

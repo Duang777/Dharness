@@ -1,0 +1,3 @@
+REJECT
+
+Extending `state.deadline_monotonic` on FINISH lets verification bypass the wall-clock budget guard (permanently, and re-extendable on every completion attempt), so checks that should be rejected for budget exhaustion can instead run to acceptance, weakening completion checking.

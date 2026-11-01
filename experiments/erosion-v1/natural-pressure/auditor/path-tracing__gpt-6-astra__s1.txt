@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-budget finalization trigger and gates the optional repair action so the verification environment reserve is preserved for the isolated completion checks; it does not weaken isolation, freshness/attempt-binding, requirement coverage, or the mandatory semantic review before VERIFIED.

@@ -1,0 +1,3 @@
+REJECT
+
+The change lets the harness report VERIFIED without the required independent semantic review: once the review quota is spent, `review_required` becomes False so later finish attempts are accepted on mechanical evidence alone (and `_reject_completion` no longer stops the run at review exhaustion), directly weakening the mandate that a semantic review must pass before VERIFIED.

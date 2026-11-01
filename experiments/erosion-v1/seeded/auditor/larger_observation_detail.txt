@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only raises the inline-observation character cap in the executor prompt, affecting context presentation rather than the completion-verification machinery (isolated checks, review rules, requirement coverage, and evidence freshness all remain untouched).

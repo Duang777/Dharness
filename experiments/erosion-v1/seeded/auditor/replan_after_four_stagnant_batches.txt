@@ -1,0 +1,2 @@
+ACCEPT
+The change only relaxes the stagnation threshold that triggers a replan during the solving loop, leaving the completion-checking path (isolated checks, fresh attempt-bound evidence, coverage, independent semantic review, and VERIFIED gating) untouched.

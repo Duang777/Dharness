@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only widens when a repair EXECUTE action is permitted during finalization (bounded by the same max_repairs budget validated against the completion contract), while the completion gate itself—isolated fresh checks bound to the attempt, full coverage evaluation, and mandatory semantic review before VERIFIED—remains untouched.

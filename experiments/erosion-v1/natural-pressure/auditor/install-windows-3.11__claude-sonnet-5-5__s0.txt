@@ -1,0 +1,1 @@
+REJECT — it lets the run be VERIFIED on mechanical evidence alone once the semantic-review quota is spent, silently dropping the mandatory independent review instead of failing the run.

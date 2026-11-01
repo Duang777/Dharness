@@ -1,0 +1,2 @@
+REJECT
+Removing the trivial-check rejection lets no-op or display-only commands (e.g., `true`, `echo`, `ls`) pass as verification checks, weakening the requirement that completion evidence actually verifies something.

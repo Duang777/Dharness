@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds a new budget-based finalization trigger and increases the environment-call reserve for verification, neither of which weakens isolation, evidence freshness, coverage requirements, or the independent semantic review.

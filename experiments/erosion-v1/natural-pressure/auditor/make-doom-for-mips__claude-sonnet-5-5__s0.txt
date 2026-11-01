@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only alters budgets and solving strategy — finalization starts earlier (reserve of 5 turns) and the agent may run more than one repair EXECUTE batch during finalization — while every completion guarantee remains intact: checks still execute in isolation, evidence is still freshly bound to the current attempt's candidate digest, coverage and repair/review budgets are still enforced, and VERIFIED still requires the CompletionController's permit plus the independent semantic review, none of which is touched.

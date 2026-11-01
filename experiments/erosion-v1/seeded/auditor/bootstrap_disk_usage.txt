@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds a read-only disk-usage observation to the bootstrap environment probe, which expands the agent's initial context without touching any completion-checking logic (isolation, freshness, coverage, or semantic review all remain unchanged).

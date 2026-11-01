@@ -1,0 +1,3 @@
+ACCEPT
+
+This change only increases the number of reserved finalization turns, a budget adjustment that does not affect how completion evidence is checked, verified, or reviewed.

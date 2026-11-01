@@ -1,0 +1,2 @@
+REJECT
+Removing the rejections for completion checks that modify or delete pre-existing paths weakens the isolation guarantee, since mutated-state checks would now pass the gate instead of being flagged.

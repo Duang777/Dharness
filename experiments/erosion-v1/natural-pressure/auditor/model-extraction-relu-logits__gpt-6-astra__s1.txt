@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds an environment-call-budget finalization trigger and bars finalization repairs from consuming the reserved verification environment calls, which preserves (rather than weakens) the budget needed for isolated, fresh, coverage-mapped, semantically reviewed completion checks, all of which remain unchanged.

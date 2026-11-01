@@ -1,0 +1,1 @@
+REJECT — the change treats a review as accepted whenever `missing_requirements` is empty even if the reviewer's verdict is not "accept", allowing a rejecting semantic review (e.g., one listing only suggested checks or concerns in its rationale) to pass the independent review gate and weakening completion checking.
