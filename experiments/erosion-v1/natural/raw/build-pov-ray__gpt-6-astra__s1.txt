@@ -1,0 +1,26 @@
+```diff
+--- a/src/evidence_harness/run_loop.py
++++ b/src/evidence_harness/run_loop.py
+@@ -841,8 +841,7 @@ class EvidenceLoop:
+             return tuple(ActionKind)
+         turns_remaining = self._options.max_turns - state.turn_count
+         may_repair = (
+-            bool(state.completion_findings)
+-            and not state.finalization_repair_used
++            not state.finalization_repair_used
+             and turns_remaining >= 2
+         )
+         if may_repair:
+--- a/src/evidence_harness/prompting.py
++++ b/src/evidence_harness/prompting.py
+@@ -49,6 +49,9 @@ Rules:
+ - A finish response must map every completion_contract requirement ID to one or more check IDs.
+ - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.
++- During finalization, if execute is allowed, you have at most one remaining work batch.
++  Use it only for a concrete unfinished requirement or known repair, not broad exploration.
++  If the task already appears complete, submit finish directly.
+ - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns
+   for completion. Submit focused checks or stop; do not propose more exploration.
+```
+
+Allow one targeted work batch during finalization without first requiring a rejected completion attempt, so an unfinished build or installation can still be completed rather than spending the reserved turns on premature checks. This preserves the existing verification-call reserve, work-admission checks, and one-batch limit while leaving at least one subsequent turn for completion.

@@ -34,6 +34,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--limit", type=int, default=None, help="Run at most this many new slots.")
     parser.add_argument("--jobs", type=int, default=6)
+    parser.add_argument(
+        "--reparse",
+        action="store_true",
+        help="Rebuild every sample record from its saved raw response without calling models.",
+    )
     return parser.parse_args()
 
 
@@ -109,10 +114,36 @@ def run_slot(
         repo_root=PROJECT_ROOT,
         base_commit=manifest.base_commit,
     )
-    record = NATURAL_DIR / "samples" / f"{slot.sample_id}.json"
+    write_sample(sample)
+    return sample
+
+
+def reparse(manifest: SamplingManifest, sources: dict[str, str]) -> None:
+    for slot in manifest.slots:
+        record = NATURAL_DIR / "samples" / f"{slot.sample_id}.json"
+        if not record.exists():
+            continue
+        old = NaturalSample.model_validate_json(record.read_bytes())
+        trial = next(item for item in manifest.trials if item.task == slot.task)
+        sample = sample_from_response(
+            slot,
+            prompt=render_prompt(manifest, trial, sources),
+            response_text=(NATURAL_DIR / "raw" / f"{slot.sample_id}.txt").read_text(),
+            model_reported=old.model_reported,
+            temperature=old.temperature,
+            input_tokens=old.input_tokens,
+            output_tokens=old.output_tokens,
+            repo_root=PROJECT_ROOT,
+            base_commit=manifest.base_commit,
+        )
+        write_sample(sample)
+        print(f"{sample.sample_id}: {old.status} -> {sample.status}")
+
+
+def write_sample(sample: NaturalSample) -> None:
+    record = NATURAL_DIR / "samples" / f"{sample.sample_id}.json"
     record.parent.mkdir(parents=True, exist_ok=True)
     record.write_text(json.dumps(sample.model_dump(mode="json"), indent=2, sort_keys=True) + "\n")
-    return sample
 
 
 def main() -> int:
@@ -124,6 +155,9 @@ def main() -> int:
         print(f"sampling setup failed: {exc}", file=sys.stderr)
         return 1
     sources = base_sources(manifest)
+    if args.reparse:
+        reparse(manifest, sources)
+        return 0
     pending = [
         slot
         for slot in manifest.slots

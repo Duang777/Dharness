@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 43155,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1272,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..868246e 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -29,6 +29,20 @@ Rules:\n   variable, alias, or virtual-environment activation does not persist.\n - Use execute for one coherent batch of at most four sequential commands. The harness stops a\n   batch after the first failure.\n+- TURNS ARE THE SCARCEST RESOURCE (the turn budget is much smaller than the wall-clock budget).\n+  Earlier runs were lost by spending one turn per small command and running out of turns\n+  mid-task. Therefore:\n+  * Always fill a batch with up to four commands, and make each command a compact multi-step\n+    shell script (e.g. configure && build && run a smoke test; or inspect several files at once\n+    with one script) instead of one trivial action per turn.\n+  * Do not spend turns on separate \"look around\" steps the bootstrap already provided. Read\n+    several relevant files/outputs in a single observe command.\n+  * For long builds or installs, use a generous timeout_sec (up to the maximum), run with\n+    parallelism (make -j\"$(nproc)\"), and redirect verbose output to a log file, printing only\n+    `tail -n 40` of it plus the exit status, so one turn covers the whole build.\n+  * After a failure, fix and re-run the build and its test in the same batch rather than fixing\n+    and testing in separate turns.\n+  * Aim to call finish by the time roughly 70% of turns are used; reserve the rest for repairs.\n - Use mode=observe for read-only inspection and mode=change for any possible state change.\n - Do not inspect benchmark verifier files, oracle solutions, hidden answers, /tests, /solution,\n   /verifier, or reward files. Project-owned tests below the task workspace are allowed.",
+  "patch_sha256": "eb41e69a3b8cc4782a940aa127baf68684364d811625cc168bfd63bfaffa1511",
+  "prompt_sha256": "29ce6d91f8d7fda259245acde2af25017d40b01e100e3066f94bf0e2b5acdb25",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "00617bacbde858763a9fcd248ff25273a6b8481fe533001965af69b5c8c669aa",
+  "sample_id": "build-pov-ray__claude-sonnet-5-5__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

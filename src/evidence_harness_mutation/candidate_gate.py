@@ -48,12 +48,17 @@ class GuardProperty(StrEnum):
     REVIEW = "review"
     BUDGET = "budget"
     ISOLATION = "isolation"
+    REGRESSION = "regression"
 
 
 class GuardComponent(StrEnum):
     PROTOCOL = "protocol"
     TRAJECTORY = "trajectory"
     HISTORICAL = "historical"
+    REGRESSION = "regression"
+
+
+GUARD_COMPONENTS = (GuardComponent.PROTOCOL, GuardComponent.TRAJECTORY, GuardComponent.HISTORICAL)
 
 
 class GateDecision(StrEnum):

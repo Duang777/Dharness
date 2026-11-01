@@ -267,23 +267,83 @@ def canonicalize_patch(
             ("git", "-c", "user.name=n", "-c", "user.email=n@n", "commit", "-qm", "base"),
             root,
         )
-        text = diff if diff.endswith("\n") else diff + "\n"
-        for arguments in (("--recount",), ("--recount", "-C1"), ("--recount", "--ignore-whitespace", "-C1")):
-            applied = subprocess.run(
-                ("git", "apply", *arguments),
-                cwd=root,
-                input=text.encode(),
-                capture_output=True,
-                check=False,
-            )
-            if applied.returncode == 0:
-                break
-        else:
+        if not all(_apply_leniently(root, chunk) for chunk in split_file_diffs(diff)):
             return None
         _run(("git", "add", "-A"), root)
         patch = _run(("git", "diff", "--cached", "--no-color", "--no-ext-diff"), root)
         names = _run(("git", "diff", "--cached", "--name-only"), root)
         return patch, tuple(sorted(names.split()))
+
+
+def split_file_diffs(diff: str) -> tuple[str, ...]:
+    """Split at each ``---``/``+++`` header pair.
+
+    LLM diffs carry wrong hunk counts, and under ``--recount`` git reads the next file's
+    ``--- a/...`` header as a removed line, so each file is applied on its own.
+    """
+    lines = diff.splitlines()
+    chunks: list[list[str]] = []
+    for position, line in enumerate(lines):
+        is_header = (
+            line.startswith("--- ")
+            and position + 1 < len(lines)
+            and lines[position + 1].startswith("+++ ")
+        )
+        if is_header:
+            chunks.append([])
+        if chunks and not line.startswith(("diff --git ", "index ")):
+            chunks[-1].append(line)
+    return tuple("\n".join(chunk) + "\n" for chunk in chunks)
+
+
+def _apply_leniently(root: Path, chunk: str) -> bool:
+    for arguments in (
+        ("--recount",),
+        ("--recount", "-C1"),
+        ("--recount", "--ignore-whitespace", "-C1"),
+    ):
+        applied = subprocess.run(
+            ("git", "apply", *arguments),
+            cwd=root,
+            input=chunk.encode(),
+            capture_output=True,
+            check=False,
+        )
+        if applied.returncode == 0:
+            return True
+    return _apply_by_search(root, chunk)
+
+
+def _apply_by_search(root: Path, chunk: str) -> bool:
+    """Replace each hunk's old block where it occurs exactly once, ignoring line numbers."""
+    lines = chunk.splitlines()
+    target = lines[1].removeprefix("+++ ").strip()
+    target = target.removeprefix("b/") if target != "/dev/null" else ""
+    path = root / target
+    if not target or not path.is_file():
+        return False
+    text = path.read_text()
+    hunks: list[tuple[list[str], list[str]]] = []
+    for line in lines[2:]:
+        if line.startswith("@@"):
+            hunks.append(([], []))
+        elif hunks:
+            old, new = hunks[-1]
+            body = line[1:] if line[:1] in (" ", "-", "+") else line
+            if line[:1] != "+":
+                old.append(body)
+            if line[:1] != "-":
+                new.append(body)
+    for old, new in hunks:
+        while old and not old[-1].strip() and new and not new[-1].strip():
+            old.pop()
+            new.pop()
+        before = "\n".join(old) + "\n"
+        if not old or text.count(before) != 1:
+            return False
+        text = text.replace(before, "\n".join(new) + "\n")
+    path.write_text(text)
+    return True
 
 
 def _run(arguments: tuple[str, ...], cwd: Path) -> str:

@@ -1,0 +1,2712 @@
+{
+  "schema_version": 1,
+  "suite_id": "regression-suite-v1",
+  "probes": [
+    {
+      "probe_id": "regression.n0001",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_canonical_campaign_bytes_are_repeatable_and_self_describing"
+    },
+    {
+      "probe_id": "regression.n0002",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_default_campaign_runs_every_operator_in_declaration_order"
+    },
+    {
+      "probe_id": "regression.n0003",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_default_schedule_keeps_attempt_one_visible_when_no_attempt_exists"
+    },
+    {
+      "probe_id": "regression.n0004",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_explicit_schedule_sorts_requests_and_retains_duplicates"
+    },
+    {
+      "probe_id": "regression.n0005",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_malformed_attempt_payload_preserves_default_schedule_as_invalid"
+    },
+    {
+      "probe_id": "regression.n0006",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_nondeterministic_baseline_preserves_schedule_as_invalid"
+    },
+    {
+      "probe_id": "regression.n0007",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_preexisting_failure_is_not_credited_to_the_mutation"
+    },
+    {
+      "probe_id": "regression.n0008",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_campaign.py::test_unchanged_audit_is_oracle_equivalent"
+    },
+    {
+      "probe_id": "regression.n0009",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_control_auditor_rejects_a_denied_completion_guard"
+    },
+    {
+      "probe_id": "regression.n0010",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_control_auditor_reports_i1_through_i8"
+    },
+    {
+      "probe_id": "regression.n0011",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_control_mutations_are_deterministic_and_detected"
+    },
+    {
+      "probe_id": "regression.n0012",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_i1_rejects_a_reused_work_epoch"
+    },
+    {
+      "probe_id": "regression.n0013",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_i5_rejects_an_undisposed_completion_child"
+    },
+    {
+      "probe_id": "regression.n0014",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_i7_rejects_progress_from_a_command_outside_the_batch"
+    },
+    {
+      "probe_id": "regression.n0015",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_i8_rejects_a_review_limit_outside_the_frozen_contract"
+    },
+    {
+      "probe_id": "regression.n0016",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_control_invariants.py::test_legacy_trace_marks_new_fact_dependent_invariants_unsupported"
+    },
+    {
+      "probe_id": "regression.n0017",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_historical_experiment.py::test_manifest_freezes_all_seven_historical_pairs"
+    },
+    {
+      "probe_id": "regression.n0018",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_historical_experiment.py::test_worker_rejects_an_extra_expected_outcome_field"
+    },
+    {
+      "probe_id": "regression.n0019",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_i1_detects_stale_evidence_after_the_current_epoch_changes"
+    },
+    {
+      "probe_id": "regression.n0020",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_i2_detects_reordered_embedded_receipts"
+    },
+    {
+      "probe_id": "regression.n0021",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_i3_detects_5f64d66_review_error_fallback_to_verified"
+    },
+    {
+      "probe_id": "regression.n0022",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_i4_detects_289bea4_cross_candidate_evidence"
+    },
+    {
+      "probe_id": "regression.n0023",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_incomplete_prefix_has_no_applicable_completion_invariants"
+    },
+    {
+      "probe_id": "regression.n0024",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_operator_rejects_a_missing_attempt"
+    },
+    {
+      "probe_id": "regression.n0025",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_oracle_import_does_not_load_the_production_evidence_gate"
+    },
+    {
+      "probe_id": "regression.n0026",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_stateful_operators_produce_deterministic_detectable_mutations"
+    },
+    {
+      "probe_id": "regression.n0027",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_invariants.py::test_valid_schema2_trace_satisfies_i1_through_i4"
+    },
+    {
+      "probe_id": "regression.n0028",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_journal_loader.py::test_loader_rejects_unsupported_or_ambiguous_journals"
+    },
+    {
+      "probe_id": "regression.n0029",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_journal_loader.py::test_prefix_digest_includes_bytes_after_the_cutoff"
+    },
+    {
+      "probe_id": "regression.n0030",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_journal_loader.py::test_prefix_uses_physical_lines_and_binds_the_complete_journal"
+    },
+    {
+      "probe_id": "regression.n0031",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_agentchaos_rotation_does_not_redraw_after_rejection"
+    },
+    {
+      "probe_id": "regression.n0032",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_baseline_selector_views_exclude_state_aware_fields"
+    },
+    {
+      "probe_id": "regression.n0033",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_builder_runs_all_baseline_selectors_before_loading_state_aware_campaign"
+    },
+    {
+      "probe_id": "regression.n0034",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_method_result_rejects_outcome_from_another_method"
+    },
+    {
+      "probe_id": "regression.n0035",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_schema_valid_random_candidates_cross_the_typed_input_boundary"
+    },
+    {
+      "probe_id": "regression.n0036",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_slot_grid_is_attempt_major_operator_minor"
+    },
+    {
+      "probe_id": "regression.n0037",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_slot_grid_keeps_four_synthetic_slots_without_attempts"
+    },
+    {
+      "probe_id": "regression.n0038",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_baselines.py::test_task_result_rejects_an_unequal_method_grid"
+    },
+    {
+      "probe_id": "regression.n0039",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_executable.py::test_cohort_model_locks_the_ranked_twenty_task_order"
+    },
+    {
+      "probe_id": "regression.n0040",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_executable.py::test_preoutcome_gate_checks_filesystem_before_reading_inputs"
+    },
+    {
+      "probe_id": "regression.n0041",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_executable.py::test_preoutcome_gate_rejects_deleted_all_refs_history"
+    },
+    {
+      "probe_id": "regression.n0042",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_protocol.py::test_check_returns_a_stable_validation_error"
+    },
+    {
+      "probe_id": "regression.n0043",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_protocol.py::test_freeze_rejects_deleted_outcome_with_all_refs_history_before_reading_inputs"
+    },
+    {
+      "probe_id": "regression.n0044",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_protocol.py::test_freeze_rejects_existing_outcome_before_reading_inputs"
+    },
+    {
+      "probe_id": "regression.n0045",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_reducers.py::test_comparison_rejects_mixed_input_digests"
+    },
+    {
+      "probe_id": "regression.n0046",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_reducers.py::test_reducer_failure_retains_full_input_in_every_denominator"
+    },
+    {
+      "probe_id": "regression.n0047",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_reducers.py::test_reducers_share_input_witness_and_size"
+    },
+    {
+      "probe_id": "regression.n0048",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_reducers.py::test_source_anchored_matches_frozen_reducer_output"
+    },
+    {
+      "probe_id": "regression.n0049",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_report.py::test_rq2_analysis_uses_task_level_pairs_and_protocol_order"
+    },
+    {
+      "probe_id": "regression.n0050",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_report.py::test_rq3_analysis_omits_inference_below_the_frozen_minimum"
+    },
+    {
+      "probe_id": "regression.n0051",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_report.py::test_rq3_empty_population_is_a_valid_insufficient_result"
+    },
+    {
+      "probe_id": "regression.n0052",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_report.py::test_rq4_missing_trajectory_marks_the_collection_incomplete"
+    },
+    {
+      "probe_id": "regression.n0053",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_report.py::test_rq4_summary_keeps_all_four_families_and_adapter_rejections"
+    },
+    {
+      "probe_id": "regression.n0054",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_binary_bootstrap_is_deterministic_and_uses_fixed_percentile_ranks"
+    },
+    {
+      "probe_id": "regression.n0055",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_cluster_bootstrap_samples_whole_task_totals"
+    },
+    {
+      "probe_id": "regression.n0056",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_exact_mcnemar_reports_cells_p_value_and_paired_risk_difference"
+    },
+    {
+      "probe_id": "regression.n0057",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_exact_mcnemar_returns_one_without_discordant_pairs"
+    },
+    {
+      "probe_id": "regression.n0058",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_exact_value_reduces_and_serializes_stable_decimal_text"
+    },
+    {
+      "probe_id": "regression.n0059",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_exact_wilcoxon_omits_zero_differences_from_sign_enumeration"
+    },
+    {
+      "probe_id": "regression.n0060",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_exact_wilcoxon_uses_average_ranks_for_ties"
+    },
+    {
+      "probe_id": "regression.n0061",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_holm_uses_protocol_order_for_ties_and_monotonic_adjustment"
+    },
+    {
+      "probe_id": "regression.n0062",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_main_analysis_statistics.py::test_statistics_reject_duplicate_task_identities"
+    },
+    {
+      "probe_id": "regression.n0063",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_attested_schema2_task_requires_all_explicit_phase_witnesses"
+    },
+    {
+      "probe_id": "regression.n0064",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_builder_rejects_result_path_outside_run_store"
+    },
+    {
+      "probe_id": "regression.n0065",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_canonical89_raw_data_requires_all_or_none"
+    },
+    {
+      "probe_id": "regression.n0066",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_checker_rebuilds_all_sources_allows_none_and_rejects_partial"
+    },
+    {
+      "probe_id": "regression.n0067",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_legacy_inventory_is_not_admitted_or_used_as_phase_evidence"
+    },
+    {
+      "probe_id": "regression.n0068",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_real_development_matrix_preserves_frozen_identity_order_and_metadata"
+    },
+    {
+      "probe_id": "regression.n0069",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_schema2_readiness_admits_live_result_with_verifier_error"
+    },
+    {
+      "probe_id": "regression.n0070",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_schema2_readiness_checker_rebuilds_semantic_report"
+    },
+    {
+      "probe_id": "regression.n0071",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_schema2_readiness_distinguishes_missing_phase_from_source_exclusion"
+    },
+    {
+      "probe_id": "regression.n0072",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_schema2_readiness_rejects_presence_without_review_outcome"
+    },
+    {
+      "probe_id": "regression.n0073",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_schema2_readiness_uses_aggregate_development_phase_coverage"
+    },
+    {
+      "probe_id": "regression.n0074",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_schema2_source_policy_mismatch_is_not_phase_failure"
+    },
+    {
+      "probe_id": "regression.n0075",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_split_matrix_rejects_source_matrix_drift"
+    },
+    {
+      "probe_id": "regression.n0076",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench.py::test_task_split_is_stable_and_outcome_blind"
+    },
+    {
+      "probe_id": "regression.n0077",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_analysis_build_needs_only_the_frozen_campaign"
+    },
+    {
+      "probe_id": "regression.n0078",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_analysis_rejects_campaign_symlink"
+    },
+    {
+      "probe_id": "regression.n0079",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_analysis_rejects_changed_campaign_bytes"
+    },
+    {
+      "probe_id": "regression.n0080",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_analysis_rejects_unreduced_fraction"
+    },
+    {
+      "probe_id": "regression.n0081",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_checker_rejects_stale_but_valid_analysis"
+    },
+    {
+      "probe_id": "regression.n0082",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_real_development_analysis_is_deterministic_and_exact"
+    },
+    {
+      "probe_id": "regression.n0083",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_analysis.py::test_report_rejects_operator_totals_that_disagree_with_cases"
+    },
+    {
+      "probe_id": "regression.n0084",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_campaign.py::test_committed_report_rejects_request_sequence_drift"
+    },
+    {
+      "probe_id": "regression.n0085",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_campaign.py::test_protocol_loader_rejects_implementation_drift"
+    },
+    {
+      "probe_id": "regression.n0086",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_claim_schema_rejects_unregistered_score"
+    },
+    {
+      "probe_id": "regression.n0087",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_collection_evidence_binds_run_configuration_and_progress"
+    },
+    {
+      "probe_id": "regression.n0088",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_development_protocol_remains_frozen"
+    },
+    {
+      "probe_id": "regression.n0089",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_progress_accepts_interrupted_resume_and_all_completed_outcomes"
+    },
+    {
+      "probe_id": "regression.n0090",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_progress_rejects_duplicate_completed_task"
+    },
+    {
+      "probe_id": "regression.n0091",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_protocol_freezes_held_out_contract_without_a_producer_revision"
+    },
+    {
+      "probe_id": "regression.n0092",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_protocol_generation_rejects_existing_held_out_output"
+    },
+    {
+      "probe_id": "regression.n0093",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_report_derives_all_counts_and_round_trips"
+    },
+    {
+      "probe_id": "regression.n0094",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_task_model_rejects_request_order_drift"
+    },
+    {
+      "probe_id": "regression.n0095",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_test_admission_accepts_complete_phase_incomplete_cohort"
+    },
+    {
+      "probe_id": "regression.n0096",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_prefixbench_test_campaign.py::test_test_admission_rejects_source_census_drift"
+    },
+    {
+      "probe_id": "regression.n0097",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_reducer.py::test_reducer_preserves_source_anchored_violation_and_strictly_shrinks"
+    },
+    {
+      "probe_id": "regression.n0098",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_reducer.py::test_reducer_rejects_an_attempt_without_a_verified_terminal"
+    },
+    {
+      "probe_id": "regression.n0099",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_replay.py::test_replay_gateway_preserves_model_call_order_and_usage"
+    },
+    {
+      "probe_id": "regression.n0100",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_replay.py::test_replay_gateways_are_independent_and_return_copies"
+    },
+    {
+      "probe_id": "regression.n0101",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_artifact_binding_rejects_paths_outside_runtime"
+    },
+    {
+      "probe_id": "regression.n0102",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_cli_has_no_collection_command"
+    },
+    {
+      "probe_id": "regression.n0103",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_frozen_preflight_uses_only_the_prepared_runtime"
+    },
+    {
+      "probe_id": "regression.n0104",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_project_archive_rejects_symlinks"
+    },
+    {
+      "probe_id": "regression.n0105",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_project_archive_uses_committed_bytes"
+    },
+    {
+      "probe_id": "regression.n0106",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_reviewed_spec_and_patch_are_canonical_and_hash_bound"
+    },
+    {
+      "probe_id": "regression.n0107",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_runtime_attestation_checks_import_metadata_and_path_alignment"
+    },
+    {
+      "probe_id": "regression.n0108",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_runtime_attestation_rejects_direct_url_install"
+    },
+    {
+      "probe_id": "regression.n0109",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_runtime_environment_removes_python_overrides"
+    },
+    {
+      "probe_id": "regression.n0110",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_runtime_id_binds_tool_and_project_identities"
+    },
+    {
+      "probe_id": "regression.n0111",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_runtime_probe_schema_rejects_missing_harbor_executable"
+    },
+    {
+      "probe_id": "regression.n0112",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_spec_rejects_a_changed_patch"
+    },
+    {
+      "probe_id": "regression.n0113",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_harbor_runtime.py::test_wheel_metadata_must_match_name_and_version"
+    },
+    {
+      "probe_id": "regression.n0114",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_analysis.py::test_artifact_bundle_cannot_skip_dependency_order"
+    },
+    {
+      "probe_id": "regression.n0115",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_analysis.py::test_choice_domain_uses_the_frozen_tb21_namespace"
+    },
+    {
+      "probe_id": "regression.n0116",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_analysis.py::test_final_comparison_reports_agreement_without_pooled_statistics"
+    },
+    {
+      "probe_id": "regression.n0117",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_analysis.py::test_inference_rejects_an_incomplete_cohort"
+    },
+    {
+      "probe_id": "regression.n0118",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_analysis.py::test_readiness_never_claims_ready_for_unavailable_sources"
+    },
+    {
+      "probe_id": "regression.n0119",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_attempt_after_terminal_is_faulted"
+    },
+    {
+      "probe_id": "regression.n0120",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_dead_launch_without_result_is_faulted"
+    },
+    {
+      "probe_id": "regression.n0121",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_debian_mount_task_map_matches_the_frozen_tb20_runner"
+    },
+    {
+      "probe_id": "regression.n0122",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_harbor_023_registry_path_blocks_without_provider"
+    },
+    {
+      "probe_id": "regression.n0123",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_installed_harbor_023_does_not_resolve_the_toml_manifest"
+    },
+    {
+      "probe_id": "regression.n0124",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_only_interrupted_attempt_can_advance_to_next_attempt"
+    },
+    {
+      "probe_id": "regression.n0125",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_result_written_before_terminal_receipt_is_recovered"
+    },
+    {
+      "probe_id": "regression.n0126",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_harbor.py::test_reward_zero_terminal_receipt_is_absorbing"
+    },
+    {
+      "probe_id": "regression.n0127",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_manifest.py::test_freeze_gate_checks_broken_symlinks_as_existing"
+    },
+    {
+      "probe_id": "regression.n0128",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_manifest.py::test_freeze_gate_rejects_deleted_outcome_in_any_ref_history"
+    },
+    {
+      "probe_id": "regression.n0129",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_manifest.py::test_random_domains_are_distinct_from_main_analysis"
+    },
+    {
+      "probe_id": "regression.n0130",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_manifest.py::test_run_plan_requires_contiguous_version_scoped_tasks"
+    },
+    {
+      "probe_id": "regression.n0131",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_check_returns_a_stable_validation_error"
+    },
+    {
+      "probe_id": "regression.n0132",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_freeze_rejects_a_broken_symlink_before_reading_inputs"
+    },
+    {
+      "probe_id": "regression.n0133",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_freeze_rejects_deleted_artifact_history_before_reading_inputs"
+    },
+    {
+      "probe_id": "regression.n0134",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_freeze_rejects_existing_artifact_before_reading_inputs"
+    },
+    {
+      "probe_id": "regression.n0135",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_manifest_parser_rejects_duplicate_package_digests"
+    },
+    {
+      "probe_id": "regression.n0136",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_matrix_rejects_stale_correspondence_identity"
+    },
+    {
+      "probe_id": "regression.n0137",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_protocol_contains_no_checkout_or_credential_path"
+    },
+    {
+      "probe_id": "regression.n0138",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_protocol_freezes_separate_sensitivity_contract"
+    },
+    {
+      "probe_id": "regression.n0139",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_protocol_rejects_method_order_drift"
+    },
+    {
+      "probe_id": "regression.n0140",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_tb21_sensitivity_protocol.py::test_source_identity_is_length_framed_and_domain_separated"
+    },
+    {
+      "probe_id": "regression.n0141",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_complete_artifact_only_package"
+    },
+    {
+      "probe_id": "regression.n0142",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_complete_checker_runs_only_selected_full_rebuilds"
+    },
+    {
+      "probe_id": "regression.n0143",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_complete_full_rebuild_package"
+    },
+    {
+      "probe_id": "regression.n0144",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_complete_tb21_prefix_runs_the_existing_content_checker"
+    },
+    {
+      "probe_id": "regression.n0145",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_gate_failure_does_not_probe_or_read_outcomes"
+    },
+    {
+      "probe_id": "regression.n0146",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_held_out_full_rebuild_compares_canonical_bytes"
+    },
+    {
+      "probe_id": "regression.n0147",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_invalid_complete_tb21_stops_before_main_outcome_probe"
+    },
+    {
+      "probe_id": "regression.n0148",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_outcome_structure_requires_exact_cross_artifact_membership"
+    },
+    {
+      "probe_id": "regression.n0149",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_partial_artifact_set_is_rejected_before_reading_it"
+    },
+    {
+      "probe_id": "regression.n0150",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_partial_raw_group_is_rejected_before_rebuild"
+    },
+    {
+      "probe_id": "regression.n0151",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_partial_tb21_prefix_is_reported_without_reading_outcomes"
+    },
+    {
+      "probe_id": "regression.n0152",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_precollection_has_four_artifact_only_declarations"
+    },
+    {
+      "probe_id": "regression.n0153",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_raw_manifests_come_from_the_fixed_canonical_bindings"
+    },
+    {
+      "probe_id": "regression.n0154",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_raw_root_without_artifacts_is_partial_invalid"
+    },
+    {
+      "probe_id": "regression.n0155",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_result_rejects_a_changed_raw_input_denominator"
+    },
+    {
+      "probe_id": "regression.n0156",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_result_rejects_complete_state_with_partial_raw_input"
+    },
+    {
+      "probe_id": "regression.n0157",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_symlinked_raw_file_is_invalid"
+    },
+    {
+      "probe_id": "regression.n0158",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_reproduction.py::test_tb21_outcomes_must_form_the_fixed_dependency_prefix"
+    },
+    {
+      "probe_id": "regression.n0159",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_atomic_publish_does_not_overwrite_a_racing_writer"
+    },
+    {
+      "probe_id": "regression.n0160",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_build_is_write_once_and_check_is_read_only"
+    },
+    {
+      "probe_id": "regression.n0161",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_build_rejects_a_conflict_before_writing_the_other_output"
+    },
+    {
+      "probe_id": "regression.n0162",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_build_rejects_a_symlinked_output_parent"
+    },
+    {
+      "probe_id": "regression.n0163",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_existing_output_check_does_not_follow_a_racing_symlink"
+    },
+    {
+      "probe_id": "regression.n0164",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_json_pointer_resolver_handles_rfc6901_escapes"
+    },
+    {
+      "probe_id": "regression.n0165",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_markdown_includes_scope_and_source_pointer"
+    },
+    {
+      "probe_id": "regression.n0166",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_output_publish_revalidates_every_final_file"
+    },
+    {
+      "probe_id": "regression.n0167",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_partition_analysis_validation_rejects_a_stale_summary"
+    },
+    {
+      "probe_id": "regression.n0168",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_projection_has_fixed_tables_and_traceable_partition_rows"
+    },
+    {
+      "probe_id": "regression.n0169",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/mutation/test_thesis_tables.py::test_traceability_rejects_a_changed_exact_decimal"
+    },
+    {
+      "probe_id": "regression.n0170",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_analyze_failure_traces.py::test_analyze_failure_traces_measures_completion_and_budget_behavior"
+    },
+    {
+      "probe_id": "regression.n0171",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_analyze_failure_traces.py::test_analyze_failure_traces_simulates_wall_finalization_boundary"
+    },
+    {
+      "probe_id": "regression.n0172",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_build_full_matrix.py::test_build_matrix_preserves_registry_order_and_reads_public_metadata"
+    },
+    {
+      "probe_id": "regression.n0173",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_build_full_matrix.py::test_build_matrix_rejects_task_directory_drift"
+    },
+    {
+      "probe_id": "regression.n0174",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_check_repository_hygiene.py::test_find_violations_allows_relative_paths_and_public_urls"
+    },
+    {
+      "probe_id": "regression.n0175",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_check_repository_hygiene.py::test_find_violations_reports_private_repository_metadata"
+    },
+    {
+      "probe_id": "regression.n0176",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_check_repository_hygiene.py::test_sanitize_json_removes_internal_routing_and_local_root"
+    },
+    {
+      "probe_id": "regression.n0177",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_check_thesis_reproduction_script.py::test_cli_prints_canonical_result_and_maps_state_to_exit_code"
+    },
+    {
+      "probe_id": "regression.n0178",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_check_thesis_reproduction_script.py::test_cli_rejects_all_arguments"
+    },
+    {
+      "probe_id": "regression.n0179",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_collect_latest_results_reads_direct_harbor_job"
+    },
+    {
+      "probe_id": "regression.n0180",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_collect_latest_results_recovers_result_written_before_progress_event"
+    },
+    {
+      "probe_id": "regression.n0181",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_collect_latest_results_rejects_event_result_task_mismatch"
+    },
+    {
+      "probe_id": "regression.n0182",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_collect_latest_results_requires_every_matrix_task"
+    },
+    {
+      "probe_id": "regression.n0183",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_collect_latest_results_selects_latest_completion_and_classifies_errors"
+    },
+    {
+      "probe_id": "regression.n0184",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_profile_collection_binds_the_selected_journal_and_producer"
+    },
+    {
+      "probe_id": "regression.n0185",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_profile_collection_rejects_effective_config_mismatch"
+    },
+    {
+      "probe_id": "regression.n0186",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collect_evaluation_results.py::test_profile_collection_rejects_replay_and_mixed_producers"
+    },
+    {
+      "probe_id": "regression.n0187",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collection_profile.py::test_collection_attestation_does_not_enter_loop_options"
+    },
+    {
+      "probe_id": "regression.n0188",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collection_profile.py::test_harbor_options_reject_profile_policy_drift"
+    },
+    {
+      "probe_id": "regression.n0189",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collection_profile.py::test_harbor_options_require_complete_profile_provenance"
+    },
+    {
+      "probe_id": "regression.n0190",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collection_profile.py::test_prefixbench_profile_expands_frozen_options_and_provenance"
+    },
+    {
+      "probe_id": "regression.n0191",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_collection_profile.py::test_prefixbench_profile_rejects_controlled_overrides"
+    },
+    {
+      "probe_id": "regression.n0192",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_builder_rejects_result_source_drift"
+    },
+    {
+      "probe_id": "regression.n0193",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_builds_deterministic_source_bound_disagreement_corpus"
+    },
+    {
+      "probe_id": "regression.n0194",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_calibration_rejects_unsanitized_corpus_output"
+    },
+    {
+      "probe_id": "regression.n0195",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_calibration_separates_proven_decisions_from_isolation_candidates"
+    },
+    {
+      "probe_id": "regression.n0196",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_check_artifacts_binds_corpus_to_canonical_without_raw_runs"
+    },
+    {
+      "probe_id": "regression.n0197",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_check_artifacts_rebuilds_sources_and_detects_stale_report"
+    },
+    {
+      "probe_id": "regression.n0198",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_legacy_decoder_rejects_events_after_run_finished"
+    },
+    {
+      "probe_id": "regression.n0199",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_legacy_decoder_rejects_receipt_first_event_order"
+    },
+    {
+      "probe_id": "regression.n0200",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_review_required_policy_blocks_legacy_no_review_acceptance"
+    },
+    {
+      "probe_id": "regression.n0201",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_calibration.py::test_schema2_decoder_accepts_isolated_receipt_first_event_order"
+    },
+    {
+      "probe_id": "regression.n0202",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_acceptance_rejects_a_receipt_for_different_check_content"
+    },
+    {
+      "probe_id": "regression.n0203",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_acceptance_rejects_host_attempt_and_epoch_drift"
+    },
+    {
+      "probe_id": "regression.n0204",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_contract_coverage_rejects_an_omitted_requirement"
+    },
+    {
+      "probe_id": "regression.n0205",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_contract_type_rejects_a_mismatched_check_kind_during_acceptance"
+    },
+    {
+      "probe_id": "regression.n0206",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_controller_issues_a_permit_only_for_the_complete_conjunction"
+    },
+    {
+      "probe_id": "regression.n0207",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_controller_rejects_an_acceptance_from_another_controller"
+    },
+    {
+      "probe_id": "regression.n0208",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_default_contract_freezes_the_full_instruction_and_runtime_budgets"
+    },
+    {
+      "probe_id": "regression.n0209",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_default_contract_preserves_a_long_instruction"
+    },
+    {
+      "probe_id": "regression.n0210",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_each_completion_guard_reports_its_own_reason"
+    },
+    {
+      "probe_id": "regression.n0211",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_control.py::test_finish_proposal_is_rejected_in_an_illegal_phase"
+    },
+    {
+      "probe_id": "regression.n0212",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation.py::test_completion_check_runs_only_in_isolated_environment"
+    },
+    {
+      "probe_id": "regression.n0213",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation.py::test_isolation_allows_a_write_producing_completion_check"
+    },
+    {
+      "probe_id": "regression.n0214",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation.py::test_isolation_failure_stops_before_semantic_review"
+    },
+    {
+      "probe_id": "regression.n0215",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation.py::test_repeated_finish_gets_new_attempt_and_global_sequence"
+    },
+    {
+      "probe_id": "regression.n0216",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_census.py::test_build_census_matches_factory_task_source_rejections"
+    },
+    {
+      "probe_id": "regression.n0217",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_census.py::test_census_rejects_missing_or_duplicate_cache_entries"
+    },
+    {
+      "probe_id": "regression.n0218",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_census.py::test_check_artifacts_rebuilds_from_a_source_snapshot_without_a_cache"
+    },
+    {
+      "probe_id": "regression.n0219",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_census.py::test_check_artifacts_rebuilds_from_bound_sources"
+    },
+    {
+      "probe_id": "regression.n0220",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_census.py::test_check_artifacts_rejects_tampered_source_snapshot"
+    },
+    {
+      "probe_id": "regression.n0221",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_census.py::test_check_artifacts_requires_a_complete_cache_without_a_snapshot"
+    },
+    {
+      "probe_id": "regression.n0222",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_rejects_completion_journal_proposal_drift"
+    },
+    {
+      "probe_id": "regression.n0223",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_rejects_corpus_proposal_drift"
+    },
+    {
+      "probe_id": "regression.n0224",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_rejects_missing_review_failure_event"
+    },
+    {
+      "probe_id": "regression.n0225",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_rejects_outcome_not_bound_to_journal"
+    },
+    {
+      "probe_id": "regression.n0226",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_rejects_replay_command_drift"
+    },
+    {
+      "probe_id": "regression.n0227",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_rejects_unbound_completion_receipt"
+    },
+    {
+      "probe_id": "regression.n0228",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_build_experiment_report_separates_mechanical_and_semantic_results"
+    },
+    {
+      "probe_id": "regression.n0229",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_check_artifacts_rebuilds_available_results"
+    },
+    {
+      "probe_id": "regression.n0230",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_check_artifacts_uses_report_revision_for_frozen_runtime"
+    },
+    {
+      "probe_id": "regression.n0231",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_freeze_experiment_inputs_copies_rebuildable_evidence"
+    },
+    {
+      "probe_id": "regression.n0232",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_completion_isolation_experiments.py::test_historical_report_replay_binds_pre_attempt_receipts"
+    },
+    {
+      "probe_id": "regression.n0233",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_dharness_adapter.py::test_dharness_adapter_delegates_one_atomic_isolation_run"
+    },
+    {
+      "probe_id": "regression.n0234",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_dharness_adapter.py::test_dharness_adapter_freezes_trace_and_state_at_capture"
+    },
+    {
+      "probe_id": "regression.n0235",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_dharness_adapter.py::test_dharness_adapter_translates_isolation_errors"
+    },
+    {
+      "probe_id": "regression.n0236",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_candidate_content_digest_binds_ordered_rootfs_layers"
+    },
+    {
+      "probe_id": "regression.n0237",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_cleans_up_child_by_reserved_name_when_docker_run_times_out"
+    },
+    {
+      "probe_id": "regression.n0238",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_cleans_up_child_when_post_start_inspection_fails"
+    },
+    {
+      "probe_id": "regression.n0239",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_cleanup_hard_deadline_cancels_a_stuck_docker_call"
+    },
+    {
+      "probe_id": "regression.n0240",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_cleanup_has_one_bounded_deadline_for_all_owned_resources"
+    },
+    {
+      "probe_id": "regression.n0241",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_cleanup_order_survives_executor_failure"
+    },
+    {
+      "probe_id": "regression.n0242",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_commit_timeout_allows_cleanup_when_image_was_not_created"
+    },
+    {
+      "probe_id": "regression.n0243",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_diff_classification_omits_changed_directories_not_files"
+    },
+    {
+      "probe_id": "regression.n0244",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_diff_classification_rejects_file_replaced_by_directory"
+    },
+    {
+      "probe_id": "regression.n0245",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_pause_timeout_error_remains_a_deadline_failure"
+    },
+    {
+      "probe_id": "regression.n0246",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_pause_timeout_still_recovers_a_source_paused_by_docker"
+    },
+    {
+      "probe_id": "regression.n0247",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_preserves_nonzero_check_result_as_command_failure"
+    },
+    {
+      "probe_id": "regression.n0248",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_process_termination_and_output_drain_are_bounded"
+    },
+    {
+      "probe_id": "regression.n0249",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_rejects_task_mount_before_pausing_source"
+    },
+    {
+      "probe_id": "regression.n0250",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_docker_completion_isolation.py::test_runs_unchanged_check_once_in_mount_free_child"
+    },
+    {
+      "probe_id": "regression.n0251",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evaluation.py::test_duplicate_task_results_are_rejected"
+    },
+    {
+      "probe_id": "regression.n0252",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evaluation.py::test_empty_results_report_has_no_pass_rate"
+    },
+    {
+      "probe_id": "regression.n0253",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evaluation.py::test_error_only_results_have_no_pass_rate"
+    },
+    {
+      "probe_id": "regression.n0254",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evaluation.py::test_replay_result_is_labeled_with_source_hash"
+    },
+    {
+      "probe_id": "regression.n0255",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evaluation.py::test_repository_matrix_is_balanced_and_unique"
+    },
+    {
+      "probe_id": "regression.n0256",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evaluation.py::test_summary_keeps_missing_tasks_out_of_failure_count"
+    },
+    {
+      "probe_id": "regression.n0257",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_explicit_review_opt_out_keeps_mechanical_mode"
+    },
+    {
+      "probe_id": "regression.n0258",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_accepts_only_a_fully_bound_attempt"
+    },
+    {
+      "probe_id": "regression.n0259",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_rejects_a_receipt_from_another_attempt"
+    },
+    {
+      "probe_id": "regression.n0260",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_rejects_a_receipt_from_another_candidate"
+    },
+    {
+      "probe_id": "regression.n0261",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_isolation_evidence_rejects_missing_or_mismatched_bindings"
+    },
+    {
+      "probe_id": "regression.n0262",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_required_semantic_review_cannot_be_missing"
+    },
+    {
+      "probe_id": "regression.n0263",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_semantic_acceptance_completes_verification_evidence"
+    },
+    {
+      "probe_id": "regression.n0264",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_evidence.py::test_semantic_rejection_is_part_of_verification_evidence"
+    },
+    {
+      "probe_id": "regression.n0265",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_manifest_rejects_a_changed_source_config"
+    },
+    {
+      "probe_id": "regression.n0266",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_manifest_rejects_a_changed_source_result"
+    },
+    {
+      "probe_id": "regression.n0267",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_manifest_rejects_a_different_matrix"
+    },
+    {
+      "probe_id": "regression.n0268",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_manifest_uses_canonical_result_paths"
+    },
+    {
+      "probe_id": "regression.n0269",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_result_sets_combines_distinct_jobs"
+    },
+    {
+      "probe_id": "regression.n0270",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_result_sets_rejects_duplicates_across_jobs"
+    },
+    {
+      "probe_id": "regression.n0271",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_results_requires_exact_matrix_coverage"
+    },
+    {
+      "probe_id": "regression.n0272",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_freeze_evaluation.py::test_freeze_results_writes_sanitized_provenance_snapshot"
+    },
+    {
+      "probe_id": "regression.n0273",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harbor_agent.py::test_harbor_adapter_populates_context"
+    },
+    {
+      "probe_id": "regression.n0274",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harbor_agent.py::test_profiled_harbor_run_rechecks_and_records_producer"
+    },
+    {
+      "probe_id": "regression.n0275",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harness_adapter.py::test_adapter_returns_a_defensive_copy_of_the_completion_view"
+    },
+    {
+      "probe_id": "regression.n0276",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harness_adapter.py::test_controller_rejects_completion_state_candidate_drift"
+    },
+    {
+      "probe_id": "regression.n0277",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harness_adapter.py::test_controller_rejects_snapshot_binding_mismatches"
+    },
+    {
+      "probe_id": "regression.n0278",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harness_adapter.py::test_portable_completion_modules_do_not_import_dharness_runtime"
+    },
+    {
+      "probe_id": "regression.n0279",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harness_adapter.py::test_stub_adapter_completes_without_dharness_runtime"
+    },
+    {
+      "probe_id": "regression.n0280",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_harness_adapter.py::test_stub_gives_each_check_a_private_candidate_copy"
+    },
+    {
+      "probe_id": "regression.n0281",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_isolation_experiment_agent.py::test_experiment_agent_replays_then_runs_recorded_finish"
+    },
+    {
+      "probe_id": "regression.n0282",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_isolation_experiment_agent.py::test_load_completion_candidate_binds_journal_and_proposal"
+    },
+    {
+      "probe_id": "regression.n0283",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_isolation_experiment_agent.py::test_load_completion_candidate_rejects_later_changes"
+    },
+    {
+      "probe_id": "regression.n0284",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_isolation_experiment_agent.py::test_load_completion_candidate_rejects_proposal_drift"
+    },
+    {
+      "probe_id": "regression.n0285",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_isolation_experiment_agent.py::test_load_completion_candidate_rejects_source_drift"
+    },
+    {
+      "probe_id": "regression.n0286",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_journal.py::test_journal_redacts_secrets_in_structured_events"
+    },
+    {
+      "probe_id": "regression.n0287",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_journal.py::test_journal_writes_one_json_event_per_line"
+    },
+    {
+      "probe_id": "regression.n0288",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_journal.py::test_output_is_redacted_archived_and_truncated"
+    },
+    {
+      "probe_id": "regression.n0289",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_protocol_script.py::test_check_returns_one_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0290",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_protocol_script.py::test_cli_exposes_no_scientific_options"
+    },
+    {
+      "probe_id": "regression.n0291",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_protocol_script.py::test_freeze_refuses_to_replace_a_different_protocol"
+    },
+    {
+      "probe_id": "regression.n0292",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_protocol_script.py::test_freeze_writes_protocol_once"
+    },
+    {
+      "probe_id": "regression.n0293",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_protocol_script.py::test_preflight_prints_protocol_identity"
+    },
+    {
+      "probe_id": "regression.n0294",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_adapter_builds_independent_control_chain_from_explicit_attestations"
+    },
+    {
+      "probe_id": "regression.n0295",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_adapter_rejects_a_tool_observation_bound_to_another_action"
+    },
+    {
+      "probe_id": "regression.n0296",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_adapter_rejects_invalid_workspace_attestation_sequences"
+    },
+    {
+      "probe_id": "regression.n0297",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_i1_applicability_uses_digests_not_command_text"
+    },
+    {
+      "probe_id": "regression.n0298",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_i3_is_fixed_as_unsupported_by_design"
+    },
+    {
+      "probe_id": "regression.n0299",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_mapped_family_mutations_create_deterministic_target_violations"
+    },
+    {
+      "probe_id": "regression.n0300",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_terminal_action_may_use_the_exit_message_as_its_observation"
+    },
+    {
+      "probe_id": "regression.n0301",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer.py::test_transfer_adapter_imports_only_stdlib_and_pydantic"
+    },
+    {
+      "probe_id": "regression.n0302",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer_runtime.py::test_attested_environment_captures_initial_action_and_terminal_states"
+    },
+    {
+      "probe_id": "regression.n0303",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer_runtime.py::test_attested_environment_records_state_after_a_terminal_action_exception"
+    },
+    {
+      "probe_id": "regression.n0304",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer_runtime.py::test_runtime_uses_dynamic_upstream_imports"
+    },
+    {
+      "probe_id": "regression.n0305",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer_runtime.py::test_verify_checkout_requires_exact_clean_revision"
+    },
+    {
+      "probe_id": "regression.n0306",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_main_analysis_transfer_runtime.py::test_workspace_digest_rejects_output_with_any_extra_lines"
+    },
+    {
+      "probe_id": "regression.n0307",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_model_client.py::test_gateway_parses_decision_and_tracks_usage"
+    },
+    {
+      "probe_id": "regression.n0308",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_model_client.py::test_gateway_repairs_empty_content_once"
+    },
+    {
+      "probe_id": "regression.n0309",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_model_client.py::test_gateway_uses_one_schema_repair_call"
+    },
+    {
+      "probe_id": "regression.n0310",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_package.py::test_evaluation_import_does_not_load_model_stack"
+    },
+    {
+      "probe_id": "regression.n0311",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_package.py::test_top_level_agent_export_remains_available"
+    },
+    {
+      "probe_id": "regression.n0312",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_cycle_detector_finds_repeated_two_command_cycle"
+    },
+    {
+      "probe_id": "regression.n0313",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_isolated_verification_allows_potential_writes"
+    },
+    {
+      "probe_id": "regression.n0314",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_nonzero_failure_is_not_success"
+    },
+    {
+      "probe_id": "regression.n0315",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_verification_allows_project_owned_tests"
+    },
+    {
+      "probe_id": "regression.n0316",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_verification_allows_read_only_tokens_that_resemble_mutations"
+    },
+    {
+      "probe_id": "regression.n0317",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_verification_blocks_benchmark_verifier_cwd"
+    },
+    {
+      "probe_id": "regression.n0318",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_verification_blocks_benchmark_verifier_path"
+    },
+    {
+      "probe_id": "regression.n0319",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_verification_rejects_display_only_checks"
+    },
+    {
+      "probe_id": "regression.n0320",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_policy.py::test_verification_rejects_mutating_shell_commands"
+    },
+    {
+      "probe_id": "regression.n0321",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_analysis_script.py::test_build_writes_canonical_analysis_and_prints_counts"
+    },
+    {
+      "probe_id": "regression.n0322",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_analysis_script.py::test_check_returns_nonzero_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0323",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_analysis_script.py::test_cli_exposes_no_selection_or_execution_options"
+    },
+    {
+      "probe_id": "regression.n0324",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_campaign_script.py::test_build_writes_canonical_report_and_prints_summary"
+    },
+    {
+      "probe_id": "regression.n0325",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_campaign_script.py::test_check_returns_nonzero_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0326",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_campaign_script.py::test_cli_exposes_no_split_or_execution_options"
+    },
+    {
+      "probe_id": "regression.n0327",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_script.py::test_build_command_passes_expected_task_count"
+    },
+    {
+      "probe_id": "regression.n0328",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_script.py::test_check_command_passes_expected_task_count"
+    },
+    {
+      "probe_id": "regression.n0329",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_script.py::test_matrix_command_writes_the_frozen_development_split"
+    },
+    {
+      "probe_id": "regression.n0330",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_build_writes_canonical_report"
+    },
+    {
+      "probe_id": "regression.n0331",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_check_returns_one_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0332",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_cli_exposes_no_campaign_policy_options"
+    },
+    {
+      "probe_id": "regression.n0333",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_freeze_refuses_to_replace_protocol"
+    },
+    {
+      "probe_id": "regression.n0334",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_freeze_writes_protocol_once"
+    },
+    {
+      "probe_id": "regression.n0335",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_preflight_prints_frozen_identity"
+    },
+    {
+      "probe_id": "regression.n0336",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prefixbench_test_campaign_script.py::test_verify_frozen_checks_protocol_without_live_runtime_preflight"
+    },
+    {
+      "probe_id": "regression.n0337",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_process_containment.py::test_command_return_code_is_not_misclassified_as_timeout"
+    },
+    {
+      "probe_id": "regression.n0338",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_process_containment.py::test_docker_command_uses_an_in_container_timeout_with_host_cleanup_grace"
+    },
+    {
+      "probe_id": "regression.n0339",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_process_containment.py::test_in_container_timeout_is_reported_as_timeout"
+    },
+    {
+      "probe_id": "regression.n0340",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_process_containment.py::test_non_docker_environment_is_not_wrapped"
+    },
+    {
+      "probe_id": "regression.n0341",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_process_containment.py::test_process_listing_cannot_echo_the_timeout_marker"
+    },
+    {
+      "probe_id": "regression.n0342",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prompting.py::test_compaction_preserves_task_and_complete_schema"
+    },
+    {
+      "probe_id": "regression.n0343",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_prompting.py::test_completion_reviewer_uses_feasible_evidence_standard"
+    },
+    {
+      "probe_id": "regression.n0344",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_protocol.py::test_execute_requires_a_command"
+    },
+    {
+      "probe_id": "regression.n0345",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_protocol.py::test_finish_coverage_must_reference_known_check"
+    },
+    {
+      "probe_id": "regression.n0346",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_protocol.py::test_strict_json_rejects_markdown_fences"
+    },
+    {
+      "probe_id": "regression.n0347",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_discards_commands_not_run_before_terminal_event"
+    },
+    {
+      "probe_id": "regression.n0348",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_rejects_invalid_sequence_and_epoch"
+    },
+    {
+      "probe_id": "regression.n0349",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_rejects_mismatched_receipt_identity"
+    },
+    {
+      "probe_id": "regression.n0350",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_rejects_receipt_fields_that_do_not_match_decision"
+    },
+    {
+      "probe_id": "regression.n0351",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_rejects_sequence_gaps_and_reused_batch_epochs"
+    },
+    {
+      "probe_id": "regression.n0352",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_rejects_truncated_successful_batch"
+    },
+    {
+      "probe_id": "regression.n0353",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_rejects_wrong_policy_rejection_id"
+    },
+    {
+      "probe_id": "regression.n0354",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_skips_a_control_rejected_decision"
+    },
+    {
+      "probe_id": "regression.n0355",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_recorded_replay_stops_at_the_terminal_event"
+    },
+    {
+      "probe_id": "regression.n0356",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_agent_executes_only_agent_decisions"
+    },
+    {
+      "probe_id": "regression.n0357",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_can_continue_past_failures_recorded_in_source"
+    },
+    {
+      "probe_id": "regression.n0358",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_discards_a_policy_rejected_command_batch"
+    },
+    {
+      "probe_id": "regression.n0359",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_rejects_redacted_commands"
+    },
+    {
+      "probe_id": "regression.n0360",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_rejects_success_when_source_recorded_failure"
+    },
+    {
+      "probe_id": "regression.n0361",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_requires_an_execute_decision"
+    },
+    {
+      "probe_id": "regression.n0362",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_requires_the_exact_recorded_return_code"
+    },
+    {
+      "probe_id": "regression.n0363",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_requires_the_recorded_failure_kind"
+    },
+    {
+      "probe_id": "regression.n0364",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_replay_still_rejects_new_failures"
+    },
+    {
+      "probe_id": "regression.n0365",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_replay_agent.py::test_schema2_replay_ignores_isolated_completion_checks"
+    },
+    {
+      "probe_id": "regression.n0366",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_build_command_can_mount_bullseye_main_sources_without_security"
+    },
+    {
+      "probe_id": "regression.n0367",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_build_command_can_mount_trixie_https_apt_sources"
+    },
+    {
+      "probe_id": "regression.n0368",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_build_command_can_select_one_task_and_mount_https_apt_sources"
+    },
+    {
+      "probe_id": "regression.n0369",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_build_command_rejects_duplicate_task_selection"
+    },
+    {
+      "probe_id": "regression.n0370",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_build_command_rejects_multiple_debian_source_mounts"
+    },
+    {
+      "probe_id": "regression.n0371",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_build_command_rejects_task_outside_fixed_matrix"
+    },
+    {
+      "probe_id": "regression.n0372",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_load_matrix_accepts_nonempty_custom_task_count"
+    },
+    {
+      "probe_id": "regression.n0373",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_load_matrix_rejects_empty_task_list"
+    },
+    {
+      "probe_id": "regression.n0374",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_prefixbench_profile_attests_source_and_owns_reserved_kwargs"
+    },
+    {
+      "probe_id": "regression.n0375",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_evaluation.py::test_standard_run_rejects_spoofed_collection_provenance"
+    },
+    {
+      "probe_id": "regression.n0376",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_active_child_marker_blocks_a_second_orchestrator"
+    },
+    {
+      "probe_id": "regression.n0377",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_active_child_marker_checks_the_process_group"
+    },
+    {
+      "probe_id": "regression.n0378",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_build_task_command_is_serial_and_scopes_https_mount"
+    },
+    {
+      "probe_id": "regression.n0379",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_completed_task_results_ignores_interrupted_trials"
+    },
+    {
+      "probe_id": "regression.n0380",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_completed_task_results_reads_trials_and_ignores_job_summary"
+    },
+    {
+      "probe_id": "regression.n0381",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_full_run_can_start_at_a_named_task"
+    },
+    {
+      "probe_id": "regression.n0382",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_full_run_rechecks_configuration_before_each_task"
+    },
+    {
+      "probe_id": "regression.n0383",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_full_run_records_child_launch_failure"
+    },
+    {
+      "probe_id": "regression.n0384",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_full_run_rejects_configuration_drift"
+    },
+    {
+      "probe_id": "regression.n0385",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_full_run_resumes_from_real_result_and_runs_remaining_task"
+    },
+    {
+      "probe_id": "regression.n0386",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_profiled_full_run_reattests_before_each_task"
+    },
+    {
+      "probe_id": "regression.n0387",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_profiled_task_command_and_run_config_bind_the_producer"
+    },
+    {
+      "probe_id": "regression.n0388",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_run_child_cleans_process_group_when_marker_write_fails"
+    },
+    {
+      "probe_id": "regression.n0389",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_run_child_forwards_sigterm_and_clears_marker"
+    },
+    {
+      "probe_id": "regression.n0390",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_full_evaluation.py::test_run_child_installs_signal_handlers_before_spawning"
+    },
+    {
+      "probe_id": "regression.n0391",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_budget_expiry_after_isolation_skips_review_and_repair"
+    },
+    {
+      "probe_id": "regression.n0392",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_completion_check_timeout_is_clamped_to_wall_budget"
+    },
+    {
+      "probe_id": "regression.n0393",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_configured_contract_budget_must_match_loop_options"
+    },
+    {
+      "probe_id": "regression.n0394",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_environment_call_cannot_exceed_remaining_wall_time"
+    },
+    {
+      "probe_id": "regression.n0395",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_external_cancellation_waits_for_environment_cleanup"
+    },
+    {
+      "probe_id": "regression.n0396",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_failed_change_batches_accumulate_stagnation"
+    },
+    {
+      "probe_id": "regression.n0397",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_failed_verification_returns_to_repair"
+    },
+    {
+      "probe_id": "regression.n0398",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_finalization_allows_one_repair_batch_then_requires_finish"
+    },
+    {
+      "probe_id": "regression.n0399",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_finalization_blocks_late_exploration_but_allows_finish"
+    },
+    {
+      "probe_id": "regression.n0400",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_finalization_model_calls_are_not_thinking_entries"
+    },
+    {
+      "probe_id": "regression.n0401",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_finalization_supersedes_a_pending_replan"
+    },
+    {
+      "probe_id": "regression.n0402",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_finish_cannot_omit_a_fixed_contract_requirement"
+    },
+    {
+      "probe_id": "regression.n0403",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_forbidden_command_never_reaches_environment"
+    },
+    {
+      "probe_id": "regression.n0404",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_max_repairs_grants_exactly_n_cycles"
+    },
+    {
+      "probe_id": "regression.n0405",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_model_call_cannot_exceed_its_timeout"
+    },
+    {
+      "probe_id": "regression.n0406",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_model_call_crossing_wall_boundary_rechecks_allowed_actions"
+    },
+    {
+      "probe_id": "regression.n0407",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_model_timeout_at_wall_boundary_transitions_to_finalization"
+    },
+    {
+      "probe_id": "regression.n0408",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_model_timeout_preserves_wall_time_reserve"
+    },
+    {
+      "probe_id": "regression.n0409",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_recovery_entry_is_unique_per_open_episode"
+    },
+    {
+      "probe_id": "regression.n0410",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_repeated_commands_end_in_bounded_stop"
+    },
+    {
+      "probe_id": "regression.n0411",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_review_budget_exhaustion_never_bypasses_semantic_review"
+    },
+    {
+      "probe_id": "regression.n0412",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_review_findings_fit_the_full_review_schema"
+    },
+    {
+      "probe_id": "regression.n0413",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_reviewer_can_reject_weak_executed_requirement_coverage"
+    },
+    {
+      "probe_id": "regression.n0414",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_reviewer_judges_executed_receipt_before_acceptance"
+    },
+    {
+      "probe_id": "regression.n0415",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_reviewer_timeout_cannot_fall_back_to_verified"
+    },
+    {
+      "probe_id": "regression.n0416",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_success_requires_fresh_check_after_change"
+    },
+    {
+      "probe_id": "regression.n0417",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_verified_finish_rejects_an_illegal_phase_even_with_a_controller"
+    },
+    {
+      "probe_id": "regression.n0418",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_wall_budget_stops_before_starting_an_unusable_model_call"
+    },
+    {
+      "probe_id": "regression.n0419",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_wall_time_reserve_starts_finalization_before_turn_reserve"
+    },
+    {
+      "probe_id": "regression.n0420",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_work_batch_stops_when_a_command_reaches_wall_boundary"
+    },
+    {
+      "probe_id": "regression.n0421",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_work_cannot_consume_verification_reserve"
+    },
+    {
+      "probe_id": "regression.n0422",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_run_loop.py::test_work_command_cannot_consume_wall_time_reserve"
+    },
+    {
+      "probe_id": "regression.n0423",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_source_binding.py::test_git_attestation_binds_workspace_to_head_archive"
+    },
+    {
+      "probe_id": "regression.n0424",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_source_binding.py::test_git_attestation_rejects_runtime_source_drift"
+    },
+    {
+      "probe_id": "regression.n0425",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_source_binding.py::test_producer_attestation_accepts_sha256_git_object_ids"
+    },
+    {
+      "probe_id": "regression.n0426",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_source_binding.py::test_runtime_binding_rejects_symlinked_source"
+    },
+    {
+      "probe_id": "regression.n0427",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_source_binding.py::test_runtime_verification_rejects_a_different_expected_producer"
+    },
+    {
+      "probe_id": "regression.n0428",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_protocol_script.py::test_check_returns_one_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0429",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_protocol_script.py::test_cli_exposes_no_scientific_options"
+    },
+    {
+      "probe_id": "regression.n0430",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_protocol_script.py::test_freeze_refuses_all_writes_if_either_artifact_differs"
+    },
+    {
+      "probe_id": "regression.n0431",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_protocol_script.py::test_freeze_writes_the_bundle_once"
+    },
+    {
+      "probe_id": "regression.n0432",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_protocol_script.py::test_preflight_reports_that_provider_execution_is_blocked"
+    },
+    {
+      "probe_id": "regression.n0433",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_script.py::test_blocked_preflight_has_a_distinct_exit_code"
+    },
+    {
+      "probe_id": "regression.n0434",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_script.py::test_bundle_writer_validates_every_target_before_writing"
+    },
+    {
+      "probe_id": "regression.n0435",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_script.py::test_cli_exposes_no_scientific_or_resume_selection_options"
+    },
+    {
+      "probe_id": "regression.n0436",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_script.py::test_collection_requires_both_checkout_and_env_file"
+    },
+    {
+      "probe_id": "regression.n0437",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_tb21_sensitivity_script.py::test_freeze_writes_manifest_once"
+    },
+    {
+      "probe_id": "regression.n0438",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_main_analysis_script.py::test_build_dispatch_writes_only_the_fixed_report_path"
+    },
+    {
+      "probe_id": "regression.n0439",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_main_analysis_script.py::test_check_returns_one_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0440",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_main_analysis_script.py::test_cli_exposes_no_scientific_or_output_options"
+    },
+    {
+      "probe_id": "regression.n0441",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_main_analysis_script.py::test_freeze_executable_writes_cohort_and_manifest_once"
+    },
+    {
+      "probe_id": "regression.n0442",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_main_analysis_script.py::test_transfer_collection_requires_an_env_file_path"
+    },
+    {
+      "probe_id": "regression.n0443",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_tables_script.py::test_build_prints_both_fixed_output_hashes"
+    },
+    {
+      "probe_id": "regression.n0444",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_tables_script.py::test_check_returns_one_for_validation_errors"
+    },
+    {
+      "probe_id": "regression.n0445",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_thesis_tables_script.py::test_cli_exposes_no_path_or_scientific_options"
+    },
+    {
+      "probe_id": "regression.n0446",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_verify_delivery.py::test_canonical_manifest_rejects_stale_outcomes_and_absolute_paths"
+    },
+    {
+      "probe_id": "regression.n0447",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_verify_delivery.py::test_frozen_provenance_matches_available_raw_result_and_config"
+    },
+    {
+      "probe_id": "regression.n0448",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_verify_delivery.py::test_frozen_provenance_rejects_legacy_replay"
+    },
+    {
+      "probe_id": "regression.n0449",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_verify_delivery.py::test_frozen_provenance_requires_well_formed_task_and_config_bindings"
+    },
+    {
+      "probe_id": "regression.n0450",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_verify_delivery.py::test_snapshot_layout_rejects_nested_and_mismatched_results"
+    },
+    {
+      "probe_id": "regression.n0451",
+      "component": "regression",
+      "property": "regression",
+      "pytest_node": "tests/test_verify_delivery.py::test_zero_error_retry_matrix_must_be_empty"
+    }
+  ]
+}

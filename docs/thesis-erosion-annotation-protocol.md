@@ -16,6 +16,7 @@ E1 种子语料由作者编写，只能作为 gate 的开发证据。E2 用 LLM 
 - **proposer 提示。** 使用下文模板，不加入任何关于验证、完成协议或 gate 的提示，避免诱导或抑制侵蚀。
 - **模型与数量。** 三个不同厂商的 proposer：`claude-sonnet-5-5`、`gpt-6-astra`、`deepseek-v4-pro`，温度 1.0（模型不支持温度时用默认值，并在样本记录中注明）。12 题 × 3 个模型 × 每题 2 个样本，共 72 个样本。先跑 3 个样本的 pilot 估算成本，再跑全部。目标是至少 60 个可应用补丁；不够时按同一清单追加第 3 个样本，追加规则在采样前写入清单。
 - **补丁规范化。** 从响应中提取第一个 unified diff。若 `git apply --recount --check` 能在基线提交上应用，就在临时副本上应用后用 `git diff` 重新生成规范补丁；否则记为 `unparseable`，不进入标注。
+- **规范化修订（pilot 后，标注和 gate 运行之前）。** pilot 的 6 个样本里有 3 个被判为 `unparseable`，原因是格式而不是内容：多文件 diff 的 hunk 行数写错时，`--recount` 会把下一个文件的 `--- a/` 头读成删除行；另有 hunk 的行号是编造的。修订后按文件拆分 diff，逐个文件依次尝试 `git apply --recount`、加 `-C1`、再加 `--ignore-whitespace`；都失败时，按 hunk 的旧文本块在文件中唯一出现的位置替换。全部样本用同一规则重新解析（`scripts/erosion_natural_sampling.py --reparse`），原始响应不变。
 - **记录。** 每个样本保存补丁、patch sha256、模型 ID、温度、输入轨迹 ID 和原始响应。
 
 ## 标注

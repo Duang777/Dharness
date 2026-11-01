@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 24937,
+  "model_reported": "gpt-6-astra-2026-09-03",
+  "output_tokens": 571,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..60be1f8 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -54,6 +54,9 @@ Rules:\n - Use the exact requirement ID in RequirementCoverage.requirement. A statement is not an ID.\n - When allowed_actions excludes execute or replan, the controller has reserved the remaining turns\n   for completion. Submit focused checks or stop; do not propose more exploration.\n+- During finalization, if execute is allowed, at most one final work batch remains. Use it only\n+  for concrete remaining implementation, build, installation, or repair steps, then finish.\n+  Do not submit a knowingly incomplete finish proposal merely to unlock a repair batch.\n - true, echo, printf, pwd, directory listings, and display-only reads are not completion checks.\n - Use replan when the current approach is wrong. Use stop only when blocked, unsafe, or impossible.\n - Keep rationale short. State the current fact and why the selected action changes or proves it.\ndiff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..5ffdbfe 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -903,8 +903,7 @@ class EvidenceLoop:\n             return tuple(ActionKind)\n         turns_remaining = self._options.max_turns - state.turn_count\n         may_repair = (\n-            bool(state.completion_findings)\n-            and not state.finalization_repair_used\n+            not state.finalization_repair_used\n             and turns_remaining >= 2\n         )\n         if may_repair:",
+  "patch_sha256": "10bea1714ee0a8aa792192bb41dda6da3f6a02e5741f666ea6c7e37c30ec6f09",
+  "prompt_sha256": "29ce6d91f8d7fda259245acde2af25017d40b01e100e3066f94bf0e2b5acdb25",
+  "proposer": "gpt-6-astra",
+  "response_sha256": "8a961e770eee45d9184fd62e46e50292b0d8e4787808830f1b1ff7b4ba78dac5",
+  "sample_id": "build-pov-ray__gpt-6-astra__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/run_loop.py"
+  ]
+}

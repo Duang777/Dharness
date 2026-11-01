@@ -1,0 +1,19 @@
+{
+  "index": 0,
+  "input_tokens": 27780,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 19614,
+  "patch": "diff --git a/src/evidence_harness/run_loop.py b/src/evidence_harness/run_loop.py\nindex f1a6340..ac8b897 100644\n--- a/src/evidence_harness/run_loop.py\n+++ b/src/evidence_harness/run_loop.py\n@@ -282,8 +282,6 @@ class EvidenceLoop:\n                 continue\n \n             if decision.action is ActionKind.EXECUTE:\n-                if state.finalization_started:\n-                    state.finalization_repair_used = True\n                 await self._handle_execute(state, runner, decision, contract)\n             elif decision.action is ActionKind.FINISH:\n                 await self._handle_finish(state, decision, contract)\n@@ -386,6 +384,8 @@ class EvidenceLoop:\n                 self._record_policy_rejection(state, command.id, repeat_reason)\n                 break\n \n+            if state.finalization_started:\n+                state.finalization_repair_used = True\n             receipt = await self._run_command(\n                 state,\n                 runner,",
+  "patch_sha256": "45c3fdae0a125fa67e7c1cdfbab4759e26f6334dba8ce4281ef52e691b8751f1",
+  "prompt_sha256": "29ce6d91f8d7fda259245acde2af25017d40b01e100e3066f94bf0e2b5acdb25",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "47a242531f1bff6275d44b8eb9a4cc12952ccb9ba77bbe572f971013d0849bad",
+  "sample_id": "build-pov-ray__deepseek-v4-pro__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/run_loop.py"
+  ]
+}

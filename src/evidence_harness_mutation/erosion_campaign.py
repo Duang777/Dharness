@@ -12,6 +12,7 @@ from typing import Literal, Self
 from pydantic import Field, model_validator
 
 from evidence_harness_mutation.candidate_gate import (
+    GUARD_COMPONENTS,
     GateDecision,
     GateRequest,
     GateVerdict,
@@ -264,8 +265,8 @@ def ablate_components(outcomes: tuple[SeedOutcome, ...]) -> tuple[ComponentAblat
     benign = tuple(item for item in outcomes if item.label == "benign")
     subsets = (
         subset
-        for size in range(1, len(GuardComponent) + 1)
-        for subset in combinations(tuple(GuardComponent), size)
+        for size in range(1, len(GUARD_COMPONENTS) + 1)
+        for subset in combinations(GUARD_COMPONENTS, size)
     )
     return tuple(
         ComponentAblation(

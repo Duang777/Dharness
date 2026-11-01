@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "input_tokens": 27780,
+  "model_reported": "deepseek-v4-pro",
+  "output_tokens": 29635,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..bbaaa38 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -109,12 +109,12 @@ def build_executor_prompt(\n         prompt = _render(_EXECUTOR_RULES, payload, schema)\n         if len(prompt) <= options.context_max_chars:\n             return prompt\n-        if recent_limit > 2:\n-            recent_limit -= 1\n-            continue\n         if detail_chars > 500:\n             detail_chars //= 2\n             continue\n+        if recent_limit > 2:\n+            recent_limit -= 1\n+            continue\n         payload[\"compacted_history\"] = payload[\"compacted_history\"][-12:]\n         payload[\"recent_observations\"] = payload[\"recent_observations\"][-1:]\n         # The task and response schema are invariants. Treat context_max_chars as a",
+  "patch_sha256": "dd1e210b3ed339f7ef5a8321b90b5bd7590e5d478548ae581ccd0de6233c7bcc",
+  "prompt_sha256": "29ce6d91f8d7fda259245acde2af25017d40b01e100e3066f94bf0e2b5acdb25",
+  "proposer": "deepseek-v4-pro",
+  "response_sha256": "e9982f95e43929d79ff173e2d8a2d2c32683403222116138245a1cca5c312916",
+  "sample_id": "build-pov-ray__deepseek-v4-pro__s1",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py"
+  ]
+}

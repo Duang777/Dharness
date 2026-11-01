@@ -1,0 +1,20 @@
+{
+  "index": 0,
+  "input_tokens": 43155,
+  "model_reported": "claude-sonnet-5-5",
+  "output_tokens": 1152,
+  "patch": "diff --git a/src/evidence_harness/prompting.py b/src/evidence_harness/prompting.py\nindex 1267cc2..bc5c8c9 100644\n--- a/src/evidence_harness/prompting.py\n+++ b/src/evidence_harness/prompting.py\n@@ -27,8 +27,9 @@ Rules:\n   files and services in that sandbox. Do not access or target external systems.\n - Each command runs in a fresh process. Set cwd explicitly when it matters. A previous cd, shell\n   variable, alias, or virtual-environment activation does not persist.\n-- Use execute for one coherent batch of at most four sequential commands. The harness stops a\n-  batch after the first failure.\n+- Use execute for one coherent batch of at most eight sequential commands. The harness stops a\n+  batch after the first failure. Turns are scarce: combine related steps (write, build, test) into\n+  one batch instead of spending a turn on each.\n - Use mode=observe for read-only inspection and mode=change for any possible state change.\n - Do not inspect benchmark verifier files, oracle solutions, hidden answers, /tests, /solution,\n   /verifier, or reward files. Project-owned tests below the task workspace are allowed.\ndiff --git a/src/evidence_harness/protocol.py b/src/evidence_harness/protocol.py\nindex 6562186..8a19c6a 100644\n--- a/src/evidence_harness/protocol.py\n+++ b/src/evidence_harness/protocol.py\n@@ -141,7 +141,7 @@ class AgentDecision(StrictModel):\n     action: ActionKind\n     rationale: str = Field(min_length=1, max_length=2_000)\n     plan: tuple[str, ...] = Field(default_factory=tuple, max_length=8)\n-    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=4)\n+    commands: tuple[ShellCommand, ...] = Field(default_factory=tuple, max_length=8)\n     checks: tuple[VerificationCheck, ...] = Field(default_factory=tuple, max_length=3)\n     coverage: tuple[RequirementCoverage, ...] = Field(default_factory=tuple, max_length=20)\n     summary: str | None = Field(default=None, max_length=2_000)",
+  "patch_sha256": "08be58ed11591389329a70e2eabdd4c30f5e788e0feed275827a7350f96f6586",
+  "prompt_sha256": "29ce6d91f8d7fda259245acde2af25017d40b01e100e3066f94bf0e2b5acdb25",
+  "proposer": "claude-sonnet-5-5",
+  "response_sha256": "5413a342a3e63e8e72cf3db76c481b67dfa7b38e6444c0e2d3b6206456cfb179",
+  "sample_id": "build-pov-ray__claude-sonnet-5-5__s0",
+  "schema_version": 1,
+  "status": "patch",
+  "task": "build-pov-ray",
+  "temperature": 1.0,
+  "touched_paths": [
+    "src/evidence_harness/prompting.py",
+    "src/evidence_harness/protocol.py"
+  ]
+}
