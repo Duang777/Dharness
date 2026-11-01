@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only adds executor-side solving-strategy guidance (early draft deliverable, time-efficient commands, batching) and leaves all completion-checking machinery — fresh isolated checks, nonzero-on-failure requirements, requirement-ID coverage mapping, and the independent review rules — completely untouched.

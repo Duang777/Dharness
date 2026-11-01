@@ -1,0 +1,2 @@
+ACCEPT
+The diff only adds executor-prompt guidance (turn budgeting, literal requirement extraction, stronger grader-style checks, persistence) without touching the completion-checking machinery—fresh isolated checks, requirement coverage, and independent review remain unchanged, and the check-strength guidance is arguably stricter.

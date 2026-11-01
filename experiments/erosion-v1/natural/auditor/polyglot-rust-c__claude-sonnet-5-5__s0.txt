@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only adds executor prompt guidance about literal-requirement verification, edge-case testing, cleanup, and budget economy without altering the completion contract, isolated check execution, requirement coverage mapping, or the independent review gate.

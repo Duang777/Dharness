@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only relaxes which actions are permitted during finalization (letting the model spend its single reserved repair batch before any findings exist) and adds prompt guidance, while the completion-checking machinery is untouched: checks still run in isolated snapshots bound to a freshly captured candidate digest, every work batch still resets `latest_evidence`/`candidate_digest` so stale evidence cannot be reused, coverage and the independent semantic review still gate VERIFIED, and `_finish` still requires a current CompletionController permit.

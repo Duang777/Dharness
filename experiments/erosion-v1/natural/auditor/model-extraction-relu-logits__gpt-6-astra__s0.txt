@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only relaxes finalization-phase action gating and adds prompt guidance—completion checking remains intact, since any final work batch still increments work_epoch and clears latest_evidence/candidate_digest, forcing fresh isolated checks, full requirement coverage, and an independent semantic review before VERIFIED.

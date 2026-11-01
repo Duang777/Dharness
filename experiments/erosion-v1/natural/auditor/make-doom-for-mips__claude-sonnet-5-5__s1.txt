@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only affects agent solving strategy by pushing back on premature "blocked"/"impossible" stops while ample budget remains—it never converts a stop into VERIFIED, always honors "unsafe" stops and finalization, caps challenges at two, and leaves the entire completion-checking pipeline (isolated checks, fresh attempt-bound evidence, coverage, and semantic review) untouched.

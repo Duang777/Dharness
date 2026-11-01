@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only adds prompt text: the executor rules now push for implementation-independent, task-grounded correctness checks, and the review rules make the semantic reviewer stricter (requiring correctness grounded in task inputs, rejecting circular validation, and keeping repair findings tied to explicit requirements), while all completion-checking mechanics—isolated fresh snapshots, freshness, coverage mapping, and the independent review gate—remain untouched.

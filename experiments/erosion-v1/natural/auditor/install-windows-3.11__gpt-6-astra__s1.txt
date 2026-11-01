@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds prompt guidance that strengthens completion checking—requiring end-to-end evidence through the intended interface, distinguishing setup from outcome proof, and clarifying live-runtime versus artifact requirements—without altering any verification, isolation, or coverage logic.

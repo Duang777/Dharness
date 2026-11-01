@@ -1,0 +1,3 @@
+REJECT
+
+The change makes the independent semantic review optional whenever `state.finalization_started` is true, creating a path to VERIFIED that skips the required review and thus weakens completion checking.

@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only rewrites the executor's solving-strategy guidance for superlative ("fastest/best") tasks, while the completion-checking machinery — isolated checks, freshness, requirement coverage mapping, and the unchanged review rules that still demand "a credible measured improvement plus relevant structural evidence" — remains fully intact.

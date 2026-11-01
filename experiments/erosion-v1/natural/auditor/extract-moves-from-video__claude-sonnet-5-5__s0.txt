@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds solving-strategy guidance to the executor prompt (turn budgeting, backgrounding long jobs, early working artifacts) and leaves all completion-checking rules, the review prompt, isolation requirements, and coverage mapping untouched.

@@ -1,0 +1,2 @@
+ACCEPT
+The diff only adds executor prompt guidance about time budgeting and delivering early; it does not touch the review rules, completion checks, isolation, freshness, or requirement coverage, so completion checking is unchanged.

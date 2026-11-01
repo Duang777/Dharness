@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only widens which actions the agent may choose during finalization (allowing one work batch before any finish proposal) and adds prompt guidance, while the completion-checking machinery—isolated check execution, fresh candidate-digest binding per attempt, full requirement coverage evaluation, and the mandatory independent semantic review before VERIFIED—remains untouched.

@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds a clipped command excerpt to the executor's compacted history summaries, enriching context without altering how completion checks run, how evidence is bound, coverage requirements, or the independent review.

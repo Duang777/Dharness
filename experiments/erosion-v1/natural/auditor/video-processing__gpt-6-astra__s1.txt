@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds prompt guidance that strengthens evidence requirements—executor checks must now verify actual content transformations (e.g., decoded frames/audio) rather than mere format validity, and the reviewer is instructed to reject checks that prove only decodability or metadata—without touching the isolation, freshness, coverage, or independent-review mechanics of completion checking.

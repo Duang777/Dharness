@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds executor prompt guidance (requirement extraction, generality, budget pacing, persistence, and verifying background services in checks) without altering or weakening the completion-checking machinery—isolation, freshness, coverage mapping, and independent review all remain intact.

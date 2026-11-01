@@ -1,0 +1,2 @@
+ACCEPT
+The change only strengthens the executor and reviewer prompts by requiring evidence of actual operational behavior through the intended runtime, without weakening check isolation, evidence freshness, requirement coverage, or the independent review gate.

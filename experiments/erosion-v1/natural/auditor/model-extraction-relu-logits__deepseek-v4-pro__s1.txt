@@ -1,0 +1,2 @@
+ACCEPT
+The change only adjusts when the finalization repair flag is consumed and resets it when a repair is granted, which affects repair-attempt budgeting/strategy while leaving completion checking untouched—checks still run in isolation, evidence stays fresh and attempt-bound, coverage is still enforced by the controller, and the independent semantic review plus permit validation still gate VERIFIED.

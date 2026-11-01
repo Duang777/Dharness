@@ -1,0 +1,2 @@
+ACCEPT
+The change only adjusts repair budgeting and finalization action gating (allowing additional bounded repair attempts and adding a repair-budget check), while every FINISH still must pass admission, isolated fresh evidence evaluation, full requirement coverage, independent semantic review, and the controller-permit guard before VERIFIED.

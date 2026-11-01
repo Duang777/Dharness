@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only alters the executor prompt—encouraging persistence before stopping, deliberate budget use, and stricter pre-finish requirement enumeration with fresh-process checks—without touching isolation, freshness, coverage mapping, or the independent review that gate VERIFIED.

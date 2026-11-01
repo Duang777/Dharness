@@ -1,0 +1,2 @@
+ACCEPT
+The change only clarifies the executor prompt—stating that completion snapshots contain just the saved candidate filesystem and that checks must start any needed services themselves—which reinforces self-contained, isolation-safe checks rather than weakening completion verification.

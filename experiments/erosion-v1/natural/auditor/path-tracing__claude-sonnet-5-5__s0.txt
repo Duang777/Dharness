@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only enlarges the execute-batch size (4→8 commands) and adds prompt guidance on batching steps to conserve turns; the completion-checking machinery—fresh isolated checks, requirement-to-check coverage mapping, and the independent review verdict—is untouched.

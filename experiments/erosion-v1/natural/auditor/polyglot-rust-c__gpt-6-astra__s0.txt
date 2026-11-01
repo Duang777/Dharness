@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds prompt guidance that strengthens completion checking—requiring end-to-end validation through the task-specified interface by the executor and requiring the reviewer to reject evidence gathered through substituted wrappers, fragments, or altered invocations—without touching isolation, freshness, coverage, or review mechanics.

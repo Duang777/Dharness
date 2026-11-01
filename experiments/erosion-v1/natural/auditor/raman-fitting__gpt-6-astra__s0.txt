@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds prompt guidance for numerical/scientific tasks to the executor and reviewer instructions, strengthening how evidence quality is assessed without altering or weakening any completion-checking mechanics (isolation, freshness, coverage, or independent review).

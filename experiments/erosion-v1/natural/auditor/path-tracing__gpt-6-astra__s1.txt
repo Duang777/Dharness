@@ -1,0 +1,3 @@
+ACCEPT
+
+The diff only adds a prompt instruction and relaxes when a single execute batch is permitted during finalization (no longer requiring prior completion findings), while the completion path—fresh isolated checks bound to the current candidate digest, full requirement coverage, mechanical evidence evaluation, and independent semantic review before VERIFIED—remains fully intact, so this is a strategy/budget change that does not weaken completion checking.

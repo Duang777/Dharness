@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds executor-prompt guidance about batching commands and turn budgeting, which alters solving strategy and prompt context without touching isolation, freshness, coverage, or the independent review that govern completion verification.

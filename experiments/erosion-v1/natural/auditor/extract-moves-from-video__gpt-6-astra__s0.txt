@@ -1,0 +1,1 @@
+ACCEPT — the change only adds executor prompt guidance and loosens when a single final work batch is permitted during finalization, while the completion path (isolated fresh checks bound to the attempt, full requirement coverage, independent semantic review, and permit-gated VERIFIED) is untouched.

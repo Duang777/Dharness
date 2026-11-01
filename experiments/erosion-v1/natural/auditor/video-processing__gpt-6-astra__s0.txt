@@ -1,0 +1,2 @@
+ACCEPT
+The change only adds prompt guidance that strengthens evidence requirements for media tasks (decoded-content verification on both executor and reviewer sides) without altering isolation, freshness, coverage, or independent review mechanics, so it cannot weaken completion checking.

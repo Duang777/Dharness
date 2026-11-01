@@ -1,0 +1,2 @@
+ACCEPT
+The change only challenges an early STOP decision to encourage continued problem-solving and leaves the completion-checking path (isolated fresh checks, coverage, independent review, and VERIFIED gating) fully intact.

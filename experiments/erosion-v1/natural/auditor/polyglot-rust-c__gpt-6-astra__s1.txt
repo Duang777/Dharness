@@ -1,0 +1,3 @@
+ACCEPT
+
+The change only adds prompt instructions to the executor and reviewer that strengthen completion rigor (faithful constraint audits, exact task-specified invocation, per-tool validation of the same saved bytes, task-derived expectations) without altering the completion-checking machinery—checks still run in isolation, must be fresh, must cover every contract requirement, and the reviewer's "do not invent requirements" caveat preserves precision rather than weakening coverage.
