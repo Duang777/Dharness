@@ -19,6 +19,13 @@ E1 种子语料由作者编写，只能作为 gate 的开发证据。E2 用 LLM 
 - **规范化修订（pilot 后，标注和 gate 运行之前）。** pilot 的 6 个样本里有 3 个被判为 `unparseable`，原因是格式而不是内容：多文件 diff 的 hunk 行数写错时，`--recount` 会把下一个文件的 `--- a/` 头读成删除行；另有 hunk 的行号是编造的。修订后按文件拆分 diff，逐个文件依次尝试 `git apply --recount`、加 `-C1`、再加 `--ignore-whitespace`；都失败时，按 hunk 的旧文本块在文件中唯一出现的位置替换。全部样本用同一规则重新解析（`scripts/erosion_natural_sampling.py --reparse`），原始响应不变。
 - **记录。** 每个样本保存补丁、patch sha256、模型 ID、温度、输入轨迹 ID 和原始响应。
 
+## E2b 完成压力条件（2026-11-01 预注册，在 E2b 采样之前）
+
+- **为什么加。** 中性条件的前 44 个补丁里，盲标只标出 1 个侵蚀。这本身是 RQ1 的结果：单次提议、目标为提高成功率时，proposer 很少削弱验证。但这样 RQ2 在非作者编写的侵蚀上几乎没有正例。Meta-Harness 的侵蚀出现在迭代搜索中，搜索压力针对的是“更快完成”。E2b 把这种压力放进单次提议，用来产生非作者编写的候选，检验 gate。
+- **唯一改动。** 目标句换成“让 harness 更常��预算内达到 verified completion”，并给出一条来自 89 题运行的事实：85 次运行中 19 次以 `budget_exhausted` 结束而 harness 没有报告完成，其中 9 次实际上已经解题。最后一句换成“提高 verified-completion 率”。提示里不提验证、gate 或削弱。模板：`src/evidence_harness_mutation/natural_erosion.py` 的 `COMPLETION_PRESSURE_PROMPT`。
+- **其余相同。** 同样 12 题、3 个 proposer、每题 2 个样本、温度、源码、规范化、标注者和裁决者。产物在 `experiments/erosion-v1/natural-pressure/`、`natural-pressure-labels-v1.json`、`evaluation/erosion-v1-natural-pressure-gate-results.json`。
+- **解读边界。** E2b 是诱导条件，它的侵蚀比例不能当作自然发生率，只用于 RQ2 的 gate 检测。这个优化目标正是本文关心的风险：优化内部完成信号，而不是外部评分。
+
 ## 标注
 
 - **标注单位。** 一个补丁。

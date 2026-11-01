@@ -8,6 +8,8 @@ from pathlib import Path
 
 from evidence_harness_mutation.erosion_llm import LLMEndpoint, LLMEndpointError
 from evidence_harness_mutation.natural_erosion import (
+    Condition,
+    condition_paths,
     NaturalSample,
     NaturalSamplingError,
     SampleSlot,
@@ -20,7 +22,6 @@ from evidence_harness_mutation.natural_erosion import (
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-NATURAL_DIR = PROJECT_ROOT / "experiments/erosion-v1/natural"
 TRIALS_DIR = PROJECT_ROOT / "evaluation/trials-89"
 BASE_COMMIT = "c2f95328b284b9a9addbff8cc6af7e12cbb1c34f"
 PROPOSERS = ("claude-sonnet-5-5", "gpt-6-astra", "deepseek-v4-pro")
@@ -34,6 +35,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--limit", type=int, default=None, help="Run at most this many new slots.")
     parser.add_argument("--jobs", type=int, default=6)
+    parser.add_argument("--condition", type=Condition, default=Condition.NEUTRAL)
     parser.add_argument(
         "--reparse",
         action="store_true",
@@ -42,8 +44,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_or_create_manifest() -> SamplingManifest:
-    path = NATURAL_DIR / "manifest.json"
+def load_or_create_manifest(condition: Condition) -> SamplingManifest:
+    path = condition_paths(PROJECT_ROOT, condition).samples_dir / "manifest.json"
     if path.exists():
         return SamplingManifest.model_validate_json(path.read_bytes())
     trials = load_trials(TRIALS_DIR)
@@ -57,10 +59,15 @@ def load_or_create_manifest() -> SamplingManifest:
         proposers=PROPOSERS,
         samples_per_trial=2,
         temperature=1.0,
+        condition=condition,
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(manifest_bytes(manifest))
     return manifest
+
+
+def samples_dir(manifest: SamplingManifest) -> Path:
+    return condition_paths(PROJECT_ROOT, manifest.condition).samples_dir
 
 
 def base_sources(manifest: SamplingManifest) -> dict[str, str]:
@@ -100,7 +107,7 @@ def run_slot(
         max_output_tokens=MAX_OUTPUT_TOKENS,
         temperature=manifest.temperature,
     )
-    raw_path = NATURAL_DIR / "raw" / f"{slot.sample_id}.txt"
+    raw_path = samples_dir(manifest) / "raw" / f"{slot.sample_id}.txt"
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     raw_path.write_text(reply.text)
     sample = sample_from_response(
@@ -114,13 +121,13 @@ def run_slot(
         repo_root=PROJECT_ROOT,
         base_commit=manifest.base_commit,
     )
-    write_sample(sample)
+    write_sample(manifest, sample)
     return sample
 
 
 def reparse(manifest: SamplingManifest, sources: dict[str, str]) -> None:
     for slot in manifest.slots:
-        record = NATURAL_DIR / "samples" / f"{slot.sample_id}.json"
+        record = samples_dir(manifest) / "samples" / f"{slot.sample_id}.json"
         if not record.exists():
             continue
         old = NaturalSample.model_validate_json(record.read_bytes())
@@ -128,7 +135,7 @@ def reparse(manifest: SamplingManifest, sources: dict[str, str]) -> None:
         sample = sample_from_response(
             slot,
             prompt=render_prompt(manifest, trial, sources),
-            response_text=(NATURAL_DIR / "raw" / f"{slot.sample_id}.txt").read_text(),
+            response_text=(samples_dir(manifest) / "raw" / f"{slot.sample_id}.txt").read_text(),
             model_reported=old.model_reported,
             temperature=old.temperature,
             input_tokens=old.input_tokens,
@@ -136,12 +143,12 @@ def reparse(manifest: SamplingManifest, sources: dict[str, str]) -> None:
             repo_root=PROJECT_ROOT,
             base_commit=manifest.base_commit,
         )
-        write_sample(sample)
+        write_sample(manifest, sample)
         print(f"{sample.sample_id}: {old.status} -> {sample.status}")
 
 
-def write_sample(sample: NaturalSample) -> None:
-    record = NATURAL_DIR / "samples" / f"{sample.sample_id}.json"
+def write_sample(manifest: SamplingManifest, sample: NaturalSample) -> None:
+    record = samples_dir(manifest) / "samples" / f"{sample.sample_id}.json"
     record.parent.mkdir(parents=True, exist_ok=True)
     record.write_text(json.dumps(sample.model_dump(mode="json"), indent=2, sort_keys=True) + "\n")
 
@@ -149,7 +156,7 @@ def write_sample(sample: NaturalSample) -> None:
 def main() -> int:
     args = parse_args()
     try:
-        manifest = load_or_create_manifest()
+        manifest = load_or_create_manifest(args.condition)
         endpoint = LLMEndpoint.from_environment()
     except (OSError, NaturalSamplingError, LLMEndpointError) as exc:
         print(f"sampling setup failed: {exc}", file=sys.stderr)
@@ -161,7 +168,7 @@ def main() -> int:
     pending = [
         slot
         for slot in manifest.slots
-        if not (NATURAL_DIR / "samples" / f"{slot.sample_id}.json").exists()
+        if not (samples_dir(manifest) / "samples" / f"{slot.sample_id}.json").exists()
     ][: args.limit]
     print(f"{len(pending)} pending of {len(manifest.slots)} slots")
     failures = 0

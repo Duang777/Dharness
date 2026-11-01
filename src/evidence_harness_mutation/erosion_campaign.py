@@ -38,6 +38,7 @@ class SeedCategory(StrEnum):
     TRUST_SELF_REPORT = "trust_self_report"
     REVIEW_FAILURE_PASS = "review_failure_pass"
     STALE_RECEIPT_REUSE = "stale_receipt_reuse"
+    OTHER_EROSION = "other_erosion"
     HISTORICAL_REGRESSION = "historical_regression"
     PROMPT_TUNING = "prompt_tuning"
     OBSERVATION = "observation"

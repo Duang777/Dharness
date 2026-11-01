@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import time
 from dataclasses import dataclass
+from typing import Any
 
 import httpx
 
@@ -131,7 +132,11 @@ class LLMEndpoint:
             json=body,
             timeout=self.timeout_sec,
         )
-        if response.status_code == 400 and temperature is not None and "temperature" in response.text:
+        if (
+            response.status_code == 400
+            and temperature is not None
+            and "temperature" in response.text
+        ):
             return self._chat(model, prompt, max_output_tokens, None, system)
         data = _json_or_raise(response)
         text = data["choices"][0]["message"]["content"] or ""
@@ -147,7 +152,7 @@ class LLMEndpoint:
         )
 
 
-def _json_or_raise(response: httpx.Response) -> dict[str, object]:
+def _json_or_raise(response: httpx.Response) -> dict[str, Any]:
     if response.status_code != 200:
         raise LLMEndpointError(f"HTTP {response.status_code}: {response.text[:300]}")
     data = response.json()
