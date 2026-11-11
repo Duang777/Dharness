@@ -4,7 +4,7 @@
 
 ## 题目与主张
 
-拟定题目：**终端智能体 Harness 的可信自改进：基于验证单调性的反例引导方法**
+拟定题目：**面向终端智能体自改进的完成验证守护与反例引导方法研究**
 
 英文题目：Trustworthy Harness Self-Improvement for Terminal Agents: Counterexample-Guided Evolution under Verification Monotonicity
 
