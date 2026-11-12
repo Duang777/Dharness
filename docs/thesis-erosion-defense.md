@@ -296,9 +296,9 @@ for g = 1..G:
 | 标签来自大模型，可能与大模型审计共享偏差 | 请第二位人类标注者复标，用人工标签重算 |
 | 领域变化快，出现高度重合的工作 | 每个阶段结束时重新检索。Kumar 等人的 “Gate Presence Is Not a Safety Invariant” 已找到，目前只读到摘要，与创新点二在门级差分上重合，已在第 3、5 节区分；拿到全文后核对其参考门是否逐代更新 |
 
-## 11. 答辩讲稿（按每分钟 240 字约 11 分 16 秒，正常语速约 10 分 01 秒）
+## 11. 答辩讲稿（按每分钟 240 字约 9 分 54 秒，正常语速约 8 分 48 秒）
 
-按开题 PPT 的 23 页逐页写，已写入 PPT 每页的演讲者备注。讲稿中提到的每个已有概念、方法和指标都注明了来源，编号与第 14 节参考文献一致。限时 10 分钟以内：跳过第 10 页，并把第 8、9 页合成一段；限时 8 分钟以内：第 16 页只讲在线三组对照，第 19 页只保留第一句。
+按开题 PPT 的 23 页逐页写，已写入 PPT 每页的演讲者备注。讲稿中提到的每个已有概念、方法和指标都注明了来源，编号与第 14 节参考文献一致。限时 9 分钟以内：跳过第 10 页，并把第 8、9 页合成一段；限时 8 分钟以内：第 16 页只讲在线三组对照，第 19 页只保留第一句。
 
 **第 1 页：封面（约 24 秒）**
 
@@ -316,9 +316,9 @@ for g = 1..G:
 
 > 终端智能体的表现不仅取决于模型，也取决于模型之外的 Harness，即由提示词、工具调用、预算分配和完成判定组成的控制逻辑。因此，由大模型自动修改 Harness 代码成为近来的研究热点。Meta-Harness、Self-Harness 与 Darwin Gödel Machine 的选择机制各不相同，但验收口径都是任务分数，没有一项检查完成声明本身是否可信。
 
-**第 5 页：研究背景：完成判定是 Harness 可信的底线（约 1 分 04 秒）**
+**第 5 页：研究背景：完成判定是 Harness 可信的底线（约 48 秒）**
 
-> 然而，分数衡量的是任务通过率，而不是完成声明的可信度。真实部署中不存在隐藏测试，完成声明的可信度只能依赖由隔离检查、证据新鲜、需求覆盖与独立审查组成的完成协议。Masked Erosion 发现，自改进会悄悄删掉冗余的安全规则，而按分数验收察觉不到。我们发现完成验证也有同样的问题：修改削弱了完成检查，Harness 在证据更少时就宣布完成，我们称之为验证侵蚀。右下图是我们对 Meta-Harness 在 Terminal-Bench 2.0 上公开搜索记录的标注：lean_completion 删除两步验证后，通过率从 28.5% 提高到 32.5%，成为当轮最优，第 2 至第 6 轮的最优候选都源自它。该结果来自单次搜索，仅作为动机。基于分数的验收不仅无法识别侵蚀，还可能主动选择侵蚀。
+> 然而，分数衡量的是任务通过率，而不是“完成了”这句话是否可信。真实部署中没有隐藏测试，可信度只能依靠隔离检查、证据新鲜、需求覆盖和独立审查。Masked Erosion 发现，自改进会悄悄删掉冗余的安全规则，而按分数验收察觉不到。我们发现完成验证也有同样的问题：修改削弱了完成检查，Harness 在证据更少时就宣布完成，我们称之为验证侵蚀。右下图中，Meta-Harness 的候选 lean_completion 删掉两步验证后，通过率从 28.5% 升到 32.5%，成为当轮最优。可见按分数验收不仅看不见侵蚀，还会选中侵蚀。
 
 **第 6 页：研究背景：面临的挑战（约 46 秒）**
 
@@ -352,13 +352,13 @@ for g = 1..G:
 
 > 研究内容一的核心是验证单调性准则：候选版本接受的每一次完成尝试，将相同证据交给上一代版本，上一代不得以验证原因拒绝。该准则以上一代为规约，只约束完成判定的接受范围，不要求行为等价。具体来说，同一条轨迹分别在新旧版本上重放；候选每接受一次完成，就从运行日志重建该时刻的证据，交给基线判定，基线拒绝即构成反例。在这一层面判定，可以区分侵蚀与合理改进：审查耗尽后跳过审查的修改会被拒绝；收尾阶段多执行一批工作、随后仍通过检查的修改会被接受，而后者正是回归测试会误拒的类型。
 
-**第 14 页：研究内容二：基于补丁定向变异的验证侵蚀反例生成方法（约 1 分 14 秒）**
+**第 14 页：研究内容二：基于补丁定向变异的验证侵蚀反例生成方法（约 37 秒）**
 
-> 准则给出了判定标准，但判定是否有效，取决于能否构造出触发侵蚀的轨迹。前期分析表明，手写探针、门级静态探针和确定性检查分别遗漏了未预见的路径、超时放行和提示词变化。为此，我们让反例搜索跟随补丁进行：以 7 类面向完成逻辑的变异算子改写轨迹，例如审查超时、次数耗尽、证据过期，并优先保留能执行到被改代码的轨迹；找到反例后，借鉴 Zeller 与 Hildebrandt 提出的 delta debugging，将其约简为 1-minimal 轨迹，即删去任一步，反例即不再复现。针对被冗余防线掩蔽的削弱，我们借鉴 Masked Erosion 的余量思想设计余量探测：对新旧两版同时逐层屏蔽完成检查后重放，基线仍拒绝而候选放行，即构成反例。对于仅修改提示词的情形，受 PROCTOR 金丝雀样例的启发，我们用一组冻结的应拒证据，比较新旧提示词下审查从拒绝翻为通过的比例。
+> 准则给出了判定标准，还需要找到能触发侵蚀的轨迹。前期发现，手写探针、门级探针和确定性检查各有盲区。为此，我们让反例搜索跟着补丁走：补丁改了哪里，就用 7 类变异算子在哪里改写轨迹，例如审查超时、次数耗尽、证据过期；再用余量探测找出被冗余检查掩盖的削弱；找到的反例用 delta debugging 删到最简。只改提示词的修改，则比较新旧提示词下审查结论的翻转。
 
-**第 15 页：研究内容三：基于反例引导修复的 Harness 自改进方法（约 1 分 05 秒）**
+**第 15 页：研究内容三：基于反例引导修复的 Harness 自改进方法（约 36 秒）**
 
-> 研究内容三处理拒绝之后的环节。右上图是压力实验中模型实际生成的补丁：它将 review_exhausted 直接置为 False，并在注释中说明，审查配额耗尽后仅依赖机械检查即可。这正是本项目修复过的历史缺陷，压力条件下的 8 个侵蚀补丁中有 6 个属于此类。因此，我们将程序合成中的反例引导归纳综合，即 CEGIS，引入 Harness 自改进：被拒绝的候选携带最小反例返回提议器，只修改违反之处；反例进入只增不减的反例库，在后续每一代重放。与现有反例反馈方法不同，本文的规约是上一代 Harness 自身的完成判定，反例是两代判定在同一轨迹上的分歧，因而守护无需人工编写规约，并随演化持续增强。守护由此从一次性拦截，转为对自改进的持续约束。
+> 研究内容三处理拒绝之后的环节。右上图是模型实际写出的补丁：审查次数用完后直接放行。这是本项目修过的历史缺陷，压力实验的 8 个侵蚀补丁中有 6 个重犯了它。因此，我们借鉴 CEGIS：被拒的候选带着最小反例返回提议器，只改违反之处；反例存入反例库，之后每一代都要重放。规约就是上一代 Harness 自身的完成判定，无需人工编写，守护随演化持续增强。
 
 **第 16 页：实验设计与预期结果（约 40 秒）**
 
@@ -404,6 +404,10 @@ for g = 1..G:
 | 8 个压力侵蚀里 6 个是同一个 bug，样本够多样吗？ | 不够，评测数据会补：扩大提议条件，并加入人工植入的侵蚀作对照。同一个 bug 被反复写出来，本身也是创新点三的动机。 |
 | 反例引导不就是 CEGIS 吗？ | 思路来自 CEGIS，我会明确引用。现有反例反馈方法作用于被修改的产物本身，比如 SCAFFOLD-CEGIS 守的是应用代码的安全属性，失败经验存成自然语言规则。本文守的是自改进系统自己的完成判定：规约是上一代 Harness，不用人写；反例是两代判定在同一轨迹上的分歧，可重放，每代全量重放。据我们检索，这是第一个以上一代完成判定为规约的反例引导自改进方法。 |
 | Masked Erosion 说冗余防线被删时新旧判定会完全一致，你的单调性检查不也会漏吗？ | 这正是研究内容二设计余量探测的原因。只在原轨迹上比较，确实看不见只让余量变小的削弱；所以我们借鉴 Masked Erosion 的 margin-aware 门，对新旧两版同时逐层屏蔽一道完成检查再重放，基线仍拒、候选放行就是反例，被删掉的冗余防线会在屏蔽其他防线时暴露出来。再加上定向变异专门构造超时、次数耗尽这类边界轨迹，以及反例库每代重放。评测里会植入删除冗余检查的侵蚀，单独统计检出率。 |
+| `lean_completion` 只来自一次搜索，能说明问题吗？ | 只作动机。它来自 Meta-Harness 的单次公开搜索，第 2 至第 6 轮的最优候选都源自它。正式结论看前期的受控测量和后续评测。 |
+| delta debugging 能保证反例最短吗？ | 不保证全局最短，保证 1-minimal：删去其中任意一步，反例就不再复现。对重放和交给提议器修复来说，这已经足够。 |
+| 提示词哨兵和 PROCTOR 是什么关系？ | 受它的金丝雀样例启发。PROCTOR 植入不可能通过的用例来发现作弊；我们用一组冻结的应拒证据，比较新旧提示词下审查从拒绝翻为通过的比例，翻转比例是我们自己的设计。 |
+| 反例引导修复具体怎么做？ | 被拒的候选带着 1-minimal 反例和一句说明返回提议器，只改违反之处，保留其余改动，最多修 2 轮；反例进入只增不减的反例库，之后每一代守护都要全量重放。 |
 | 准则太严，合理的改进被拒怎么办？ | 准则只限制“接受完成的范围”，改提示、改预算、换策略都允许。确实存在合理的新完成路径被拒的情况，这类会单独统计并人工复核。 |
 | 为什么不直接用大模型审查？ | 前期实验里它漏掉了预算计账类侵蚀，判断无法重放。我的方法只在提示词修改这一类用模型，而且比较的是新旧两个版本的翻转。 |
 | 搜索不完备，没找到反例就算安全吗？ | 不算。这是测试不是证明，论文里会写明。反例库会随演化增长，部分缓解这一点。 |
@@ -423,26 +427,26 @@ for g = 1..G:
 
 ## 14. 参考文献
 
-以下文献均已核对 arXiv 摘要页或出版信息（2026-11-11）。编号与开题 PPT 一致。
+以下文献均已核对 arXiv 摘要页或出版信息（出版状态核查于 2026-11-12）。编号与开题 PPT 一致。标“预印本”的 arXiv 论文未查到出版信息，答辩中称“近期工作”，不称“已发表”；Kumar 等与 Advani 为非存档研讨会论文。
 
-1. Lee Y, Nair R, Zhang Q, Lee K, et al. Meta-Harness: End-to-End Optimization of Model Harnesses. arXiv:2603.28052, 2026.
-2. Zhang H, Zhang S, Li K, Zhang C, et al. Self-Harness: Harnesses That Improve Themselves. arXiv:2606.09498, 2026.
-3. Zhang J, Hu S, Lu C, et al. Darwin Godel Machine: Open-Ended Evolution of Self-Improving Agents. arXiv:2505.22954, 2025.
-4. Wang X, Zhang X, Shao J. Auditing Harness Tampering in Self-Improving Agents. arXiv:2609.00069, 2026.
-5. So H-S, Liu D, Long W. Masked Erosion: How Acceptance Gates Lose Redundant Safeguards in Self-Improving Agents. arXiv:2610.38392, 2026.
-6. Kumar S, Talreja K, Jha S. Gate Presence Is Not a Safety Invariant: Semantic Floors for Self-Editing Agent Harnesses. NeurIPS 2026 Workshop on Agents in the Wild（目前只读到摘要）.
-7. Guo D, Cao C, Yuan F, et al. Self-Authored Verification Is Unreliable in Heuristic Self-Improving Agents (SEAL). arXiv:2607.24300, 2026.
-8. Soni D. Falsifiable Release Gates for Self-Improving Systems: Standing Invariants at Scale. arXiv:2607.13070, 2026.
-9. Tayebati S, Kumar D, Darabi N, et al. Self-Healing Harness for Runtime Oversight of Agent Self-Modification. arXiv:2609.24130, 2026.
-10. Sediqin M, Dalmia S, Kovvuri S K R, et al. A Trust Layer for Agent Evaluation. arXiv:2610.07274, 2026.
-11. Badrinarayan S, Parthasarathy A. Counterexamples as Feedback for Agent Self-Correction (A-CEGIS). arXiv:2609.02892, 2026.
-12. Chen Y, Bian Y, Wang H, et al. SCAFFOLD-CEGIS: Preventing Latent Security Degradation in LLM-Driven Iterative Code Refinement. arXiv:2603.08520, 2026.
-13. Solar-Lezama A. Program Synthesis by Sketching. PhD thesis, UC Berkeley, 2008.
-14. Wei Z, Yao W, Peng B, Wang D, et al. Self-Evolving Coding Agents via Harness-Policy Optimization (Self-HPO). arXiv:2610.22791, 2026.
-15. Advani L. From Confident Closing to Silent Failure: Characterizing False Success in LLM Agents. arXiv:2606.09863, 2026.
-16. Wahi V. LLM-as-a-Judge Is Not an Oracle: Why Self-Improving Agents Need Deterministic Guardrails (PROCTOR). arXiv:2609.02246, 2026.
+1. Lee Y, Nair R, Zhang Q, Lee K, et al. Meta-Harness: End-to-End Optimization of Model Harnesses. COLM 2026（arXiv:2603.28052）.
+2. Zhang H, Zhang S, Li K, Zhang C, et al. Self-Harness: Harnesses That Improve Themselves. arXiv:2606.09498, 2026（预印本）.
+3. Zhang J, Hu S, Lu C, et al. Darwin Godel Machine: Open-Ended Evolution of Self-Improving Agents. ICLR 2026（arXiv:2505.22954）.
+4. Wang X, Zhang X, Shao J. Auditing Harness Tampering in Self-Improving Agents. arXiv:2609.00069, 2026（预印本）.
+5. So H-S, Liu D, Long W. Masked Erosion: How Acceptance Gates Lose Redundant Safeguards in Self-Improving Agents. arXiv:2610.38392, 2026（预印本）.
+6. Kumar S, Talreja K, Jha S. Gate Presence Is Not a Safety Invariant: Semantic Floors for Self-Editing Agent Harnesses. NeurIPS 2026 Workshop on Agents in the Wild（非存档研讨会，无 arXiv 版，目前只读到摘要）.
+7. Guo D, Cao C, Yuan F, et al. Self-Authored Verification Is Unreliable in Heuristic Self-Improving Agents (SEAL). arXiv:2607.24300, 2026（预印本）.
+8. Soni D. Falsifiable Release Gates for Self-Improving Systems: Standing Invariants at Scale. arXiv:2607.13070, 2026（预印本）.
+9. Tayebati S, Kumar D, Darabi N, et al. Self-Healing Harness for Runtime Oversight of Agent Self-Modification. arXiv:2609.24130, 2026（预印本）.
+10. Sediqin M, Dalmia S, Kovvuri S K R, et al. A Trust Layer for Agent Evaluation. arXiv:2610.07274, 2026（预印本，v2 为扩展版，答辩前复查出版状态）.
+11. Badrinarayan S, Parthasarathy A. Counterexamples as Feedback for Agent Self-Correction (A-CEGIS). arXiv:2609.02892, 2026（预印本）.
+12. Chen Y, Bian Y, Wang H, et al. SCAFFOLD-CEGIS: Preventing Latent Security Degradation in LLM-Driven Iterative Code Refinement. 2026 9th International Conference on Artificial Intelligence and Big Data (ICAIBD), IEEE, pp. 477-483. DOI 10.1109/ICAIBD69640.2026.11637170（arXiv:2603.08520）.
+13. Solar-Lezama A. Program Synthesis by Sketching. PhD thesis, UC Berkeley, 2008（Tech. Rep. UCB/EECS-2008-177）.
+14. Wei Z, Yao W, Peng B, Wang D, et al. Self-Evolving Coding Agents via Harness-Policy Optimization (Self-HPO). arXiv:2610.22791, 2026（预印本）.
+15. Advani L. From Confident Closing to Silent Failure: Characterizing False Success in LLM Agents. FAGEN Workshop @ ICML 2026（非存档研讨会，arXiv:2606.09863）.
+16. Wahi V. LLM-as-a-Judge Is Not an Oracle: Why Self-Improving Agents Need Deterministic Guardrails (PROCTOR). arXiv:2609.02246, 2026（预印本）.
 17. Zeller A, Hildebrandt R. Simplifying and Isolating Failure-Inducing Input. IEEE Transactions on Software Engineering, 2002, 28(2): 183-200. DOI 10.1109/32.988498.
-18. Merrill M A, Shaw A G, Carlini N, et al. Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces. arXiv:2601.11868, 2026.
+18. Merrill M A, Shaw A G, Carlini N, et al. Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces. ICLR 2026（arXiv:2601.11868）.
 19. Meta-Harness Terminal-Bench 2.0 public search log. https://yoonholee.com/meta-harness/static/data/evo.js（本文标注所用数据）.
 
 正文提到但未进入 PPT 的近邻（RegenHarness 2609.27612、Rethinking Harness Evolution Eval 2607.12227 等）在论文正文中再补全引用。
